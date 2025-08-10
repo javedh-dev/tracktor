@@ -1,3 +1,4 @@
+import { currencyOptions } from '$lib/models/config';
 import { config } from '$lib/stores/config';
 import { format } from 'date-fns';
 
@@ -32,21 +33,12 @@ const formatDate = (date: Date | string): string => {
 };
 
 const getCurrencySymbol = (): string => {
-	return (
-		new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: configs.currency
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'currency')?.value || ''
-	);
+	return currencyOptions.find((currency) => configs.currency == currency.value)?.symbol || ''
 };
 
 const formatCurrency = (amount: number): string => {
-	return new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: configs.currency
-	}).format(amount);
+	const formattedAmount = new Intl.NumberFormat('en-US').format(amount);
+	return `${getCurrencySymbol()} ${formattedAmount}`;
 };
 
 const getDistanceUnit = (): string => {
