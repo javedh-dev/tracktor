@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$components/common/Button.svelte';
+	import { currencyOptions, dateFormatOptions, uomOptions } from '$lib/models/config';
 
 	let { modalVisibility = $bindable(), loading = false, callback } = $props();
 
@@ -14,25 +15,6 @@
 	import { config, type Config } from '$lib/stores/config';
 
 	let localConfig: Config[] = $state([]);
-
-	const dateFormatOptions = [
-		{ value: 'dd/MM/yyyy', label: 'dd/MM/yyyy (e.g., 31/12/2000)' },
-		{ value: 'MM/dd/yyyy', label: 'MM/dd/yyyy (e.g., 12/25/2000)' },
-		{ value: 'yyyy-MM-dd', label: 'yyyy-MM-dd (e.g., 2000-12-31)' },
-		{ value: 'dd MMM, yyyy', label: 'dd MMM, yyyy (e.g., 31 Dec, 2000)' }
-	];
-
-	const currencyOptions = [
-		{ value: 'INR', label: 'INR (₹)' },
-		{ value: 'USD', label: 'USD ($)' },
-		{ value: 'EUR', label: 'EUR (€)' },
-		{ value: 'GBP', label: 'GBP (£)' }
-	];
-
-	const uomOptions = [
-		{ value: 'metric', label: 'Metric' },
-		{ value: 'imperial', label: 'Imperial' }
-	];
 
 	config.subscribe((value) => {
 		localConfig = JSON.parse(JSON.stringify(value));
