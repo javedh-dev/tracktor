@@ -12,7 +12,7 @@ import {
 import { db } from "./db.js";
 
 const umzug = new Umzug({
-  migrations: { glob: "migrations/*.ts" },
+  migrations: { glob: "src/db/migrations/*.ts" },
   context: db.getQueryInterface(),
   storage: new SequelizeStorage({
     tableName: "migrations",
@@ -25,7 +25,6 @@ const umzug = new Umzug({
 type Migration = typeof umzug._types.migration;
 
 const performDbMigrations = async () => {
-  await db.sync({ alter: false });
   return umzug.up({});
 };
 
