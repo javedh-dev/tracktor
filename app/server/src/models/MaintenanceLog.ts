@@ -36,7 +36,7 @@ MaintenanceLog.init(
       allowNull: false,
     },
     vehicleId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUIDV4,
       references: {
         model: "vehicles",
         key: "id",

@@ -13,6 +13,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
     defaultValue: false,
   });
 }
-export const down: Migration = ({ context: queryInterface }) => {
-  return queryInterface.dropAllSchemas();
+export const down: Migration = async ({ context: queryInterface }) => {
+  await queryInterface.removeColumn("fuel_logs", "filled");
+  await queryInterface.removeColumn("fuel_logs", "missed_last");
 }
