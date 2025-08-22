@@ -2,6 +2,7 @@
 	import ConfigForm from '$components/forms/ConfigForm.svelte';
 	import ModalContainer from '$components/common/ModalContainer.svelte';
 	import { configModelStore } from '$lib/stores/config';
+	import { t } from '$lib/stores/i18n';
 
 	let logToEdit = $state<any>(null);
 	let showModal = $state(false);
@@ -24,7 +25,7 @@
 {#if showModal}
 	<ModalContainer
 		onclose={() => closeModal()}
-		title='Configurations'
+		title={$t('modals.configurations')}
 		{loading}
 	>
 		<ConfigForm

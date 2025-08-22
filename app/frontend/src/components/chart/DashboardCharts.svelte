@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '$lib/stores/i18n';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import { Pencil, Trash2 } from '@lucide/svelte';
@@ -135,18 +136,18 @@
 {:else if error}
 	<p class="text-red-500">Error: {error}</p>
 {:else if fuelCostData?.datasets?.length === 0 && mileageData?.datasets?.length === 0}
-	<p>No fuel or mileage data available for this vehicle.</p>
+	<p>{$t('dashboard.noDataAvailable')}</p>
 {:else}
 	<div class="overflow-x-auto">
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
 			<ChartCard
-				title="Fuel Cost Over Time"
+				title={$t('dashboard.fuelCostOverTime')}
 				chartData={fuelCostData}
 				ChartComponent={Line}
 				options={chartOptions}
 			/>
 			<ChartCard
-				title="Mileage Over Time"
+				title={$t('dashboard.mileageOverTime')}
 				chartData={mileageData}
 				ChartComponent={Line}
 				options={chartOptions}

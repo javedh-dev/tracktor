@@ -20,6 +20,7 @@
 	import { puccModelStore } from '$lib/stores/pucc';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
+	import { t } from '$lib/stores/i18n';
 	import IconButton from './IconButton.svelte';
 	import DeleteConfirmation from './DeleteConfirmation.svelte';
 
@@ -35,16 +36,16 @@
 				}
 			});
 			if (response.ok) {
-				alert('Vehicle deleted successfully.');
+				alert($t('vehicle.deleteSuccess'));
 				vehicleModelStore.hide();
 				fetchVehicles();
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to delete vehicle.');
+				alert(data.message || $t('vehicle.deleteError'));
 			}
 		} catch (e) {
 			console.log(e);
-			alert('Failed to connect to the server.');
+			alert($t('vehicle.connectionError'));
 		}
 	}
 
@@ -74,20 +75,20 @@
 	<div class="flex-1 text-gray-600 dark:text-gray-300">
 		<p class="flex items-center gap-2">
 			<IdCard class="h-5 w-5 text-gray-400 dark:text-gray-500" /><span class="font-semibold"
-				>License Plate:</span
+				>{$t('vehicle.licensePlate')}:</span
 			>
 			{vehicle.licensePlate}
 		</p>
 		<p class="flex items-center gap-2">
 			<Fingerprint class="h-5 w-5 text-gray-400 dark:text-gray-500" /><span class="font-semibold"
-				>VIN:</span
+				>{$t('vehicle.vin')}:</span
 			>
 			{vehicle.vin ? vehicle.vin : '-'}
 		</p>
 
 		<p class="flex items-center gap-2">
 			<Paintbrush class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-			<span class="font-semibold">Color:</span>
+			<span class="font-semibold">{$t('vehicle.color')}:</span>
 			{#if vehicle.color}
 				<span
 					class="m-1 h-4 w-8 rounded border-2 border-sky-500 p-2 dark:border-sky-800"
@@ -99,24 +100,26 @@
 		</p>
 		<p class="flex items-center gap-2">
 			<Gauge class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-			<span class="font-semibold">Odometer:</span>
+			<span class="font-semibold">{$t('vehicle.odometer')}:</span>
 			{vehicle.odometer ? formatDistance(vehicle.odometer) : '-'}
 		</p>
 		{#if vehicle.insuranceStatus}
 			<p class="flex items-center gap-2">
 				<Shield class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-				<span class="font-semibold">Insurance:</span>
+				<span class="font-semibold">{$t('vehicle.insurance')}:</span>
 				<span class={vehicle.insuranceStatus === 'Active' ? 'text-green-600' : 'text-red-600'}>
-					{vehicle.insuranceStatus}
+					{vehicle.insuranceStatus === 'Active' ? $t('vehicle.active') : 
+					 vehicle.insuranceStatus === 'Not Available' ? $t('common.notAvailable') : vehicle.insuranceStatus}
 				</span>
 			</p>
 		{/if}
 		{#if vehicle.puccStatus}
 			<p class="flex items-center gap-2">
 				<BadgeCheck class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-				<span class="font-semibold">PUCC:</span>
+				<span class="font-semibold">{$t('vehicle.pucc')}:</span>
 				<span class={vehicle.puccStatus === 'Active' ? 'text-green-600' : 'text-red-600'}>
-					{vehicle.puccStatus}
+					{vehicle.puccStatus === 'Active' ? $t('vehicle.active') : 
+					 vehicle.puccStatus === 'Not Available' ? $t('common.notAvailable') : vehicle.puccStatus}
 				</span>
 			</p>
 		{/if}
@@ -128,28 +131,28 @@
 				iconStyles=" text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 				icon={Fuel}
 				onclick={() => fuelLogModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Log fuel refill"
+				ariaLabel={$t('vehicle.logFuel')}
 			/>
 			<IconButton
 				buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 				iconStyles=" text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 				icon={Wrench}
 				onclick={() => maintenanceModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Maintenence"
+				ariaLabel={$t('navigation.maintenance')}
 			/>
 			<IconButton
 				buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 				iconStyles=" text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 				icon={Shield}
 				onclick={() => insuranceModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Insurance"
+				ariaLabel={$t('navigation.insurance')}
 			/>
 			<IconButton
 				buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
 				iconStyles=" text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 				icon={BadgeCheck}
 				onclick={() => puccModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Pollution Certificate"
+				ariaLabel={$t('navigation.pollutionCertificate')}
 			/>
 		</div>
 		<div class="flex justify-end gap-2">
@@ -160,14 +163,14 @@
 				onclick={() => {
 					vehicleModelStore.show(vehicle, true);
 				}}
-				ariaLabel="Edit"
+				ariaLabel={$t('common.edit')}
 			/>
 			<IconButton
 				buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 				iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
 				icon={Trash2}
 				onclick={() => (deleteDialog = true)}
-				ariaLabel="Delete"
+				ariaLabel={$t('common.delete')}
 			/>
 		</div>
 	</div>

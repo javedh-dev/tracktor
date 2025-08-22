@@ -2,6 +2,7 @@
 	import ModalContainer from '$components/common/ModalContainer.svelte';
 	import { insuranceModelStore } from '$lib/stores/insurance';
 	import InsuranceForm from '$components/forms/InsuranceForm.svelte';
+	import { t } from '$lib/stores/i18n';
 
 	let entryToEdit = $state<any>(null);
 	let showModal = $state(false);
@@ -27,7 +28,7 @@
 {#if showModal}
 	<ModalContainer
 		onclose={closeModal}
-		title={editMode ? 'Edit Insurance' : 'Add Insurance'}
+		title={editMode ? $t('modals.editInsurance') : $t('modals.addInsurance')}
 		{loading}
 	>
 		<InsuranceForm

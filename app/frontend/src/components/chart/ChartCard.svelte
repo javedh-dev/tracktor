@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '$lib/stores/i18n';
 	const { title, chartData, options, ChartComponent } = $props();
 </script>
 
@@ -9,6 +10,6 @@
 	{#if chartData && chartData.labels && chartData.labels.length > 0}
 		<ChartComponent data={chartData} {options} />
 	{:else}
-		<p class="text-center text-gray-500 dark:text-gray-400">No data available for this vehicle.</p>
+		<p class="text-center text-gray-500 dark:text-gray-400">{$t('dashboard.noDataAvailable')}</p>
 	{/if}
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '$lib/stores/i18n';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
@@ -101,7 +102,7 @@
 {:else if error}
 	<p class="text-red-500">Error: {error}</p>
 {:else if maintenanceLogs.length === 0}
-	<div>No maintenance logs for this vehicle.</div>
+	<div>{$t('modals.noMaintenanceLogs')}</div>
 {:else}
 	<div class="overflow-x-auto">
 		<table class="min-w-full overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">

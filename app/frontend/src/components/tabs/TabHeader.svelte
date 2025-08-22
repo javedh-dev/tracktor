@@ -1,27 +1,29 @@
 <script lang="ts">
+	import { t } from '$lib/stores/i18n';
+	
 	let { activeTab = $bindable() } = $props();
 	const tabs: {
 		name: string;
 		id: string;
 	}[] = [
 		{
-			name: 'Dashboard',
+			name: $t('navigation.dashboard'),
 			id: 'dashboard'
 		},
 		{
-			name: 'Fuel Logs',
+			name: $t('navigation.fuelLogs'),
 			id: 'fuel'
 		},
 		{
-			name: 'Maintenance',
+			name: $t('navigation.maintenance'),
 			id: 'maintenance'
 		},
 		{
-			name: 'Insurance',
+			name: $t('navigation.insurance'),
 			id: 'insurance'
 		},
 		{
-			name: 'Pollution Certificate',
+			name: $t('navigation.pollution'),
 			id: 'pollution'
 		}
 	];
