@@ -4,8 +4,8 @@ import {
   getInsurances,
   updateInsurance,
   deleteInsurance,
-} from "../controllers/InsuranceController.js";
-import { authenticatePin } from "../middleware/auth.js";
+} from "@controllers/InsuranceController.js";
+import { authenticatePin } from "@middleware/auth.js";
 
 const router = Router({ mergeParams: true });
 

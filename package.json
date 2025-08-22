@@ -1,9 +1,34 @@
 {
-  "name": "root",
+  "name": "tracktor",
   "private": true,
   "workspaces": [
-    "app/*"
+    "app/*",
+    "docs"
   ],
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {
+    "setup": "node scripts/setup-env.js",
+    "test:cors": "node scripts/test-cors.js",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=server",
+    "dev:frontend": "npm run dev --workspace=client",
+    "build": "npm run build --workspace=server && npm run build --workspace=client",
+    "build:backend": "npm run build --workspace=server",
+    "build:frontend": "npm run build --workspace=client",
+    "start": "npm run start --workspace=server",
+    "preview": "npm run preview --workspace=server",
+    "db:migrate": "npm run db:migrate --workspace=server",
+    "db:seed": "npm run db:seed --workspace=server",
+    "db:status": "npm run db:status --workspace=server",
+    "format": "npm run format --workspace=client && npm run format --workspace=server",
+    "lint": "npm run lint --workspace=client",
+    "check": "npm run check --workspace=client",
+    "docs:dev": "npm run docs:dev --workspace=docs",
+    "docs:build": "npm run docs:build --workspace=docs",
+    "docs:preview": "npm run docs:preview --workspace=docs",
+    "clean": "npm run clean --workspaces --if-present",
+    "install:all": "npm install --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
 }

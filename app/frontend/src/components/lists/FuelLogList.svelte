@@ -46,7 +46,7 @@
 		error = '';
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs`,
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs`,
 				{
 					headers: {
 						'X-User-PIN': localStorage.getItem('userPin') || ''
@@ -72,7 +72,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs/${logId}`,
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs/${logId}`,
 				{
 					method: 'DELETE',
 					headers: {

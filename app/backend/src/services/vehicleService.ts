@@ -1,6 +1,6 @@
-import { Status, statusFromError } from "../exceptions/ServiceError.js";
-import { VehicleError } from "../exceptions/VehicleError.js";
-import { Insurance, PollutionCertificate, Vehicle } from "../models/index.js";
+import { Status, statusFromError } from "@exceptions/ServiceError.js";
+import { VehicleError } from "@exceptions/VehicleError.js";
+import { Insurance, PollutionCertificate, Vehicle } from "@models/index.js";
 
 export const addVehicle = async (vehicleData: any) => {
   const vehicle = await Vehicle.create(vehicleData);
@@ -8,7 +8,6 @@ export const addVehicle = async (vehicleData: any) => {
 };
 
 export const getAllVehicles = async () => {
-
   const vehicles = await Vehicle.findAll({
     include: [
       { association: "insurance" },
@@ -51,24 +50,17 @@ export const getAllVehicles = async () => {
       puccStatus,
     };
   });
-
 };
 
 export const getVehicleById = async (id: string) => {
-
   const vehicle = await Vehicle.findByPk(id);
   if (!vehicle) {
-    throw new VehicleError(
-      `No vehicle found for id : ${id}`,
-      Status.NOT_FOUND,
-    );
+    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
   return vehicle;
-
 };
 
 export const updateVehicle = async (id: string, vehicleData: any) => {
-
   const vehicle = await Vehicle.findByPk(id);
   if (!vehicle) {
     throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
@@ -79,17 +71,12 @@ export const updateVehicle = async (id: string, vehicleData: any) => {
 };
 
 export const deleteVehicle = async (id: string) => {
-
   const result = await Vehicle.destroy({
     where: { id: id },
     cascade: true,
   });
   if (result === 0) {
-    throw new VehicleError(
-      `No vehicle found for id : ${id}`,
-      Status.NOT_FOUND,
-    );
+    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
   return { message: "Vehicle deleted successfully." };
-
 };

@@ -60,7 +60,7 @@
 			};
 			// await simulateNetworkDelay(2000); // Simulate network delay for development
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${editMode ? vehicleToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${editMode ? vehicleToEdit.id : ''}`,
 				{
 					method: editMode ? 'PUT' : 'POST',
 					headers: {

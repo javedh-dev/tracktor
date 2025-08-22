@@ -13,7 +13,7 @@ const createConfigStore = () => {
 	async function fetchConfig() {
 		if (browser) {
 			try {
-				const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}/api/config`, {
+				const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/config`, {
 					headers: {
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					}
@@ -33,7 +33,7 @@ const createConfigStore = () => {
 	async function updateConfig(configs: Config[]) {
 		if (browser) {
 			try {
-				const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}/api/config`, {
+				const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/config`, {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',

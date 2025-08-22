@@ -1,17 +1,16 @@
 import { Request, Response } from "express";
-import * as fuelLogService from "../services/fuelLogService.js";
-import { FuelLogError } from "../exceptions/FuelLogError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import * as fuelLogService from "@services/fuelLogService.js";
+import { FuelLogError } from "@exceptions/FuelLogError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const addFuelLog = async (req: Request, res: Response) => {
-
   const { vehicleId } = req.params;
   const { date, odometer, fuelAmount, cost } = req.body;
 
   if (!date || !odometer || !fuelAmount || !cost) {
     throw new FuelLogError(
       "Date, Odometer, Fuel Amount, and Cost are required in request body.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   if (!vehicleId) {
@@ -46,7 +45,7 @@ export const updateFuelLog = async (req: Request, res: Response) => {
   if (!date || !odometer || !fuelAmount || !cost) {
     throw new FuelLogError(
       "Date, Odometer, Fuel Amount, and Cost are required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   if (!id) {

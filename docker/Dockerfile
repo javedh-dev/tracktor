@@ -31,6 +31,10 @@ COPY --from=backend-builder /app/backend/package.json ./backend/package.json
 # Copy built frontend from frontend-builder stage
 COPY --from=frontend-builder /app/frontend/build ./backend/frontend/build
 
+# Copy and set up entrypoint script
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 WORKDIR /app/backend
 
 EXPOSE 3000
@@ -38,4 +42,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV DB_PATH=/data/vehicles.db
-CMD ["node", "dist/index.js"]
+ENTRYPOINT ["/app/entrypoint.sh"]

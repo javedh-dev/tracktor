@@ -4,8 +4,8 @@ import {
   getPollutionCertificates,
   updatePollutionCertificate,
   deletePollutionCertificate,
-} from "../controllers/PUCCController.js";
-import { authenticatePin } from "../middleware/auth.js";
+} from "@controllers/PUCCController.js";
+import { authenticatePin } from "@middleware/auth.js";
 
 const router = Router({ mergeParams: true });
 

@@ -1,8 +1,8 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import { db } from "../db/index.js";
+import { db } from "@db/index.js";
 import Vehicle from "./Vehicle.js";
-import { InsuranceError } from "../exceptions/InsuranceError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import { InsuranceError } from "@exceptions/InsuranceError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 interface InsuranceAttributes {
   id: string;
@@ -16,11 +16,12 @@ interface InsuranceAttributes {
 }
 
 interface InsuranceCreationAttributes
-  extends Optional<InsuranceAttributes, "id"> { }
+  extends Optional<InsuranceAttributes, "id"> {}
 
 class Insurance
   extends Model<InsuranceAttributes, InsuranceCreationAttributes>
-  implements InsuranceAttributes {
+  implements InsuranceAttributes
+{
   declare public id: string;
   declare public vehicleId: string;
   declare public provider: string;
@@ -133,19 +134,19 @@ Insurance.init(
         if (sDate >= eDate) {
           throw new InsuranceError(
             "Start date must always be before end date.",
-            Status.BAD_REQUEST,
+            Status.BAD_REQUEST
           );
         }
 
         if (sDate < maxEndDate) {
           throw new InsuranceError(
             "Start date must always be after previous insurance end date.",
-            Status.BAD_REQUEST,
+            Status.BAD_REQUEST
           );
         }
       },
     },
-  },
+  }
 );
 
 export default Insurance;

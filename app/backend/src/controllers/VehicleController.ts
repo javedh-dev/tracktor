@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import * as vehicleService from "../services/vehicleService.js";
-import { VehicleError } from "../exceptions/VehicleError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import * as vehicleService from "@services/vehicleService.js";
+import { VehicleError } from "@exceptions/VehicleError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const addVehicle = async (req: Request, res: Response) => {
   const { make, model, year, licensePlate } = req.body;
   if (!make || !model || !year || !licensePlate) {
     new VehicleError(
       "Make, Model, Year, and License Plate are required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   const result = await vehicleService.addVehicle(req.body);
@@ -36,7 +36,7 @@ export const updateVehicle = async (req: Request, res: Response) => {
   if (!make || !model || !year || !licensePlate) {
     throw new VehicleError(
       "Make, Model, Year, and License Plate are required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   if (!id) {

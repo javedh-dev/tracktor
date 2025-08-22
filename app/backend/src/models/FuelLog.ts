@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import { db } from "../db/index.js";
+import { db } from "@db/index.js";
 
 interface FuelLogAttributes {
   id: string;
@@ -11,11 +11,12 @@ interface FuelLogAttributes {
   notes?: string;
 }
 
-interface FuelLogCreationAttributes extends Optional<FuelLogAttributes, "id"> { }
+interface FuelLogCreationAttributes extends Optional<FuelLogAttributes, "id"> {}
 
 class FuelLog
   extends Model<FuelLogAttributes, FuelLogCreationAttributes>
-  implements FuelLogAttributes {
+  implements FuelLogAttributes
+{
   declare public id: string;
   declare public vehicleId: string;
   declare public date: string;
@@ -91,6 +92,6 @@ FuelLog.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  },
+  }
 );
 export default FuelLog;

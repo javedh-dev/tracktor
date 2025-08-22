@@ -1,32 +1,38 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import { db } from '../db/index.js';
+import { DataTypes, Model, Optional } from "sequelize";
+import { db } from "@db/index.js";
 
 interface AuthAttributes {
-    id: number;
-    hash: string;
+  id: number;
+  hash: string;
 }
 
-interface AuthCreationAttributes extends Optional<AuthAttributes, 'id'> { }
+interface AuthCreationAttributes extends Optional<AuthAttributes, "id"> {}
 
-class Auth extends Model<AuthAttributes, AuthCreationAttributes> implements AuthAttributes {
-    public declare id: number;
-    public declare hash: string;
+class Auth
+  extends Model<AuthAttributes, AuthCreationAttributes>
+  implements AuthAttributes
+{
+  declare public id: number;
+  declare public hash: string;
 }
 
-Auth.init({
+Auth.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
     },
     hash: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-}, {
-    tableName: 'auth',
+  },
+  {
+    tableName: "auth",
     timestamps: true,
     underscored: true,
     sequelize: db,
-});
+  }
+);
 
 export default Auth;

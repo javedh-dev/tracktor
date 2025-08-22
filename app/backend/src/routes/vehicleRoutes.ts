@@ -5,8 +5,8 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
-} from "../controllers/VehicleController.js";
-import { authenticatePin } from "../middleware/auth.js";
+} from "@controllers/VehicleController.js";
+import { authenticatePin } from "@middleware/auth.js";
 import fuelLogRoutes from "./fuelLogRoutes.js";
 import insuranceRoutes from "./insuranceRoutes.js";
 import maintenanceLogRoutes from "./maintenanceLogRoutes.js";

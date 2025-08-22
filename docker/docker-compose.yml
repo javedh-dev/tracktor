@@ -9,7 +9,14 @@ services:
       - tracktor-app-data:/data
     environment:
       - NODE_ENV=production
+      - SERVER_PORT=3000
+      - SERVER_HOST=0.0.0.0
+      - DATABASE_PATH=/data/vehicles.db
+      - PUBLIC_API_BASE_URL=
       - PUBLIC_DEMO_MODE=false
+      - DEMO_MODE=false
+      - LOG_LEVEL=info
+      - CORS_ORIGINS=*
 
 volumes:
   tracktor-app-data: null
