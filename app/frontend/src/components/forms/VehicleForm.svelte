@@ -17,6 +17,8 @@
 	import StatusBlock from '$components/common/StatusBlock.svelte';
 	import type { Status } from '$lib/models/status';
 	import { handleApiError, type ApiError } from '$lib/models/Error';
+	import { t } from '$lib/stores/i18n';
+	import ColorPicker from '../common/ColorPicker.svelte';
 
 	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
 
@@ -44,7 +46,7 @@
 	async function persistVehicle() {
 		if (!vehicle.make || !vehicle.model || !vehicle.year || !vehicle.licensePlate) {
 			status = {
-				message: 'Please fill in all required fields.',
+				message: $t('forms.validation.vehicleRequired'),
 				type: 'ERROR'
 			};
 			return;
@@ -71,7 +73,7 @@
 
 			if (response.ok) {
 				status = {
-					message: `Vehicle ${editMode ? 'updated' : 'added'} successfully!`,
+					message: editMode ? $t('forms.success.vehicleUpdated') : $t('forms.success.vehicleAdded'),
 					type: 'SUCCESS'
 				};
 				Object.assign(vehicle, {
@@ -91,7 +93,7 @@
 			}
 		} catch (e) {
 			status = {
-				message: 'Failed to connect to the server.',
+				message: $t('forms.errors.connectionFailed'),
 				type: 'ERROR'
 			};
 		}
@@ -117,20 +119,20 @@
 		<FormField
 			id="make"
 			type="text"
-			placeholder="Make"
+			placeholder={$t('forms.placeholders.make')}
 			bind:value={vehicle.make}
 			icon={Building2}
-			label="Manufacturer"
+			label={$t('forms.labels.make')}
 			required={true}
 			ariaLabel="Vehicle Make"
 		/>
 		<FormField
 			id="model"
 			type="text"
-			placeholder="Model"
+			placeholder={$t('forms.placeholders.model')}
 			bind:value={vehicle.model}
 			icon={Car}
-			label="Model"
+			label={$t('forms.labels.model')}
 			required={true}
 			ariaLabel="Vehicle Model"
 		/>
@@ -139,54 +141,52 @@
 		<FormField
 			id="year"
 			type="number"
-			placeholder="Year"
+			placeholder={$t('forms.placeholders.year')}
 			bind:value={vehicle.year}
 			icon={Calendar1}
-			label="Year"
+			label={$t('forms.labels.year')}
 			required={true}
 			ariaLabel="Vehicle Year"
 		/>
-		<FormField
-			id="color"
-			type="text"
-			placeholder="Color"
+		<!-- Reemplazar el FormField de color con: -->
+		<ColorPicker
 			bind:value={vehicle.color}
-			icon={Paintbrush}
-			label="Color"
-			ariaLabel="Color"
+			label={$t('forms.labels.color')}
+			required
+			on:change={(e) => vehicle.color = e.detail}
 		/>
 	</div>
 
 	<FormField
 		id="licensePlate"
 		type="text"
-		placeholder="License Plate"
+		placeholder={$t('forms.placeholders.licensePlate')}
 		bind:value={vehicle.licensePlate}
 		icon={IdCard}
-		label="Licence Plate"
+		label={$t('forms.labels.licensePlate')}
 		required={true}
 		ariaLabel="License Plate"
 	/>
 	<FormField
 		id="vin"
 		type="text"
-		placeholder="VIN Number"
+		placeholder={$t('forms.placeholders.vinNumber')}
 		bind:value={vehicle.vin}
 		icon={Fingerprint}
-		label="VIN Number"
+		label={$t('forms.labels.vinNumber')}
 		ariaLabel="VIN Number"
 	/>
 
 	<FormField
 		id="odometer"
 		type="number"
-		placeholder="Odometer"
+		placeholder={$t('forms.placeholders.odometerReading')}
 		bind:value={vehicle.odometer}
 		icon={Gauge}
-		label="Odometer"
+		label={$t('forms.labels.odometer')}
 		ariaLabel="Odometer"
 	/>
-	<Button type="submit" variant="primary" text={editMode ? 'Update' : 'Add'} />
+	<Button type="submit" variant="primary" text={editMode ? $t('forms.buttons.update') : $t('forms.buttons.add')} />
 
 	{#if editMode}
 		<input type="hidden" name="id" value={vehicleToEdit?.id || ''} />

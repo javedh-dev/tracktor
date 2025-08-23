@@ -2,6 +2,7 @@
 	import MaintenanceLogForm from '$components/forms/MaintenanceLogForm.svelte';
 	import ModalContainer from '$components/common/ModalContainer.svelte';
 	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import { t } from '$lib/stores/i18n';
 
 	let logToEdit = $state<any>(null);
 	let showModal = $state(false);
@@ -27,7 +28,7 @@
 {#if showModal}
 	<ModalContainer
 		onclose={closeModal}
-		title={editMode ? 'Edit Maintenance Log' : 'Add Maintenance Log'}
+		title={editMode ? $t('modals.editMaintenance') : $t('modals.addMaintenance')}
 		{loading}
 	>
 		<MaintenanceLogForm

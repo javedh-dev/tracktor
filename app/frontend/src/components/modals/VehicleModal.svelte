@@ -2,6 +2,7 @@
 	import ModalContainer from '$components/common/ModalContainer.svelte';
 	import { vehicleModelStore } from '$lib/stores/vehicle';
 	import VehicleForm from '$components/forms/VehicleForm.svelte';
+	import { t } from '$lib/stores/i18n';
 
 	let showModal = $state(false);
 	let vehicleToEdit = $state(null);
@@ -21,7 +22,7 @@
 </script>
 
 {#if showModal}
-	<ModalContainer onclose={closeModal} title={editMode ? 'Edit Vehicle' : 'Add Vehicle'} {loading}>
+	<ModalContainer onclose={closeModal} title={editMode ? $t('modals.editVehicle') : $t('modals.addVehicle')} {loading}>
 		<VehicleForm {vehicleToEdit} {editMode} bind:modalVisibility={showModal} {loading} />
 	</ModalContainer>
 {/if}

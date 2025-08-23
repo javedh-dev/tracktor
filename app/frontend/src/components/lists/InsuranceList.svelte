@@ -8,6 +8,7 @@
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$components/common/IconButton.svelte';
 	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
+	import { t } from '$lib/stores/i18n';
 
 	let { vehicleId } = $props();
 
@@ -102,7 +103,7 @@
 {:else if error}
 	<p class="text-red-500">Error: {error}</p>
 {:else if insurances.length === 0}
-	<div>No Insurance found for this vehicle.</div>
+	<div>{$t('modals.noInsuranceLogs')}</div>
 {:else}
 	{#each insurances as ins (ins.id)}
 		<div

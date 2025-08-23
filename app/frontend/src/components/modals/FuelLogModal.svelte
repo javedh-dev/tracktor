@@ -2,6 +2,7 @@
 	import FuelLogForm from '$components/forms/FuelLogForm.svelte';
 	import ModalContainer from '$components/common/ModalContainer.svelte';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
+	import { t } from '$lib/stores/i18n';
 
 	let logToEdit = $state<any>(null);
 	let showModal = $state(false);
@@ -27,7 +28,7 @@
 {#if showModal}
 	<ModalContainer
 		onclose={() => closeModal()}
-		title={editMode ? 'Edit Fuel Log' : 'Log Fuel Refill'}
+		title={editMode ? $t('modals.editFuelLog') : $t('modals.addFuelLog')}
 		{loading}
 	>
 		<FuelLogForm

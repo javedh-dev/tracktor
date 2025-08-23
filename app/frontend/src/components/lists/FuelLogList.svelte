@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import { Trash2 } from '@lucide/svelte';
+	import { t } from '$lib/stores/i18n';
 	import {
 		formatCurrency,
 		formatDate,
@@ -103,7 +104,7 @@
 {:else if error}
 	<p class="text-red-500">Error: {error}</p>
 {:else if fuelLogs.length === 0}
-	<p>No fuel refill logs found for this vehicle.</p>
+	<p>{$t('modals.noFuelLogs')}</p>
 {:else}
 	<div class="overflow-x-auto">
 		<table class="min-w-full overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
