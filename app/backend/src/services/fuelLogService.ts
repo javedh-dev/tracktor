@@ -30,7 +30,7 @@ export const getFuelLogs = async (vehicleId: string) => {
   // Calculate mileage
   return fuelLogs.map((log, index, arr) => {
     // mileage can only be calculated for a full tank and a previous log is needed
-    if (index === 0 || !log.filled) {
+    if (index === 0 || !log.filled || log.missedLast) {
       return { ...log.toJSON(), mileage: null };
     }
 
