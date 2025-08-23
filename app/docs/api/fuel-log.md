@@ -17,7 +17,9 @@ Adds a new fuel log for a vehicle.
       "odometer": 12345,
       "fuelAmount": 40,
       "cost": 4000,
-      "notes": "Full tank"
+      "notes": "Full tank",
+      "filled": true,
+      "missedLast": false
     }
     ```
 
@@ -54,7 +56,9 @@ Updates a fuel log's information.
       "odometer": 12400,
       "fuelAmount": 35,
       "cost": 3500,
-      "notes": "Partial refill"
+      "notes": "Partial refill",
+      "filled": false,
+      "missedLast": false
     }
     ```
 
