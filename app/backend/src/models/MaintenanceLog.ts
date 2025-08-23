@@ -100,7 +100,7 @@ MaintenanceLog.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  }
+  },
 );
 
 export default MaintenanceLog;

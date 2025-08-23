@@ -1,7 +1,7 @@
 {
   "name": "server",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Tractor backend",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

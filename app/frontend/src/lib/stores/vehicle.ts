@@ -66,11 +66,14 @@ const createVehiclesStore = () => {
 		});
 		// await simulateNetworkDelay(2000); // Simulate network delay for development
 		try {
-			const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles`, {
-				headers: {
-					'X-User-PIN': pin || ''
+			const response = await fetch(
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles`,
+				{
+					headers: {
+						'X-User-PIN': pin || ''
+					}
 				}
-			});
+			);
 			if (response.ok) {
 				const vehicles = await response.json();
 				if (Array.isArray(vehicles)) {
@@ -89,7 +92,7 @@ const createVehiclesStore = () => {
 				}
 			} else {
 				if (response.status == 401) {
-					goto("/login", { replaceState: true });
+					goto('/login', { replaceState: true });
 				}
 				console.log('Failed to fetch vehicles', response);
 				const data = await response.json();

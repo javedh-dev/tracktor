@@ -28,7 +28,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -57,7 +57,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -109,7 +109,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -166,7 +166,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -218,7 +218,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -270,7 +270,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await queryInterface.createTable(
@@ -323,7 +323,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
           defaultValue: DataTypes.NOW,
         },
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();

@@ -44,7 +44,7 @@ paths:
                   type: string
                   example: "Full tank"
       responses:
-        '201':
+        "201":
           description: Fuel log added successfully.
           content:
             application/json:
@@ -55,13 +55,13 @@ paths:
                     type: number
                   message:
                     type: string
-        '400':
+        "400":
           description: Missing required fields.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Vehicle not found.
-        '500':
+        "500":
           description: Server error.
     get:
       tags:
@@ -77,7 +77,7 @@ paths:
             type: integer
           description: The ID of the vehicle.
       responses:
-        '200':
+        "200":
           description: A list of fuel logs for the vehicle.
           content:
             application/json:
@@ -105,11 +105,11 @@ paths:
                       type: number
                       nullable: true
                       description: Calculated mileage (km/L or miles/gallon).
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Vehicle not found.
-        '500':
+        "500":
           description: Server error.
   /api/fuel-logs/{id}:
     get:
@@ -126,7 +126,7 @@ paths:
             type: integer
           description: The ID of the fuel log.
       responses:
-        '200':
+        "200":
           description: Fuel log data.
           content:
             application/json:
@@ -148,11 +148,11 @@ paths:
                     type: number
                   notes:
                     type: string
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Fuel log not found.
-        '500':
+        "500":
           description: Server error.
     put:
       tags:
@@ -198,15 +198,15 @@ paths:
                   type: string
                   example: "Full tank"
       responses:
-        '200':
+        "200":
           description: Fuel log updated successfully.
-        '400':
+        "400":
           description: Missing required fields.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Fuel log not found.
-        '500':
+        "500":
           description: Server error.
     delete:
       tags:
@@ -222,11 +222,11 @@ paths:
             type: integer
           description: The ID of the fuel log.
       responses:
-        '200':
+        "200":
           description: Fuel log deleted successfully.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Fuel log not found.
-        '500':
+        "500":
           description: Server error.

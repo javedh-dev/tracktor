@@ -19,7 +19,7 @@ export const env = {
 
   // CORS Configuration
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(",").map((origin) =>
-    origin.trim()
+    origin.trim(),
   ) || [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -49,7 +49,7 @@ export function validateEnvironment(): void {
   if (missing.length > 0) {
     console.error(
       "❌ Missing required environment variables:",
-      missing.join(", ")
+      missing.join(", "),
     );
     process.exit(1);
   }

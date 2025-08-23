@@ -5,13 +5,13 @@ import { Status, statusFromError } from "@exceptions/ServiceError.js";
 
 export const addPollutionCertificate = async (
   vehicleId: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: any,
 ) => {
   const vehicle = await Vehicle.findByPk(vehicleId);
   if (!vehicle) {
     throw new PollutionCertificateError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   const pollutionCertificate = await PollutionCertificate.create({
@@ -31,7 +31,7 @@ export const getPollutionCertificates = async (vehicleId: string) => {
   if (!pollutionCertificates) {
     throw new PollutionCertificateError(
       `No PUCC found for vehicle id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return pollutionCertificates;
@@ -40,7 +40,7 @@ export const getPollutionCertificates = async (vehicleId: string) => {
 export const updatePollutionCertificate = async (
   vehicleId: string,
   id: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: any,
 ) => {
   const pollutionCertificate = await PollutionCertificate.findOne({
     where: { vehicleId: vehicleId, id: id },
@@ -48,7 +48,7 @@ export const updatePollutionCertificate = async (
   if (!pollutionCertificate) {
     throw new PollutionCertificateError(
       `No PUCC found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -63,7 +63,7 @@ export const deletePollutionCertificate = async (id: string) => {
   if (result === 0) {
     throw new PollutionCertificateError(
       `No PUCC found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Pollution certificate deleted successfully." };

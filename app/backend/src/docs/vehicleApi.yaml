@@ -40,7 +40,7 @@ paths:
                   type: number
                   example: 50000
       responses:
-        '201':
+        "201":
           description: Vehicle added successfully.
           content:
             application/json:
@@ -51,13 +51,13 @@ paths:
                     type: number
                   message:
                     type: string
-        '400':
+        "400":
           description: Missing required fields.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '409':
+        "409":
           description: Vehicle with this license plate or VIN already exists.
-        '500':
+        "500":
           description: Server error.
     get:
       tags:
@@ -66,7 +66,7 @@ paths:
       security:
         - UserPinAuth: []
       responses:
-        '200':
+        "200":
           description: A list of vehicles.
           content:
             application/json:
@@ -91,9 +91,9 @@ paths:
                       type: string
                     odometer:
                       type: number
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '500':
+        "500":
           description: Server error.
   /api/vehicles/{id}:
     get:
@@ -110,7 +110,7 @@ paths:
             type: integer
           description: The vehicle ID.
       responses:
-        '200':
+        "200":
           description: Vehicle data.
           content:
             application/json:
@@ -133,11 +133,11 @@ paths:
                     type: string
                   odometer:
                     type: number
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Vehicle not found.
-        '500':
+        "500":
           description: Server error.
     put:
       tags:
@@ -186,17 +186,17 @@ paths:
                   type: number
                   example: 50000
       responses:
-        '200':
+        "200":
           description: Vehicle updated successfully.
-        '400':
+        "400":
           description: Missing required fields.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Vehicle not found.
-        '409':
+        "409":
           description: Vehicle with this license plate or VIN already exists.
-        '500':
+        "500":
           description: Server error.
     delete:
       tags:
@@ -212,11 +212,11 @@ paths:
             type: integer
           description: The vehicle ID.
       responses:
-        '200':
+        "200":
           description: Vehicle deleted successfully.
-        '401':
+        "401":
           description: Unauthorized (Invalid PIN).
-        '404':
+        "404":
           description: Vehicle not found.
-        '500':
+        "500":
           description: Server error.

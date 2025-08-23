@@ -67,13 +67,13 @@ initializeDatabase()
     app.listen(env.SERVER_PORT, env.SERVER_HOST, () => {
       console.log("─".repeat(75));
       console.log(
-        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`
+        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`,
       );
       console.log(`📊 Environment: ${env.NODE_ENV}`);
       console.log(`🗄️ Database: ${env.DATABASE_PATH}`);
       console.log(`🎭 Demo Mode: ${env.DEMO_MODE ? "Enabled" : "Disabled"}`);
       console.log(
-        `🌐 CORS: ${env.isDevelopment() ? "Permissive (Development)" : "Strict (Production)"}`
+        `🌐 CORS: ${env.isDevelopment() ? "Permissive (Development)" : "Strict (Production)"}`,
       );
       if (!env.isDevelopment()) {
         console.log(`📋 Allowed origins: ${env.CORS_ORIGINS.join(", ")}`);

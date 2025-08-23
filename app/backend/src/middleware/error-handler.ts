@@ -16,21 +16,19 @@ export const errorHandler = (
         errors: err.errors.map((e: any) => {
           return {
             message: e.message,
-            path: e.path
-          }
-        })
+            path: e.path,
+          };
+        }),
       };
       break;
     default:
       body = {
         type: err.name,
-        errors: [
-          { message: err.message }
-        ]
-      }
+        errors: [{ message: err.message }],
+      };
   }
 
-  console.error(err.name)
+  console.error(err.name);
   res.status(500);
   res.send(JSON.stringify(body));
 };

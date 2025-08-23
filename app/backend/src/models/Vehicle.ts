@@ -108,7 +108,7 @@ Vehicle.init(
           if (existingVehicles.length > 0) {
             throw new VehicleError(
               "VIN NUmber already exists.",
-              Status.CONFLICT
+              Status.CONFLICT,
             );
           }
         },
@@ -139,7 +139,7 @@ Vehicle.init(
           if (minOdometer && value > minOdometer) {
             throw new VehicleError(
               "Initial Odometer Reading must be lesser than first fuel log odometer.",
-              Status.BAD_REQUEST
+              Status.BAD_REQUEST,
             );
           }
         },
@@ -151,7 +151,7 @@ Vehicle.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  }
+  },
 );
 
 export default Vehicle;

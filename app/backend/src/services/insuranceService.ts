@@ -8,7 +8,7 @@ export const addInsurance = async (vehicleId: string, insuranceData: any) => {
   if (!vehicle) {
     throw new InsuranceError(
       `No Vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   const insurance = await Insurance.create({
@@ -28,7 +28,7 @@ export const getInsurances = async (vehicleId: string) => {
   if (!insurance) {
     throw new InsuranceError(
       `No Insurances found for vehicle id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return insurance;
@@ -37,7 +37,7 @@ export const getInsurances = async (vehicleId: string) => {
 export const updateInsurance = async (
   vehicleId: string,
   id: string,
-  insuranceData: any
+  insuranceData: any,
 ) => {
   const insurance = await Insurance.findOne({
     where: { vehicleId: vehicleId, id },
@@ -45,7 +45,7 @@ export const updateInsurance = async (
   if (!insurance) {
     throw new InsuranceError(
       `No Insurances found for id: ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   await insurance.update(insuranceData);
@@ -59,7 +59,7 @@ export const deleteInsurance = async (id: string) => {
   if (result === 0) {
     throw new InsuranceError(
       `No Insurances found for id: ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Insurance details deleted successfully." };

@@ -134,19 +134,19 @@ Insurance.init(
         if (sDate >= eDate) {
           throw new InsuranceError(
             "Start date must always be before end date.",
-            Status.BAD_REQUEST
+            Status.BAD_REQUEST,
           );
         }
 
         if (sDate < maxEndDate) {
           throw new InsuranceError(
             "Start date must always be after previous insurance end date.",
-            Status.BAD_REQUEST
+            Status.BAD_REQUEST,
           );
         }
       },
     },
-  }
+  },
 );
 
 export default Insurance;
