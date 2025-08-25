@@ -8,6 +8,8 @@ interface FuelLogAttributes {
   odometer: number;
   fuelAmount: number;
   cost: number;
+  filled: boolean;
+  missedLast: boolean;
   notes?: string;
 }
 
@@ -23,6 +25,8 @@ class FuelLog
   declare public odometer: number;
   declare public fuelAmount: number;
   declare public cost: number;
+  declare public filled: boolean;
+  declare public missedLast: boolean;
   declare public notes?: string;
 }
 
@@ -75,6 +79,16 @@ FuelLog.init(
           msg: "Fuel Amount must be greater than 0.",
         },
       },
+    },
+    filled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    missedLast: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     notes: {
       type: DataTypes.STRING,

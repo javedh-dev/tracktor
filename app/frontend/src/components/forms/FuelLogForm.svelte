@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$components/common/Button.svelte';
+	import Checkbox from '$components/common/Checkbox.svelte';
 	import StatusBlock from '$components/common/StatusBlock.svelte';
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$lib/models/Error';
@@ -22,7 +23,9 @@
 		odometer: null,
 		fuelAmount: null,
 		cost: null,
-		notes: null
+		notes: null,
+    missedLast: false,
+    filled: true,
 	});
 
 	let status = $state<Status>({
@@ -71,7 +74,9 @@
 					odometer: '',
 					fuelAmount: '',
 					cost: '',
-					notes: ''
+					notes: '',
+          missedLast: false,
+          filled: true
 				});
 			} else {
 				const data = await response.json();
@@ -139,6 +144,23 @@
 			required={true}
 			ariaLabel="Fuel Cost"
 			inputClass="step-0.01"
+		/>
+	</div>
+
+  <div class="grid grid-flow-row grid-cols-2 gap-4">
+		<Checkbox
+			id="filled"
+			bind:checked={refill.filled}
+			icon={Fuel}
+			label="Tank Filled?"
+			ariaLabel="Tank Filled"
+		/>
+		<Checkbox
+			id="missedLast"
+			bind:checked={refill.missedLast}
+			icon={BadgeDollarSign}
+			label="Missed Last?"
+			ariaLabel="Previous Fuel Log Missed"
 		/>
 	</div>
 

@@ -43,6 +43,12 @@ paths:
                 notes:
                   type: string
                   example: "Full tank"
+                filled:
+                  type: boolean
+                  default: true
+                missedLast:
+                  type: boolean
+                  default: false
       responses:
         "201":
           description: Fuel log added successfully.
@@ -101,6 +107,10 @@ paths:
                       type: number
                     notes:
                       type: string
+                    filled:
+                      type: boolean
+                    missedLast:
+                      type: boolean
                     mileage:
                       type: number
                       nullable: true
@@ -148,6 +158,10 @@ paths:
                     type: number
                   notes:
                     type: string
+                  filled:
+                    type: boolean
+                  missedLast:
+                    type: boolean
         "401":
           description: Unauthorized (Invalid PIN).
         "404":
@@ -197,6 +211,12 @@ paths:
                 notes:
                   type: string
                   example: "Full tank"
+                filled:
+                  type: boolean
+                  default: true
+                missedLast:
+                  type: boolean
+                  default: false
       responses:
         "200":
           description: Fuel log updated successfully.
