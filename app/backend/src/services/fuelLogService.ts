@@ -1,5 +1,5 @@
 import { FuelLogError } from "@exceptions/FuelLogError.js";
-import { Status, statusFromError } from "@exceptions/ServiceError.js";
+import { Status } from "@exceptions/ServiceError.js";
 import { VehicleError } from "@exceptions/VehicleError.js";
 import { Vehicle, FuelLog } from "@models/index.js";
 
@@ -8,7 +8,7 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   const fuelLog = await FuelLog.create({
@@ -47,7 +47,7 @@ export const getFuelLogById = async (id: string) => {
   if (!fuelLog) {
     throw new FuelLogError(
       `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return fuelLog;
@@ -58,7 +58,7 @@ export const updateFuelLog = async (id: string, fuelLogData: any) => {
   if (!fuelLog) {
     throw new FuelLogError(
       `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -73,7 +73,7 @@ export const deleteFuelLog = async (id: string) => {
   if (result === 0) {
     throw new FuelLogError(
       `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Fuel log deleted successfully." };

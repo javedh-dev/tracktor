@@ -2,11 +2,10 @@ import { browser } from '$app/environment';
 
 export class AuthState {
 	private static instance: AuthState;
-	private isAuthenticated: boolean = $state(false);
+	private isAuthenticated: boolean = false;
 
 	private constructor(currentRoute: string) {
-		// Private constructor to prevent instantiation from outside
-		this.isAuthenticated = false; // Default value
+		this.isAuthenticated = false;
 		if (browser) {
 			if (currentRoute !== '/login') {
 				const pin = localStorage.getItem('userPin');

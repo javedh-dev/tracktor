@@ -17,7 +17,7 @@ export class ServiceError extends Error {
   }
 }
 
-export const statusFromError = (error: any) => {
+export const statusFromError = (error: Error) => {
   if (error instanceof ServiceError) return error.status;
   if (error instanceof ValidationError) return Status.BAD_REQUEST;
   if (error instanceof UniqueConstraintError) return Status.CONFLICT;

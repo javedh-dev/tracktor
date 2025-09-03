@@ -1,22 +1,14 @@
 services:
   app:
-    image: ghcr.io/javedh-dev/tracktor:latest
+    image: ghcr.io/javedh-dev/tracktor:dev
     container_name: tracktor-app
     restart: always
     ports:
       - "3333:3000"
     volumes:
-      - tracktor-app-data:/data
+      - ../app/backend/tracktor.db:/data/tracktor.db
     environment:
-      - NODE_ENV=production
-      - SERVER_PORT=3000
-      - SERVER_HOST=0.0.0.0
-      - DATABASE_PATH=/data/vehicles.db
-      - PUBLIC_API_BASE_URL=
-      - PUBLIC_DEMO_MODE=false
-      - DEMO_MODE=false
-      - LOG_LEVEL=info
-      - CORS_ORIGINS=*
+      - PUBLIC_API_BASE_URL=/
 
 volumes:
   tracktor-app-data: null

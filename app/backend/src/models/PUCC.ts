@@ -58,7 +58,7 @@ PollutionCertificate.init(
           msg: "Certificate Number must be between length 3 to 50.",
         },
         is: {
-          args: "^[0-9A-Za-z\s\-]*$",
+          args: "^[0-9A-Za-z- ]*$",
           msg: "Only number and characters with space and hyphen are allowed in certificate number.",
         },
       },
@@ -117,7 +117,7 @@ PollutionCertificate.init(
             where: {
               vehicleId: this.vehicleId as string,
             },
-          }
+          },
         );
 
         const sDate = new Date(this.issueDate as string);
@@ -127,19 +127,19 @@ PollutionCertificate.init(
         if (sDate >= eDate) {
           throw new PollutionCertificateError(
             "Issue date must always be before Expiry date.",
-            Status.BAD_REQUEST
+            Status.BAD_REQUEST,
           );
         }
 
         if (sDate < maxEndDate) {
           throw new PollutionCertificateError(
             "Issue date must always be after previous PUCC Expiry date.",
-            Status.BAD_REQUEST
+            Status.BAD_REQUEST,
           );
         }
       },
     },
-  }
+  },
 );
 
 export default PollutionCertificate;

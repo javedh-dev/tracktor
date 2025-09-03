@@ -10,7 +10,7 @@ export const addFuelLog = async (req: Request, res: Response) => {
   if (!date || !odometer || !fuelAmount || !cost) {
     throw new FuelLogError(
       "Date, Odometer, Fuel Amount, and Cost are required in request body.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   if (!vehicleId) {
@@ -45,7 +45,7 @@ export const updateFuelLog = async (req: Request, res: Response) => {
   if (!date || !odometer || !fuelAmount || !cost) {
     throw new FuelLogError(
       "Date, Odometer, Fuel Amount, and Cost are required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   if (!id) {

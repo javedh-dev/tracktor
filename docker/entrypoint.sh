@@ -8,7 +8,7 @@ cd /app/backend
 
 # Run database migrations
 echo "Running database migrations..."
-if node dist/db/migrate.js migrate; then
+if node dist/src/db/migrate.js migrate; then
     echo "✓ Database migrations completed successfully"
 else
     echo "✗ Database migrations failed"

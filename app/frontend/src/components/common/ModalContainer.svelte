@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Plus, PlusCircle } from '@lucide/svelte';
+	import { Plus } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 	import IconButton from './IconButton.svelte';
 
-	const { onclose, children, title, loading } = $props();
+	const { onclose, children, title } = $props();
 </script>
 
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">

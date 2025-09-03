@@ -7,6 +7,7 @@ import {
   deleteVehicle,
 } from "@controllers/VehicleController.js";
 import { authenticatePin } from "@middleware/auth.js";
+import { asyncHandler } from "@middleware/async-handler.js";
 import fuelLogRoutes from "./fuelLogRoutes.js";
 import insuranceRoutes from "./insuranceRoutes.js";
 import maintenanceLogRoutes from "./maintenanceLogRoutes.js";
@@ -14,11 +15,11 @@ import puccRoutes from "./puccRoutes.js";
 
 const router = Router();
 
-router.post("/", authenticatePin, addVehicle);
-router.get("/", authenticatePin, getAllVehicles);
-router.get("/:id", authenticatePin, getVehicleById);
-router.put("/:id", authenticatePin, updateVehicle);
-router.delete("/:id", authenticatePin, deleteVehicle);
+router.post("/", authenticatePin, asyncHandler(addVehicle));
+router.get("/", authenticatePin, asyncHandler(getAllVehicles));
+router.get("/:id", authenticatePin, asyncHandler(getVehicleById));
+router.put("/:id", authenticatePin, asyncHandler(updateVehicle));
+router.delete("/:id", authenticatePin, asyncHandler(deleteVehicle));
 
 router.use("/:vehicleId/fuel-logs", fuelLogRoutes);
 router.use("/:vehicleId/insurance", insuranceRoutes);

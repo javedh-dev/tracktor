@@ -105,7 +105,7 @@
 			{/if}
 		</div>
 	{/each}
-	<Button type="submit" variant="primary" text="Update" />
+	<Button type="submit" variant="primary" text="Update" {loading} />
 </form>
 {#if status.message}
 	<p

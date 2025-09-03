@@ -12,6 +12,7 @@
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$components/common/IconButton.svelte';
 	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$lib/utils/api';
 
 	const { vehicleId } = $props();
 
@@ -44,14 +45,11 @@
 		loading = true;
 		error = '';
 		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs`,
-				{
-					headers: {
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					}
+			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/fuel-logs`), {
+				headers: {
+					'X-User-PIN': localStorage.getItem('userPin') || ''
 				}
-			);
+			});
 			if (response.ok) {
 				fuelLogs = await response.json();
 			} else {
@@ -71,7 +69,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs/${logId}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs/${logId}`,
 				{
 					method: 'DELETE',
 					headers: {

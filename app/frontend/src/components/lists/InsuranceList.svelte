@@ -2,12 +2,12 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import { Shield, Calendar, Hash, DollarSign, Pencil, Trash2, Notebook } from '@lucide/svelte';
+	import { Shield, Calendar, Hash, DollarSign, Trash2, Notebook } from '@lucide/svelte';
 	import { formatCurrency, formatDate } from '$lib/utils/formatting';
-	import { insuranceModelStore } from '$lib/stores/insurance';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$components/common/IconButton.svelte';
 	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$lib/utils/api';
 
 	let { vehicleId } = $props();
 
@@ -44,21 +44,19 @@
 		loading = true;
 		error = '';
 		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/insurance`,
-				{
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
+			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/insurance`), {
+				headers: {
+					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
 				}
-			);
+			});
 			if (response.ok) {
 				insurances = await response.json();
 				console.log('Insurance : ', JSON.stringify(insurances));
 			} else {
 				error = 'Failed to fetch insurance data.';
 			}
-		} catch (err) {
+		} catch (e) {
+			console.error(e);
 			error = 'Network error. Please try again.';
 		} finally {
 			loading = false;
@@ -71,7 +69,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/insurance/${insuranceId}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/insurance/${insuranceId}`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -83,10 +81,11 @@
 				await fetchInsuranceDetails();
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to delete insurance details.');
+				error = data.message || 'Failed to delete insurance details.';
 			}
-		} catch (err) {
-			alert('Network error. Failed to delete insurance details.');
+		} catch (e) {
+			console.error(e);
+			error = 'Network error. Failed to delete insurance details.';
 		}
 	}
 

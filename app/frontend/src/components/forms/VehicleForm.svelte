@@ -17,6 +17,7 @@
 	import StatusBlock from '$components/common/StatusBlock.svelte';
 	import type { Status } from '$lib/models/status';
 	import { handleApiError, type ApiError } from '$lib/models/Error';
+	import { cleanup } from '$lib/utils/formatting';
 
 	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
 
@@ -58,14 +59,14 @@
 			};
 			// await simulateNetworkDelay(2000); // Simulate network delay for development
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${editMode ? vehicleToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${editMode ? vehicleToEdit.id : ''}`,
 				{
 					method: editMode ? 'PUT' : 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					},
-					body: JSON.stringify(vehicle)
+					body: JSON.stringify(cleanup(vehicle))
 				}
 			);
 
@@ -90,6 +91,7 @@
 				status = handleApiError(data, editMode);
 			}
 		} catch (e) {
+			console.error('Error persisting vehicle:', e);
 			status = {
 				message: 'Failed to connect to the server.',
 				type: 'ERROR'

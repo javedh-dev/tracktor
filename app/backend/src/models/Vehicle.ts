@@ -80,7 +80,7 @@ Vehicle.init(
       unique: true,
       validate: {
         is: {
-          args: "^[A-Z0-9\- ]{2,10}$",
+          args: "^[A-Z0-9- ]{2,25}$",
           msg: "Licence Plate format is incorrect.",
         },
       },
@@ -93,7 +93,7 @@ Vehicle.init(
           msg: "VIN number can't be an empty string.",
         },
         is: {
-          args: "^[A-HJ-NPR-Z0-9]{17}$",
+          args: "^[A-HJ-NPR-Z0-9]{3,}$",
           msg: "VIN number format is incorrect.",
         },
         async isUnique(value: string) {
@@ -108,7 +108,7 @@ Vehicle.init(
           if (existingVehicles.length > 0) {
             throw new VehicleError(
               "VIN NUmber already exists.",
-              Status.CONFLICT
+              Status.CONFLICT,
             );
           }
         },
@@ -139,7 +139,7 @@ Vehicle.init(
           if (minOdometer && value > minOdometer) {
             throw new VehicleError(
               "Initial Odometer Reading must be lesser than first fuel log odometer.",
-              Status.BAD_REQUEST
+              Status.BAD_REQUEST,
             );
           }
         },
@@ -151,7 +151,7 @@ Vehicle.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  }
+  },
 );
 
 export default Vehicle;

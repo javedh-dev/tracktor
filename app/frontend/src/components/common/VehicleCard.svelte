@@ -28,15 +28,12 @@
 
 	async function deleteVehicle(vehicleId: string) {
 		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					}
+			const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}`, {
+				method: 'DELETE',
+				headers: {
+					'X-User-PIN': localStorage.getItem('userPin') || ''
 				}
-			);
+			});
 			if (response.ok) {
 				alert('Vehicle deleted successfully.');
 				vehicleModelStore.hide();

@@ -46,7 +46,7 @@ The application automatically runs migrations and seeds data on startup based on
 
 ## Environment Variables
 
-- `DB_PATH` - SQLite database file path (default: ./vehicles.db)
+- `DB_PATH` - SQLite database file path (default: ./tracktor.db)
 - `DEMO_MODE` - Enable demo data seeding (default: false)
 - `AUTH_PIN` - Set authentication PIN
 - `SHOW_SQL` - Show SQL queries in console (default: false)

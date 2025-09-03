@@ -16,13 +16,13 @@ paths:
                   description: The 4-digit PIN.
                   example: "1234"
       responses:
-        '200':
+        "200":
           description: PIN updated successfully.
-        '201':
+        "201":
           description: PIN set successfully.
-        '400':
+        "400":
           description: Invalid PIN format.
-        '500':
+        "500":
           description: Server error.
   /api/pin/verify:
     post:
@@ -41,13 +41,13 @@ paths:
                   description: The 4-digit PIN to verify.
                   example: "1234"
       responses:
-        '200':
+        "200":
           description: PIN verified successfully.
-        '400':
+        "400":
           description: PIN is required.
-        '401':
+        "401":
           description: Invalid PIN.
-        '404':
+        "404":
           description: PIN not set.
-        '500':
+        "500":
           description: Server error.

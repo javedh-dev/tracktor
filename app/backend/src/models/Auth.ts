@@ -32,7 +32,7 @@ Auth.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  }
+  },
 );
 
 export default Auth;

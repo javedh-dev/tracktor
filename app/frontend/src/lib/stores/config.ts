@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { env } from '$env/dynamic/public';
+import { getApiUrl } from '$lib/utils/api';
 
 export interface Config {
 	key: string;
@@ -13,7 +13,7 @@ const createConfigStore = () => {
 	async function fetchConfig() {
 		if (browser) {
 			try {
-				const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/config`, {
+				const response = await fetch(getApiUrl('/api/config'), {
 					headers: {
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					}
@@ -33,7 +33,7 @@ const createConfigStore = () => {
 	async function updateConfig(configs: Config[]) {
 		if (browser) {
 			try {
-				const response = await fetch(`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/config`, {
+				const response = await fetch(getApiUrl('/api/config'), {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
@@ -72,9 +72,7 @@ const createConfigModalStore = () => {
 		callback: undefined
 	});
 
-	function show(
-		callback: any = undefined
-	) {
+	function show(callback: any = undefined) {
 		set({
 			show: true,
 			callback

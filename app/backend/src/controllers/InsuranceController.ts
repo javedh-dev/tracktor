@@ -13,7 +13,7 @@ export const addInsurance = async (req: Request, res: Response) => {
   if (!provider || !policyNumber || !startDate || !endDate || !cost) {
     throw new InsuranceError(
       "Provider, Policy Number, Start Date, End Date, and Cost are required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const result = await insuranceService.addInsurance(vehicleId, req.body);
@@ -36,19 +36,19 @@ export const updateInsurance = async (req: Request, res: Response) => {
   if (!vehicleId || !id) {
     throw new InsuranceError(
       "Vehicle ID and Insurance Id is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   if (!provider || !policyNumber || !startDate || !endDate || !cost) {
     throw new InsuranceError(
       "Provider, Policy Number, Start Date, End Date, and Cost are required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const result = await insuranceService.updateInsurance(
     vehicleId,
     id,
-    req.body
+    req.body,
   );
   res.status(200).json(result);
 };

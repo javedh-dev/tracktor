@@ -17,61 +17,26 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "paths": {
-      "@config": [
-        "./src/config"
-      ],
-      "@config/*": [
-        "./src/config/*"
-      ],
-      "@controllers": [
-        "./src/controllers"
-      ],
-      "@controllers/*": [
-        "./src/controllers/*"
-      ],
-      "@db": [
-        "./src/db"
-      ],
-      "@db/*": [
-        "./src/db/*"
-      ],
-      "@exceptions": [
-        "./src/exceptions"
-      ],
-      "@exceptions/*": [
-        "./src/exceptions/*"
-      ],
-      "@models": [
-        "./src/models"
-      ],
-      "@models/*": [
-        "./src/models/*"
-      ],
-      "@routes": [
-        "./src/routes"
-      ],
-      "@routes/*": [
-        "./src/routes/*"
-      ],
-      "@services": [
-        "./src/services"
-      ],
-      "@services/*": [
-        "./src/services/*"
-      ],
-      "@middleware": [
-        "./src/middleware"
-      ],
-      "@middleware/*": [
-        "./src/middleware/*"
-      ]
+      "@config": ["./src/config"],
+      "@config/*": ["./src/config/*"],
+      "@controllers": ["./src/controllers"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@db": ["./src/db"],
+      "@db/*": ["./src/db/*"],
+      "@exceptions": ["./src/exceptions"],
+      "@exceptions/*": ["./src/exceptions/*"],
+      "@models": ["./src/models"],
+      "@models/*": ["./src/models/*"],
+      "@routes": ["./src/routes"],
+      "@routes/*": ["./src/routes/*"],
+      "@services": ["./src/services"],
+      "@services/*": ["./src/services/*"],
+      "@middleware": ["./src/middleware"],
+      "@middleware/*": ["./src/middleware/*"],
+      "@frontend": ["./frontend"],
+      "@frontend/*": ["./frontend/*"]
     }
   },
-  "include": [
-    "**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "./dist"
-  ]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "./dist"]
 }

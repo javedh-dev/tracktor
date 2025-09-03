@@ -6,9 +6,13 @@ import { db } from "./db.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Determine if we're running in development (TypeScript) or production (compiled JavaScript)
+const isProduction = __filename.includes("/dist/");
+const migrationExtension = isProduction ? "js" : "ts";
+
 const umzug = new Umzug({
   migrations: {
-    glob: path.join(__dirname, "migrations/*.ts"),
+    glob: path.join(__dirname, `migrations/*.${migrationExtension}`),
     resolve: ({ name, path: migrationPath }) => {
       return {
         name,
@@ -36,7 +40,7 @@ type Migration = typeof umzug._types.migration;
 const performDbMigrations = async () => {
   try {
     console.log("Running database migrations...");
-    await umzug.up();
+    await umzug.up({});
     console.log("Migrations completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);

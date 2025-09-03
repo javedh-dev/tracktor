@@ -3,11 +3,11 @@
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
 	import { formatCurrency, formatDate, formatDistance } from '$lib/utils/formatting';
-	import { Pencil, Trash2 } from '@lucide/svelte';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import { Trash2 } from '@lucide/svelte';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$components/common/IconButton.svelte';
 	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$lib/utils/api';
 
 	let { vehicleId } = $props();
 
@@ -43,21 +43,19 @@
 		loading = true;
 		error = '';
 		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/maintenance-logs`,
-				{
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
+			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/maintenance-logs`), {
+				headers: {
+					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
 				}
-			);
+			});
 			if (response.ok) {
 				const data = await response.json();
 				maintenanceLogs = data;
 			} else {
 				error = 'Failed to fetch maintenance logs.';
 			}
-		} catch (err) {
+		} catch (e) {
+			console.error(e);
 			error = 'Network error. Please try again.';
 		} finally {
 			loading = false;
@@ -70,7 +68,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/maintenance-logs/${logId}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/maintenance-logs/${logId}`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -82,10 +80,11 @@
 				await fetchMaintenanceLogs();
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to delete maintenance log.');
+				error = data.message || 'Failed to delete maintenance log.';
 			}
-		} catch (err) {
-			alert('Network error. Failed to delete maintenance log.');
+		} catch (e) {
+			console.error(e);
+			error = 'Network error. Failed to delete maintenance log.';
 		}
 	}
 
