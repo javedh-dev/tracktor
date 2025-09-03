@@ -2,11 +2,12 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import { FileText, Calendar, MapPin, Pencil, Trash2, BadgeCheck } from '@lucide/svelte';
+	import { FileText, Calendar, MapPin, Trash2, BadgeCheck } from '@lucide/svelte';
 	import { formatDate } from '$lib/utils/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$components/common/IconButton.svelte';
 	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$lib/utils/api';
 
 	let { vehicleId } = $props();
 
@@ -42,20 +43,18 @@
 		loading = true;
 		error = '';
 		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/pucc`,
-				{
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
+			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/pucc`), {
+				headers: {
+					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
 				}
-			);
+			});
 			if (response.ok) {
 				pollutionCertificates = await response.json();
 			} else {
 				error = 'Failed to fetch Pollution Certificates.';
 			}
-		} catch (err) {
+		} catch (e) {
+			console.error(e);
 			error = 'Network error. Please try again.';
 		} finally {
 			loading = false;
@@ -68,7 +67,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/pucc/${puccId}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc/${puccId}`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -80,10 +79,11 @@
 				await fetchPollutionCertificateDetails();
 			} else {
 				const data = await response.json();
-				alert(data.message || 'Failed to delete pollution certificate.');
+				error = data.message || 'Failed to delete pollution certificate.';
 			}
-		} catch (err) {
-			alert('Network error. Failed to delete pollution certificate.');
+		} catch (e) {
+			console.error(e);
+			error = 'Network error. Failed to delete pollution certificate.';
 		}
 	}
 

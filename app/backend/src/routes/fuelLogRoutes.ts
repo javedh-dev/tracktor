@@ -7,13 +7,14 @@ import {
   deleteFuelLog,
 } from "@controllers/FuelLogController.js";
 import { authenticatePin } from "@middleware/auth.js";
+import { asyncHandler } from "@middleware/async-handler.js";
 
 const router = Router({ mergeParams: true });
 
-router.post("/", authenticatePin, addFuelLog);
-router.get("/", authenticatePin, getFuelLogs);
-router.get("/:id", authenticatePin, getFuelLogById);
-router.put("/:id", authenticatePin, updateFuelLog);
-router.delete("/:id", authenticatePin, deleteFuelLog);
+router.post("/", authenticatePin, asyncHandler(addFuelLog));
+router.get("/", authenticatePin, asyncHandler(getFuelLogs));
+router.get("/:id", authenticatePin, asyncHandler(getFuelLogById));
+router.put("/:id", authenticatePin, asyncHandler(updateFuelLog));
+router.delete("/:id", authenticatePin, asyncHandler(deleteFuelLog));
 
 export default router;

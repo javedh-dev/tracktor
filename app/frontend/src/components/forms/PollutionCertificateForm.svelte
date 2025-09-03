@@ -52,14 +52,14 @@
 
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/pucc/${editMode ? entryToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc/${editMode ? entryToEdit.id : ''}`,
 				{
 					method: `${editMode ? 'PUT' : 'POST'}`,
 					headers: {
 						'Content-Type': 'application/json',
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					},
-					body: JSON.stringify(certificate)
+					body: JSON.stringify(cleanup(certificate))
 				}
 			);
 
@@ -81,6 +81,7 @@
 				status = handleApiError(data, editMode);
 			}
 		} catch (e) {
+			console.error(e);
 			status = {
 				message: $t('forms.errors.connectionFailed'),
 				type: 'ERROR'

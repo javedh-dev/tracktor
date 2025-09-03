@@ -1,16 +1,16 @@
 import { MaintenanceLog, Vehicle } from "@models/index.js";
 import { MaintenanceLogError } from "@exceptions/MaintenanceLogError.js";
-import { Status, statusFromError } from "@exceptions/ServiceError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const addMaintenanceLog = async (
   vehicleId: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   const vehicle = await Vehicle.findByPk(vehicleId);
   if (!vehicle) {
     throw new MaintenanceLogError(
       `No vehicle found for id ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -40,7 +40,7 @@ export const getMaintenanceLogById = async (id: string) => {
   if (!maintenanceLog) {
     throw new MaintenanceLogError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return maintenanceLog;
@@ -48,13 +48,13 @@ export const getMaintenanceLogById = async (id: string) => {
 
 export const updateMaintenanceLog = async (
   id: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   const maintenanceLog = await MaintenanceLog.findByPk(id);
   if (!maintenanceLog) {
     throw new MaintenanceLogError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -69,7 +69,7 @@ export const deleteMaintenanceLog = async (id: string) => {
   if (result === 0) {
     throw new MaintenanceLogError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Maintenance log deleted successfully." };

@@ -39,13 +39,13 @@ Both backend and frontend applications load their configuration from the root `.
 | Variable              | Default                 | Description                |
 | --------------------- | ----------------------- | -------------------------- |
 | `API_BASE_URL`        | `http://localhost:3000` | Base URL for API calls     |
-| `PUBLIC_API_BASE_URL` | `http://localhost:3000` | Public API URL (SvelteKit) |
+| `API_BASE_URL` | `http://localhost:3000` | Public API URL (SvelteKit) |
 
 ### Database Configuration
 
 | Variable        | Default         | Description               |
 | --------------- | --------------- | ------------------------- |
-| `DATABASE_PATH` | `./vehicles.db` | SQLite database file path |
+| `DATABASE_PATH` | `./tracktor.db` | SQLite database file path |
 
 ### Application Features
 
@@ -76,7 +76,7 @@ NODE_ENV=development
 SERVER_PORT=3000
 CLIENT_PORT=5173
 API_BASE_URL=http://localhost:3000
-PUBLIC_API_BASE_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 DEMO_MODE=false
 ```
 
@@ -86,8 +86,8 @@ DEMO_MODE=false
 NODE_ENV=production
 SERVER_PORT=3000
 SERVER_HOST=0.0.0.0
-DATABASE_PATH=/data/vehicles.db
-PUBLIC_API_BASE_URL=https://your-domain.com
+DATABASE_PATH=/data/tracktor.db
+API_BASE_URL=https://your-domain.com
 DEMO_MODE=false
 LOG_LEVEL=warn
 ```
@@ -101,7 +101,7 @@ environment:
   - NODE_ENV=production
   - SERVER_PORT=3000
   - SERVER_HOST=0.0.0.0
-  - DATABASE_PATH=/data/vehicles.db
+  - DATABASE_PATH=/data/tracktor.db
   - PUBLIC_DEMO_MODE=false
   - LOG_LEVEL=info
 ```
@@ -144,7 +144,7 @@ environment:
 SvelteKit requires the `PUBLIC_` prefix for environment variables that need to be available in the browser. This is why we have both:
 
 - `API_BASE_URL` (backend only)
-- `PUBLIC_API_BASE_URL` (frontend/browser accessible)
+- `API_BASE_URL` (frontend/browser accessible)
 
 ## Troubleshooting
 
@@ -152,7 +152,7 @@ SvelteKit requires the `PUBLIC_` prefix for environment variables that need to b
 
 1. **Port conflicts**: Change `SERVER_PORT` or `CLIENT_PORT` if ports are in use
 2. **CORS errors**: Add your domain to `CORS_ORIGINS`
-3. **API connection issues**: Verify `PUBLIC_API_BASE_URL` matches your backend URL
+3. **API connection issues**: Verify `API_BASE_URL` matches your backend URL
 4. **Database issues**: Check `DATABASE_PATH` permissions and directory existence
 
 ### Debugging

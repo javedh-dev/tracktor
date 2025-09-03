@@ -2,20 +2,10 @@
 	import { t } from '$lib/stores/i18n';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
-	import { Pencil, Trash2 } from '@lucide/svelte';
 	import { darkModeStore } from '$lib/stores/dark-mode';
 	import { Chart, registerables, type ChartOptions } from 'chart.js';
-	import {
-		formatCurrency,
-		formatDate,
-		formatVolume,
-		formatMileage,
-		formatDistance,
-		getCurrencySymbol,
-		getMileageUnit
-	} from '$lib/utils/formatting';
+	import { formatDate, getCurrencySymbol, getMileageUnit } from '$lib/utils/formatting';
 
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
 	import ChartCard from './ChartCard.svelte';
 	import { Line } from 'svelte5-chartjs';
 	import { Jumper } from 'svelte-loading-spinners';
@@ -63,7 +53,7 @@
 	async function fetchChartData() {
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs`,
 				{
 					headers: {
 						'X-User-PIN': localStorage.getItem('userPin') || ''
@@ -117,7 +107,7 @@
 				console.error('Failed to fetch chart data');
 			}
 		} catch (e) {
-			console.error('Failed to connect to the server.');
+			console.error('Failed to connect to the server.', e);
 		} finally {
 			loading = false;
 		}

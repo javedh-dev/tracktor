@@ -1,5 +1,14 @@
+# Python
 .ropeproject
+
+# Dependencies
 node_modules
+
+# Scripts
+scripts
+
+# Backup/Support directories
+Sp_Support/
 
 # Environment files
 .env
@@ -9,7 +18,12 @@ node_modules
 # Build outputs
 dist/
 build/
+.output/
 .svelte-kit/
+
+# VitePress
+.vitepress/cache/
+.vitepress/dist/
 
 # Logs
 logs
@@ -18,7 +32,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
 # Database
+vehicles.db
 *.db
 *.sqlite
 *.sqlite3
@@ -31,3 +55,14 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,4 +1,4 @@
-import { Status, statusFromError } from "@exceptions/ServiceError.js";
+import { Status } from "@exceptions/ServiceError.js";
 import { VehicleError } from "@exceptions/VehicleError.js";
 import { Insurance, PollutionCertificate, Vehicle } from "@models/index.js";
 

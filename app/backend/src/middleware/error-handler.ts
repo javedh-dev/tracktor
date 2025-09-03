@@ -1,36 +1,46 @@
-import { Request, Response } from "express";
-import { ValidationError } from "sequelize";
+import { Request, Response, NextFunction } from "express";
 
 export const errorHandler = (
   err: any,
   req: Request,
   res: Response,
-  next: any,
+  _: NextFunction,
 ) => {
+  // Log the error for debugging
+  console.error("Error in %s %s:", req.method, req.path, err);
+
   res.setHeader("Content-Type", "application/json");
+
+  let statusCode = 500;
   let body = {};
+
   switch (err.name) {
     case "SequelizeValidationError":
+      statusCode = 400;
       body = {
         type: "ValidationError",
-        errors: err.errors.map((e: any) => {
-          return {
-            message: e.message,
-            path: e.path
-          }
-        })
+        errors: err.errors.map((e: any) => ({
+          message: e.message,
+          path: e.path,
+        })),
+      };
+      break;
+    case "AuthError":
+      // Use the status from the error if available, otherwise default to 500
+      statusCode = err.status || 500;
+      body = {
+        type: "AuthError",
+        errors: [{ message: err.message }],
       };
       break;
     default:
+      // Check if error has a status property
+      statusCode = err.status || err.statusCode || 500;
       body = {
-        type: err.name,
-        errors: [
-          { message: err.message }
-        ]
-      }
+        type: err.name || "Error",
+        errors: [{ message: err.message || "Internal server error" }],
+      };
   }
 
-  console.error(err.name)
-  res.status(500);
-  res.send(JSON.stringify(body));
+  res.status(statusCode).json(body);
 };

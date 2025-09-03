@@ -4,7 +4,7 @@
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$lib/models/Error';
 	import type { Status } from '$lib/models/status';
-	import { getCurrencySymbol } from '$lib/utils/formatting';
+	import { cleanup, getCurrencySymbol } from '$lib/utils/formatting';
 	import FormField from '../common/FormField.svelte';
 	import { Calendar1, Gauge, Fuel, FileText, BadgeDollarSign } from '@lucide/svelte';
 	import { t } from '$lib/stores/i18n';
@@ -52,14 +52,14 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/fuel-logs/${editMode ? logToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs/${editMode ? logToEdit.id : ''}`,
 				{
 					method: `${editMode ? 'PUT' : 'POST'}`,
 					headers: {
 						'Content-Type': 'application/json',
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					},
-					body: JSON.stringify(refill)
+					body: JSON.stringify(cleanup(refill))
 				}
 			);
 			if (response.ok) {
@@ -78,7 +78,8 @@
 				const data = await response.json();
 				status = handleApiError(data, editMode);
 			}
-		} catch (err) {
+		} catch (e) {
+			console.error(e);
 			status = {
 				message: $t('forms.errors.connectionFailed'),
 				type: 'ERROR'

@@ -122,7 +122,7 @@ export const seedDemoData = async () => {
     },
   ]);
 
-  const vehicle1FuelLogs: any = [
+  const vehicle1FuelLogs = [
     {
       vehicleId: vehicle1.id,
       date: "2024-01-15",
@@ -140,7 +140,7 @@ export const seedDemoData = async () => {
     },
   ];
 
-  const vehicle2FuelLogs: any = [
+  const vehicle2FuelLogs = [
     {
       vehicleId: vehicle2.id,
       date: "2024-01-20",
@@ -167,7 +167,7 @@ export const seedDemoData = async () => {
     const cost = Math.random() * 16 + 50;
     vehicle1FuelLogs.push({
       vehicleId: vehicle1.id,
-      date: currentDate1.toISOString().split("T")[0],
+      date: currentDate1.toISOString().split("T")[0] || "",
       odometer: currentOdometer1,
       fuelAmount: parseFloat(fuelAmount.toFixed(2)),
       cost: parseFloat(cost.toFixed(2)),
@@ -183,7 +183,7 @@ export const seedDemoData = async () => {
     const cost = Math.random() * 16 + 50;
     vehicle2FuelLogs.push({
       vehicleId: vehicle2.id,
-      date: currentDate2.toISOString().split("T")[0],
+      date: currentDate2.toISOString().split("T")[0] || "",
       odometer: currentOdometer2,
       fuelAmount: parseFloat(fuelAmount.toFixed(2)),
       cost: parseFloat(cost.toFixed(2)),

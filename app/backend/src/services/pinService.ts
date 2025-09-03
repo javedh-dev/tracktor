@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { Auth } from "@models/index.js";
 import { AuthError } from "@exceptions/AuthError.js";
-import { Status, statusFromError } from "@exceptions/ServiceError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const setPin = async (pin: string) => {
   const hash = await bcrypt.hash(pin, 10);
@@ -31,7 +31,7 @@ export const verifyPin = async (pin: string) => {
   } else {
     throw new AuthError(
       "Incorrect PIN provided. Please try again with correct PIN",
-      Status.UNAUTHORIZED
+      Status.UNAUTHORIZED,
     );
   }
 };

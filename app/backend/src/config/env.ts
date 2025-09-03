@@ -1,7 +1,26 @@
-/**
- * Environment Configuration
- * Centralized environment variable management for the backend
- */
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load environment variables from root directory
+config({
+  path: resolve(process.cwd(), "../../.env"),
+  override: true,
+  quiet: true,
+});
+
+const getOrigins = (): string[] => {
+  const origins = process.env.CORS_ORIGINS;
+  if (!origins) {
+    return [
+      "*"
+    ];
+  }
+
+  return origins
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+};
 
 export const env = {
   // Application Environment
@@ -12,27 +31,21 @@ export const env = {
   SERVER_PORT: Number(process.env.SERVER_PORT) || 3000,
 
   // Database Configuration
-  DATABASE_PATH: process.env.DATABASE_PATH || "./vehicles.db",
+  DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
 
   // Application Features
-  DEMO_MODE: process.env.DEMO_MODE === "true",
+  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
 
   // CORS Configuration
-  CORS_ORIGINS: process.env.CORS_ORIGINS?.split(",").map((origin) =>
-    origin.trim()
-  ) || [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-  ],
+  CORS_ORIGINS: getOrigins(),
 
   // Logging Configuration
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
 
   // Helper methods
-  isDevelopment: () => process.env.NODE_ENV === "development",
+  isDevelopment: () =>
+    !process.env.NODE_ENV || process.env.NODE_ENV === "development",
   isProduction: () => process.env.NODE_ENV === "production",
   isTest: () => process.env.NODE_ENV === "test",
 } as const;
@@ -43,7 +56,7 @@ export default env;
  * Validate required environment variables
  */
 export function validateEnvironment(): void {
-  const required = ["NODE_ENV"];
+  const required: string[] = [];
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {

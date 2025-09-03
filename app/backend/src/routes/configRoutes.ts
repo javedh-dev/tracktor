@@ -4,11 +4,12 @@ import {
   getConfigByKey,
   updateConfig,
 } from "@controllers/ConfigController.js";
+import { asyncHandler } from "@middleware/async-handler.js";
 
 const router = Router();
 
-router.get("/", getConfig);
-router.get("/:key", getConfigByKey); // Alias for getConfig
-router.put("/", updateConfig);
+router.get("/", asyncHandler(getConfig));
+router.get("/:key", asyncHandler(getConfigByKey)); // Alias for getConfig
+router.put("/", asyncHandler(updateConfig));
 
 export default router;

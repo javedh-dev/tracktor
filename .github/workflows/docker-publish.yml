@@ -1,15 +1,19 @@
-name: Docker Publish
+name: Build and Publish
 
 on:
   push:
     branches:
-      - main
+      - "*" # Build on any branch for testing
     tags:
       - "[0-9]+.[0-9]+.[0-9]+" # Matches tags like 1.2.3
+  pull_request:
+    branches:
+      - main
+      - dev
 
 jobs:
-  build_and_publish:
-    name: Build and Publish Docker Images
+  build:
+    name: Build and Conditionally Publish Docker Images
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,48 +21,77 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      - name: Determine build strategy
+        id: strategy
+        run: |
+          # Determine if we should push and what platforms to build
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]] || [[ "${GITHUB_REF}" == "refs/heads/dev" ]] || [[ "${GITHUB_REF}" =~ ^refs/tags/ ]]; then
+            echo "push=true" >> $GITHUB_OUTPUT
+            echo "platforms=linux/amd64,linux/arm64" >> $GITHUB_OUTPUT
+            echo "cache-mode=max" >> $GITHUB_OUTPUT
+          else
+            echo "push=false" >> $GITHUB_OUTPUT
+            echo "platforms=linux/amd64" >> $GITHUB_OUTPUT  # Single platform for faster builds
+            echo "cache-mode=min" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        if: steps.strategy.outputs.push == 'true'
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set image tags
+      - name: Extract metadata
         id: meta
-        run: |
-          if [[ "${GITHUB_REF}" =~ ^refs/tags/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            VERSION="${BASH_REMATCH[1]}"
-            MAJOR_MINOR="${VERSION%.*}"
-            echo "APP_TAGS=ghcr.io/${{ github.repository }}:${VERSION},ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${MAJOR_MINOR}" >> $GITHUB_ENV
-            echo "DOC_TAGS=ghcr.io/${{ github.repository }}-docs:${VERSION},ghcr.io/${{ github.repository }}-docs:latest,ghcr.io/${{ github.repository }}-docs:${MAJOR_MINOR}" >> $GITHUB_ENV
-          else
-            SHA="${GITHUB_SHA::8}"
-            echo "APP_TAGS=ghcr.io/${{ github.repository }}:${SHA}" >> $GITHUB_ENV
-            echo "DOC_TAGS=ghcr.io/${{ github.repository }}-docs:${SHA}" >> $GITHUB_ENV
-          fi
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern=latest
+
+      - name: Extract docs metadata
+        id: docs-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}-docs
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern=latest
 
       - name: Build and push app
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ${{ env.APP_TAGS }}
-          platforms: linux/amd64,linux/arm64
+          file: docker/Dockerfile
+          push: ${{ steps.strategy.outputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ steps.strategy.outputs.platforms }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=${{ steps.strategy.outputs.cache-mode }}
 
       - name: Build and push docs
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.docs
-          push: true
-          tags: ${{ env.DOC_TAGS }}
-          platforms: linux/amd64,linux/arm64
+          file: docker/Dockerfile.docs
+          push: ${{ steps.strategy.outputs.push }}
+          tags: ${{ steps.docs-meta.outputs.tags }}
+          labels: ${{ steps.docs-meta.outputs.labels }}
+          platforms: linux/amd64 # Docs typically don't need multi-arch
+          cache-from: type=gha
+          cache-to: type=gha,mode=${{ steps.strategy.outputs.cache-mode }}

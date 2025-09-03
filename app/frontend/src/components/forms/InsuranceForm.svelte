@@ -5,7 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$lib/models/Error';
 	import type { Status } from '$lib/models/status';
-	import { getCurrencySymbol } from '$lib/utils/formatting';
+	import { cleanup, getCurrencySymbol } from '$lib/utils/formatting';
 	import { BadgeDollarSign, Building2, Calendar1, IdCard, Notebook } from '@lucide/svelte';
 	import { t } from '$lib/stores/i18n';
 
@@ -55,14 +55,14 @@
 
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/insurance/${editMode ? entryToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/insurance/${editMode ? entryToEdit.id : ''}`,
 				{
 					method: `${editMode ? 'PUT' : 'POST'}`,
 					headers: {
 						'Content-Type': 'application/json',
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					},
-					body: JSON.stringify(insurance)
+					body: JSON.stringify(cleanup(insurance))
 				}
 			);
 
@@ -84,6 +84,7 @@
 				status = handleApiError(data, editMode);
 			}
 		} catch (e) {
+			console.error(e);
 			status = {
 				message: $t('forms.errors.connectionFailed'),
 				type: 'ERROR'
