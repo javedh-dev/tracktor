@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import * as maintenanceLogService from "../services/maintenanceLogService.js";
-import { MaintenanceLogError } from "../exceptions/MaintenanceLogError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import * as maintenanceLogService from "@services/maintenanceLogService.js";
+import { MaintenanceLogError } from "@exceptions/MaintenanceLogError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const addMaintenanceLog = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
@@ -10,18 +10,18 @@ export const addMaintenanceLog = async (req: Request, res: Response) => {
   if (!vehicleId) {
     throw new MaintenanceLogError(
       "Vehicle ID is required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   if (!date || !odometer || !serviceCenter || !cost) {
     throw new MaintenanceLogError(
       "Date, Odometer, ServiceCenter, and Cost are required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   const result = await maintenanceLogService.addMaintenanceLog(
     vehicleId,
-    req.body,
+    req.body
   );
   res.status(201).json(result);
 };
@@ -31,7 +31,7 @@ export const getMaintenanceLogs = async (req: Request, res: Response) => {
   if (!vehicleId) {
     throw new MaintenanceLogError(
       "Vehicle ID is required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   const maintenanceLogs =
@@ -44,12 +44,11 @@ export const getMaintenanceLogById = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
 
-  const maintenanceLog =
-    await maintenanceLogService.getMaintenanceLogById(id);
+  const maintenanceLog = await maintenanceLogService.getMaintenanceLogById(id);
   res.status(200).json(maintenanceLog);
 };
 
@@ -60,19 +59,16 @@ export const updateMaintenanceLog = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   if (!date || !odometer || !service || !cost) {
     throw new MaintenanceLogError(
       "Date, Odometer, Service, and Cost are required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
-  const result = await maintenanceLogService.updateMaintenanceLog(
-    id,
-    req.body,
-  );
+  const result = await maintenanceLogService.updateMaintenanceLog(id, req.body);
   res.status(200).json(result);
 };
 
@@ -81,7 +77,7 @@ export const deleteMaintenanceLog = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
 

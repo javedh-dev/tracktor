@@ -10,7 +10,23 @@ scripts
 # Backup/Support directories
 Sp_Support/
 
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+.output/
+.svelte-kit/
+
+# VitePress
+.vitepress/cache/
+.vitepress/dist/
+
 # Logs
+logs
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -25,28 +41,11 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-
 # Database
 vehicles.db
 *.db
 *.sqlite
 *.sqlite3
-
-# Build outputs
-dist/
-build/
-.output/
-
-# SvelteKit
-.svelte-kit/
-
-# VitePress
-.vitepress/cache/
-.vitepress/dist/
 
 # OS generated files
 .DS_Store

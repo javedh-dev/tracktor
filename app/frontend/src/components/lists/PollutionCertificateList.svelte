@@ -43,7 +43,7 @@
 		error = '';
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc`,
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/pucc`,
 				{
 					headers: {
 						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
@@ -68,7 +68,7 @@
 		}
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc/${puccId}`,
+				`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/vehicles/${vehicleId}/pucc/${puccId}`,
 				{
 					method: 'DELETE',
 					headers: {

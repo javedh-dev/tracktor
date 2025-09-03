@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import * as pinService from "../services/pinService.js";
-import { AuthError } from "../exceptions/AuthError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import * as pinService from "@services/pinService.js";
+import { AuthError } from "@exceptions/AuthError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const setPin = async (req: Request, res: Response) => {
   const { pin } = req.body;

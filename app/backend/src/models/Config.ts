@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import { db } from "../db/index.js";
+import { db } from "@db/index.js";
 
 interface ConfigAttributes {
   key: string;
@@ -40,7 +40,7 @@ Config.init(
     timestamps: true,
     underscored: true,
     sequelize: db,
-  },
+  }
 );
 
 export default Config;

@@ -3,7 +3,7 @@ import {
   getConfig,
   getConfigByKey,
   updateConfig,
-} from "../controllers/ConfigController.js";
+} from "@controllers/ConfigController.js";
 
 const router = Router();
 

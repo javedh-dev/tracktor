@@ -22,7 +22,9 @@
 		if (browser) {
 			async function checkPinStatus() {
 				try {
-					const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}/api/pin/status`);
+					const response = await fetch(
+						`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}/api/pin/status`
+					);
 					if (response.ok) {
 						const data = await response.json();
 						pinExists = data.exists;
@@ -68,13 +70,16 @@
 
 	const endpointCall = async (pin: string, verify = true) => {
 		const endpoint = verify ? '/api/pin/verify' : '/api/pin';
-		const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}${endpoint}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ pin })
-		});
+		const response = await fetch(
+			`${env.PUBLIC_API_BASE_URL || 'http://localhost:3000'}${endpoint}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ pin })
+			}
+		);
 
 		if (response.ok) {
 			// Store PIN and redirect

@@ -1,10 +1,9 @@
 import bcrypt from "bcrypt";
-import { Auth } from "../models/index.js";
-import { AuthError } from "../exceptions/AuthError.js";
-import { Status, statusFromError } from "../exceptions/ServiceError.js";
+import { Auth } from "@models/index.js";
+import { AuthError } from "@exceptions/AuthError.js";
+import { Status, statusFromError } from "@exceptions/ServiceError.js";
 
 export const setPin = async (pin: string) => {
-
   const hash = await bcrypt.hash(pin, 10);
 
   const [auth, created] = await Auth.findOrCreate({
@@ -19,11 +18,9 @@ export const setPin = async (pin: string) => {
   } else {
     return { message: "PIN set successfully." };
   }
-
 };
 
 export const verifyPin = async (pin: string) => {
-
   const auth = await Auth.findByPk(1);
   if (!auth) {
     throw new AuthError("PIN is not set yet. Please set PIN first.");
@@ -34,15 +31,12 @@ export const verifyPin = async (pin: string) => {
   } else {
     throw new AuthError(
       "Incorrect PIN provided. Please try again with correct PIN",
-      Status.UNAUTHORIZED,
+      Status.UNAUTHORIZED
     );
   }
-
 };
 
 export const getPinStatus = async () => {
-
   const auth = await Auth.findByPk(1);
   return { exists: !!auth };
-
 };

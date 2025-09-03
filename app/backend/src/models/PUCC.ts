@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import { db } from "../db/index.js";
-import { PollutionCertificateError } from "../exceptions/PollutionCertificateError.js";
-import { Status } from "../exceptions/ServiceError.js";
+import { db } from "@db/index.js";
+import { PollutionCertificateError } from "@exceptions/PollutionCertificateError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 interface PollutionCertificateAttributes {
   id: string;
@@ -14,14 +14,15 @@ interface PollutionCertificateAttributes {
 }
 
 interface PollutionCertificateCreationAttributes
-  extends Optional<PollutionCertificateAttributes, "id"> { }
+  extends Optional<PollutionCertificateAttributes, "id"> {}
 
 class PollutionCertificate
   extends Model<
     PollutionCertificateAttributes,
     PollutionCertificateCreationAttributes
   >
-  implements PollutionCertificateAttributes {
+  implements PollutionCertificateAttributes
+{
   declare public id: string;
   declare public vehicleId: string;
   declare public certificateNumber: string;
@@ -116,7 +117,7 @@ PollutionCertificate.init(
             where: {
               vehicleId: this.vehicleId as string,
             },
-          },
+          }
         );
 
         const sDate = new Date(this.issueDate as string);
@@ -126,19 +127,19 @@ PollutionCertificate.init(
         if (sDate >= eDate) {
           throw new PollutionCertificateError(
             "Issue date must always be before Expiry date.",
-            Status.BAD_REQUEST,
+            Status.BAD_REQUEST
           );
         }
 
         if (sDate < maxEndDate) {
           throw new PollutionCertificateError(
             "Issue date must always be after previous PUCC Expiry date.",
-            Status.BAD_REQUEST,
+            Status.BAD_REQUEST
           );
         }
       },
     },
-  },
+  }
 );
 
 export default PollutionCertificate;

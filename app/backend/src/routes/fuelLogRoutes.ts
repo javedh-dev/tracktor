@@ -5,8 +5,8 @@ import {
   getFuelLogById,
   updateFuelLog,
   deleteFuelLog,
-} from "../controllers/FuelLogController.js";
-import { authenticatePin } from "../middleware/auth.js";
+} from "@controllers/FuelLogController.js";
+import { authenticatePin } from "@middleware/auth.js";
 
 const router = Router({ mergeParams: true });
 

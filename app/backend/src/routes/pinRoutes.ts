@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-  setPin,
-  verifyPin,
-  getPinStatus,
-} from "../controllers/PinController.js";
+import { setPin, verifyPin, getPinStatus } from "@controllers/PinController.js";
 
 const router = Router();
 

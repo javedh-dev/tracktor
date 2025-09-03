@@ -5,8 +5,8 @@ import {
   getMaintenanceLogById,
   updateMaintenanceLog,
   deleteMaintenanceLog,
-} from "../controllers/MaintenanceLogController.js";
-import { authenticatePin } from "../middleware/auth.js";
+} from "@controllers/MaintenanceLogController.js";
+import { authenticatePin } from "@middleware/auth.js";
 
 const router = Router({ mergeParams: true });
 

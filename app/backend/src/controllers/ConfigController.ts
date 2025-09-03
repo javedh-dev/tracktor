@@ -3,9 +3,9 @@ import {
   getAppConfig,
   getAppConfigByKey,
   updateAppConfig,
-} from "../services/configService.js";
-import { ConfigError } from "../exceptions/ConfigError.js";
-import { Status } from "../exceptions/ServiceError.js";
+} from "@services/configService.js";
+import { ConfigError } from "@exceptions/ConfigError.js";
+import { Status } from "@exceptions/ServiceError.js";
 
 export const getConfig = async (req: Request, res: Response) => {
   const config = await getAppConfig();
@@ -30,7 +30,7 @@ export const updateConfig = async (req: Request, res: Response) => {
     configs.map(async (config) => {
       const { key, value } = config;
       return await updateAppConfig(key, value);
-    }),
+    })
   );
   res.json(updatedConfigs);
 };
