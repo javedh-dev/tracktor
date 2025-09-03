@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import '../styles/app.css';
-	import { tick } from 'svelte';
+	import { tick, onMount } from 'svelte';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte';
 	import ThemeToggle from '$components/common/ThemeToggle.svelte';
 	import { env } from '$env/dynamic/public';

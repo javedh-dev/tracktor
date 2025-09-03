@@ -108,19 +108,14 @@
 		<table class="min-w-full overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
 			<thead class="bg-gray-200 dark:bg-gray-700">
 				<tr>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Date</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300"
-						>Odometer</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300"
-						>Fuel Amount</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Cost</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Mileage</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Notes</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Actions</th
-					>
+					
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.date')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.odometer')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.fuelAmount')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.cost')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.mileage')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.notes')}</th>
+					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">{$t('table.headers.actions')}</th>
 				</tr>
 			</thead>
 			<tbody>

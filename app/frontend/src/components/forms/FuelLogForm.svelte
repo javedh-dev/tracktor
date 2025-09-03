@@ -132,7 +132,7 @@
 		<FormField
 			id="cost"
 			type="number"
-			placeholder={`${$t('forms.placeholders.costCurrency')} ( ${getCurrencySymbol()} )`}
+			placeholder={`${$t('forms.placeholders.totalCost')} ( ${getCurrencySymbol()} )`}
 			bind:value={refill.cost}
 			icon={BadgeDollarSign}
 			label={$t('forms.labels.cost')}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	let pin = Array(6).fill('');
-	let inputs: HTMLInputElement[] = [];
+	let inputs: HTMLInputElement[] = $state([]);
 
 	const { complete } = $props();
 

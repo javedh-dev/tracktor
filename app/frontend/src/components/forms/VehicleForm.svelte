@@ -19,6 +19,7 @@
 	import { handleApiError, type ApiError } from '$lib/models/Error';
 	import { t } from '$lib/stores/i18n';
 	import ColorPicker from '../common/ColorPicker.svelte';
+	import { cleanup } from '$lib/utils/formatting';
 
 	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
 

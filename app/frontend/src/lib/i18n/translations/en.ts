@@ -108,7 +108,8 @@ export default {
       date: 'Date',
       odometerReading: 'Odometer Reading',
       fuelAmountLitres: 'Fuel Amount (Litres)',
-      costCurrency: 'Cost',
+      costCurrency: 'Total Cost',
+      totalCost: 'Total Cost of Refill',
       notes: 'Notes',
       startDate: 'Start Date',
       endDate: 'End Date',
@@ -213,5 +214,17 @@ export default {
     saturation: 'Saturation',
     lightness: 'Lightness',
     hexCode: 'Hex Code'
+  },
+  table: {
+    headers: {
+      date: 'Date',
+      odometer: 'Odometer',
+      fuelAmount: 'Fuel Amount',
+      cost: 'Cost',
+      totalCost: 'Total Cost',
+      mileage: 'Mileage',
+      notes: 'Notes',
+      actions: 'Actions'
+    }
   }
 };

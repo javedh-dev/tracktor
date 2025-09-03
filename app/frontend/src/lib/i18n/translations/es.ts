@@ -109,6 +109,7 @@ export default {
       odometerReading: 'Lectura del Odómetro',
       fuelAmountLitres: 'Cantidad de Combustible (Litros)',
       costCurrency: 'Costo',
+      totalCost: 'Costo Total de la Recarga',
       notes: 'Notas',
       startDate: 'Fecha de Inicio',
       endDate: 'Fecha de Fin',
@@ -213,5 +214,18 @@ export default {
     saturation: 'Saturación',
     lightness: 'Luminosidad',
     hexCode: 'Código Hex'
+  },
+  table: {
+    headers: {
+      date: 'Fecha',
+      odometer: 'Odómetro',
+      fuelAmount: 'Cantidad de Combustible',
+      cost: 'Costo',
+      costCurrency: 'Costo Total',
+      totalCost: 'Costo Total de la Recarga',
+      mileage: 'Kilometraje',
+      notes: 'Notas',
+      actions: 'Acciones'
+    }
   }
 };
