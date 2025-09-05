@@ -53,23 +53,32 @@ export const getMaintenanceLogById = async (req: Request, res: Response) => {
 };
 
 export const updateMaintenanceLog = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { date, odometer, service, cost } = req.body;
+  try {
+    const { id } = req.params;
+    const { date, odometer, serviceCenter, cost } = req.body;
 
-  if (!id) {
-    throw new MaintenanceLogError(
-      "Maintenance Log ID is required.",
-      Status.BAD_REQUEST,
-    );
+    if (!id) {
+      return res.status(400).json({ message: "Maintenance Log ID is required." });
+    }
+
+    // Guard for required fields
+    if (
+      !date ||
+      odometer === undefined || odometer === null ||
+      !serviceCenter ||
+      cost === undefined || cost === null
+    ) {
+      return res.status(400).json({
+        message: "Date, Odometer, Service, and Cost are required."
+      });
+    }
+
+    const result = await maintenanceLogService.updateMaintenanceLog(id, req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('Error in updateMaintenanceLog:', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
-  if (!date || !odometer || !service || !cost) {
-    throw new MaintenanceLogError(
-      "Date, Odometer, Service, and Cost are required.",
-      Status.BAD_REQUEST,
-    );
-  }
-  const result = await maintenanceLogService.updateMaintenanceLog(id, req.body);
-  res.status(200).json(result);
 };
 
 export const deleteMaintenanceLog = async (req: Request, res: Response) => {
