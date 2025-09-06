@@ -19,7 +19,15 @@
 			<h5 class="">Are you sure you want to delete?</h5>
 			<div class="mt-8 flex w-full gap-4">
 				<Button variant="hero" text="Cancel" type="button" onclick={() => (open = false)} />
-				<Button variant="primary" text="Confirm" type="button" onclick={onConfirm} />
+				<Button
+					variant="primary"
+					text="Confirm"
+					type="button"
+					onclick={() => {
+						onConfirm?.();
+						open = false;
+					}}
+				/>
 			</div>
 		</div>
 	</div>
