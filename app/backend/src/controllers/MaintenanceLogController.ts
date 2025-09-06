@@ -13,7 +13,8 @@ export const addMaintenanceLog = async (req: Request, res: Response) => {
       Status.BAD_REQUEST,
     );
   }
-  if (!date || !odometer || !serviceCenter || !cost) {
+  // Use `== null` instead of falsy check → allows 0 values
+  if (!date || odometer == null || !serviceCenter || cost == null) {
     throw new MaintenanceLogError(
       "Date, Odometer, ServiceCenter, and Cost are required.",
       Status.BAD_REQUEST,
@@ -58,19 +59,18 @@ export const updateMaintenanceLog = async (req: Request, res: Response) => {
     const { date, odometer, serviceCenter, cost } = req.body;
 
     if (!id) {
-      return res.status(400).json({ message: "Maintenance Log ID is required." });
+      throw new MaintenanceLogError(
+        "Maintenance Log ID is required.",
+        Status.BAD_REQUEST,
+      );
     }
 
     // Guard for required fields
-    if (
-      !date ||
-      odometer === undefined || odometer === null ||
-      !serviceCenter ||
-      cost === undefined || cost === null
-    ) {
-      return res.status(400).json({
-        message: "Date, Odometer, Service, and Cost are required."
-      });
+    if (!date || odometer == null || !serviceCenter || cost == null) {
+      throw new MaintenanceLogError(
+        "Date, Odometer, Service, and Cost are required.",
+        Status.BAD_REQUEST,
+      );
     }
 
     const result = await maintenanceLogService.updateMaintenanceLog(id, req.body);

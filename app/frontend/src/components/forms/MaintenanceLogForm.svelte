@@ -47,31 +47,24 @@
 
 	async function persistLog() {
 		loading = true;
-
-		console.log('logToEdit:', logToEdit);
-		console.log('log before cleanup:', log);
-		console.log('log after cleanup:', cleanup(log));
-
-		console.log(typeof log.odometer, log.odometer, typeof log.cost, log.cost);
-
 		// 1️⃣ Validate required fields first
 		// This prevents 0 from being rejected. Right now, if odometer = 0 or cost = 0, !log.odometer is true and triggers the 400 error.
-		//	if (
-		//		!log.date ||
-		//		log.odometer === null ||
-		//		log.odometer === undefined ||
-		//		!log.serviceCenter ||
-		//		log.cost === null ||
-		//		log.cost === undefined
-		//	) {
-		//		status = {
-		//			message: 'Date, Odometer, Service Center, and Cost are required.',
-		//			type: 'ERROR'
-		//		};
-		//		loading = false;
+		if (
+			!log.date ||
+			log.odometer === null ||
+			log.odometer === undefined ||
+			!log.serviceCenter ||
+			log.cost === null ||
+			log.cost === undefined
+		) {
+			status = {
+				message: 'Date, Odometer, Service Center, and Cost are required.',
+				type: 'ERROR'
+			};
+			loading = false;
 
-		//		return;
-		//	}
+			return;
+		}
 
 		try {
 			// 2️⃣ Construct the payload
@@ -86,11 +79,7 @@
 					}
 				: cleanup(log); // For POST, keep using cleanup
 
-			console.log('Sending payload:', payload); // Debug: check what is sent
-
 			// 3️⃣ Send the request
-
-			console.log(typeof log.odometer, log.odometer, typeof log.cost, log.cost);
 			const response = await fetch(
 				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/maintenance-logs/${editMode ? logToEdit.id : ''}`,
 				{
@@ -120,7 +109,12 @@
 				});
 				modalVisibility = false;
 			} else {
-				const data = await response.json();
+				let data;
+				try {
+					data = await response.json();
+				} catch {
+					data = { message: 'Unknown server error' };
+				}
 				status = handleApiError(data, editMode);
 			}
 		} catch (e) {
@@ -181,7 +175,7 @@
 			ariaLabel="Service Cost ( {getCurrencySymbol()} )"
 		/>
 		<FormField
-			id="service"
+			id="serviceCenter"
 			type="text"
 			placeholder="Service Center"
 			bind:value={log.serviceCenter}

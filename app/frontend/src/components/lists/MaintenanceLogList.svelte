@@ -26,10 +26,9 @@
 	let loading = $state(false);
 	let error = $state('');
 	let selectedMaintenanceLog = $state<string>();
-	let selectedMaintenanceLogFull = $state<MaintenanceLog | null>(null);
 	let deleteDialog = $state(false);
-	let updateDialog = $state(false);
 
+	// 🔄 Fetch logs when vehicleId is available
 	$effect(() => {
 		if (!vehicleId) {
 			error = 'Vehicle ID is required.';
@@ -39,6 +38,7 @@
 		}
 	});
 
+	// ✅ Fetch logs from API
 	async function fetchMaintenanceLogs() {
 		if (!vehicleId) {
 			maintenanceLogs = [];
@@ -66,6 +66,7 @@
 		}
 	}
 
+	// 🗑️ Delete a log
 	async function deleteMaintenenceLog(logId: string | undefined) {
 		if (!logId) {
 			return;
@@ -92,51 +93,25 @@
 		}
 	}
 
-	async function updateMaintenanceLog(logId: string | undefined, updatedLogData: any) {
-		// 1. A guard clause to ensure both the log ID and the data are provided.
-		// The 'any' type is used here for simplicity, but in a real app,
-		// you would use a specific type or interface for `updatedLogData`.
-		if (!logId || !updatedLogData) {
-			// You might want to set an error message here as well.
-			console.error('Missing log ID or updated data.');
+	// ✏️ Open modal for editing
+	async function updateMaintenanceLog(log: MaintenanceLog) {
+		if (!log) {
+			console.error('Missing log object.');
 			return;
 		}
 
 		try {
-			// 2. The core network request using `fetch`.
-			const response = await fetch(
-				// 3. The URL is similar to the delete function. It should point to the specific resource.
-				// Some APIs might use a slightly different URL for updates, but this pattern is common.
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/maintenance-logs/${logId}`,
-				{
-					// 4. Change the HTTP method to 'PUT' or 'PATCH'.
-					// 'PUT' is typically used for a complete replacement of the resource.
-					// 'PATCH' is used for a partial update. Choose the one that fits your API.
-					method: 'PUT',
-
-					// 5. The headers are similar, but you must also specify the content type of the body.
-					headers: {
-						'Content-Type': 'application/json',
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					},
-
-					// 6. Add a `body` property. This is the most crucial difference.
-					// You must stringify the JSON data to send it in the request body.
-					body: JSON.stringify(updatedLogData)
+			maintenanceModelStore.show(
+				vehicleId, // string
+				log, // ✅ Directly pass log (no unnecessary copy object)
+				true, // editMode
+				async (success) => {
+					if (success) {
+						await fetchMaintenanceLogs(); // 🔄 Refresh list on save
+					}
 				}
 			);
-
-			// 7. Handle the response, similar to the delete function.
-			if (response.ok) {
-				// 8. If successful, refresh the list of logs to show the updated data.
-				await fetchMaintenanceLogs();
-			} else {
-				const data = await response.json();
-				// 9. Set the error message if the server responds with an error.
-				error = data.message || 'Failed to update maintenance log.';
-			}
 		} catch (e) {
-			// 10. Handle network-level errors.
 			console.error(e);
 			error = 'Network error. Failed to update maintenance log.';
 		}
@@ -184,6 +159,7 @@
 						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{formatCurrency(log.cost)}</td>
 						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{log.notes || '-'}</td>
 						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">
+							<!-- 🗑️ Delete -->
 							<IconButton
 								buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 								iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
@@ -194,29 +170,13 @@
 								}}
 								ariaLabel="Delete"
 							/>
+							<!-- ✏️ Edit -->
 							<IconButton
 								buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 								iconStyles="text-gray-600 dark:text-gray-100 hover:text-blue-500"
 								icon={Pen}
 								onclick={() => {
-									// Only pass the fields that MaintenanceLogForm expects
-									maintenanceModelStore.show(
-										vehicleId, // string
-										{
-											id: log.id,
-											date: log.date,
-											odometer: log.odometer,
-											serviceCenter: log.serviceCenter,
-											cost: log.cost,
-											notes: log.notes ?? ''
-										}, // logToEdit
-										true, // editMode
-										async (success) => {
-											if (success) {
-												await fetchMaintenanceLogs();
-											}
-										}
-									);
+									updateMaintenanceLog(log);
 								}}
 								ariaLabel="Edit"
 							/>
@@ -232,4 +192,7 @@
 	/>
 {/if}
 
-<MaintenanceLogModal />
+<!-- ✅ Only render modal when store says it should be visible -->
+{#if $maintenanceModelStore.modalVisibility}
+	<MaintenanceLogModal />
+{/if}
