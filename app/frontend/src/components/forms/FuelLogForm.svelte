@@ -1,12 +1,26 @@
 <script lang="ts">
 	import Button from '$components/common/Button.svelte';
+	import Checkbox from '$components/common/Checkbox.svelte';
 	import StatusBlock from '$components/common/StatusBlock.svelte';
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$lib/models/Error';
 	import type { Status } from '$lib/models/status';
-	import { cleanup, getCurrencySymbol } from '$lib/utils/formatting';
+	import {
+		cleanup,
+		getCurrencySymbol,
+		getDistanceUnit,
+		getVolumeUnit
+	} from '$lib/utils/formatting';
 	import FormField from '../common/FormField.svelte';
-	import { Calendar1, Gauge, Fuel, FileText, BadgeDollarSign } from '@lucide/svelte';
+	import {
+		Calendar1,
+		Gauge,
+		Fuel,
+		FileText,
+		BadgeDollarSign,
+		CircleSlash,
+		ArrowBigLeftDash
+	} from '@lucide/svelte';
 	import { t } from '$lib/stores/i18n';
 
 	let {
@@ -23,7 +37,9 @@
 		odometer: null,
 		fuelAmount: null,
 		cost: null,
-		notes: null
+		notes: null,
+		missedLast: false,
+		filled: true
 	});
 
 	let status = $state<Status>({
@@ -72,7 +88,9 @@
 					odometer: '',
 					fuelAmount: '',
 					cost: '',
-					notes: ''
+					notes: '',
+					missedLast: false,
+					filled: true
 				});
 			} else {
 				const data = await response.json();
@@ -110,7 +128,7 @@
 			id="odometer"
 			type="number"
 			label={$t('forms.labels.odometer')}
-			placeholder={$t('forms.placeholders.odometerReading')}
+			placeholder={`${$t('forms.placeholders.odometerReading')} (${getDistanceUnit()})`}
 			bind:value={refill.odometer}
 			icon={Gauge}
 			required={true}
@@ -122,7 +140,7 @@
 		<FormField
 			id="fuelAmount"
 			type="number"
-			placeholder={$t('forms.placeholders.fuelAmountLitres')}
+			placeholder={`${$t('forms.placeholders.fuelAmountLitres')} (${getVolumeUnit()})`}
 			bind:value={refill.fuelAmount}
 			icon={Fuel}
 			label={$t('forms.labels.fuelAmount')}
@@ -139,6 +157,23 @@
 			required={true}
 			ariaLabel="Fuel Cost"
 			inputClass="step-0.01"
+		/>
+	</div>
+
+	<div class="grid grid-flow-row grid-cols-2 gap-4">
+		<Checkbox
+			id="filled"
+			bind:checked={refill.filled}
+			icon={CircleSlash}
+			label="Tank Filled?"
+			ariaLabel="Tank Filled"
+		/>
+		<Checkbox
+			id="missedLast"
+			bind:checked={refill.missedLast}
+			icon={ArrowBigLeftDash}
+			label="Missed Last?"
+			ariaLabel="Previous Fuel Log Missed"
 		/>
 	</div>
 

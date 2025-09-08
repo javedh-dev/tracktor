@@ -21,9 +21,6 @@
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
-    "docs:dev": "npm run docs:dev --workspace=docs",
-    "docs:build": "npm run docs:build --workspace=docs",
-    "docs:preview": "npm run docs:preview --workspace=docs",
     "clean": "npm run clean --workspaces --if-present",
     "reset": "npm run reset --workspaces --if-present",
     "install:all": "npm install --workspaces"

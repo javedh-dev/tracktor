@@ -26,11 +26,11 @@
 </script>
 
 {#if showModal}
-	<ModalContainer
-		onclose={() => closeModal()}
-		title={editMode ? $t('modals.editFuelLog') : $t('modals.addFuelLog')}
-		{loading}
-	>
+    <ModalContainer
+        onclose={() => closeModal()}
+        title={editMode ? $t('modals.editFuelLog') : $t('modals.addFuelLog')}
+        {loading}
+    >
 		<FuelLogForm
 			{vehicleId}
 			{logToEdit}

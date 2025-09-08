@@ -1,5 +1,6 @@
 {
     "scm.defaultViewSortKey": "path",
     "explorer.excludeGitIgnore": false,
-    "explorer.fileNesting.enabled": false
+    "explorer.fileNesting.enabled": false,
+    "kiroAgent.configureMCP": "Disabled"
 }

@@ -14,7 +14,7 @@
     "db:status": "tsx src/db/status.ts",
     "format": "(eslint --fix . || true) && prettier --write .",
     "lint": "eslint . && prettier --check .",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist && rm -rf tracktor.db",
     "reset": "npm run clean && rm -rf tracktor.db node_modules && npm install"
   },
   "keywords": [],

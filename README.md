@@ -1,10 +1,9 @@
 > ⚠️ **WARNING:**
-> Tracktor is under very active development. There may be frequent breaking changes, and it is **not stable for production use**.
+> Tracktor is under active development. There may be frequent breaking changes, though we are taking precautions but it is **not stable for production use**.
 > _Please keep regular backups of your data!_
 
 <div align="center" style="margin-bottom: 20px;">
-  <img src="app/docs/public/logo-dark.svg#gh-dark-mode-only" style="height:60px; margin-right: 10px; vertical-align: middle;"/>
-  <img src="app/docs/public/logo-light.svg#gh-light-mode-only" style="height:60px; margin-right: 10px; vertical-align: middle;"/>
+  <img src="./docs/screenshots/logo.svg" style="height:60px; margin-right: 10px; vertical-align: middle;"/>
   <h1 style="display:inline; font-size: 2.5rem; vertical-align: middle;">Tracktor</h1>
 </div>
 
@@ -14,7 +13,11 @@
 </p>
 
 <p align="center">
-  <img src="app/docs/public/screenshots/dashboard.png" alt="Dashboard" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/dashboard-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/dashboard-light.png" />
+    <img alt="Dashboard" src="./docs/screenshots/dashboard-light.png" width="90%" style="border-radius: 10px" />
+  </picture>
 </p>
 
 ## ✨ Features
@@ -30,84 +33,77 @@
 
 <p align="center">
   <h3>🔐 Login Page</h3><br>
-  <img src="app/docs/public/screenshots/login.png" alt="Login Page" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/login-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/login-light.png" />
+    <img alt="Login Page" src="./docs/screenshots/login-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 <p align="center">
   <h3>📈 Charts</h3><br>
-  <img src="app/docs/public/screenshots/charts.png" alt="Charts" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/charts-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/charts-light.png" />
+    <img alt="Login Page" src="./docs/screenshots/charts-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 <p align="center">
   <h3>⛽ Fuel Log</h3><br>
-  <img src="app/docs/public/screenshots/fuel.png" alt="Fuel Log" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/fuel-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/fuel-light.png" />
+    <img alt="Fuel Log" src="./docs/screenshots/fuel-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 <p align="center">
   <h3>🛠️ Maintenance Log</h3><br>
-  <img src="app/docs/public/screenshots/maintenance.png" alt="Maintenance Log" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/maintenance-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/maintenance-light.png" />
+    <img alt="Maintenance Log" src="./docs/screenshots/maintenance-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 <p align="center">
   <h3>🛡️ Insurance Details</h3><br>
-  <img src="app/docs/public/screenshots/insurance.png" alt="Insurance Details" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/insurance-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/insurance-light.png" />
+    <img alt="Insurance Details" src="./docs/screenshots/insurance-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 <p align="center">
   <h3>📄 PUCC Details</h3><br>
-  <img src="app/docs/public/screenshots/pucc.png" alt="PUCC Details" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/pucc-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/pucc-light.png" />
+    <img alt="PUCC Details" src="./docs/screenshots/pucc-light.png" style="border-radius: 10px" />
+  </picture>
 </p>
 
 ## 🛠️ Tech Stack
 
 - 🎨 **Frontend:** SvelteKit, Tailwind CSS
 - 🖥️ **Backend:** Node.js, Express.js
-- 🗄️ **Database:** SQLite
-- 📚 **Documentation:** VitePress
+- 🗄️ **Database:** SQLite, sequelize ORM
 - 🐳 **Containerization:** Docker & Docker Compose
 
 ## 🚀 Getting Started
 
-### 📦 Prerequisites
-
-- 🟢 Node.js (v18 or higher)
-- 📦 npm
-- 🐳 Docker & Docker Compose (for containerized setup)
-
-### 🛠️ Installation (Development)
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/tracktor.git
-   cd tracktor
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Set up environment:**
-   ```bash
-   npm run setup
-   ```
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-5. **Open your browser:**
-   Navigate to `http://localhost:5173` for the frontend.
-
-### 🐳 Running with Docker Compose
-
-1. **Build and start all services:**
-   ```bash
-   docker-compose up --build
-   ```
-2. **Access the app:**
-   - 🚜 Main App: `http://localhost:3000`
-   - 📚 Docs: `http://localhost:5173`
+Please check the [installation guide](./docs/INSTALL.md) for detailed instructions on setting up the project.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the [contributing guidelines](app/docs/contributing.md) before submitting a pull request. 🙏
+Contributions are welcome! Please read the [contributing guidelines](./docs/CONTRIBUTING.md) before submitting a pull request.
+
+Please consider supporting this project by giving it a star! ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
 
 ## 📄 License
 
-This project is licensed under the ISC License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 📊 Repository activity
+
+![Activities](https://repobeats.axiom.co/api/embed/d41931a72a5373ee0d2073e72279862171468023.svg "Repobeats analytics image")
 
 ## ⭐ Star History
 
@@ -117,4 +113,10 @@ This project is licensed under the ISC License. See the [LICENSE](LICENSE) file 
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=javedh-dev/tracktor&type=Date" />
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=javedh-dev/tracktor&type=Date" />
  </picture>
+</a>
+
+## 🤝 Contributors
+
+<a href="https://github.com/javedh-dev/tracktor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=javedh-dev/tracktor"/>
 </a>

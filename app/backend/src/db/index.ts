@@ -2,6 +2,7 @@ import { Umzug, SequelizeStorage } from "umzug";
 import path from "path";
 import { fileURLToPath } from "url";
 import { db } from "./db.js";
+import env from "@config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,9 +50,7 @@ const performDbMigrations = async () => {
 };
 
 const seedData = async () => {
-  const demoMode = process.env.DEMO_MODE === "true";
-
-  if (demoMode) {
+  if (env.DEMO_MODE) {
     console.log("Demo mode enabled - seeding with sample data");
     await insertDummyData();
   } else {

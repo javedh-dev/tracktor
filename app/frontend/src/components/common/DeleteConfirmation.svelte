@@ -15,7 +15,7 @@
 			<span class="rounded-lg bg-rose-50 p-3">
 				<Trash2 class="h-6 w-6 text-rose-600" />
 			</span>
-			<h3 class="mt-4 text-2xl text-black">Delete</h3>
+			<h3 class="mt-4 text-2xl text-black dark:text-white">Delete</h3>
 			<h5 class="">Are you sure you want to delete?</h5>
 			<div class="mt-8 flex w-full gap-4">
 				<Button variant="hero" text="Cancel" type="button" onclick={() => (open = false)} />

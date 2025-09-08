@@ -29,16 +29,45 @@ export const getFuelLogs = async (vehicleId: string) => {
 
   // Calculate mileage
   return fuelLogs.map((log, index, arr) => {
-    if (index > 0) {
-      const prevLog = arr[index - 1];
-      if (!prevLog) {
-        return { ...log.toJSON(), mileage: null };
-      }
-      const distance = log.odometer - prevLog.odometer;
-      const mileage = distance / log.fuelAmount;
-      return { ...log.toJSON(), mileage: parseFloat(mileage.toFixed(2)) };
+    // mileage can only be calculated for a full tank and a previous log is needed
+    if (index === 0 || !log.filled || log.missedLast) {
+      return { ...log.toJSON(), mileage: null };
     }
-    return { ...log.toJSON(), mileage: null };
+
+    // find the previous full tank log that serves as a starting point
+    // a missed log acts as a barrier, preventing searching further back
+    let startIndex = -1;
+    for (let i = index - 1; i >= 0; i--) {
+      if (arr[i]?.filled) {
+        startIndex = i;
+        break;
+      }
+      if (arr[i]?.missedLast) {
+        break;
+      }
+    }
+
+    // if there is no valid starting log, mileage can't be calculated
+    if (startIndex === -1) {
+      return { ...log.toJSON(), mileage: null };
+    }
+
+    const startLog = arr[startIndex]!;
+    const distance = log.odometer - startLog.odometer;
+
+    // sum all fuel added after the starting log (accounts for partial fills)
+    let totalFuel = 0;
+    for (let i = startIndex + 1; i <= index; i++) {
+      totalFuel += arr[i]!.fuelAmount;
+    }
+
+    // avoid division by zero and ensure distance is positive
+    if (totalFuel === 0 || distance <= 0) {
+      return { ...log.toJSON(), mileage: null };
+    }
+
+    const mileage = distance / totalFuel;
+    return { ...log.toJSON(), mileage: parseFloat(mileage.toFixed(2)) };
   });
 };
 

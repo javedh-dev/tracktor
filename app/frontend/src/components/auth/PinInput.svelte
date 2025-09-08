@@ -1,32 +1,18 @@
 <script lang="ts">
+	export let complete: (pin: string) => void;
 	let pin = Array(6).fill('');
 	let inputs: HTMLInputElement[] = $state([]);
 
-	const { complete } = $props();
-
-	function handleInput(event: Event, index: number) {
-		const input = event.target as HTMLInputElement;
-		const value = input.value;
-
-		if (value.length > 1) {
-			input.value = value.slice(-1);
-		}
-
-		pin[index] = input.value;
-
-		if (input.value && index < 5) {
-			inputs[index + 1].focus();
-		}
-
-		if (pin.every((digit) => digit !== '')) {
-			complete(pin.join(''));
-		}
+	function onInput(e: Event, i: number) {
+		const input = e.target as HTMLInputElement;
+		input.value = input.value.slice(-1); // Always keep only last digit
+		pin[i] = input.value;
+		if (input.value && i < pin.length - 1) inputs[i + 1].focus();
+		if (pin.every((d) => d !== '')) complete(pin.join(''));
 	}
 
-	function handleKeydown(event: KeyboardEvent, index: number) {
-		if (event.key === 'Backspace' && !pin[index] && index > 0) {
-			inputs[index - 1].focus();
-		}
+	function onKeydown(e: KeyboardEvent, i: number) {
+		if (e.key === 'Backspace' && !pin[i] && i > 0) inputs[i - 1].focus();
 	}
 </script>
 
@@ -38,8 +24,8 @@
 			inputmode="numeric"
 			pattern="[0-9]*"
 			maxlength="1"
-			oninput={(e) => handleInput(e, i)}
-			onkeydown={(e) => handleKeydown(e, i)}
+			on:input={(e) => onInput(e, i)}
+			on:keydown={(e) => onKeydown(e, i)}
 			aria-label={`PIN digit ${i + 1}`}
 		/>
 	{/each}

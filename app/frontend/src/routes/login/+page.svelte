@@ -26,6 +26,13 @@
 					if (response.ok) {
 						const data = await response.json();
 						pinExists = data.exists;
+						if (!pinExists) {
+							status = {
+								message:
+									'No PIN found. Please set `AUTH_PIN` environment variable before starting the app.',
+								type: 'ERROR'
+							};
+						}
 					} else {
 						status = {
 							message: 'Failed to check PIN status.',
@@ -127,16 +134,9 @@
 				<ShieldEllipsis class="h-8 w-8" />
 				Enter your 6-digit PIN to access Tracktor
 			</p>
-		{:else}
-			<p
-				class="mb-6 flex items-center justify-center gap-2 text-center text-gray-600 dark:text-gray-300"
-			>
-				<ShieldPlus class="h-8 w-8" />
-				Set your 6-digit PIN for Tracktor
-			</p>
 		{/if}
 
-		{#if !checkingPinStatus}
+		{#if !checkingPinStatus && pinExists}
 			<PinInput complete={(pin: string) => handlePinComplete(pin)} />
 		{/if}
 

@@ -60,18 +60,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern=latest
 
-      - name: Extract docs metadata
-        id: docs-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}-docs
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern=latest
-
       - name: Build and push app
         uses: docker/build-push-action@v5
         with:
@@ -81,17 +69,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ steps.strategy.outputs.platforms }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=${{ steps.strategy.outputs.cache-mode }}
-
-      - name: Build and push docs
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile.docs
-          push: ${{ steps.strategy.outputs.push }}
-          tags: ${{ steps.docs-meta.outputs.tags }}
-          labels: ${{ steps.docs-meta.outputs.labels }}
-          platforms: linux/amd64 # Docs typically don't need multi-arch
           cache-from: type=gha
           cache-to: type=gha,mode=${{ steps.strategy.outputs.cache-mode }}

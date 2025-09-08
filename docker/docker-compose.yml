@@ -3,12 +3,12 @@ services:
     image: ghcr.io/javedh-dev/tracktor:dev
     container_name: tracktor-app
     restart: always
+    env_file: .env
     ports:
       - "3333:3000"
     volumes:
-      - ../app/backend/tracktor.db:/data/tracktor.db
-    environment:
-      - PUBLIC_API_BASE_URL=/
+      - tracktor-app-data:/data/
 
 volumes:
-  tracktor-app-data: null
+  tracktor-app-data:
+    driver: local
