@@ -12,8 +12,13 @@
 	});
 
 	import { config, type Config } from '$lib/stores/config';
+	import { listCurrencies } from '$lib/utils/currencies';
 
 	let localConfig: Config[] = $state([]);
+
+	const userLocale = navigator.language || 'en';
+	
+  	const currencyOptions = listCurrencies(userLocale);
 
 	const dateFormatOptions = [
 		{ value: 'dd/MM/yyyy', label: 'dd/MM/yyyy (e.g., 31/12/2000)' },
@@ -21,14 +26,7 @@
 		{ value: 'yyyy-MM-dd', label: 'yyyy-MM-dd (e.g., 2000-12-31)' },
 		{ value: 'dd MMM, yyyy', label: 'dd MMM, yyyy (e.g., 31 Dec, 2000)' }
 	];
-
-	const currencyOptions = [
-		{ value: 'INR', label: 'INR (₹)' },
-		{ value: 'USD', label: 'USD ($)' },
-		{ value: 'EUR', label: 'EUR (€)' },
-		{ value: 'GBP', label: 'GBP (£)' }
-	];
-
+	
 	const uomOptions = [
 		{ value: 'metric', label: 'Metric' },
 		{ value: 'imperial', label: 'Imperial' }
@@ -76,15 +74,15 @@
 					{/each}
 				</select>
 			{:else if item.key === 'currency'}
-				<select
-					id={item.key}
-					bind:value={item.value}
-					class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-				>
-					{#each currencyOptions as option}
-						<option value={option.value}>{option.label}</option>
-					{/each}
-				</select>
+			<select
+				id={item.key}
+				bind:value={item.value}
+				class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+			>
+				{#each currencyOptions as option}
+				<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
 			{:else if item.key === 'unitOfMeasure'}
 				<select
 					id={item.key}
