@@ -9,15 +9,15 @@
 		Building2
 	} from '@lucide/svelte';
 	import FormField from '../common/FormField.svelte';
-	import type { NewVehicle } from '$lib/models/vehicle';
+	import type { NewVehicle } from '$models/vehicle';
 	import { env } from '$env/dynamic/public';
-	import { vehiclesStore } from '$lib/stores/vehicle';
+	import { vehiclesStore } from '$stores/vehicle';
 	import { browser } from '$app/environment';
-	import Button from '$components/common/Button.svelte';
-	import StatusBlock from '$components/common/StatusBlock.svelte';
-	import type { Status } from '$lib/models/status';
-	import { handleApiError, type ApiError } from '$lib/models/Error';
-	import { cleanup } from '$lib/utils/formatting';
+	import Button from '$appui/common/Button.svelte';
+	import StatusBlock from '$appui/common/StatusBlock.svelte';
+	import type { Status } from '$models/status';
+	import { handleApiError, type ApiError } from '$models/Error';
+	import { cleanup } from '$utils/formatting';
 
 	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
 

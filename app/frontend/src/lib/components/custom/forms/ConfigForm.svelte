@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$components/common/Button.svelte';
+	import Button from '$appui/common/Button.svelte';
 
 	let { modalVisibility = $bindable(), loading = false, callback } = $props();
 
@@ -11,7 +11,7 @@
 		type: null
 	});
 
-	import { config, type Config } from '$lib/stores/config';
+	import { config, type Config } from '$stores/config';
 
 	let localConfig: Config[] = $state([]);
 

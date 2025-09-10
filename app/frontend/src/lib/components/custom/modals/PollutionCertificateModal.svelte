@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ModalContainer from '$components/common/ModalContainer.svelte';
-	import { puccModelStore } from '$lib/stores/pucc';
-	import PollutionCertificateForm from '$components/forms/PollutionCertificateForm.svelte';
+	import ModalContainer from '$appui/common/ModalContainer.svelte';
+	import { puccModelStore } from '$stores/pucc';
+	import PollutionCertificateForm from '$appui/forms/PollutionCertificateForm.svelte';
 
 	let entryToEdit = $state<any>(null);
 	let showModal = $state(false);

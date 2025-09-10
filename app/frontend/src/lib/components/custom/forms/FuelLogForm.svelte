@@ -1,16 +1,11 @@
 <script lang="ts">
-	import Button from '$components/common/Button.svelte';
-	import Checkbox from '$components/common/Checkbox.svelte';
-	import StatusBlock from '$components/common/StatusBlock.svelte';
+	import Button from '$appui/common/Button.svelte';
+	import Checkbox from '$appui/common/Checkbox.svelte';
+	import StatusBlock from '$appui/common/StatusBlock.svelte';
 	import { env } from '$env/dynamic/public';
-	import { handleApiError } from '$lib/models/Error';
-	import type { Status } from '$lib/models/status';
-	import {
-		cleanup,
-		getCurrencySymbol,
-		getDistanceUnit,
-		getVolumeUnit
-	} from '$lib/utils/formatting';
+	import { handleApiError } from '$models/Error';
+	import type { Status } from '$models/status';
+	import { cleanup, getCurrencySymbol, getDistanceUnit, getVolumeUnit } from '$utils/formatting';
 	import FormField from '../common/FormField.svelte';
 	import {
 		Calendar1,

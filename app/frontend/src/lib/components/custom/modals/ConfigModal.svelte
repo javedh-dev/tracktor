@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ConfigForm from '$components/forms/ConfigForm.svelte';
-	import ModalContainer from '$components/common/ModalContainer.svelte';
-	import { configModelStore } from '$lib/stores/config';
+	import ConfigForm from '$appui/forms/ConfigForm.svelte';
+	import ModalContainer from '$appui/common/ModalContainer.svelte';
+	import { configModelStore } from '$stores/config';
 
 	let showModal = $state(false);
 	let loading = $state(false);

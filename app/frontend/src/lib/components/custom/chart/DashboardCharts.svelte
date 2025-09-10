@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
-	import { darkModeStore } from '$lib/stores/dark-mode';
+	import { darkModeStore } from '$stores/dark-mode';
 	import { Chart, registerables, type ChartOptions } from 'chart.js';
-	import { formatDate, getCurrencySymbol, getMileageUnit } from '$lib/utils/formatting';
+	import { formatDate, getCurrencySymbol, getMileageUnit } from '$utils/formatting';
 
 	import ChartCard from './ChartCard.svelte';
 	import { Line } from 'svelte5-chartjs';

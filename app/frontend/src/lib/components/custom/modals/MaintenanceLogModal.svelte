@@ -1,7 +1,7 @@
 <script lang="ts">
-	import MaintenanceLogForm from '$components/forms/MaintenanceLogForm.svelte';
-	import ModalContainer from '$components/common/ModalContainer.svelte';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import MaintenanceLogForm from '$appui/forms/MaintenanceLogForm.svelte';
+	import ModalContainer from '$appui/common/ModalContainer.svelte';
+	import { maintenanceModelStore } from '$stores/maintenance';
 
 	let logToEdit = $state<any>(null);
 	let showModal = $state(false);

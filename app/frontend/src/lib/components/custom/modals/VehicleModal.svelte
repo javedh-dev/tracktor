@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ModalContainer from '$components/common/ModalContainer.svelte';
-	import { vehicleModelStore } from '$lib/stores/vehicle';
-	import VehicleForm from '$components/forms/VehicleForm.svelte';
+	import ModalContainer from '$appui/common/ModalContainer.svelte';
+	import { vehicleModelStore } from '$stores/vehicle';
+	import VehicleForm from '$appui/forms/VehicleForm.svelte';
 
 	let showModal = $state(false);
 	let vehicleToEdit = $state(null);

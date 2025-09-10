@@ -1,7 +1,7 @@
 <script lang="ts">
-	import FuelLogForm from '$components/forms/FuelLogForm.svelte';
-	import ModalContainer from '$components/common/ModalContainer.svelte';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
+	import FuelLogForm from '$appui/forms/FuelLogForm.svelte';
+	import ModalContainer from '$appui/common/ModalContainer.svelte';
+	import { fuelLogModelStore } from '$stores/fuel-log';
 
 	let logToEdit = $state<any>(null);
 	let showModal = $state(false);

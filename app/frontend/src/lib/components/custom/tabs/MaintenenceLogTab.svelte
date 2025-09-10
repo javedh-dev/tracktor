@@ -1,6 +1,6 @@
 <script lang="ts">
-	import TabContainer from '$components/common/TabContainer.svelte';
-	import MaintenanceLogList from '$components/lists/MaintenanceLogList.svelte';
+	import TabContainer from '$appui/common/TabContainer.svelte';
+	import MaintenanceLogList from '$appui/lists/MaintenanceLogList.svelte';
 
 	let { vehicleId } = $props();
 </script>

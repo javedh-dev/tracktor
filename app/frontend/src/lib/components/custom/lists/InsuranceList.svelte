@@ -3,11 +3,11 @@
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
 	import { Shield, Calendar, Hash, DollarSign, Trash2, Notebook } from '@lucide/svelte';
-	import { formatCurrency, formatDate } from '$lib/utils/formatting';
+	import { formatCurrency, formatDate } from '$utils/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$components/common/IconButton.svelte';
-	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
-	import { getApiUrl } from '$lib/utils/api';
+	import IconButton from '$appui/common/IconButton.svelte';
+	import DeleteConfirmation from '$appui/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$utils/api';
 
 	let { vehicleId } = $props();
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import VehicleCard from '$components/common/VehicleCard.svelte';
+	import { vehiclesStore } from '$stores/vehicle';
+	import VehicleCard from '$appui/common/VehicleCard.svelte';
 
 	let { vehicles, selectedVehicleId, updateCallback } = $props();
 

@@ -12,12 +12,12 @@
 		Shield,
 		BadgeCheck
 	} from '@lucide/svelte';
-	import { formatDistance } from '$lib/utils/formatting';
-	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import { insuranceModelStore } from '$lib/stores/insurance';
-	import { puccModelStore } from '$lib/stores/pucc';
+	import { formatDistance } from '$utils/formatting';
+	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
+	import { maintenanceModelStore } from '$stores/maintenance';
+	import { fuelLogModelStore } from '$stores/fuel-log';
+	import { insuranceModelStore } from '$stores/insurance';
+	import { puccModelStore } from '$stores/pucc';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
 	import IconButton from './IconButton.svelte';

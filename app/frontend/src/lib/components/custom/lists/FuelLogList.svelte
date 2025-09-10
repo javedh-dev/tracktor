@@ -8,11 +8,11 @@
 		formatVolume,
 		formatMileage,
 		formatDistance
-	} from '$lib/utils/formatting';
+	} from '$utils/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$components/common/IconButton.svelte';
-	import DeleteConfirmation from '$components/common/DeleteConfirmation.svelte';
-	import { getApiUrl } from '$lib/utils/api';
+	import IconButton from '$appui/common/IconButton.svelte';
+	import DeleteConfirmation from '$appui/common/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$utils/api';
 
 	const { vehicleId } = $props();
 

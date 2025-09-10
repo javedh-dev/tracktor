@@ -1,6 +1,6 @@
 <script lang="ts">
-	import TabContainer from '$components/common/TabContainer.svelte';
-	import DashboardCharts from '$components/chart/DashboardCharts.svelte';
+	import TabContainer from '$appui/common/TabContainer.svelte';
+	import DashboardCharts from '$appui/chart/DashboardCharts.svelte';
 
 	const { vehicleId } = $props();
 </script>

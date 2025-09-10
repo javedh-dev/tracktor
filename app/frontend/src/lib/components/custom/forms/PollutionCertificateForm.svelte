@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Button from '$components/common/Button.svelte';
-	import FormField from '$components/common/FormField.svelte';
-	import StatusBlock from '$components/common/StatusBlock.svelte';
+	import Button from '$appui/common/Button.svelte';
+	import FormField from '$appui/common/FormField.svelte';
+	import StatusBlock from '$appui/common/StatusBlock.svelte';
 	import { env } from '$env/dynamic/public';
-	import { handleApiError } from '$lib/models/Error';
-	import type { Status } from '$lib/models/status';
-	import { cleanup } from '$lib/utils/formatting';
+	import { handleApiError } from '$models/Error';
+	import type { Status } from '$models/status';
+	import { cleanup } from '$utils/formatting';
 	import { Calendar1, IdCard, Notebook, TestTube2 } from '@lucide/svelte';
 
 	let {

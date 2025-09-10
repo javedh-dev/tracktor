@@ -5,12 +5,12 @@
 	import '../styles/app.css';
 	import { tick } from 'svelte';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte';
-	import ThemeToggle from '$components/common/ThemeToggle.svelte';
+	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
 	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { configModelStore } from '$lib/stores/config';
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import IconButton from '$components/common/IconButton.svelte';
+	import { configModelStore } from '$stores/config';
+	import { vehiclesStore } from '$stores/vehicle';
+	import IconButton from '$appui/common/IconButton.svelte';
 
 	let { children } = $props();
 

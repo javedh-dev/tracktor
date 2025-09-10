@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { darkModeStore } from '$lib/stores/dark-mode';
+	import { darkModeStore } from '$stores/dark-mode';
 	import { Moon, Sun } from '@lucide/svelte';
 	let darkMode = $state(false);
 

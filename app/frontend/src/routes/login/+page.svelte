@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import PinInput from '$components/auth/PinInput.svelte';
-	import ThemeToggle from '$components/common/ThemeToggle.svelte';
-	import { getApiUrl } from '$lib/utils/api';
+	import PinInput from '$appui/auth/PinInput.svelte';
+	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
+	import { getApiUrl } from '$utils/api';
 	import { ShieldEllipsis, ShieldPlus, Tractor } from '@lucide/svelte';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { simulateNetworkDelay } from '$lib/utils/dev';
-	import StatusBlock from '$components/common/StatusBlock.svelte';
-	import type { Status } from '$lib/models/status';
+	import { simulateNetworkDelay } from '$utils/dev';
+	import StatusBlock from '$appui/common/StatusBlock.svelte';
+	import type { Status } from '$models/status';
 
 	let loading = $state(false);
 	let status = $state<Status>({
