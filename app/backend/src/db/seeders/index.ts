@@ -126,8 +126,8 @@ const seedDemoData = async (enforce: boolean = false) => {
         }),
         fuelAmount: faker.number.float({ min: 1, max: 100 }),
         cost: faker.number.float({ min: 10, max: 10000 }),
-        filled: faker.datatype.boolean({ probability: 0.9 }),
-        missedLast: faker.datatype.boolean({ probability: 0.1 }),
+        filled: faker.datatype.boolean({ probability: 0.995 }),
+        missedLast: faker.datatype.boolean({ probability: 0.005 }),
       });
     }
     await db.insert(fuelLogTable).values(fuelLogs);

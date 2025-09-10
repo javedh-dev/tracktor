@@ -23,6 +23,11 @@
 	const generateChartOptions = (isDarkMode: boolean): ChartOptions => {
 		return {
 			responsive: true,
+			datasets: {
+				line: {
+					spanGaps: true
+				}
+			},
 			plugins: {
 				legend: {
 					labels: {
