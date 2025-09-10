@@ -1,4 +1,4 @@
-import { config } from '$lib/stores/config';
+import { config } from '../stores/config';
 import { format } from 'date-fns';
 
 export interface ConfigStore {

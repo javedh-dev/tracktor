@@ -1,4 +1,4 @@
-import { getApiUrl } from "$lib/utils/api";
+import { getApiUrl } from "../utils/api";
 
 export const isPinSet = async () => {
     try {
