@@ -5,7 +5,6 @@
     "app/*"
   ],
   "scripts": {
-    "setup": "node scripts/setup-env.js",
     "test:cors": "node scripts/test-cors.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --workspace=backend",
