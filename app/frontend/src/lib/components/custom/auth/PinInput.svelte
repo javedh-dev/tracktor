@@ -32,7 +32,7 @@
 </div>
 
 <style>
-	@reference "../../styles/app.css";
+	@reference "../../../../styles/app.css";
 	input {
 		@apply h-10 w-10 rounded-md border-2 border-gray-300 bg-white text-center text-xl text-gray-900 focus:border-blue-500 focus:ring-blue-500 sm:h-12 sm:w-12 sm:text-2xl dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400;
 		-webkit-text-security: disc;
