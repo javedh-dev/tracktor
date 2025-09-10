@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import { tick } from 'svelte';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte';
@@ -50,6 +51,7 @@
 	};
 </script>
 
+<ModeWatcher />
 <!-- Dark mode toggle, scrolls with screen -->
 {#if demoMode}
 	<div

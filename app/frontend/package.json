@@ -40,7 +40,7 @@
 		"svelte-check": "^4.0.0",
 		"svelte-eslint-parser": "^1.3.1",
 		"tailwind-merge": "^3.3.1",
-		"tailwind-variants": "^3.1.1",
+		"tailwind-variants": "^1.0.0",
 		"tailwindcss": "^4.0.0",
 		"tw-animate-css": "^1.3.8",
 		"typescript": "^5.0.0",
@@ -49,6 +49,7 @@
 	},
 	"dependencies": {
 		"dot-env": "^0.0.1",
+		"mode-watcher": "^1.1.0",
 		"svelte-loading-spinners": "^0.3.6",
 		"svelte5-chartjs": "^1.0.0"
 	}
