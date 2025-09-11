@@ -3,6 +3,7 @@
 	import { ShieldEllipsis, Tractor } from '@lucide/svelte';
 	import PinInput from '../auth/PinInput.svelte';
 	import * as Card from '$lib/components/ui/card';
+	import ThemeToggle from '../common/ThemeToggle.svelte';
 
 	let { class: className = '', oncomplete, ...restProps } = $props();
 </script>

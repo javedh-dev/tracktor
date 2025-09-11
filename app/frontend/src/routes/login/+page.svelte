@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import LoginForm from '$appui/forms/login-form.svelte';
-	import ThemeToggle from '$lib/components/custom/common/ThemeToggle.svelte';
+	import LoginForm from '$appui/forms/LoginForm.svelte';
+	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
 	import { verifyPin } from '$services/auth.service';
 	import { simulateNetworkDelay } from '$utils/dev';
 	import { toast } from 'svelte-sonner';
@@ -26,7 +26,7 @@
 
 <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
 	<div class="w-full max-w-lg">
-		<div class="absolute top-4 right-4">
+		<div class="absolute top-16 right-12">
 			<ThemeToggle />
 		</div>
 		<LoginForm {oncomplete} />

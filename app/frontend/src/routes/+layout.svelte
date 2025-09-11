@@ -5,14 +5,11 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import { tick } from 'svelte';
-	import { LogOut, Tractor, Settings } from '@lucide/svelte';
-	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
+	import { TriangleAlert } from '@lucide/svelte';
 	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { configModelStore } from '$stores/config';
-	import { vehiclesStore } from '$stores/vehicle';
-	import IconButton from '$appui/common/IconButton.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import * as Alert from '$lib/components/ui/alert/index.js';
 
 	let { children } = $props();
 
@@ -36,35 +33,20 @@
 			checkingAuth = false;
 		});
 	});
-
-	function logout() {
-		if (browser) {
-			localStorage.removeItem('userPin');
-			isAuthenticated = false;
-		}
-	}
-
-	const fetchVehicles = () => {
-		if (browser) {
-			const pin = localStorage.getItem('userPin') || undefined;
-			if (pin) vehiclesStore.fetchVehicles(pin);
-		}
-	};
 </script>
 
 <ModeWatcher />
 <Toaster position="top-right" richColors expand />
-<!-- Dark mode toggle, scrolls with screen -->
+
 {#if demoMode}
-	<div
-		class="w-full border-b border-yellow-300 bg-yellow-100 py-2 text-center text-base font-semibold text-yellow-900 shadow-sm dark:border-yellow-700 dark:bg-yellow-900 dark:text-yellow-100"
-	>
-		<span>
-			⚠️ NOTICE: This is a demo instance. Data will be reset periodically and is not saved
-			permanently. Please avoid adding any persoanl info.</span
-		>
-		<br />
-		<strong>Default PIN : 123456</strong>
+	<div class="sticky top-0 w-full">
+		<Alert.Root class="rounded-none border-x-0 border-t-0 text-amber-500">
+			<TriangleAlert />
+			<Alert.Title>
+				This is a demo instance. Data will be reset periodically and is not saved permanently.
+				Please avoid adding any persoanl info. <strong>Default PIN : 123456</strong>
+			</Alert.Title>
+		</Alert.Root>
 	</div>
 {/if}
 {#if checkingAuth}
@@ -72,46 +54,5 @@
 		<Jumper size="64" color="#155dfc" duration="2s" />
 		<p class="text-lg text-gray-600">Validating Auth...</p>
 	</div>
-{:else if isAuthenticated}
-	<div class="min-h-screen transition-colors">
-		<header class="bg-white shadow-sm transition-colors dark:bg-gray-800">
-			<nav class="container mx-auto flex items-center justify-between p-4">
-				<a
-					href="/dashboard"
-					class="flex items-center gap-2 text-2xl font-bold text-blue-700 transition-colors hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-400"
-				>
-					<Tractor class="h-8 w-8" />
-					Tracktor
-				</a>
-				<div class="flex items-center justify-center gap-2 align-middle">
-					<ThemeToggle />
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
-						icon={Settings}
-						onclick={() => {
-							configModelStore.show((status: boolean) => {
-								status && fetchVehicles();
-							});
-						}}
-						ariaLabel="Settings"
-					/>
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-						icon={LogOut}
-						onclick={logout}
-						ariaLabel="Logout"
-					/>
-				</div>
-			</nav>
-		</header>
-		<main class="text-gray-600 dark:text-gray-100">
-			{@render children()}
-			<Toaster />
-		</main>
-	</div>
-{:else}
-	<!-- Render login page or other public pages -->
-	{@render children()}
 {/if}
+{@render children()}
