@@ -17,7 +17,7 @@ export const seedData = async () => {
   const pinEnv = process.env.AUTH_PIN;
   const enforceEnv = process.env.FORCE_DEMO_SEED_DATA;
   const demoMode = process.env.PUBLIC_DEMO_MODE;
-  if (pinEnv && pinEnv.trim().length == 6) await seedAuthPin(pinEnv);
+  if (!demoMode && (pinEnv && pinEnv.trim().length == 6)) await seedAuthPin(pinEnv);
   if (demoMode == "true") await seedDemoData(enforceEnv == "true");
 };
 
@@ -32,6 +32,7 @@ const seedAuthPin = async (pin: string) => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
+  seedAuthPin('123456')
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {

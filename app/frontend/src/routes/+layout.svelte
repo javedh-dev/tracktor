@@ -12,6 +12,7 @@
 	import { configModelStore } from '$stores/config';
 	import { vehiclesStore } from '$stores/vehicle';
 	import IconButton from '$appui/common/IconButton.svelte';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { children } = $props();
 
@@ -52,6 +53,7 @@
 </script>
 
 <ModeWatcher />
+<Toaster position="top-right" richColors expand />
 <!-- Dark mode toggle, scrolls with screen -->
 {#if demoMode}
 	<div
@@ -66,12 +68,12 @@
 	</div>
 {/if}
 {#if checkingAuth}
-	<div class="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+	<div class="flex min-h-screen items-center justify-center">
 		<Jumper size="64" color="#155dfc" duration="2s" />
 		<p class="text-lg text-gray-600">Validating Auth...</p>
 	</div>
 {:else if isAuthenticated}
-	<div class="min-h-screen bg-gray-100 transition-colors dark:bg-gray-900">
+	<div class="min-h-screen transition-colors">
 		<header class="bg-white shadow-sm transition-colors dark:bg-gray-800">
 			<nav class="container mx-auto flex items-center justify-between p-4">
 				<a
@@ -106,6 +108,7 @@
 		</header>
 		<main class="text-gray-600 dark:text-gray-100">
 			{@render children()}
+			<Toaster />
 		</main>
 	</div>
 {:else}

@@ -1,152 +1,34 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import PinInput from '$appui/auth/PinInput.svelte';
-	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
-	import { getApiUrl } from '$utils/api';
-	import { ShieldEllipsis, ShieldPlus, Tractor } from '@lucide/svelte';
-	import { Jumper } from 'svelte-loading-spinners';
+	import { goto } from '$app/navigation';
+	import LoginForm from '$appui/forms/login-form.svelte';
+	import ThemeToggle from '$lib/components/custom/common/ThemeToggle.svelte';
+	import { verifyPin } from '$services/auth.service';
 	import { simulateNetworkDelay } from '$utils/dev';
-	import StatusBlock from '$appui/common/StatusBlock.svelte';
-	import type { Status } from '$models/status';
+	import { toast } from 'svelte-sonner';
 
-	let loading = $state(false);
-	let status = $state<Status>({
-		message: undefined,
-		type: 'INFO'
-	});
-	let pinExists = $state(false);
-	let checkingPinStatus = $state(true);
-
-	$effect(() => {
-		if (browser) {
-			async function checkPinStatus() {
-				try {
-					const response = await fetch(getApiUrl('/api/pin/status'));
-					if (response.ok) {
-						const data = await response.json();
-						pinExists = data.exists;
-						if (!pinExists) {
-							status = {
-								message:
-									'No PIN found. Please set `AUTH_PIN` environment variable before starting the app.',
-								type: 'ERROR'
-							};
-						}
-					} else {
-						status = {
-							message: 'Failed to check PIN status.',
-							type: 'ERROR'
-						};
-					}
-				} catch (e) {
-					console.error(e);
-					status = {
-						message: 'Unknown Server Error Occurred.',
-						type: 'ERROR'
-					};
-				} finally {
-					checkingPinStatus = false;
+	const oncomplete = (pin: string) => {
+		console.log(pin);
+		verifyPin(pin).then(async (verified) => {
+			if (verified) {
+				if (browser) {
+					localStorage.setItem('userPin', pin);
 				}
+				toast.success('Login Successfull...!');
+				await simulateNetworkDelay(1000);
+				goto('/dashboard', { replaceState: true });
+			} else {
+				toast.error('Incorrect Pin. Please try again...!');
 			}
-			checkPinStatus();
-			const localPin = localStorage.getItem('userPin');
-			if (localPin) {
-				endpointCall(localPin, true);
-				return;
-			}
-		}
-	});
-
-	async function handlePinComplete(pin: string) {
-		loading = true;
-		status.message = '';
-		// await simulateNetworkDelay(1000); // Simulate network delay for development
-		try {
-			await endpointCall(pin, pinExists);
-		} catch (e) {
-			console.error(e);
-			status = {
-				message: 'Failed to connect to the server. Please check your connection.',
-				type: 'ERROR'
-			};
-		} finally {
-			loading = false;
-		}
-	}
-
-	const endpointCall = async (pin: string, verify = true) => {
-		const endpoint = verify ? '/api/pin/verify' : '/api/pin';
-		const response = await fetch(getApiUrl(endpoint), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ pin })
 		});
-
-		if (response.ok) {
-			// Store PIN and redirect
-			if (browser) {
-				localStorage.setItem('userPin', pin);
-			}
-			loading = false;
-			status = {
-				message: 'PIN Verified Successfully',
-				type: 'SUCCESS'
-			};
-			await simulateNetworkDelay(1000);
-			goto('/dashboard', { replaceState: true });
-		} else {
-			const data = await response.json();
-			status = {
-				message:
-					data.message || (pinExists ? 'Invalid PIN. Please try again.' : 'Failed to set PIN.'),
-				type: 'ERROR'
-			};
-		}
 	};
 </script>
 
-<div
-	class="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4 transition-colors dark:bg-gray-900"
->
-	<div class="absolute top-4 right-4">
-		<ThemeToggle />
-	</div>
-	<div
-		class="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
-	>
-		<div class="mb-6">
-			<h1
-				class="flex items-center justify-center gap-5 text-center text-3xl font-bold text-gray-800 dark:text-gray-100"
-			>
-				<Tractor class="h-10 w-10"></Tractor> Welcome
-			</h1>
+<div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+	<div class="w-full max-w-lg">
+		<div class="absolute top-4 right-4">
+			<ThemeToggle />
 		</div>
-
-		{#if checkingPinStatus}
-			<p class="mb-6 text-center text-gray-600 dark:text-gray-300">Checking PIN status...</p>
-		{:else if pinExists}
-			<p
-				class="mb-6 flex items-center justify-center gap-2 text-center text-gray-600 dark:text-gray-300"
-			>
-				<ShieldEllipsis class="h-8 w-8" />
-				Enter your 6-digit PIN to access Tracktor
-			</p>
-		{/if}
-
-		{#if !checkingPinStatus && pinExists}
-			<PinInput complete={(pin: string) => handlePinComplete(pin)} />
-		{/if}
-
-		{#if loading}
-			<p
-				class="mt-4 flex items-center justify-center text-center font-semibold text-blue-600 dark:text-blue-400"
-			>
-				<Jumper size="40" color="#155dfc" unit="px" duration="2s" />
-			</p>
-		{/if}
-		<StatusBlock message={status.message} type={status.type} />
+		<LoginForm {oncomplete} />
 	</div>
 </div>
