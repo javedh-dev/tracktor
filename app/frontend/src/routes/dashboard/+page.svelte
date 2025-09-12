@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { PlusCircle } from '@lucide/svelte';
-	import FuelLogModal from '$appui/modals/FuelLogModal.svelte';
-	import VehicleModal from '$appui/modals/VehicleModal.svelte';
-	import VehicleList from '$appui/lists/VehicleList.svelte';
+	import FuelLogModal from '$lib/components/features/dashboard/fuel/FuelLogModal.svelte';
+	import VehicleModal from '$lib/components/features/vehicle/VehicleModal.svelte';
+	import VehicleList from '$lib/components/features/vehicle/VehicleList.svelte';
 	import type { Vehicle } from '$models/vehicle';
 	import { Jumper } from 'svelte-loading-spinners';
-	import MaintenanceLogModal from '$appui/modals/MaintenanceLogModal.svelte';
+	import MaintenanceLogModal from '$lib/components/features/dashboard/maintenance/MaintenanceLogModal.svelte';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
-	import PollutionCertificateModal from '$appui/modals/PollutionCertificateModal.svelte';
-	import InsuranceModal from '$appui/modals/InsuranceModal.svelte';
+	import PollutionCertificateModal from '$lib/components/features/dashboard/pullution/PollutionCertificateModal.svelte';
+	import InsuranceModal from '$lib/components/features/dashboard/insurance/InsuranceModal.svelte';
 	import { browser } from '$app/environment';
-	import ConfigModal from '$appui/modals/ConfigModal.svelte';
+	import ConfigModal from '$lib/components/features/config/ConfigModal.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import TabHeader from '$lib/components/custom/tabs/DashboardTabs.svelte';
-	import DashboardTabs from '$lib/components/custom/tabs/DashboardTabs.svelte';
+	import TabHeader from '$lib/components/features/dashboard/overview/DashboardTabs.svelte';
+	import DashboardTabs from '$lib/components/features/dashboard/overview/DashboardTabs.svelte';
 
 	let vehicles = $state<Vehicle[]>([]);
 	let loading = $state(true);

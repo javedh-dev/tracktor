@@ -4,7 +4,7 @@
 	import { browser } from '$app/environment';
 	import { tick } from 'svelte';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte';
-	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
+	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { env } from '$env/dynamic/public';
 	import { configModelStore } from '$stores/config';
 	import { vehiclesStore } from '$stores/vehicle';

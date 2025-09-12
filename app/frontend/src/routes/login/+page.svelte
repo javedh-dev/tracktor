@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import LoginForm from '$appui/forms/LoginForm.svelte';
-	import ThemeToggle from '$appui/common/ThemeToggle.svelte';
+	import LoginForm from '$lib/components/features/login/LoginForm.svelte';
+	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { verifyPin } from '$services/auth.service';
 	import { simulateNetworkDelay } from '$utils/dev';
 	import { toast } from 'svelte-sonner';

@@ -1,4 +1,4 @@
-import LabelWithIcon from '$lib/components/custom/common/LabelWithIcon.svelte';
+import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 import { Badge } from '$lib/components/ui/badge';
 import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 import { formatCurrency, formatDate, formatDistance, formatVolume } from '$utils/formatting';
