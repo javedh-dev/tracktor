@@ -123,7 +123,7 @@
 </script>
 
 {#if loading}
-	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
+	<p class="flex items-center justify-center gap-5 text-lg">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
 {:else if error}

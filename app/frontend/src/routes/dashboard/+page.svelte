@@ -6,18 +6,15 @@
 	import type { Vehicle } from '$models/vehicle';
 	import { Jumper } from 'svelte-loading-spinners';
 	import MaintenanceLogModal from '$appui/modals/MaintenanceLogModal.svelte';
-	import TabHeader from '$appui/tabs/TabHeader.svelte';
-	import DashboardTab from '$appui/tabs/DashboardTab.svelte';
-	import FuelLogTab from '$appui/tabs/FuelLogTab.svelte';
-	import MaintenenceLogTab from '$appui/tabs/MaintenenceLogTab.svelte';
-	import InsuranceTab from '$appui/tabs/InsuranceTab.svelte';
-	import PollutionTab from '$appui/tabs/PollutionTab.svelte';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
 	import PollutionCertificateModal from '$appui/modals/PollutionCertificateModal.svelte';
 	import InsuranceModal from '$appui/modals/InsuranceModal.svelte';
 	import { browser } from '$app/environment';
 	import ConfigModal from '$appui/modals/ConfigModal.svelte';
-	import Button from '$appui/common/Button.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Tabs from '$lib/components/ui/tabs';
+	import TabHeader from '$lib/components/custom/tabs/DashboardTabs.svelte';
+	import DashboardTabs from '$lib/components/custom/tabs/DashboardTabs.svelte';
 
 	let vehicles = $state<Vehicle[]>([]);
 	let loading = $state(true);
@@ -55,16 +52,13 @@
 	fetchVehicles();
 </script>
 
-<div class="container mx-auto bg-gray-100 p-6 transition-colors dark:bg-gray-900">
+<div class="container mx-auto p-6 transition-colors">
 	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">Your Vehicles</h1>
-		<Button
-			type="button"
-			variant="hero"
-			text="Add Vehicle"
-			icon={PlusCircle}
-			onclick={() => vehicleModelStore.show()}
-		/>
+		<h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Your Vehicles</h1>
+		<Button variant="outline" size="lg" onclick={() => vehicleModelStore.show()}>
+			<PlusCircle />
+			Add Vehicle
+		</Button>
 	</div>
 	{#if loading}
 		<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
@@ -78,24 +72,7 @@
 	{/if}
 
 	{#if selectedVehicleId}
-		<div class="mt-12">
-			<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-				<TabHeader bind:activeTab />
-			</div>
-			<div id="default-tab-content">
-				{#if activeTab === 'dashboard'}
-					<DashboardTab vehicleId={selectedVehicleId} />
-				{:else if activeTab === 'fuel'}
-					<FuelLogTab vehicleId={selectedVehicleId} />
-				{:else if activeTab === 'maintenance'}
-					<MaintenenceLogTab vehicleId={selectedVehicleId} />
-				{:else if activeTab === 'insurance'}
-					<InsuranceTab vehicleId={selectedVehicleId} />
-				{:else if activeTab === 'pollution'}
-					<PollutionTab vehicleId={selectedVehicleId} />
-				{/if}
-			</div>
-		</div>
+		<DashboardTabs vehicleId={selectedVehicleId} />
 	{:else if vehicles.length > 0 && !loading}
 		<div class="py-12 text-center">
 			<p class="text-lg text-gray-500 dark:text-gray-400">

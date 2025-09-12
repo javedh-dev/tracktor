@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { vehiclesStore } from '$stores/vehicle';
 	import VehicleCard from '$appui/common/VehicleCard.svelte';
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 
 	let { vehicles, selectedVehicleId, updateCallback } = $props();
 
@@ -10,25 +11,22 @@
 </script>
 
 {#if vehicles.length > 0}
-	<div
-		class="grid grid-cols-1 gap-6 bg-gray-100 transition-colors sm:grid-cols-2 lg:grid-cols-3 dark:bg-gray-900"
-	>
-		{#each vehicles as vehicle (vehicle.id)}
-			<div
-				tabindex="0"
-				role="button"
-				onclick={() => selectVehicle(vehicle.id)}
-				onkeydown={(e) => {
-					if (e.key === 'Enter' || e.key === ' ') selectVehicle(vehicle.id);
-				}}
-				class:ring-2={selectedVehicleId === vehicle.id}
-				class:ring-blue-500={selectedVehicleId === vehicle.id}
-				class="cursor-pointer rounded-2xl transition-all duration-300 ease-in-out"
-			>
-				<VehicleCard {vehicle} {updateCallback} />
-			</div>
-		{/each}
-	</div>
+	<ScrollArea class="w-full whitespace-nowrap" orientation="horizontal">
+		<div class="m-4 flex gap-4">
+			{#each vehicles as vehicle (vehicle.id)}
+				<div
+					tabindex="0"
+					role="button"
+					onclick={() => selectVehicle(vehicle.id)}
+					onkeydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') selectVehicle(vehicle.id);
+					}}
+				>
+					<VehicleCard {vehicle} {updateCallback} isSelected={selectedVehicleId === vehicle.id} />
+				</div>
+			{/each}
+		</div>
+	</ScrollArea>
 {:else}
 	<!-- <div class="flex items-center justify-center"> -->
 	<div class="flex min-h-48 items-center justify-center gap-10 bg-gray-100 dark:bg-gray-900">

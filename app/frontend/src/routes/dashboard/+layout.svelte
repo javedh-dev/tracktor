@@ -8,7 +8,7 @@
 	import { env } from '$env/dynamic/public';
 	import { configModelStore } from '$stores/config';
 	import { vehiclesStore } from '$stores/vehicle';
-	import IconButton from '$appui/common/IconButton.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	let { children } = $props();
 
@@ -48,38 +48,34 @@
 	};
 </script>
 
-<header class="bg-white shadow-sm transition-colors dark:bg-gray-800">
-	<nav class="container mx-auto flex items-center justify-between p-4">
-		<a
-			href="/dashboard"
-			class="flex items-center gap-2 text-2xl font-bold text-blue-700 transition-colors hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-400"
-		>
-			<Tractor class="h-8 w-8" />
-			Tracktor
-		</a>
-		<div class="flex items-center justify-center gap-2 align-middle">
-			<ThemeToggle />
-			<IconButton
-				buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-				iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
-				icon={Settings}
-				onclick={() => {
-					configModelStore.show((status: boolean) => {
-						status && fetchVehicles();
-					});
-				}}
-				ariaLabel="Settings"
-			/>
-			<IconButton
-				buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-				iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-				icon={LogOut}
-				onclick={logout}
-				ariaLabel="Logout"
-			/>
+<header
+	class="flex h-auto shrink-0 justify-center gap-2 border-b py-3 text-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)"
+>
+	<div class="flex w-full items-center px-6">
+		<h1 class="text-primary flex flex-row items-center gap-2 text-2xl font-semibold">
+			<Tractor class="h-8 w-8" /> Tracktor
+		</h1>
+		<div class="ml-auto flex items-center gap-2">
+			<div class="flex items-center justify-center gap-2 align-middle">
+				<ThemeToggle />
+				<Button
+					variant="ghost"
+					onclick={() => {
+						configModelStore.show((status: boolean) => {
+							status && fetchVehicles();
+						});
+					}}
+				>
+					<Settings class="h-[1.2rem] w-[1.2rem]" />
+				</Button>
+				<Button variant="ghost" onclick={logout}>
+					<LogOut class="h-[1.2rem] w-[1.2rem]" />
+				</Button>
+			</div>
 		</div>
-	</nav>
+	</div>
 </header>
-<main class="text-gray-600 dark:text-gray-100">
+
+<main>
 	{@render children()}
 </main>

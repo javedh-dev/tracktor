@@ -24,6 +24,7 @@
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
 		"@tailwindcss/vite": "^4.0.0",
+		"@tanstack/table-core": "^8.21.3",
 		"@typescript-eslint/eslint-plugin": "^8.40.0",
 		"@typescript-eslint/parser": "^8.40.0",
 		"bits-ui": "^2.9.6",
@@ -35,6 +36,7 @@
 		"eslint-plugin-svelte": "^3.11.0",
 		"eslint-plugin-unused-imports": "^4.2.0",
 		"globals": "^14.0.0",
+		"layerchart": "^2.0.0-next.27",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
@@ -51,6 +53,12 @@
 		"vite-plugin-lucide-preprocess": "^1.4.3"
 	},
 	"dependencies": {
+		"@types/d3-array": "^3.2.1",
+		"@types/d3-scale": "^4.0.9",
+		"@types/d3-shape": "^3.1.7",
+		"d3-array": "^3.2.4",
+		"d3-scale": "^4.0.2",
+		"d3-shape": "^3.2.0",
 		"dot-env": "^0.0.1",
 		"mode-watcher": "^1.1.0",
 		"svelte-loading-spinners": "^0.3.6",

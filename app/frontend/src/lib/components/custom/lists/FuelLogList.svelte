@@ -1,30 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
-	import { Trash2 } from '@lucide/svelte';
-	import {
-		formatCurrency,
-		formatDate,
-		formatVolume,
-		formatMileage,
-		formatDistance
-	} from '$utils/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$appui/common/IconButton.svelte';
 	import DeleteConfirmation from '$appui/common/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$utils/api';
+	import { columns, type FuelLog } from '$models/fuel-log';
+	import FuelLogTable from './FuelLogTable.svelte';
 
 	const { vehicleId } = $props();
-
-	interface FuelLog {
-		id: string;
-		date: string;
-		odometer: number;
-		fuelAmount: number;
-		cost: number;
-		notes?: string;
-		mileage?: number;
-	}
 
 	let fuelLogs: FuelLog[] = $state([]);
 	let loading = $state(true);
@@ -39,6 +22,7 @@
 		} else {
 			fetchFuelLogs();
 		}
+		$inspect(fuelLogs);
 	});
 
 	async function fetchFuelLogs() {
@@ -95,7 +79,7 @@
 </script>
 
 {#if loading}
-	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
+	<p class="flex items-center justify-center gap-5 text-lg">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
 {:else if error}
@@ -103,56 +87,72 @@
 {:else if fuelLogs.length === 0}
 	<p>No fuel refill logs found for this vehicle.</p>
 {:else}
-	<div class="overflow-x-auto">
-		<table class="min-w-full overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
-			<thead class="bg-gray-200 dark:bg-gray-700">
-				<tr>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Date</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300"
-						>Odometer</th
+	<!-- <Table.Root class=" m-8 text-base">
+		<Table.Header>
+			<Table.Row class="bg-background sticky top-0 z-10 rounded-t-lg font-bold">
+				<Table.Head class="w-[100px]">Date</Table.Head>
+				<Table.Head class="w-[100px]">Odometer</Table.Head>
+				<Table.Head class="w-[100px]">Fuel Amount</Table.Head>
+				<Table.Head class="w-[70px]">Full Tank</Table.Head>
+				<Table.Head class="w-[100px]">Missed Last</Table.Head>
+				<Table.Head class="w-[100px]">Cost</Table.Head>
+				<Table.Head class="w-[100px]">Mileage</Table.Head>
+				<Table.Head>Notes</Table.Head>
+				<Table.Head class="w-[100px]">Actions</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each fuelLogs as log (log.id)}
+				<Table.Row class="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
+					<Table.Cell>
+						{formatDate(log.date)}
+					</Table.Cell>
+					<Table.Cell>
+						{formatDistance(log.odometer)}
+					</Table.Cell>
+					<Table.Cell class="text-end">
+						{formatVolume(log.fuelAmount)}
+					</Table.Cell>
+					<Table.Cell class="text-center">
+						{#if log.filled}
+							<Check />
+						{:else}
+							<X />
+						{/if}
+					</Table.Cell>
+					<Table.Cell class="mx-auto">
+						{#if log.missedLast}
+							<Check />
+						{:else}
+							<X />
+						{/if}
+					</Table.Cell>
+					<Table.Cell>
+						{formatCurrency(log.cost)}</Table.Cell
 					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300"
-						>Fuel Amount</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Cost</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Mileage</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Notes</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Actions</th
-					>
-				</tr>
-			</thead>
-			<tbody>
-				{#each fuelLogs as log (log.id)}
-					<tr class="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">{formatDate(log.date)}</td>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200"
-							>{formatDistance(log.odometer)}</td
-						>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200"
-							>{formatVolume(log.fuelAmount)}</td
-						>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">{formatCurrency(log.cost)}</td>
-						<td class="styled-text px-4 py-2 text-gray-800 dark:text-gray-200"
-							>{log.mileage ? formatMileage(log.mileage) : '-'}</td
-						>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">{log.notes || '-'}</td>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">
-							<IconButton
-								buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-								iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-								icon={Trash2}
-								onclick={() => {
-									selectedFuelLog = log.id;
-									deleteDialog = true;
-								}}
-								ariaLabel="Delete"
-							/>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
+					<Table.Cell>
+						{log.mileage ? formatMileage(log.mileage) : '-'}
+					</Table.Cell>
+					<Table.Cell>
+						{log.notes || '-'}
+					</Table.Cell>
+					<Table.Cell>
+						<IconButton
+							buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+							iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
+							icon={Trash2}
+							onclick={() => {
+								selectedFuelLog = log.id;
+								deleteDialog = true;
+							}}
+							ariaLabel="Delete"
+						/>
+					</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root> -->
+	<FuelLogTable data={fuelLogs} {columns} />
+
 	<DeleteConfirmation onConfirm={() => deleteFuelLog(selectedFuelLog)} bind:open={deleteDialog} />
 {/if}

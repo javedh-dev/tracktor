@@ -10,10 +10,10 @@ const config = {
 		alias: {
 			$lib: './src/lib',
 			$appui: './src/lib/components/custom',
-			$models: './src/models',
-			$stores: './src/stores',
-			$services: './src/services',
-			$utils: './src/utils'
+			$models: './src/lib/types',
+			$stores: './src/lib/stores',
+			$services: './src/lib/services',
+			$utils: './src/lib/utility'
 		}
 	}
 };

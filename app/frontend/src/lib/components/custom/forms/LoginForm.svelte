@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/utils';
 	import { ShieldEllipsis, Tractor } from '@lucide/svelte';
 	import PinInput from '../auth/PinInput.svelte';
 	import * as Card from '$lib/components/ui/card';

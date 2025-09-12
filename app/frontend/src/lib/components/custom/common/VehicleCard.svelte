@@ -1,16 +1,17 @@
 <script lang="ts">
 	import {
-		Car,
-		IdCard,
-		Fingerprint,
-		Paintbrush,
 		Gauge,
 		Pencil,
 		Trash2,
 		Fuel,
 		Wrench,
 		Shield,
-		BadgeCheck
+		BadgeCheck,
+		CircleDotDashed,
+		ShieldCheck,
+		ShieldClose,
+		BadgeAlert,
+		ShieldAlert
 	} from '@lucide/svelte';
 	import { formatDistance } from '$utils/formatting';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
@@ -22,8 +23,13 @@
 	import { env } from '$env/dynamic/public';
 	import IconButton from './IconButton.svelte';
 	import DeleteConfirmation from './DeleteConfirmation.svelte';
+	import * as Card from '$lib/components/ui/card';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import IconWithTooltip from './IconWithTooltip.svelte';
 
-	const { vehicle, updateCallback } = $props();
+	const { vehicle, updateCallback, isSelected = false } = $props();
 	let deleteDialog = $state(false);
 
 	async function deleteVehicle(vehicleId: string) {
@@ -54,122 +60,132 @@
 			if (pin) vehiclesStore.fetchVehicles(pin);
 		}
 	};
+
+	// Dynamic image URL - fallback to default if vehicle doesn't have image
+	const imageUrl =
+		vehicle.imageUrl || 'https://www.v3cars.com/media/model-imgs/91-92-062100-daytona-grey.webp';
 </script>
 
-<div
-	class="flex min-h-60 flex-col justify-between gap-4 rounded-2xl border-2 border-transparent bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:border-blue-500 hover:shadow-2xl dark:bg-gray-800 dark:text-gray-100 dark:hover:border-blue-400"
+<Card.Root
+	class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out ${isSelected ? 'border-primary' : 'border-transparent'}`}
 >
-	<div class="mb-2 flex items-center justify-between">
-		<div class="flex items-center gap-2">
-			<Car class="h-7 w-7 text-blue-500 dark:text-blue-400" />
-			<span class="text-2xl font-bold text-gray-800 dark:text-gray-100"
-				>{vehicle.make} {vehicle.model}</span
-			>
+	<Card.Header class="relative h-42 overflow-hidden p-0 ">
+		<div class="w-full">
+			<img src={imageUrl} alt="car" class="rounded-t-xl object-cover opacity-30 dark:opacity-30" />
 		</div>
-		<span
-			class="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white dark:bg-blue-500 dark:text-gray-100"
-			>{vehicle.year}</span
-		>
-	</div>
-	<div class="flex-1 text-gray-600 dark:text-gray-300">
-		<p class="flex items-center gap-2">
-			<IdCard class="h-5 w-5 text-gray-400 dark:text-gray-500" /><span class="font-semibold"
-				>License Plate:</span
-			>
-			{vehicle.licensePlate}
-		</p>
-		<p class="flex items-center gap-2">
-			<Fingerprint class="h-5 w-5 text-gray-400 dark:text-gray-500" /><span class="font-semibold"
-				>VIN:</span
-			>
-			{vehicle.vin ? vehicle.vin : '-'}
-		</p>
+		<div class="absolute inset-0 flex flex-col justify-between p-4">
+			<div class="flex flex-col">
+				<div class="flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<span class="text-2xl font-bold">{vehicle.make} {vehicle.model}</span>
+					</div>
+					<p class="flex items-center gap-2">
+						{#if vehicle.color}
+							<Badge
+								variant="outline"
+								class="m-1 h-5 w-8"
+								style={`background-color: ${vehicle.color}`}
+							></Badge>
+						{:else}
+							<span>-</span>
+						{/if}
+					</p>
+				</div>
+				<div
+					class="mono text-accent-foreground/50 mt-2 flex flex-row justify-between text-sm font-medium"
+				>
+					{vehicle.vin ? vehicle.vin : '-'}
+					<p class="mono text-foreground flex items-center gap-2">
+						<Gauge class="h-5 w-5" />
+						{vehicle.odometer ? formatDistance(vehicle.odometer) : '-'}
+					</p>
+				</div>
+			</div>
 
-		<p class="flex items-center gap-2">
-			<Paintbrush class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-			<span class="font-semibold">Color:</span>
-			{#if vehicle.color}
-				<span
-					class="m-1 h-4 w-8 rounded border-2 border-sky-500 p-2 dark:border-sky-800"
-					style={`background-color: ${vehicle.color}`}
-				></span>
-			{:else}
-				<span>-</span>
-			{/if}
-		</p>
-		<p class="flex items-center gap-2">
-			<Gauge class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-			<span class="font-semibold">Odometer:</span>
-			{vehicle.odometer ? formatDistance(vehicle.odometer) : '-'}
-		</p>
-		{#if vehicle.insuranceStatus}
-			<p class="flex items-center gap-2">
-				<Shield class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-				<span class="font-semibold">Insurance:</span>
-				<span class={vehicle.insuranceStatus === 'Active' ? 'text-green-600' : 'text-red-600'}>
-					{vehicle.insuranceStatus}
-				</span>
-			</p>
-		{/if}
-		{#if vehicle.puccStatus}
-			<p class="flex items-center gap-2">
-				<BadgeCheck class="h-5 w-5 text-gray-400 dark:text-gray-500" />
-				<span class="font-semibold">PUCC:</span>
-				<span class={vehicle.puccStatus === 'Active' ? 'text-green-600' : 'text-red-600'}>
-					{vehicle.puccStatus}
-				</span>
-			</p>
-		{/if}
-	</div>
-	<div class=" flex justify-between">
-		<div class="flex justify-start">
-			<IconButton
-				buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
-				iconStyles=" text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
-				icon={Fuel}
-				onclick={() => fuelLogModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Log fuel refill"
-			/>
-			<IconButton
-				buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
-				iconStyles=" text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
-				icon={Wrench}
-				onclick={() => maintenanceModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Maintenence"
-			/>
-			<IconButton
-				buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
-				iconStyles=" text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
-				icon={Shield}
-				onclick={() => insuranceModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Insurance"
-			/>
-			<IconButton
-				buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
-				iconStyles=" text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
-				icon={BadgeCheck}
-				onclick={() => puccModelStore.show(vehicle.id, null, false, updateCallback)}
-				ariaLabel="Pollution Certificate"
-			/>
+			<div class="flex flex-row justify-between">
+				<IconWithTooltip
+					icon={vehicle.insuranceStatus === 'Active' ? ShieldCheck : ShieldAlert}
+					className={vehicle.insuranceStatus === 'Active'
+						? 'dark:text-green-700 text-green-500'
+						: 'dark:text-rose-600 text-rose-500'}
+					tooltip={`Insurance is ${vehicle.insuranceStatus}`}
+					side="right"
+				/>
+				<IconWithTooltip
+					icon={vehicle.puccStatus === 'Active' ? BadgeCheck : BadgeAlert}
+					className={vehicle.puccStatus === 'Active'
+						? 'dark:text-green-700 text-green-500'
+						: 'dark:text-rose-600 text-rose-500'}
+					tooltip={`Pollution Status is ${vehicle.puccStatus}`}
+					side="left"
+				/>
+			</div>
 		</div>
-		<div class="flex justify-end gap-2">
-			<IconButton
-				buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-				iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
-				icon={Pencil}
-				onclick={() => {
-					vehicleModelStore.show(vehicle, true);
-				}}
-				ariaLabel="Edit"
-			/>
-			<IconButton
-				buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-				iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-				icon={Trash2}
-				onclick={() => (deleteDialog = true)}
-				ariaLabel="Delete"
-			/>
+	</Card.Header>
+	<Card.Content class="px-4">
+		<div class="flex items-center justify-between">
+			<div class="border-secondary inline-block rounded-md border-4 text-xl font-bold">
+				<div class="flex flex-row items-center gap-4">
+					<div class="bg-secondary flex h-8 w-8 items-center justify-center">
+						<CircleDotDashed class="h-5 w-5" />
+					</div>
+					<p class="mono pe-4 font-bold">{vehicle.licensePlate}</p>
+				</div>
+			</div>
+			<Badge class="text-zinc-100">{vehicle.year}</Badge>
 		</div>
-	</div>
-</div>
+	</Card.Content>
+	<Card.Footer class="px-3 pt-4">
+		<div class="flex w-full justify-between">
+			<div class="flex justify-start">
+				<IconButton
+					buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
+					iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
+					icon={Fuel}
+					onclick={() => fuelLogModelStore.show(vehicle.id, null, false, updateCallback)}
+					ariaLabel="Log fuel refill"
+				/>
+				<IconButton
+					buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
+					iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
+					icon={Wrench}
+					onclick={() => maintenanceModelStore.show(vehicle.id, null, false, updateCallback)}
+					ariaLabel="Maintenence"
+				/>
+				<IconButton
+					buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
+					iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
+					icon={Shield}
+					onclick={() => insuranceModelStore.show(vehicle.id, null, false, updateCallback)}
+					ariaLabel="Insurance"
+				/>
+				<IconButton
+					buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
+					iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
+					icon={BadgeCheck}
+					onclick={() => puccModelStore.show(vehicle.id, null, false, updateCallback)}
+					ariaLabel="Pollution Certificate"
+				/>
+			</div>
+			<div class="flex justify-end gap-2">
+				<IconButton
+					buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+					iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
+					icon={Pencil}
+					onclick={() => {
+						vehicleModelStore.show(vehicle, true);
+					}}
+					ariaLabel="Edit"
+				/>
+				<IconButton
+					buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+					iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
+					icon={Trash2}
+					onclick={() => (deleteDialog = true)}
+					ariaLabel="Delete"
+				/>
+			</div>
+		</div>
+	</Card.Footer>
+</Card.Root>
 <DeleteConfirmation onConfirm={() => deleteVehicle(vehicle.id)} bind:open={deleteDialog} />
