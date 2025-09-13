@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import LoginForm from '$lib/components/features/login/LoginForm.svelte';
+	import LoginForm from '$feature/login/LoginForm.svelte';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { verifyPin } from '$services/auth.service';
-	import { simulateNetworkDelay } from '$utils/dev';
+	import { simulateNetworkDelay } from '$helper/dev';
 	import { toast } from 'svelte-sonner';
 
 	const oncomplete = (pin: string) => {
@@ -15,7 +15,7 @@
 					localStorage.setItem('userPin', pin);
 				}
 				toast.success('Login Successfull...!');
-				await simulateNetworkDelay(1000);
+				await simulateNetworkDelay(300);
 				goto('/dashboard', { replaceState: true });
 			} else {
 				toast.error('Incorrect Pin. Please try again...!');

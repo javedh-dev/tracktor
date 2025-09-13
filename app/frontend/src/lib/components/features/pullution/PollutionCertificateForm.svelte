@@ -5,8 +5,8 @@
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$models/Error';
 	import type { Status } from '$models/status';
-	import { cleanup, getCurrencySymbol } from '$utils/formatting';
-	import { BadgeDollarSign, Building2, Calendar1, IdCard, Notebook } from '@lucide/svelte';
+	import { cleanup } from '$helper/formatting';
+	import { Calendar1, IdCard, Notebook, TestTube2 } from '@lucide/svelte/icons';
 
 	let {
 		vehicleId,
@@ -17,12 +17,11 @@
 		callback
 	} = $props();
 
-	let insurance = $state({
-		provider: null,
-		policyNumber: null,
-		startDate: null,
-		endDate: null,
-		cost: null,
+	let certificate = $state({
+		certificateNumber: null,
+		issueDate: null,
+		expiryDate: null,
+		testingCenter: null,
 		notes: null
 	});
 
@@ -33,20 +32,19 @@
 
 	$effect(() => {
 		if (entryToEdit) {
-			Object.assign(insurance, entryToEdit);
+			Object.assign(certificate, entryToEdit);
 		}
 	});
 
-	async function persistInsurance() {
+	async function persistCertificate() {
 		if (
-			!insurance.provider ||
-			!insurance.policyNumber ||
-			!insurance.startDate ||
-			!insurance.endDate ||
-			!insurance.cost
+			!certificate.certificateNumber ||
+			!certificate.issueDate ||
+			!certificate.expiryDate ||
+			!certificate.testingCenter
 		) {
 			status = {
-				message: 'Provider, Policy Number, Start Date, End Date, Cost are required.',
+				message: 'Certificate Number, Issue Date, Expiry Date, Testing Center are required.',
 				type: 'ERROR'
 			};
 			return;
@@ -54,28 +52,28 @@
 
 		try {
 			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/insurance/${editMode ? entryToEdit.id : ''}`,
+				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc/${editMode ? entryToEdit.id : ''}`,
 				{
 					method: `${editMode ? 'PUT' : 'POST'}`,
 					headers: {
 						'Content-Type': 'application/json',
 						'X-User-PIN': localStorage.getItem('userPin') || ''
 					},
-					body: JSON.stringify(cleanup(insurance))
+					body: JSON.stringify(cleanup(certificate))
 				}
 			);
 
 			if (response.ok) {
 				status = {
-					message: `Insurance details ${editMode ? 'updated' : 'added'} successfully!`,
+					message: `Pollution Certificate ${editMode ? 'updated' : 'added'} successfully!`,
 					type: 'SUCCESS'
 				};
-				Object.assign(insurance, {
-					provider: '',
-					policyNumber: '',
-					startDate: '',
-					endDate: '',
-					cost: null
+				Object.assign(certificate, {
+					certificateNumber: '',
+					issueDate: '',
+					expiryDate: '',
+					testingCenter: '',
+					notes: ''
 				});
 				modalVisibility = false;
 			} else {
@@ -98,70 +96,59 @@
 </script>
 
 <form
-	class="space-y-6"
 	onsubmit={(e) => {
-		persistInsurance();
+		persistCertificate();
 		e.preventDefault();
 	}}
+	class="space-y-6"
 >
 	<FormField
-		id="provider"
+		id="certificate-number"
 		type="text"
-		placeholder="Provider"
-		bind:value={insurance.provider}
-		icon={Building2}
-		label="Provider"
-		required={true}
-		ariaLabel="Provider"
-	/>
-	<FormField
-		id="policy-number"
-		type="text"
-		placeholder="Policy Number"
-		bind:value={insurance.policyNumber}
+		placeholder="Certificate Number"
+		bind:value={certificate.certificateNumber}
 		icon={IdCard}
-		label="Policy Number"
+		label="Certificate Number"
 		required={true}
-		ariaLabel="Policy Number"
+		ariaLabel="Certificate Number"
 	/>
 	<div class="grid grid-flow-row grid-cols-2 gap-4">
 		<FormField
-			id="start-date"
+			id="issue-date"
 			type="date"
-			placeholder="Start Date"
-			bind:value={insurance.startDate}
+			placeholder="Issue Date"
+			bind:value={certificate.issueDate}
 			icon={Calendar1}
+			label="Issue Date"
 			required={true}
-			label="Start Date"
-			ariaLabel="Start Date"
+			ariaLabel="Issue Date"
 		/>
-
 		<FormField
-			id="end-date"
+			id="expiry-date"
 			type="date"
-			placeholder="End Date"
-			bind:value={insurance.endDate}
+			placeholder="Expiry Date"
+			bind:value={certificate.expiryDate}
 			icon={Calendar1}
-			label="End Date"
+			label="Expiry date"
 			required={true}
-			ariaLabel="End Date"
+			ariaLabel="Expiry Date"
 		/>
 	</div>
 	<FormField
-		id="cost"
-		type="number"
-		placeholder="Cost ( {getCurrencySymbol()} )"
-		bind:value={insurance.cost}
-		icon={BadgeDollarSign}
-		label="Cost"
+		id="testing-center"
+		type="text"
+		placeholder="Testing Center"
+		bind:value={certificate.testingCenter}
+		icon={TestTube2}
+		label="Testing Center"
 		required={true}
-		ariaLabel="Cost"
+		ariaLabel="Testing Center"
 	/>
 	<FormField
 		id="notes"
 		type="text"
 		placeholder="Notes"
-		bind:value={insurance.notes}
+		bind:value={certificate.notes}
 		icon={Notebook}
 		label="Notes"
 		required={false}

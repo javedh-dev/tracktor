@@ -25,11 +25,11 @@
 			<InputOTP.Group>
 				<InputOTP.Slot
 					cell={{
-						char: cell.char && '⌽',
+						char: cell.char && '◉',
 						hasFakeCaret: cell.hasFakeCaret,
 						isActive: cell.isActive
 					}}
-					class="text-xl"
+					class="text-lg"
 				/>
 			</InputOTP.Group>
 		{/each}

@@ -1,7 +1,7 @@
 import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 import { Badge } from '$lib/components/ui/badge';
 import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
-import { formatCurrency, formatDate, formatDistance, formatVolume } from '$utils/formatting';
+import { formatCurrency, formatDate, formatDistance, formatVolume } from '$helper/formatting';
 import {
 	Banknote,
 	Calendar1,
@@ -10,7 +10,7 @@ import {
 	Notebook,
 	PaintBucket,
 	SkipBack
-} from '@lucide/svelte';
+} from '@lucide/svelte/icons';
 import type { ColumnDef } from '@tanstack/table-core';
 import { createRawSnippet } from 'svelte';
 
@@ -123,15 +123,14 @@ export const columns: ColumnDef<FuelLog>[] = [
 				icon: Fuel,
 				iconClass: 'h-4 w-4 ',
 				label: 'Full Tank',
-				style: 'justify-center'
+				style: 'justify-start'
 			}),
 		cell: ({ row }) =>
 			renderComponent(Badge, {
 				variant: 'outline',
-				class: 'flex flex-row justify-center',
 				children: createRawSnippet(() => {
 					return {
-						render: () => `${row.getValue('filled') ? 'Yes' : 'No'}`
+						render: () => `<span>${row.getValue('filled') ? 'Yes' : 'No'}</span>`
 					};
 				})
 			})
@@ -143,14 +142,14 @@ export const columns: ColumnDef<FuelLog>[] = [
 				icon: SkipBack,
 				iconClass: 'h-4 w-4 ',
 				label: 'Missed Last',
-				style: 'justify-center'
+				style: 'justify-start'
 			}),
 		cell: ({ row }) =>
 			renderComponent(Badge, {
 				variant: 'outline',
 				children: createRawSnippet(() => {
 					return {
-						render: () => `${row.getValue('missedLast') ? 'Yes' : 'No'}`
+						render: () => `<span>${row.getValue('missedLast') ? 'Yes' : 'No'}</span>`
 					};
 				})
 			})

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import * as Chart from '$lib/components/ui/chart/index.js';
-	import { formatDate } from '$utils/formatting';
+	import { formatDate } from '$helper/formatting';
 	import { scaleBand, scaleUtc } from 'd3-scale';
 	import { curveNatural } from 'd3-shape';
 	import { LineChart, Spline } from 'layerchart';

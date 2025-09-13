@@ -1,17 +1,17 @@
 <script lang="ts">
-	import MaintenanceLogForm from '$lib/components/features/dashboard/maintenance/MaintenanceLogForm.svelte';
 	import ModalContainer from '$appui/ModalContainer.svelte';
-	import { maintenanceModelStore } from '$stores/maintenance';
+	import { insuranceModelStore } from '$stores/insurance';
+	import InsuranceForm from './InsuranceForm.svelte';
 
-	let logToEdit = $state<any>(null);
+	let entryToEdit = $state<any>(null);
 	let showModal = $state(false);
 	let editMode = $state(false);
 	let loading = $state(false);
 	let vehicleId = $state<string | undefined>(undefined);
 	let callback = $state<any>();
 
-	maintenanceModelStore.subscribe((data) => {
-		logToEdit = data.logToEdit;
+	insuranceModelStore.subscribe((data) => {
+		entryToEdit = data.entryToEdit;
 		showModal = data.show;
 		editMode = data.editMode;
 		vehicleId = data.vehicleId;
@@ -20,19 +20,15 @@
 	});
 
 	function closeModal() {
-		maintenanceModelStore.hide();
+		insuranceModelStore.hide();
 	}
 </script>
 
 {#if showModal}
-	<ModalContainer
-		onclose={closeModal}
-		title={editMode ? 'Edit Maintenance Log' : 'Add Maintenance Log'}
-		{loading}
-	>
-		<MaintenanceLogForm
+	<ModalContainer onclose={closeModal} title={editMode ? 'Edit Insurance' : 'Add Insurance'}>
+		<InsuranceForm
 			bind:modalVisibility={showModal}
-			bind:logToEdit
+			bind:entryToEdit
 			{editMode}
 			{vehicleId}
 			{callback}

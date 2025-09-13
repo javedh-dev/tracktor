@@ -13,7 +13,7 @@ const config = {
 			$models: './src/lib/types',
 			$stores: './src/lib/stores',
 			$services: './src/lib/services',
-			$utils: './src/lib/utility',
+			$helper: './src/lib/helper',
 			$feature: './src/lib/components/features'
 		}
 	}

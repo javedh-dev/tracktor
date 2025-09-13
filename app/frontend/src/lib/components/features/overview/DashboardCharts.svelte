@@ -2,7 +2,7 @@
 	import { env } from '$env/dynamic/public';
 	import { darkModeStore } from '$stores/dark-mode';
 	import { Chart, registerables, type ChartOptions } from 'chart.js';
-	import { formatDate, getCurrencySymbol, getMileageUnit } from '$utils/formatting';
+	import { formatDate, getCurrencySymbol, getMileageUnit } from '$helper/formatting';
 
 	import ChartCard from './ChartCard.svelte';
 	import { Line } from 'svelte5-chartjs';

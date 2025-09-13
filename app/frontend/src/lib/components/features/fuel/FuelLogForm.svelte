@@ -5,7 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$models/Error';
 	import type { Status } from '$models/status';
-	import { cleanup, getCurrencySymbol, getDistanceUnit, getVolumeUnit } from '$utils/formatting';
+	import { cleanup, getCurrencySymbol, getDistanceUnit, getVolumeUnit } from '$helper/formatting';
 	import FormField from '$appui/FormField.svelte';
 	import {
 		Calendar1,
@@ -15,7 +15,7 @@
 		BadgeDollarSign,
 		CircleSlash,
 		ArrowBigLeftDash
-	} from '@lucide/svelte';
+	} from '@lucide/svelte/icons';
 
 	let {
 		vehicleId,

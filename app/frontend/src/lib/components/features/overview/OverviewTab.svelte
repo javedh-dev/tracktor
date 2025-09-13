@@ -6,6 +6,5 @@
 </script>
 
 <TabContainer title="Overview">
-	<!-- <MileageChart {vehicleId} /> -->
 	<DashboardCharts {vehicleId} />
 </TabContainer>

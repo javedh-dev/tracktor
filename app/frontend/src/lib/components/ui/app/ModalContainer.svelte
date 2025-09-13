@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus } from '@lucide/svelte';
+	import { Plus } from '@lucide/svelte/icons';
 	import { scale } from 'svelte/transition';
 	import IconButton from './IconButton.svelte';
 

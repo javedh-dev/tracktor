@@ -3,7 +3,7 @@
 	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
-	import { getApiUrl } from '$utils/api';
+	import { getApiUrl } from '$helper/api';
 	import { columns, type FuelLog } from '$models/fuel-log';
 	import FuelLogTable from './FuelLogTable.svelte';
 
@@ -22,7 +22,6 @@
 		} else {
 			fetchFuelLogs();
 		}
-		$inspect(fuelLogs);
 	});
 
 	async function fetchFuelLogs() {

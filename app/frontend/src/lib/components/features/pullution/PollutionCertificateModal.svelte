@@ -1,17 +1,17 @@
 <script lang="ts">
-	import FuelLogForm from '$lib/components/features/dashboard/fuel/FuelLogForm.svelte';
 	import ModalContainer from '$appui/ModalContainer.svelte';
-	import { fuelLogModelStore } from '$stores/fuel-log';
+	import { puccModelStore } from '$stores/pucc';
+	import PollutionCertificateForm from './PollutionCertificateForm.svelte';
 
-	let logToEdit = $state<any>(null);
+	let entryToEdit = $state<any>(null);
 	let showModal = $state(false);
 	let editMode = $state(false);
 	let loading = $state(false);
 	let vehicleId = $state<string | undefined>(undefined);
 	let callback = $state<any>();
 
-	fuelLogModelStore.subscribe((data) => {
-		logToEdit = data.logToEdit;
+	puccModelStore.subscribe((data) => {
+		entryToEdit = data.entryToEdit;
 		showModal = data.show;
 		editMode = data.editMode;
 		vehicleId = data.vehicleId;
@@ -20,20 +20,20 @@
 	});
 
 	function closeModal() {
-		fuelLogModelStore.hide();
+		puccModelStore.hide();
 	}
 </script>
 
 {#if showModal}
 	<ModalContainer
-		onclose={() => closeModal()}
-		title={editMode ? 'Edit Fuel Log' : 'Log Fuel Refill'}
+		onclose={closeModal}
+		title={editMode ? 'Edit Pollution Certificate' : 'Add Pollution Certificate'}
 	>
-		<FuelLogForm
-			{vehicleId}
-			{logToEdit}
-			{editMode}
+		<PollutionCertificateForm
 			bind:modalVisibility={showModal}
+			bind:entryToEdit
+			{editMode}
+			{vehicleId}
 			{callback}
 			{loading}
 		/>

@@ -5,8 +5,8 @@
 	import { env } from '$env/dynamic/public';
 	import { handleApiError } from '$models/Error';
 	import type { Status } from '$models/status';
-	import { cleanup, getCurrencySymbol, getDistanceUnit } from '$utils/formatting';
-	import { BadgeDollarSign, Calendar1, Gauge, Hammer, Notebook } from '@lucide/svelte';
+	import { cleanup, getCurrencySymbol, getDistanceUnit } from '$helper/formatting';
+	import { BadgeDollarSign, Calendar1, Gauge, Hammer, Notebook } from '@lucide/svelte/icons';
 
 	let {
 		vehicleId,

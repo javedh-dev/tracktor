@@ -7,7 +7,7 @@
 		Paintbrush,
 		Gauge,
 		Building2
-	} from '@lucide/svelte';
+	} from '@lucide/svelte/icons';
 	import FormField from '$appui/FormField.svelte';
 	import type { NewVehicle } from '$models/vehicle';
 	import { env } from '$env/dynamic/public';
@@ -17,7 +17,7 @@
 	import StatusBlock from '$appui/StatusBlock.svelte';
 	import type { Status } from '$models/status';
 	import { handleApiError, type ApiError } from '$models/Error';
-	import { cleanup } from '$utils/formatting';
+	import { cleanup } from '$helper/formatting';
 
 	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
 

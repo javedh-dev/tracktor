@@ -2,12 +2,12 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import { Shield, Calendar, Hash, DollarSign, Trash2, Notebook } from '@lucide/svelte';
-	import { formatCurrency, formatDate } from '$utils/formatting';
+	import { Shield, Calendar, Hash, DollarSign, Trash2, Notebook } from '@lucide/svelte/icons';
+	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
-	import { getApiUrl } from '$utils/api';
+	import { getApiUrl } from '$helper/api';
 
 	let { vehicleId } = $props();
 

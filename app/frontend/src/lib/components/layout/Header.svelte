@@ -1,0 +1,62 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { LogOut, Tractor, Settings } from '@lucide/svelte/icons';
+	import ThemeToggle from '$appui/ThemeToggle.svelte';
+	import { env } from '$env/dynamic/public';
+	import { configModelStore } from '$stores/config';
+	import { vehiclesStore } from '$stores/vehicle';
+	import { Button } from '$lib/components/ui/button';
+	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
+
+	let isAuthenticated = $state(false);
+
+	$effect(() => {
+		const pin = localStorage.getItem('userPin');
+		isAuthenticated = !!pin;
+
+		if (!isAuthenticated) {
+			goto('/login', { replaceState: true });
+		}
+	});
+
+	const logout = () => {
+		localStorage.removeItem('userPin');
+		isAuthenticated = false;
+	};
+
+	const fetchVehicles = () => {
+		const pin = localStorage.getItem('userPin') || undefined;
+		if (pin) vehiclesStore.fetchVehicles(pin);
+	};
+</script>
+
+<header
+	class="flex h-auto shrink-0 justify-center gap-2 border-b py-3 text-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)"
+>
+	<div class="flex w-full items-center px-6">
+		<LabelWithIcon
+			icon={Tractor}
+			iconClass="h-8 w-8"
+			style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
+			label="Tracktor"
+		/>
+		<div class="ml-auto flex items-center gap-2">
+			<div class="flex items-center gap-2">
+				<ThemeToggle />
+				<Button
+					variant="ghost"
+					onclick={() => {
+						configModelStore.show((status: boolean) => {
+							status && fetchVehicles();
+						});
+					}}
+				>
+					<Settings class="h-[1.2rem] w-[1.2rem]" />
+				</Button>
+				<Button variant="ghost" onclick={logout}>
+					<LogOut class="h-[1.2rem] w-[1.2rem]" />
+				</Button>
+			</div>
+		</div>
+	</div>
+</header>

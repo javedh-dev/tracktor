@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TabContainer from '$appui/TabContainer.svelte';
-	import PollutionCertificateList from '$lib/components/features/dashboard/pullution/PollutionCertificateList.svelte';
+	import PollutionCertificateList from './PollutionCertificateList.svelte';
 
 	let { vehicleId } = $props();
 </script>
