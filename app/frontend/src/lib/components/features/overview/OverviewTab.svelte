@@ -1,10 +1,16 @@
 <script lang="ts">
 	import TabContainer from '$appui/TabContainer.svelte';
-	import DashboardCharts from './DashboardCharts.svelte';
+	import CostChart from './CostChart.svelte';
+	import MileageChart from './MileageChart.svelte';
 
 	const { vehicleId } = $props();
 </script>
 
 <TabContainer title="Overview">
-	<DashboardCharts {vehicleId} />
+	<div class="overflow-x-auto">
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<MileageChart {vehicleId} />
+			<CostChart {vehicleId} />
+		</div>
+	</div>
 </TabContainer>

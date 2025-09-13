@@ -5,14 +5,15 @@ import { formatCurrency, formatDate, formatDistance, formatVolume } from '$helpe
 import {
 	Banknote,
 	Calendar1,
+	CircleGauge,
 	Fuel,
-	GaugeCircle,
 	Notebook,
 	PaintBucket,
 	SkipBack
 } from '@lucide/svelte/icons';
 import type { ColumnDef } from '@tanstack/table-core';
 import { createRawSnippet } from 'svelte';
+import FuelLogContextMenu from '$lib/components/features/fuel/FuelLogContextMenu.svelte';
 
 export interface NewFuelLog {
 	date: string;
@@ -32,6 +33,7 @@ export interface FuelLog {
 	mileage?: number;
 	filled?: boolean;
 	missedLast?: boolean;
+	vehicleId: string;
 }
 
 export const columns: ColumnDef<FuelLog>[] = [
@@ -40,17 +42,16 @@ export const columns: ColumnDef<FuelLog>[] = [
 		header: () =>
 			renderComponent(LabelWithIcon, {
 				icon: Calendar1,
-				iconClass: 'h-4 w-4 ',
+				iconClass: 'h-4 w-4',
 				label: 'Date',
-				style: 'justify-center'
+				style: 'justify-start'
 			}),
 		cell: ({ row }) => {
 			const dateCellSnippet = createRawSnippet<[string]>((date) => {
 				return {
-					render: () => `<div class="flex flex-row justify-center">${formatDate(date())}</div>`
+					render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
 				};
 			});
-
 			return renderSnippet(dateCellSnippet, row.getValue('date'));
 		}
 	},
@@ -58,17 +59,16 @@ export const columns: ColumnDef<FuelLog>[] = [
 		accessorKey: 'odometer',
 		header: () =>
 			renderComponent(LabelWithIcon, {
-				icon: GaugeCircle,
+				icon: CircleGauge,
 				iconClass: 'h-4 w-4 ',
 				label: 'Odometer',
-				style: 'justify-center'
+				style: 'justify-start'
 			}),
 		cell: ({ row }) => {
 			const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
 				const odometer = getOdometer();
 				return {
-					render: () =>
-						`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
+					render: () => `<div class="flex flex-row justify-start">${formatDistance(odometer)}</div>`
 				};
 			});
 
@@ -76,54 +76,13 @@ export const columns: ColumnDef<FuelLog>[] = [
 		}
 	},
 	{
-		accessorKey: 'fuelAmount',
-		header: () =>
-			renderComponent(LabelWithIcon, {
-				icon: PaintBucket,
-				iconClass: 'h-4 w-4 ',
-				label: 'Fuel Amount',
-				style: 'justify-center'
-			}),
-		cell: ({ row }) => {
-			const fuelAmountCellSnippet = createRawSnippet<[number]>((getFuelAmount) => {
-				const fuelAmount = getFuelAmount();
-				return {
-					render: () =>
-						`<div class="flex flex-row justify-center">${formatVolume(fuelAmount)}</div>`
-				};
-			});
-
-			return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
-		}
-	},
-	{
-		accessorKey: 'cost',
-		header: () =>
-			renderComponent(LabelWithIcon, {
-				icon: Banknote,
-				iconClass: 'h-4 w-4 ',
-				label: 'Cost',
-				style: 'justify-center'
-			}),
-		cell: ({ row }) => {
-			const costCellSnippet = createRawSnippet<[number]>((getCost) => {
-				const cost = getCost();
-				return {
-					render: () => `<div class="flex flex-row justify-center">${formatCurrency(cost)}</div>`
-				};
-			});
-
-			return renderSnippet(costCellSnippet, row.getValue('cost'));
-		}
-	},
-	{
 		accessorKey: 'filled',
 		header: () =>
 			renderComponent(LabelWithIcon, {
 				icon: Fuel,
-				iconClass: 'h-4 w-4 ',
+				iconClass: 'h-4 w-4',
 				label: 'Full Tank',
-				style: 'justify-start'
+				style: 'max-w-24 justify-start'
 			}),
 		cell: ({ row }) =>
 			renderComponent(Badge, {
@@ -140,9 +99,9 @@ export const columns: ColumnDef<FuelLog>[] = [
 		header: () =>
 			renderComponent(LabelWithIcon, {
 				icon: SkipBack,
-				iconClass: 'h-4 w-4 ',
+				iconClass: 'h-4 w-4',
 				label: 'Missed Last',
-				style: 'justify-start'
+				style: 'max-w-24 justify-start'
 			}),
 		cell: ({ row }) =>
 			renderComponent(Badge, {
@@ -155,13 +114,66 @@ export const columns: ColumnDef<FuelLog>[] = [
 			})
 	},
 	{
+		accessorKey: 'fuelAmount',
+		header: () =>
+			renderComponent(LabelWithIcon, {
+				icon: PaintBucket,
+				iconClass: 'h-4 w-4 ',
+				label: 'Volume',
+				style: 'justify-start'
+			}),
+		cell: ({ row }) => {
+			const fuelAmountCellSnippet = createRawSnippet<[number]>((fuelAmount) => {
+				return {
+					render: () =>
+						`<div class="flex flex-row justify-start">${formatVolume(fuelAmount())}</div>`
+				};
+			});
+			return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
+		}
+	},
+	{
+		accessorKey: 'cost',
+		header: () =>
+			renderComponent(LabelWithIcon, {
+				icon: Banknote,
+				iconClass: 'h-4 w-4 ',
+				label: 'Cost',
+				style: 'justify-start'
+			}),
+		cell: ({ row }) => {
+			const costCellSnippet = createRawSnippet<[number]>((cost) => {
+				return {
+					render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
+				};
+			});
+
+			return renderSnippet(costCellSnippet, row.getValue('cost'));
+		}
+	},
+	{
 		accessorKey: 'notes',
 		header: () =>
 			renderComponent(LabelWithIcon, {
 				icon: Notebook,
-				iconClass: 'h-4 w-4 ',
+				iconClass: 'h-4 w-4',
 				label: 'Notes',
-				style: 'justify-center'
+				style: 'justify-start'
+			}),
+		cell: ({ row }) => {
+			const noteSnippet = createRawSnippet<[string]>((note) => {
+				return {
+					render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
+				};
+			});
+			return renderSnippet(noteSnippet, row.getValue('notes'));
+		}
+	},
+	{
+		id: 'actions',
+		cell: ({ row }) =>
+			renderComponent(FuelLogContextMenu, {
+				fuelLog: row.original
 			})
 	}
 ];

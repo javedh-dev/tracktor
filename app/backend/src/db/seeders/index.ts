@@ -17,7 +17,8 @@ export const seedData = async () => {
   const pinEnv = process.env.AUTH_PIN;
   const enforceEnv = process.env.FORCE_DEMO_SEED_DATA;
   const demoMode = process.env.PUBLIC_DEMO_MODE;
-  if (!demoMode && (pinEnv && pinEnv.trim().length == 6)) await seedAuthPin(pinEnv);
+  if (!demoMode && pinEnv && pinEnv.trim().length == 6)
+    await seedAuthPin(pinEnv);
   if (demoMode == "true") await seedDemoData(enforceEnv == "true");
 };
 
@@ -32,7 +33,7 @@ const seedAuthPin = async (pin: string) => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-  seedAuthPin('123456')
+  seedAuthPin("123456");
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {
@@ -120,15 +121,15 @@ const seedDemoData = async (enforce: boolean = false) => {
     for (let i = 0; i < 25; i++) {
       fuelLogs.push({
         vehicleId: vehicle.id,
-        date: faker.date.past({ years: 1 }).toDateString(),
+        date: faker.date.recent({ days: 90 }).toDateString(),
         odometer: faker.number.int({
           min: vehicle.odometer!,
-          max: vehicle.odometer! + 20000,
+          max: vehicle.odometer! + 5000,
         }),
-        fuelAmount: faker.number.float({ min: 1, max: 100 }),
+        fuelAmount: faker.number.float({ min: 10, max: 25 }),
         cost: faker.number.float({ min: 10, max: 10000 }),
-        filled: faker.datatype.boolean({ probability: 0.995 }),
-        missedLast: faker.datatype.boolean({ probability: 0.005 }),
+        filled: faker.datatype.boolean({ probability: 0.9 }),
+        missedLast: faker.datatype.boolean({ probability: 0.1 }),
       });
     }
     await db.insert(fuelLogTable).values(fuelLogs);

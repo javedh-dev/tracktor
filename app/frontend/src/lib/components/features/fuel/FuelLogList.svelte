@@ -46,32 +46,6 @@
 		loading = false;
 	}
 
-	async function deleteFuelLog(logId: string | undefined) {
-		if (!logId) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/fuel-logs/${logId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					}
-				}
-			);
-			if (response.ok) {
-				fuelLogs = fuelLogs.filter((log) => log.id !== logId);
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to delete fuel log.';
-			}
-		} catch (e) {
-			console.error('Failed to connect to the server.', e);
-			error = 'Failed to connect to the server.';
-		}
-	}
-
 	onMount(() => {
 		fetchFuelLogs();
 	});
@@ -152,6 +126,4 @@
 		</Table.Body>
 	</Table.Root> -->
 	<FuelLogTable data={fuelLogs} {columns} />
-
-	<DeleteConfirmation onConfirm={() => deleteFuelLog(selectedFuelLog)} bind:open={deleteDialog} />
 {/if}

@@ -5,6 +5,6 @@
 	let { vehicleId } = $props();
 </script>
 
-<TabContainer title="Fuel Refill History">
+<TabContainer title="Fuel Logs">
 	<FuelLogList {vehicleId} />
 </TabContainer>
