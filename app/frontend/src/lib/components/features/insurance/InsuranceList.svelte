@@ -2,7 +2,15 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import { Shield, Calendar, Hash, DollarSign, Trash2, Notebook } from '@lucide/svelte/icons';
+	import {
+		Shield,
+		Calendar,
+		Hash,
+		DollarSign,
+		Trash2,
+		Notebook,
+		Banknote
+	} from '@lucide/svelte/icons';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$appui/IconButton.svelte';
@@ -104,13 +112,11 @@
 	<div>No Insurance found for this vehicle.</div>
 {:else}
 	{#each insurances as ins (ins.id)}
-		<div
-			class="mt-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-		>
+		<div class="bg-background/50 mt-4 rounded-lg p-6 shadow-sm">
 			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<Shield class="h-6 w-6 text-blue-500 dark:text-blue-400" />
-					<span class="text-xl font-bold text-gray-800 dark:text-gray-100">{ins.provider}</span>
+				<div class="dark: flex items-center gap-2 text-blue-400 text-blue-500">
+					<Shield class="h-6 w-6" />
+					<span class="text-xl font-bold">{ins.provider}</span>
 				</div>
 				<div class="flex gap-2">
 					<IconButton
@@ -126,28 +132,28 @@
 				</div>
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+				<div class="flex items-center gap-2">
 					<Hash class="h-5 w-5" />
 					<span class="font-semibold">Policy Number:</span>
 					<span>{ins.policyNumber}</span>
 				</div>
-				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-					<DollarSign class="h-5 w-5" />
+				<div class="flex items-center gap-2">
+					<Banknote class="h-5 w-5" />
 					<span class="font-semibold">Cost:</span>
 					<span>{formatCurrency(ins.cost)}</span>
 				</div>
-				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+				<div class="flex items-center gap-2">
 					<Calendar class="h-5 w-5 " />
 					<span class="font-semibold">Start Date:</span>
 					<span>{formatDate(ins.startDate)}</span>
 				</div>
-				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+				<div class="flex items-center gap-2">
 					<Calendar class="h-5 w-5 " />
 					<span class="font-semibold">End Date:</span>
 					<span>{formatDate(ins.endDate)}</span>
 				</div>
 				{#if ins.notes}
-					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<div class="flex items-center gap-2">
 						<Notebook class="h-5 w-5 " />
 						<span class="font-semibold">Notes:</span>
 						<span>{ins.notes}</span>

@@ -4,20 +4,23 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { getApiUrl } from '$lib/helper/api';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
+	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import type { MaintenanceLog } from '$lib/types';
 	import type { FuelLog } from '$lib/types/fuel-log';
 	import { EllipsisVertical } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
+	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =
+		$props();
 	let showDeleteDialog = $state(false);
 
 	async function deleteFuelLog() {
-		if (!fuelLog.id) {
+		if (!maintenanceLog.id) {
 			return;
 		}
 		try {
 			const response = await fetch(
-				getApiUrl(`/api/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`),
+				getApiUrl(`/api/vehicles/${maintenanceLog.vehicleId}/fuel-logs/${maintenanceLog.id}`),
 				{
 					method: 'DELETE',
 					headers: {
@@ -51,7 +54,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					fuelLogModelStore.show(fuelLog.vehicleId, fuelLog, true, onaction);
+					maintenanceModelStore.show(maintenanceLog.vehicleId, maintenanceLog, true, onaction);
 				}}
 			>
 				Edit

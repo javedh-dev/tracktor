@@ -1,19 +1,161 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
-	import { columns, type FuelLog } from '$models/fuel-log';
-	import FuelLogTable from './FuelLogTable.svelte';
+	import { type FuelLog } from '$models/fuel-log';
+	import { createRawSnippet } from 'svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { formatCurrency, formatDate, formatDistance, formatVolume } from '$lib/helper/formatting';
+	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
+	import {
+		Banknote,
+		Calendar1,
+		CircleGauge,
+		Fuel,
+		Notebook,
+		PaintBucket,
+		SquircleDashed
+	} from '@lucide/svelte';
+	import type { ColumnDef } from '@tanstack/table-core';
+	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
+	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import AppTable from '$lib/components/layout/AppTable.svelte';
 
 	const { vehicleId } = $props();
 
 	let fuelLogs: FuelLog[] = $state([]);
 	let loading = $state(true);
 	let error = $state('');
-	let selectedFuelLog = $state<string>();
-	let deleteDialog = $state(false);
+
+	const columns: ColumnDef<FuelLog>[] = [
+		{
+			accessorKey: 'date',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Calendar1,
+					iconClass: 'h-4 w-4',
+					label: 'Date',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const dateCellSnippet = createRawSnippet<[string]>((date) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
+					};
+				});
+				return renderSnippet(dateCellSnippet, row.getValue('date'));
+			}
+		},
+		{
+			accessorKey: 'odometer',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: CircleGauge,
+					iconClass: 'h-4 w-4 ',
+					label: 'Odometer',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
+					const odometer = getOdometer();
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
+					};
+				});
+
+				return renderSnippet(odometerCellSnippet, row.getValue('odometer'));
+			}
+		},
+		{
+			accessorKey: 'filled',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Fuel,
+					iconClass: 'h-4 w-4',
+					label: 'Filled',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => renderSnippet(badge, row.getValue('filled'))
+		},
+		{
+			accessorKey: 'missedLast',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: SquircleDashed,
+					iconClass: 'h-4 w-4',
+					label: 'Missed Last',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => renderSnippet(badge, row.getValue('missedLast'))
+		},
+		{
+			accessorKey: 'fuelAmount',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: PaintBucket,
+					iconClass: 'h-4 w-4 ',
+					label: 'Fuel Amount',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const fuelAmountCellSnippet = createRawSnippet<[number]>((fuelAmount) => {
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">${formatVolume(fuelAmount())}</div>`
+					};
+				});
+				return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
+			}
+		},
+		{
+			accessorKey: 'cost',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Banknote,
+					iconClass: 'h-4 w-4 ',
+					label: 'Cost',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((cost) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('cost'));
+			}
+		},
+		{
+			accessorKey: 'notes',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Notebook,
+					iconClass: 'h-4 w-4',
+					label: 'Notes',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const noteSnippet = createRawSnippet<[string]>((note) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
+					};
+				});
+				return renderSnippet(noteSnippet, row.getValue('notes'));
+			}
+		},
+		{
+			id: 'actions',
+			cell: ({ row }) =>
+				renderComponent(FuelLogContextMenu, {
+					fuelLog: row.original,
+					onaction: () => {
+						fetchFuelLogs();
+					}
+				})
+		}
+	];
 
 	$effect(() => {
 		if (!vehicleId) {
@@ -60,70 +202,11 @@
 {:else if fuelLogs.length === 0}
 	<p>No fuel refill logs found for this vehicle.</p>
 {:else}
-	<!-- <Table.Root class=" m-8 text-base">
-		<Table.Header>
-			<Table.Row class="bg-background sticky top-0 z-10 rounded-t-lg font-bold">
-				<Table.Head class="w-[100px]">Date</Table.Head>
-				<Table.Head class="w-[100px]">Odometer</Table.Head>
-				<Table.Head class="w-[100px]">Fuel Amount</Table.Head>
-				<Table.Head class="w-[70px]">Full Tank</Table.Head>
-				<Table.Head class="w-[100px]">Missed Last</Table.Head>
-				<Table.Head class="w-[100px]">Cost</Table.Head>
-				<Table.Head class="w-[100px]">Mileage</Table.Head>
-				<Table.Head>Notes</Table.Head>
-				<Table.Head class="w-[100px]">Actions</Table.Head>
-			</Table.Row>
-		</Table.Header>
-		<Table.Body>
-			{#each fuelLogs as log (log.id)}
-				<Table.Row class="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
-					<Table.Cell>
-						{formatDate(log.date)}
-					</Table.Cell>
-					<Table.Cell>
-						{formatDistance(log.odometer)}
-					</Table.Cell>
-					<Table.Cell class="text-end">
-						{formatVolume(log.fuelAmount)}
-					</Table.Cell>
-					<Table.Cell class="text-center">
-						{#if log.filled}
-							<Check />
-						{:else}
-							<X />
-						{/if}
-					</Table.Cell>
-					<Table.Cell class="mx-auto">
-						{#if log.missedLast}
-							<Check />
-						{:else}
-							<X />
-						{/if}
-					</Table.Cell>
-					<Table.Cell>
-						{formatCurrency(log.cost)}</Table.Cell
-					>
-					<Table.Cell>
-						{log.mileage ? formatMileage(log.mileage) : '-'}
-					</Table.Cell>
-					<Table.Cell>
-						{log.notes || '-'}
-					</Table.Cell>
-					<Table.Cell>
-						<IconButton
-							buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-							iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-							icon={Trash2}
-							onclick={() => {
-								selectedFuelLog = log.id;
-								deleteDialog = true;
-							}}
-							ariaLabel="Delete"
-						/>
-					</Table.Cell>
-				</Table.Row>
-			{/each}
-		</Table.Body>
-	</Table.Root> -->
-	<FuelLogTable data={fuelLogs} {columns} />
+	<AppTable data={fuelLogs} {columns} />
 {/if}
+
+{#snippet badge(status: boolean)}
+	<div class="flex flex-row justify-center">
+		<Badge variant="outline"><span>{status ? 'Yes' : 'No'}</span></Badge>
+	</div>
+{/snippet}

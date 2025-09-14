@@ -1,30 +1,136 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { createRawSnippet, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
 	import { formatCurrency, formatDate, formatDistance } from '$helper/formatting';
-	import { Trash2 } from '@lucide/svelte/icons';
+	import { Banknote, Calendar1, CircleGauge, Notebook, Trash2, Wrench } from '@lucide/svelte/icons';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
+	import AppTable from '$lib/components/layout/AppTable.svelte';
+	import type { ColumnDef } from '@tanstack/table-core';
+	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
+	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import type { MaintenanceLog } from '$lib/types';
+	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
 
 	let { vehicleId } = $props();
-
-	interface MaintenanceLog {
-		id: string;
-		date: string;
-		odometer: number;
-		serviceCenter: string;
-		cost: number;
-		notes?: string;
-	}
 
 	let maintenanceLogs: MaintenanceLog[] = $state([]);
 	let loading = $state(false);
 	let error = $state('');
 	let selectedMaintenanceLog = $state<string>();
 	let deleteDialog = $state(false);
+
+	const columns: ColumnDef<MaintenanceLog>[] = [
+		{
+			accessorKey: 'date',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Calendar1,
+					iconClass: 'h-4 w-4',
+					label: 'Date',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const dateCellSnippet = createRawSnippet<[string]>((date) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
+					};
+				});
+				return renderSnippet(dateCellSnippet, row.getValue('date'));
+			}
+		},
+		{
+			accessorKey: 'odometer',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: CircleGauge,
+					iconClass: 'h-4 w-4 ',
+					label: 'Odometer',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
+					const odometer = getOdometer();
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
+					};
+				});
+
+				return renderSnippet(odometerCellSnippet, row.getValue('odometer'));
+			}
+		},
+		{
+			accessorKey: 'serviceCenter',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Wrench,
+					iconClass: 'h-4 w-4',
+					label: 'Service Center',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const odometerCellSnippet = createRawSnippet<[number]>((serviceCenter) => {
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-start">${formatDistance(serviceCenter())}</div>`
+					};
+				});
+
+				return renderSnippet(odometerCellSnippet, row.getValue('serviceCenter'));
+			}
+		},
+		{
+			accessorKey: 'cost',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Banknote,
+					iconClass: 'h-4 w-4 ',
+					label: 'Cost',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((cost) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('cost'));
+			}
+		},
+		{
+			accessorKey: 'notes',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Notebook,
+					iconClass: 'h-4 w-4',
+					label: 'Notes',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const noteSnippet = createRawSnippet<[string]>((note) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
+					};
+				});
+				return renderSnippet(noteSnippet, row.getValue('notes'));
+			}
+		},
+		{
+			id: 'actions',
+			cell: ({ row }) =>
+				renderComponent(MaintenanceContextMenu, {
+					maintenanceLog: row.original,
+					onaction: () => {
+						fetchMaintenanceLogs();
+					}
+				})
+		}
+	];
 
 	$effect(() => {
 		if (!vehicleId) {
@@ -102,52 +208,5 @@
 {:else if maintenanceLogs.length === 0}
 	<div>No maintenance logs for this vehicle.</div>
 {:else}
-	<div class="overflow-x-auto">
-		<table class="min-w-full overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
-			<thead class="bg-gray-200 dark:bg-gray-700">
-				<tr>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Date</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200"
-						>Odometer</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200"
-						>Service Center</th
-					>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Cost</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Notes</th>
-					<th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Actions</th
-					>
-				</tr>
-			</thead>
-			<tbody>
-				{#each maintenanceLogs as log (log.id)}
-					<tr class="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
-						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{formatDate(log.date)}</td>
-						<td class="px-4 py-2 text-gray-900 dark:text-gray-100"
-							>{formatDistance(log.odometer)}</td
-						>
-						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{log.serviceCenter}</td>
-						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{formatCurrency(log.cost)}</td>
-						<td class="px-4 py-2 text-gray-900 dark:text-gray-100">{log.notes || '-'}</td>
-						<td class="px-4 py-2 text-gray-800 dark:text-gray-200">
-							<IconButton
-								buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-								iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-								icon={Trash2}
-								onclick={() => {
-									selectedMaintenanceLog = log.id;
-									deleteDialog = true;
-								}}
-								ariaLabel="Delete"
-							/>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
-	<DeleteConfirmation
-		onConfirm={() => deleteMaintenenceLog(selectedMaintenanceLog)}
-		bind:open={deleteDialog}
-	/>
+	<AppTable data={maintenanceLogs} {columns} />
 {/if}

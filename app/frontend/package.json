@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@eslint/js": "^9.34.0",
 		"@internationalized/date": "^3.9.0",
-		"@lucide/svelte": "^0.515.0",
+		"@lucide/svelte": "^0.544.0",
 		"@sveltejs/adapter-node": "^5.2.13",
 		"@sveltejs/kit": "^2.22.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
@@ -28,7 +28,6 @@
 		"@typescript-eslint/eslint-plugin": "^8.40.0",
 		"@typescript-eslint/parser": "^8.40.0",
 		"bits-ui": "^2.9.6",
-		"chart.js": "^4.5.0",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.1.0",
 		"eslint": "^9.34.0",
@@ -60,7 +59,6 @@
 		"d3-shape": "^3.2.0",
 		"dot-env": "^0.0.1",
 		"mode-watcher": "^1.1.0",
-		"svelte-loading-spinners": "^0.3.6",
-		"svelte5-chartjs": "^1.0.0"
+		"svelte-loading-spinners": "^0.3.6"
 	}
 }

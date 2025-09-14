@@ -102,15 +102,11 @@
 	<div>No maintenance logs for this vehicle.</div>
 {:else}
 	{#each pollutionCertificates as pucc (pucc.id)}
-		<div
-			class="mt-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-		>
+		<div class="bg-background/50 mt-4 rounded-lg border p-6 shadow-sm">
 			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<BadgeCheck class="h-6 w-6 text-purple-500 dark:text-purple-400" />
-					<span class="text-xl font-bold text-gray-800 dark:text-gray-100"
-						>{pucc.certificateNumber}</span
-					>
+				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
+					<BadgeCheck class="h-6 w-6 " />
+					<span class="text-xl font-bold">{pucc.certificateNumber}</span>
 				</div>
 				<div class="flex gap-2">
 					<IconButton
