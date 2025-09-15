@@ -12,8 +12,8 @@
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
-	import type { MaintenanceLog } from '$lib/types';
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
+	import type { MaintenanceLog } from '$lib/types/maintenance';
 
 	let { vehicleId } = $props();
 
@@ -75,8 +75,7 @@
 			cell: ({ row }) => {
 				const odometerCellSnippet = createRawSnippet<[number]>((serviceCenter) => {
 					return {
-						render: () =>
-							`<div class="flex flex-row justify-start">${formatDistance(serviceCenter())}</div>`
+						render: () => `<div class="flex flex-row justify-start">${serviceCenter()}</div>`
 					};
 				});
 

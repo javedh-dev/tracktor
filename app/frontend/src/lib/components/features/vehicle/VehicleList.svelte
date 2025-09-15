@@ -24,8 +24,10 @@
 		}
 	});
 
-	const selectVehicle = (vehicleId: string) => {
-		vehiclesStore.selectVehicle(vehicleId);
+	const selectVehicle = (vehicleId: string|null) => {
+		if (vehicleId){
+			vehiclesStore.selectVehicle(vehicleId);
+		}
 	};
 </script>
 

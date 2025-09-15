@@ -1,0 +1,31 @@
+<script lang="ts">
+	import * as Sheet from '$lib/components/ui/sheet/index.js';
+	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
+
+	let { open, close, title, description = '', children = null } = $props();
+</script>
+
+<Sheet.Root
+	{open}
+	onOpenChangeComplete={(state) => {
+		!state && close();
+	}}
+>
+	<ScrollArea class="px-6" orientation="vertical">
+		<!-- <Sheet.Trigger class={buttonVariants({ variant: 'outline' })}>Open</Sheet.Trigger> -->
+		<Sheet.Content side="right" class="px-2">
+			<Sheet.Header>
+				<Sheet.Title class="text-2xl">{title}</Sheet.Title>
+				<hr />
+				<Sheet.Description>
+					{description}
+				</Sheet.Description>
+			</Sheet.Header>
+			<div class="px-6">
+				{#if children}
+					{@render children()}
+				{/if}
+			</div>
+		</Sheet.Content>
+	</ScrollArea>
+</Sheet.Root>

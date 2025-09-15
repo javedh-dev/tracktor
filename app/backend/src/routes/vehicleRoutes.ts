@@ -19,7 +19,7 @@ const router = Router();
 router.post("/", authenticatePin, asyncHandler(addVehicle));
 router.get("/", authenticatePin, asyncHandler(getAllVehicles));
 router.get("/:id", authenticatePin, asyncHandler(getVehicleById));
-router.put("/:id", authenticatePin, asyncHandler(updateVehicle));
+router.put("/", authenticatePin, asyncHandler(updateVehicle));
 router.delete("/:id", authenticatePin, asyncHandler(deleteVehicle));
 
 router.use("/:vehicleId/fuel-logs", fuelLogRoutes);

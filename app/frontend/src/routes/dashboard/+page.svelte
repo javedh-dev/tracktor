@@ -1,18 +1,11 @@
 <script lang="ts">
-	import FuelLogModal from '$feature/fuel/FuelLogModal.svelte';
-	import VehicleModal from '$feature/vehicle/VehicleModal.svelte';
 	import VehicleList from '$feature/vehicle/VehicleList.svelte';
-	import { Jumper } from 'svelte-loading-spinners';
-	import MaintenanceLogModal from '$feature/maintenance/MaintenanceLogModal.svelte';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
-	import PollutionCertificateModal from '$feature/pullution/PollutionCertificateModal.svelte';
-	import InsuranceModal from '$feature/insurance/InsuranceModal.svelte';
-	import ConfigModal from '$feature/config/ConfigModal.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
-	import { CirclePlus } from '@lucide/svelte/icons';
 	import { onMount } from 'svelte';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import { CirclePlus } from '@lucide/svelte';
 
 	let selectedVehicleId = $state<string | undefined>();
 
@@ -26,7 +19,7 @@
 	onMount(() => fetchVehicles());
 </script>
 
-<div class="container mx-auto p-6">
+<div class="mx-auto p-6 lg:container">
 	<div class="mb-2 flex items-center justify-between">
 		<h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">Your Garage</h1>
 		<Button
@@ -50,11 +43,4 @@
 			</p>
 		</div>
 	{/if}
-
-	<VehicleModal />
-	<FuelLogModal />
-	<MaintenanceLogModal />
-	<PollutionCertificateModal />
-	<InsuranceModal />
-	<ConfigModal />
 </div>

@@ -2,15 +2,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import {
-		Shield,
-		Calendar,
-		Hash,
-		DollarSign,
-		Trash2,
-		Notebook,
-		Banknote
-	} from '@lucide/svelte/icons';
+	import { Shield, Calendar, Hash, Trash2, Notebook, Banknote } from '@lucide/svelte/icons';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$appui/IconButton.svelte';
@@ -59,7 +51,6 @@
 			});
 			if (response.ok) {
 				insurances = await response.json();
-				console.log('Insurance : ', JSON.stringify(insurances));
 			} else {
 				error = 'Failed to fetch insurance data.';
 			}

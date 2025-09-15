@@ -1,51 +1,150 @@
 <script lang="ts">
-	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from "svelte/elements";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
+	import { cn, type WithElementRef } from '$lib/utils.js';
+	import type { Component } from 'svelte';
+	import ColorPicker from 'svelte-awesome-color-picker';
+	import * as Popover from '../popover';
+	import { Calendar } from '$lib/components/ui/calendar/index.js';
+	import { formatDate } from '$lib/helper/formatting';
 
-	type InputType = Exclude<HTMLInputTypeAttribute, "file">;
+	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
 	type Props = WithElementRef<
-		Omit<HTMLInputAttributes, "type"> &
-			({ type: "file"; files?: FileList } | { type?: InputType; files?: undefined })
+		Omit<HTMLInputAttributes, 'type'> &
+			({ type: 'file'; files?: FileList } | { type?: InputType; files?: undefined }) & {
+				icon?: Component;
+			}
 	>;
 
 	let {
 		ref = $bindable(null),
 		value = $bindable(),
 		type,
+		icon: Icon,
 		files = $bindable(),
 		class: className,
 		...restProps
 	}: Props = $props();
+
+	let open = $state(false);
 </script>
 
-{#if type === "file"}
-	<input
-		bind:this={ref}
-		data-slot="input"
-		class={cn(
-			"selection:bg-primary dark:bg-input/30 selection:text-primary-foreground border-input ring-offset-background placeholder:text-muted-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 pt-1.5 text-sm font-medium outline-none transition-[color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-			"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-			"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-			className
-		)}
-		type="file"
-		bind:files
-		bind:value
-		{...restProps}
-	/>
-{:else}
-	<input
-		bind:this={ref}
-		data-slot="input"
-		class={cn(
-			"border-input bg-background selection:bg-primary dark:bg-input/30 selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base outline-none transition-[color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-			"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-			"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-			className
-		)}
-		{type}
-		bind:value
-		{...restProps}
-	/>
-{/if}
+<div class="relative">
+	{#if type === 'file'}
+		<input
+			bind:this={ref}
+			data-slot="input"
+			class={cn(
+				'selection:bg-primary dark:bg-input/30 selection:text-primary-foreground border-input',
+				'ring-offset-background placeholder:text-muted-foreground flex h-9 w-full min-w-0',
+				'rounded-md border bg-transparent px-3 pt-1.5 text-sm font-medium shadow-xs',
+				'transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50',
+				'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
+				'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+				'aria-invalid:border-destructive',
+				className,
+				Icon ? 'pr-4 pl-8' : ''
+			)}
+			type="file"
+			bind:files
+			bind:value
+			{...restProps}
+		/>
+	{:else if type === 'color'}
+		<div
+			class={cn(
+				'border-input bg-background selection:bg-primary dark:bg-input/30',
+				'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
+				'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
+				'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+				'flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow]',
+				'items-center justify-start outline-none disabled:cursor-not-allowed disabled:opacity-50',
+				className,
+				Icon ? 'pr-4 pl-8' : ''
+			)}
+		>
+			<ColorPicker
+				position="responsive"
+				bind:hex={value}
+				label={value.toUpperCase()}
+				isAlpha={false}
+				--slider-width="18px"
+				--input-size="18px"
+			/>
+		</div>
+	{:else if type == 'calendar'}
+		<input
+			bind:this={ref}
+			data-slot="input"
+			disabled
+			class={cn(
+				'border-input bg-background selection:bg-primary dark:bg-input/30',
+				'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
+				'flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs',
+				'transition-[color,box-shadow] outline-none',
+				'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
+				'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+				'aria-invalid:border-destructive',
+				className,
+				Icon ? 'pr-4 pl-8' : ''
+			)}
+			{type}
+			bind:value
+			{...restProps}
+		/>
+	{:else}
+		<input
+			bind:this={ref}
+			data-slot="input"
+			class={cn(
+				'border-input bg-background selection:bg-primary dark:bg-input/30',
+				'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
+				'flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs',
+				'transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50',
+				'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
+				'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+				'aria-invalid:border-destructive',
+				className,
+				Icon ? 'pr-4 pl-8' : ''
+			)}
+			{type}
+			bind:value
+			{...restProps}
+		/>
+	{/if}
+
+	{#if Icon}
+		<Icon
+			class="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 text-gray-400"
+			aria-hidden="true"
+		/>
+	{/if}
+
+	{#if type === 'calendar'}
+		<Popover.Root bind:open>
+			<Popover.Trigger id={`${ref?.id}-date-picker`}>
+				{#snippet child({ props })}
+					<span
+						{...props}
+						class="absolute top-5 left-8 size-6 w-full -translate-y-1/2 text-sm opacity-50"
+						aria-hidden="true"
+					>
+						{value}
+					</span>
+				{/snippet}
+			</Popover.Trigger>
+			<Popover.Content class="w-auto overflow-hidden p-0" align="start">
+				<Calendar
+					type="single"
+					captionLayout="dropdown"
+					onValueChange={(v) => {
+						if (v) {
+							value = formatDate(v.toString());
+							open = false;
+						}
+					}}
+				/>
+			</Popover.Content>
+		</Popover.Root>
+	{/if}
+</div>

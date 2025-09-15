@@ -1,5 +1,6 @@
 import { getApiUrl } from '$lib/helper/api';
-import type { DataPoint } from '$lib/types';
+import type { DataPoint, Response } from '$lib/types';
+import type { Vehicle } from '$lib/types/vehicle';
 
 export const fetchMileageData = async (vehicleId: string): Promise<DataPoint[]> => {
 	let mileageData: DataPoint[] = [];
@@ -61,4 +62,56 @@ export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => 
 		console.error('Failed to connect to the server.', e);
 	}
 	return costData;
+};
+
+export const saveVehicle = async (
+	vehicle: Vehicle,
+	method: 'PUT' | 'POST'
+): Promise<Response<Vehicle>> => {
+	const res: Response<Vehicle> = { status: 'OK' };
+	try {
+		const response = await fetch(getApiUrl(`/api/vehicles/`), {
+			method,
+			headers: {
+				'Content-Type': 'application/json',
+				'X-User-PIN': localStorage.getItem('userPin') || ''
+			},
+			body: JSON.stringify(vehicle)
+		});
+
+		if (response.ok) {
+			res.data = await response.json();
+		} else {
+			res.status = 'ERROR';
+			const data = await response.json();
+			res.error = (data.message as string) || 'Failed to delete vehicle.';
+		}
+	} catch (e) {
+		res.status = 'ERROR';
+		res.error = 'Error while saving vehicle : ' + e;
+	}
+	return res;
+};
+
+export const deleteVehicle = async (vehicleId: string): Promise<Response<string>> => {
+	const res: Response<string> = { status: 'OK' };
+	try {
+		const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}`), {
+			method: 'DELETE',
+			headers: {
+				'X-User-PIN': localStorage.getItem('userPin') || ''
+			}
+		});
+		if (response.ok) {
+			res.data = vehicleId;
+		} else {
+			res.status = 'ERROR';
+			const data = await response.json();
+			res.error = (data.message as string) || 'Failed to delete vehicle.';
+		}
+	} catch (e) {
+		res.status = 'ERROR';
+		res.error = 'Error while saving vehicle : ' + e;
+	}
+	return res;
 };

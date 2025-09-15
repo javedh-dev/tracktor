@@ -1,197 +1,139 @@
 <script lang="ts">
+	import AppSheet from '$lib/components/layout/AppSheet.svelte';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { saveVehicle } from '$lib/services/vehicle.service';
+	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
+	import { vehicleSchema, type Vehicle } from '$lib/types/vehicle';
 	import {
-		Car,
-		Calendar1,
-		IdCard,
+		Building2,
+		Calendar,
+		CarFront,
+		CircleGauge,
 		Fingerprint,
-		Paintbrush,
-		Gauge,
-		Building2
-	} from '@lucide/svelte/icons';
-	import FormField from '$appui/FormField.svelte';
-	import type { NewVehicle } from '$models/vehicle';
-	import { env } from '$env/dynamic/public';
-	import { vehiclesStore } from '$stores/vehicle';
-	import { browser } from '$app/environment';
-	import Button from '$appui/Button.svelte';
-	import StatusBlock from '$appui/StatusBlock.svelte';
-	import type { Status } from '$models/status';
-	import { handleApiError, type ApiError } from '$models/Error';
-	import { cleanup } from '$helper/formatting';
+		IdCard,
+		Paintbrush
+	} from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
+	import { superForm, defaults } from 'sveltekit-superforms';
+	import { zod4 } from 'sveltekit-superforms/adapters';
 
-	let { vehicleToEdit = null, editMode = false, modalVisibility = $bindable(), loading } = $props();
+	let open = $state(false);
+	let vehicleToEdit: Vehicle | undefined = $state();
+	let editMode = $state(false);
 
-	const vehicle: NewVehicle = $state({
-		make: null,
-		model: null,
-		year: null,
-		licensePlate: null,
-		vin: null,
-		color: null,
-		odometer: null
+	vehicleModelStore.subscribe((data) => {
+		open = data.show;
+		vehicleToEdit = data.vehicleToEdit;
+		editMode = data.editMode;
 	});
 
-	let status = $state<Status>({
-		message: undefined,
-		type: 'INFO'
+	const form = superForm(defaults(zod4(vehicleSchema)), {
+		validators: zod4(vehicleSchema),
+		SPA: true,
+		onUpdate: ({ form: f }) => {
+			if (f.valid) {
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				saveVehicle(f.data, vehicleToEdit ? 'PUT' : 'POST').then((res) => {
+					if (res.status == 'OK') {
+						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
+						toast.success(`Vehicle ${vehicleToEdit ? 'updated' : 'saved'} successfully...!!!`);
+						vehicleModelStore.hide();
+					}
+				});
+			} else {
+				toast.error('Please fix the errors in the form.');
+				console.error(JSON.stringify(f.data, null, 2));
+			}
+		}
 	});
+	const { form: formData, enhance } = form;
 
 	$effect(() => {
 		if (vehicleToEdit) {
-			Object.assign(vehicle, vehicleToEdit);
+			formData.set(vehicleToEdit);
 		}
 	});
-
-	async function persistVehicle() {
-		if (!vehicle.make || !vehicle.model || !vehicle.year || !vehicle.licensePlate) {
-			status = {
-				message: 'Please fill in all required fields.',
-				type: 'ERROR'
-			};
-			return;
-		}
-		try {
-			if (loading) return; // Prevent multiple submissions
-			loading = true;
-			status = {
-				message: undefined,
-				type: 'INFO'
-			};
-			// await simulateNetworkDelay(2000); // Simulate network delay for development
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${editMode ? vehicleToEdit.id : ''}`,
-				{
-					method: editMode ? 'PUT' : 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					},
-					body: JSON.stringify(cleanup(vehicle))
-				}
-			);
-
-			if (response.ok) {
-				status = {
-					message: `Vehicle ${editMode ? 'updated' : 'added'} successfully!`,
-					type: 'SUCCESS'
-				};
-				Object.assign(vehicle, {
-					make: '',
-					model: '',
-					year: null,
-					licensePlate: '',
-					vin: '',
-					color: '',
-					odometer: null
-				});
-				modalVisibility = false;
-				fetchVehicles(); // Refresh the vehicle list after closing the modal
-			} else {
-				const data: ApiError = await response.json();
-				status = handleApiError(data, editMode);
-			}
-		} catch (e) {
-			console.error('Error persisting vehicle:', e);
-			status = {
-				message: 'Failed to connect to the server.',
-				type: 'ERROR'
-			};
-		}
-		loading = false;
-	}
-
-	const fetchVehicles = () => {
-		if (browser) {
-			const pin = localStorage.getItem('userPin') || undefined;
-			if (pin) vehiclesStore.fetchVehicles(pin);
-		}
-	};
 </script>
 
-<form
-	onsubmit={(e) => {
-		persistVehicle();
-		e.preventDefault();
-	}}
-	class="space-y-6"
->
-	<div class="grid grid-flow-row grid-cols-2 gap-4">
-		<FormField
-			id="make"
-			type="text"
-			placeholder="Make"
-			bind:value={vehicle.make}
-			icon={Building2}
-			label="Manufacturer"
-			required={true}
-			ariaLabel="Vehicle Make"
-		/>
-		<FormField
-			id="model"
-			type="text"
-			placeholder="Model"
-			bind:value={vehicle.model}
-			icon={Car}
-			label="Model"
-			required={true}
-			ariaLabel="Vehicle Model"
-		/>
-	</div>
-	<div class="grid grid-flow-row grid-cols-2 gap-4">
-		<FormField
-			id="year"
-			type="number"
-			placeholder="Year"
-			bind:value={vehicle.year}
-			icon={Calendar1}
-			label="Year"
-			required={true}
-			ariaLabel="Vehicle Year"
-		/>
-		<FormField
-			id="color"
-			type="text"
-			placeholder="Color"
-			bind:value={vehicle.color}
-			icon={Paintbrush}
-			label="Color"
-			ariaLabel="Color"
-		/>
-	</div>
+<AppSheet {open} close={() => vehicleModelStore.hide()} title="Add Vehicle">
+	<form use:enhance onsubmit={(e) => e.preventDefault()}>
+		<div class="flex flex-col gap-4">
+			<div class="flex w-full flex-row gap-4">
+				<Form.Field {form} name="make" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Manufacturer of the vehicle">Make</Form.Label>
+							<Input {...props} bind:value={$formData.make} icon={Building2} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="model" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Model of the vehicle">Model</Form.Label>
+							<Input {...props} bind:value={$formData.model} icon={CarFront} />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+			<div class="flex w-full flex-row gap-4">
+				<Form.Field {form} name="year" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Year of Manufacturing">Year</Form.Label>
+							<Input {...props} bind:value={$formData.year} icon={Calendar} type="number" />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="color" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Color of the vehicle">Color</Form.Label>
+							<Input {...props} bind:value={$formData.color} icon={Paintbrush} type="color" />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
 
-	<FormField
-		id="licensePlate"
-		type="text"
-		placeholder="License Plate"
-		bind:value={vehicle.licensePlate}
-		icon={IdCard}
-		label="Licence Plate"
-		required={true}
-		ariaLabel="License Plate"
-	/>
-	<FormField
-		id="vin"
-		type="text"
-		placeholder="VIN Number"
-		bind:value={vehicle.vin}
-		icon={Fingerprint}
-		label="VIN Number"
-		ariaLabel="VIN Number"
-	/>
-
-	<FormField
-		id="odometer"
-		type="number"
-		placeholder="Odometer"
-		bind:value={vehicle.odometer}
-		icon={Gauge}
-		label="Odometer"
-		ariaLabel="Odometer"
-	/>
-	<Button type="submit" variant="primary" text={editMode ? 'Update' : 'Add'} />
-
-	{#if editMode}
-		<input type="hidden" name="id" value={vehicleToEdit?.id || ''} />
-	{/if}
-</form>
-<StatusBlock message={status.message} type={status.type} />
+			<Form.Field {form} name="licensePlate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Registration Number of vehicle">License Plate</Form.Label>
+						<Input {...props} bind:value={$formData.licensePlate} icon={IdCard} />
+					{/snippet}
+				</Form.Control>
+				<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="vin" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Vehicle Idenification Number">VIN</Form.Label>
+						<Input {...props} bind:value={$formData.vin} icon={Fingerprint} />
+					{/snippet}
+				</Form.Control>
+				<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="odometer" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
+						<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
+					{/snippet}
+				</Form.Control>
+				<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Button>Submit</Form.Button>
+		</div>
+	</form>
+</AppSheet>

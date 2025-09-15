@@ -16,7 +16,6 @@
 
 <AreaChart
 	{chartData}
-	color="#a1a1aa"
 	label="Cost"
 	title={`Cost over Time in (${getCurrencySymbol()})`}
 	xFormatter={(v: Date) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}

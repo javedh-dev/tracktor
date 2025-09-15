@@ -3,12 +3,8 @@ export type DataPoint = {
 	y: number | null;
 };
 
-export type MaintenanceLog = {
-	id: string;
-	date: string;
-	odometer: number;
-	serviceCenter: string;
-	cost: number;
-	notes?: string;
-	vehicleId: string;
+export type Response<DataType> = {
+	status: 'OK' | 'ERROR';
+	data?: DataType;
+	error?: string;
 };

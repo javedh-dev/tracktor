@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { getApiUrl } from '$helper/api';
-	import { type FuelLog } from '$models/fuel-log';
+	import { type FuelLog } from '$lib/types/fuel';
 	import { createRawSnippet } from 'svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { formatCurrency, formatDate, formatDistance, formatVolume } from '$lib/helper/formatting';

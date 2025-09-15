@@ -2,40 +2,26 @@
 	import DeleteConfirmation from '$lib/components/ui/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { getApiUrl } from '$lib/helper/api';
+	import { deleteFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import type { FuelLog } from '$lib/types/fuel-log';
+	import type { FuelLog } from '$lib/types/fuel';
 	import { EllipsisVertical } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
 
-	async function deleteFuelLog() {
-		if (!fuelLog.id) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				getApiUrl(`/api/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`),
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					}
-				}
-			);
-			if (response.ok) {
+	const deleteLog = () => {
+		deleteFuelLog(fuelLog).then((res) => {
+			if (res.status === 'OK') {
 				showDeleteDialog = false;
 				toast.success('Deleted Fuel Log');
 				onaction();
 			} else {
-				toast.error('Failed to delete the Fuel Log');
+				toast.error(res.error || 'Some error occurred while deleting vehicle.');
 			}
-		} catch (e) {
-			console.error('Failed to connect to the server.', e);
-		}
-	}
+		});
+	};
 </script>
 
 <div class=" flex flex-row justify-end">
@@ -63,4 +49,4 @@
 	</DropdownMenu.Root>
 </div>
 
-<DeleteConfirmation onConfirm={() => deleteFuelLog()} bind:open={showDeleteDialog} />
+<DeleteConfirmation onConfirm={() => deleteLog()} bind:open={showDeleteDialog} />

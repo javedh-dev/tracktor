@@ -166,11 +166,12 @@
 							{/each}
 						</Table.Row>
 					{:else}
-						<Table.Row>
-							<Table.Cell colspan={columns.length} class="h-24 text-center">
+						<Table.Row class="f">
+							<Table.Cell colspan={columns.length} class="h-24">
 								<LabelWithIcon
 									icon={CircleSlash2}
 									iconClass="h-4 w-4"
+									style="justify-center"
 									label={`No data avaialble`}
 								/>
 							</Table.Cell>
@@ -209,7 +210,7 @@
 					Next
 				</Button>
 			</div>
-			<div class="flex flex-row items-center gap-4">
+			<div class="flex flex-row items-center gap-4 text-sm">
 				Rows per page
 				<Select.Root type="single" bind:value={pageSize}>
 					<Select.Trigger size="sm">{pageSize}</Select.Trigger>

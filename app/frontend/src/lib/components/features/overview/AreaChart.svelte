@@ -16,7 +16,7 @@
 		yFormatter
 	}: {
 		chartData: DataPoint[];
-		color: string;
+		color?: string;
 		label: string;
 		title: string;
 		xFormatter: (v: Date) => string;

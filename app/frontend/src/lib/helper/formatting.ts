@@ -1,5 +1,5 @@
 import { config } from '$stores/config';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 export interface ConfigStore {
 	dateFormat: string;
@@ -29,6 +29,10 @@ config.subscribe((value) => {
 
 const formatDate = (date: Date | string): string => {
 	return format(date, configs.dateFormat);
+};
+
+const parseDate = (date: string) => {
+	return parse(date, configs.dateFormat, new Date());
 };
 
 const getCurrencySymbol = (): string => {
@@ -108,6 +112,7 @@ const formatMileage = (mileage: number): string => {
 
 export {
 	formatDate,
+	parseDate,
 	getCurrencySymbol,
 	formatCurrency,
 	getDistanceUnit,

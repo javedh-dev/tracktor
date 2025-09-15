@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LicensePlate from './LicensePlate.svelte';
+	import LicensePlate from '../../ui/app/LicensePlate.svelte';
 
 	import {
 		Gauge,
@@ -9,7 +9,6 @@
 		Wrench,
 		Shield,
 		BadgeCheck,
-		CircleDotDashed,
 		ShieldCheck,
 		BadgeAlert,
 		ShieldAlert,
@@ -29,30 +28,21 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import IconWithTooltip from '$appui/IconWithTooltip.svelte';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import { deleteVehicle } from '$lib/services/vehicle.service';
+	import { toast } from 'svelte-sonner';
 
 	const { vehicle, updateCallback, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
 
-	const deleteVehicle = async (vehicleId: string) => {
-		try {
-			const response = await fetch(`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}`, {
-				method: 'DELETE',
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			});
-			if (response.ok) {
-				alert('Vehicle deleted successfully.');
-				vehicleModelStore.hide();
-				fetchVehicles();
-			} else {
-				const data = await response.json();
-				alert(data.message || 'Failed to delete vehicle.');
+	const performDelete = async (vehicleId: string) => {
+		deleteVehicle(vehicleId).then(res=>{
+			if(res.status=="OK"){
+				fetchVehicles()
+				toast.success("Successfully deleted vehicle...!!!");
+			}else{
+				toast.error(res.error || "Some error occurred while deleting vehicle.");
 			}
-		} catch (e) {
-			console.log(e);
-			alert('Failed to connect to the server.');
-		}
+		})
 	};
 
 	const fetchVehicles = () => {
@@ -187,4 +177,4 @@
 		</Card.Footer>
 	</Card.Root>
 </div>
-<DeleteConfirmation onConfirm={() => deleteVehicle(vehicle.id)} bind:open={deleteDialog} />
+<DeleteConfirmation onConfirm={() => performDelete(vehicle.id)} bind:open={deleteDialog} />

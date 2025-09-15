@@ -17,7 +17,6 @@
 
 <AreaChart
 	{chartData}
-	color="#a1a1aa"
 	label="Milage"
 	title={`Mileage over Time in ( ${getMileageUnit()} )`}
 	xFormatter={(v: Date) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
