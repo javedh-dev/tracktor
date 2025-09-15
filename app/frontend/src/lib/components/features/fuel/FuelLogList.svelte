@@ -15,7 +15,7 @@
 		Notebook,
 		PaintBucket,
 		SquircleDashed
-	} from '@lucide/svelte';
+	} from '@lucide/svelte/icons';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';

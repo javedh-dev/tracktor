@@ -5,6 +5,7 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import PollutionCertificateForm from '$lib/components/features/pullution/PollutionCertificateForm.svelte';
 	import InsuranceForm from '$lib/components/features/insurance/InsuranceForm.svelte';
+	import ConfigSheet from '$lib/components/features/config/ConfigSheet.svelte';
 
 	let { children } = $props();
 </script>
@@ -19,3 +20,4 @@
 <MaintenanceForm />
 <InsuranceForm />
 <PollutionCertificateForm />
+<ConfigSheet />
