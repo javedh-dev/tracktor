@@ -8,3 +8,8 @@ export type Response<DataType> = {
 	data?: DataType;
 	error?: string;
 };
+
+// Re-export types from other modules
+export type { Insurance, InsuranceSchema } from './insurance';
+export type { PollutionCertificate, PollutionCertificateSchema } from './pucc';
+export type { MaintenanceLog, MaintenenceSchema } from './maintenance';

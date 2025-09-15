@@ -2,12 +2,13 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
-	import { Shield, Calendar, Hash, Trash2, Notebook, Banknote } from '@lucide/svelte/icons';
+	import { Shield, Calendar, Hash, Trash2, Notebook, Banknote, Pencil } from '@lucide/svelte/icons';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
+	import { insuranceModelStore } from '$lib/stores/insurance';
 
 	let { vehicleId } = $props();
 
@@ -110,6 +111,17 @@
 					<span class="text-xl font-bold">{ins.provider}</span>
 				</div>
 				<div class="flex gap-2">
+					<IconButton
+						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
+						icon={Pencil}
+						onclick={() => {
+							insuranceModelStore.show(vehicleId, ins, true, () => {
+								fetchInsuranceDetails();
+							});
+						}}
+						ariaLabel="Delete"
+					/>
 					<IconButton
 						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"

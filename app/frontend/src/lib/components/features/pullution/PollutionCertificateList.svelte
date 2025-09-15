@@ -8,6 +8,7 @@
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
+	import { puccModelStore } from '$lib/stores/pucc';
 
 	let { vehicleId } = $props();
 
@@ -109,6 +110,16 @@
 					<span class="text-xl font-bold">{pucc.certificateNumber}</span>
 				</div>
 				<div class="flex gap-2">
+					<IconButton
+						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
+						icon={Trash2}
+						onclick={() => {
+							selectedPucc = pucc.id;
+							puccModelStore.show(vehicleId, pucc, true, () => fetchPollutionCertificateDetails());
+						}}
+						ariaLabel="Delete"
+					/>
 					<IconButton
 						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"

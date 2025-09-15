@@ -14,9 +14,14 @@ export interface MaintenanceLog {
 export const maintenenceSchema = z.object({
 	id: z.string().nullable(),
 	vehicleId: z.uuid(),
-	date: z.string().check((val) => {
-		parseDate(val.value);
-	}),
+	date: z.string().refine((val) => {
+		try {
+			parseDate(val);
+			return true;
+		} catch {
+			return false;
+		}
+	}, 'Invalid date format'),
 	odometer: z.number().positive(),
 	serviceCenter: z
 		.string()

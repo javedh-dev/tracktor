@@ -23,6 +23,7 @@ export const addPollutionCertificate = async (
     .values({
       ...pollutionCertificateData,
       vehicleId: vehicleId,
+      id: undefined,
     })
     .returning();
   return {

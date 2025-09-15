@@ -3,6 +3,8 @@
 	import MaintenanceForm from '$lib/components/features/maintenance/MaintenanceForm.svelte';
 	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
 	import Header from '$lib/components/layout/Header.svelte';
+	import PollutionCertificateForm from '$lib/components/features/pullution/PollutionCertificateForm.svelte';
+	import InsuranceForm from '$lib/components/features/insurance/InsuranceForm.svelte';
 
 	let { children } = $props();
 </script>
@@ -15,3 +17,5 @@
 <VehicleForm />
 <FuelForm />
 <MaintenanceForm />
+<InsuranceForm />
+<PollutionCertificateForm />
