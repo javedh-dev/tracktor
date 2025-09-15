@@ -106,7 +106,7 @@
 	{#each insurances as ins (ins.id)}
 		<div class="bg-background/50 mt-4 rounded-lg p-6 shadow-sm">
 			<div class="flex items-center justify-between">
-				<div class="dark: flex items-center gap-2 text-blue-400 text-blue-500">
+				<div class="dark: flex items-center gap-2 text-blue-400">
 					<Shield class="h-6 w-6" />
 					<span class="text-xl font-bold">{ins.provider}</span>
 				</div>
