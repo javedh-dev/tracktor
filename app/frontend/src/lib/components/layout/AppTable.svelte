@@ -14,7 +14,14 @@
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
-	import { CircleSlash2, Columns3, ChevronDownIcon } from '@lucide/svelte/icons';
+	import {
+		CircleSlash2,
+		Columns3,
+		ChevronDownIcon,
+		ArrowRight,
+		ArrowLeft,
+		Search
+	} from '@lucide/svelte/icons';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Select from '$lib/components/ui/select';
@@ -103,7 +110,7 @@
 			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={`No data avaialble`} />
 		</div>
 	{:else}
-		<div class="mb-4 flex flex-row items-center justify-between">
+		<div class="mb-4 flex flex-row items-center justify-between gap-2">
 			<Input
 				placeholder="Search"
 				value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
@@ -111,6 +118,7 @@
 				onchange={(e) => {
 					table.getColumn('notes')?.setFilterValue(e.currentTarget.value);
 				}}
+				icon={Search}
 				class="bg-background/60 h-full max-w-sm"
 			/>
 			<DropdownMenu.Root>
@@ -181,33 +189,33 @@
 			</Table.Root>
 		</div>
 		<div class="flex items-center justify-between space-x-2 pt-4">
-			<div class="space-x-2">
+			<div class="flex flex-row items-center space-x-2">
 				<Button
 					variant="outline"
-					size="sm"
+					size="icon"
 					onclick={() => table.previousPage()}
 					disabled={!table.getCanPreviousPage()}
 					class="cursor-pointer"
 				>
-					Previous
+					<ArrowLeft />
 				</Button>
 				{#each table.getPageOptions() as pageNum}
 					<Badge
 						variant="outline"
 						onclick={() => table.setPageIndex(pageNum)}
-						class="hover:bg-primary hover:text-background cursor-pointer"
+						class="hover:bg-primary hover:text-background hidden cursor-pointer lg:inline-block"
 					>
 						{pageNum + 1}
 					</Badge>
 				{/each}
 				<Button
 					variant="outline"
-					size="sm"
+					size="icon"
 					onclick={() => table.nextPage()}
 					disabled={!table.getCanNextPage()}
 					class="cursor-pointer"
 				>
-					Next
+					<ArrowRight />
 				</Button>
 			</div>
 			<div class="flex flex-row items-center gap-4 text-sm">

@@ -9,14 +9,14 @@
 </script>
 
 <Card.Root class={cn('flex flex-col items-center gap-6 py-12', className)} {...restProps}>
-	<LabelWithIcon icon={Tractor} iconClass="h-12 w-12">
-		<h1 class="text-3xl font-bold">Welcome to Tracktor</h1>
+	<LabelWithIcon icon={Tractor} iconClass="lg:h-12 lg:w-12">
+		<h1 class="text-xl font-bold lg:text-3xl">Welcome to Tracktor</h1>
 	</LabelWithIcon>
 	<LabelWithIcon
 		icon={ShieldEllipsis}
-		iconClass="h-6 w-6"
+		iconClass="lg:h-6 lg:w-6"
 		label="Enter your 6-digit PIN to access the app"
-		style="gap-4 text-zinc-400"
+		style="gap-4 text-zinc-400 text-sm"
 	/>
 	<PinInput {oncomplete} />
 </Card.Root>

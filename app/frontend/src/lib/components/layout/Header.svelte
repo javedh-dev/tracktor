@@ -2,11 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte/icons';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
-	import { env } from '$env/dynamic/public';
 	import { configModelStore } from '$stores/config';
 	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
+	import { page } from '$app/stores';
 
 	let isAuthenticated = $state(false);
 
@@ -14,7 +14,7 @@
 		const pin = localStorage.getItem('userPin');
 		isAuthenticated = !!pin;
 
-		if (!isAuthenticated) {
+		if (!isAuthenticated && $page.url.pathname !== '/login') {
 			goto('/login', { replaceState: true });
 		}
 	});
@@ -33,7 +33,7 @@
 <header
 	class="flex h-auto shrink-0 justify-center gap-2 border-b py-3 text-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)"
 >
-	<div class="flex w-full items-center px-6">
+	<div class="flex w-full items-center px-2 lg:px-6">
 		<LabelWithIcon
 			icon={Tractor}
 			iconClass="h-8 w-8"
@@ -43,19 +43,21 @@
 		<div class="ml-auto flex items-center gap-2">
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
-				<Button
-					variant="ghost"
-					onclick={() => {
-						configModelStore.show((status: boolean) => {
-							status && fetchVehicles();
-						});
-					}}
-				>
-					<Settings class="h-[1.2rem] w-[1.2rem]" />
-				</Button>
-				<Button variant="ghost" onclick={logout}>
-					<LogOut class="h-[1.2rem] w-[1.2rem]" />
-				</Button>
+				{#if isAuthenticated}
+					<Button
+						variant="ghost"
+						onclick={() => {
+							configModelStore.show((status: boolean) => {
+								status && fetchVehicles();
+							});
+						}}
+					>
+						<Settings class="h-[1.2rem] w-[1.2rem]" />
+					</Button>
+					<Button variant="ghost" onclick={logout}>
+						<LogOut class="h-[1.2rem] w-[1.2rem]" />
+					</Button>
+				{/if}
 			</div>
 		</div>
 	</div>

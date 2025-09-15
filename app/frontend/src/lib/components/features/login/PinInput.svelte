@@ -29,7 +29,7 @@
 						hasFakeCaret: cell.hasFakeCaret,
 						isActive: cell.isActive
 					}}
-					class="text-lg"
+					class="text-base lg:text-lg"
 				/>
 			</InputOTP.Group>
 		{/each}

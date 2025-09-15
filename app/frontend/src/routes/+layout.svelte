@@ -17,12 +17,12 @@
 
 {#if demoMode}
 	<div
-		class="bg-secondary/95 sticky top-0 z-50 flex flex-row justify-center p-2 dark:border-b-amber-900"
+		class="bg-secondary/95 sticky top-0 z-10 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900"
 	>
 		<LabelWithIcon
 			icon={TriangleAlert}
 			iconClass="h-5 w-5"
-			style="text-amber-500 dark:text-amber-700 gap-1"
+			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center"
 		>
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
 			avoid adding any persoanl info. <strong>Default PIN : 123456</strong>

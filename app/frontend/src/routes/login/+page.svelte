@@ -6,6 +6,7 @@
 	import { verifyPin } from '$services/auth.service';
 	import { simulateNetworkDelay } from '$helper/dev';
 	import { toast } from 'svelte-sonner';
+	import Header from '$lib/components/layout/Header.svelte';
 
 	const oncomplete = (pin: string) => {
 		console.log(pin);
@@ -24,11 +25,9 @@
 	};
 </script>
 
-<div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+<Header />
+<div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-4 md:p-10">
 	<div class="w-full max-w-lg">
-		<div class="absolute top-16 right-12">
-			<ThemeToggle />
-		</div>
 		<LoginForm {oncomplete} />
 	</div>
 </div>

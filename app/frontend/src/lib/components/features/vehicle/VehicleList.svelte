@@ -24,8 +24,8 @@
 		}
 	});
 
-	const selectVehicle = (vehicleId: string|null) => {
-		if (vehicleId){
+	const selectVehicle = (vehicleId: string | null) => {
+		if (vehicleId) {
 			vehiclesStore.selectVehicle(vehicleId);
 		}
 	};
@@ -46,7 +46,7 @@
 
 {#if vehicles.length > 0}
 	<ScrollArea class="w-full whitespace-nowrap" orientation="horizontal">
-		<div class="m-4 flex gap-4">
+		<div class="my-4 flex gap-4">
 			{#each vehicles as vehicle (vehicle.id)}
 				<VehicleCard
 					{vehicle}

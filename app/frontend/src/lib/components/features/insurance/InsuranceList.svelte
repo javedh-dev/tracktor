@@ -1,32 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { env } from '$env/dynamic/public';
-	import { Shield, Calendar, Hash, Trash2, Notebook, Banknote, Pencil } from '@lucide/svelte/icons';
+	import { Shield, Calendar, Hash, Notebook, Banknote } from '@lucide/svelte/icons';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$appui/IconButton.svelte';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
-	import { insuranceModelStore } from '$lib/stores/insurance';
+	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
+	import type { Insurance } from '$lib/types';
 
 	let { vehicleId } = $props();
-
-	interface Insurance {
-		id: string;
-		provider: string;
-		policyNumber: string;
-		startDate: string;
-		endDate: string;
-		cost: number;
-		notes: string;
-	}
 
 	let insurances: Insurance[] = $state([]);
 	let loading = $state(false);
 	let error = $state('');
-	let selectedInsurance = $state<string>();
-	let deleteDialog = $state(false);
 
 	$effect(() => {
 		if (!vehicleId) {
@@ -63,32 +49,6 @@
 		}
 	}
 
-	async function deleteInsurance(insuranceId: string | undefined) {
-		if (!insuranceId) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/insurance/${insuranceId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
-				}
-			);
-			if (response.ok) {
-				await fetchInsuranceDetails();
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to delete insurance details.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Failed to delete insurance details.';
-		}
-	}
-
 	onMount(() => {
 		fetchInsuranceDetails();
 	});
@@ -104,35 +64,13 @@
 	<div>No Insurance found for this vehicle.</div>
 {:else}
 	{#each insurances as ins (ins.id)}
-		<div class="bg-background/50 mt-4 rounded-lg p-6 shadow-sm">
+		<div class="bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="dark: flex items-center gap-2 text-blue-400">
 					<Shield class="h-6 w-6" />
-					<span class="text-xl font-bold">{ins.provider}</span>
+					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{ins.provider}</span>
 				</div>
-				<div class="flex gap-2">
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-						icon={Pencil}
-						onclick={() => {
-							insuranceModelStore.show(vehicleId, ins, true, () => {
-								fetchInsuranceDetails();
-							});
-						}}
-						ariaLabel="Delete"
-					/>
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-						icon={Trash2}
-						onclick={() => {
-							selectedInsurance = ins.id;
-							deleteDialog = true;
-						}}
-						ariaLabel="Delete"
-					/>
-				</div>
+				<InsuranceContextMenu insurance={ins} onaction={fetchInsuranceDetails} />
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2">
@@ -165,8 +103,4 @@
 			</div>
 		</div>
 	{/each}
-	<DeleteConfirmation
-		onConfirm={() => deleteInsurance(selectedInsurance)}
-		bind:open={deleteDialog}
-	/>
 {/if}

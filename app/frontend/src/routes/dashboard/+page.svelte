@@ -19,12 +19,12 @@
 	onMount(() => fetchVehicles());
 </script>
 
-<div class="mx-auto p-6 lg:container">
+<div class="mx-auto p-4 lg:container lg:p-6">
 	<div class="mb-2 flex items-center justify-between">
-		<h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">Your Garage</h1>
+		<h1 class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
 		<Button
 			variant="outline"
-			size="lg"
+			size="default"
 			class="cursor-pointer"
 			onclick={() => vehicleModelStore.show()}
 		>

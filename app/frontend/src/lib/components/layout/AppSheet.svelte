@@ -13,7 +13,7 @@
 >
 	<ScrollArea class="px-6" orientation="vertical">
 		<!-- <Sheet.Trigger class={buttonVariants({ variant: 'outline' })}>Open</Sheet.Trigger> -->
-		<Sheet.Content side="right" class="px-2">
+		<Sheet.Content side="right" class="w-full px-2 lg:w-sm">
 			<Sheet.Header>
 				<Sheet.Title class="text-2xl">{title}</Sheet.Title>
 				<hr />

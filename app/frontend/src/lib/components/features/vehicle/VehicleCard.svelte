@@ -35,14 +35,14 @@
 	let deleteDialog = $state(false);
 
 	const performDelete = async (vehicleId: string) => {
-		deleteVehicle(vehicleId).then(res=>{
-			if(res.status=="OK"){
-				fetchVehicles()
-				toast.success("Successfully deleted vehicle...!!!");
-			}else{
-				toast.error(res.error || "Some error occurred while deleting vehicle.");
+		deleteVehicle(vehicleId).then((res) => {
+			if (res.status == 'OK') {
+				fetchVehicles();
+				toast.success('Successfully deleted vehicle...!!!');
+			} else {
+				toast.error(res.error || 'Some error occurred while deleting vehicle.');
 			}
-		})
+		});
 	};
 
 	const fetchVehicles = () => {
@@ -59,7 +59,7 @@
 
 <div tabindex="0" role="button" {onclick} {onkeydown}>
 	<Card.Root
-		class={`hover:border-primary h-full w-sm cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out ${isSelected ? 'border-primary' : 'border-transparent'}`}
+		class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary' : 'border-transparent'}`}
 	>
 		<Card.Header class="relative h-38 overflow-hidden p-0 ">
 			<div class="w-full">

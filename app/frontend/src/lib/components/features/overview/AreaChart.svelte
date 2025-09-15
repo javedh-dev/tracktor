@@ -41,7 +41,7 @@
 		// 	format: yFormatter
 		// },
 		grid: {
-			style: 'stroke-dasharray: 4',
+			style: 'stroke-dasharray: 2',
 			class: 'stroke-1'
 		}
 	} satisfies AreaChartPropsObjProp;
@@ -54,8 +54,8 @@
 	} satisfies Chart.ChartConfig;
 </script>
 
-<div class="bg-background/50 rounded-lg px-12 py-8">
-	<div class="mb-4 flex flex-row justify-end font-bold">{title}</div>
+<div class="bg-background/50 rounded-lg px-4 pt-2 pb-6 lg:p-6">
+	<div class="mb-4 flex flex-row justify-start font-bold">{title}</div>
 	{#if chartData.length != 0}
 		<Chart.Container config={chartConfig}>
 			<AreaChart
@@ -73,7 +73,7 @@
 					}
 				]}
 				seriesLayout="stack"
-				axis={true}
+				axis={'x'}
 				props={chartProps}
 			>
 				{#snippet tooltip()}

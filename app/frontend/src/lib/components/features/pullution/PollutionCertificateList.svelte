@@ -9,19 +9,13 @@
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
 	import { puccModelStore } from '$lib/stores/pucc';
+	import PuccContextMenu from './PuccContextMenu.svelte';
+	import type { PollutionCertificate } from '$lib/types';
+	import { deletePollutionCertificate } from '$lib/services/pucc.service';
 
 	let { vehicleId } = $props();
 
-	interface PollutionCertificateDetails {
-		id: string;
-		certificateNumber: string;
-		issueDate: string;
-		expiryDate: string;
-		testingCenter: string;
-		notes?: string;
-	}
-
-	let pollutionCertificates: PollutionCertificateDetails[] = $state([]);
+	let pollutionCertificates: PollutionCertificate[] = $state([]);
 	let loading = $state(false);
 	let error = $state('');
 	let selectedPucc = $state<string>();
@@ -62,32 +56,6 @@
 		}
 	}
 
-	async function deletePollutionCertificate(puccId: string | undefined) {
-		if (!puccId) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/pucc/${puccId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
-				}
-			);
-			if (response.ok) {
-				await fetchPollutionCertificateDetails();
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to delete pollution certificate.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Failed to delete pollution certificate.';
-		}
-	}
-
 	onMount(() => {
 		fetchPollutionCertificateDetails();
 	});
@@ -103,34 +71,13 @@
 	<div>No maintenance logs for this vehicle.</div>
 {:else}
 	{#each pollutionCertificates as pucc (pucc.id)}
-		<div class="bg-background/50 mt-4 rounded-lg border p-6 shadow-sm">
+		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
 					<BadgeCheck class="h-6 w-6 " />
-					<span class="text-xl font-bold">{pucc.certificateNumber}</span>
+					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
 				</div>
-				<div class="flex gap-2">
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-						icon={Trash2}
-						onclick={() => {
-							selectedPucc = pucc.id;
-							puccModelStore.show(vehicleId, pucc, true, () => fetchPollutionCertificateDetails());
-						}}
-						ariaLabel="Delete"
-					/>
-					<IconButton
-						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
-						icon={Trash2}
-						onclick={() => {
-							selectedPucc = pucc.id;
-							deleteDialog = true;
-						}}
-						ariaLabel="Delete"
-					/>
-				</div>
+				<PuccContextMenu {pucc} onaction={fetchPollutionCertificateDetails} />
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
@@ -158,8 +105,4 @@
 			</div>
 		</div>
 	{/each}
-	<DeleteConfirmation
-		onConfirm={() => deletePollutionCertificate(selectedPucc)}
-		bind:open={deleteDialog}
-	/>
 {/if}

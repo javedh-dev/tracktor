@@ -49,15 +49,17 @@
 </script>
 
 <Tabs.Root value={tabs[0].id} class="w-full">
-	<Tabs.List class="w-full">
+	<Tabs.List
+		class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
+	>
 		{#each tabs as tab}
-			<Tabs.Trigger value={tab.id}>
+			<Tabs.Trigger value={tab.id} class="justify-start lg:justify-center">
 				<LabelWithIcon icon={tab.Icon} label={tab.name} />
 			</Tabs.Trigger>
 		{/each}
 	</Tabs.List>
 	{#each tabs as { id, Component } (id)}
-		<Tabs.Content class=" w-full" value={id}>
+		<Tabs.Content class="w-full" value={id}>
 			<Component {vehicleId} />
 		</Tabs.Content>
 	{/each}

@@ -33,3 +33,31 @@ export const saveMaintenanceLog = async (
 	}
 	return res;
 };
+
+export const deleteMaintenanceLog = async (
+	maintenanceLog: MaintenanceLog
+): Promise<Response<string>> => {
+	const res: Response<string> = { status: 'OK' };
+	try {
+		const response = await fetch(
+			getApiUrl(`/api/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id}`),
+			{
+				method: 'DELETE',
+				headers: {
+					'X-User-PIN': localStorage.getItem('userPin') || ''
+				}
+			}
+		);
+		if (response.ok) {
+			res.data = await response.json();
+		} else {
+			res.status = 'ERROR';
+			const data = await response.json();
+			res.error = (data.message as string) || 'Failed to delete maintenance log.';
+		}
+	} catch (e) {
+		res.status = 'ERROR';
+		res.error = 'Error while deleting maintenance log : ' + e;
+	}
+	return res;
+};
