@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { simulateNetworkDelay } from '$lib/helper/dev';
 
 	if (browser) {
 		const pin = localStorage.getItem('userPin');

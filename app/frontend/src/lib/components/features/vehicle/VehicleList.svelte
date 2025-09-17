@@ -33,18 +33,16 @@
 
 {#if loading}
 	<div class="flex items-center justify-center">
-		<Jumper size="40" duration="2s" />
+		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
 {:else if error}
 	<LabelWithIcon
 		icon={CircleAlert}
 		iconClass="h-6 w-6"
-		style="flex min-h-98 items-center justify-center gap-4 text-xl"
+		style="flex min-h-98 items-center justify-center gap-4 text-xl text-rose-500"
 		label={error}
 	/>
-{/if}
-
-{#if vehicles.length > 0}
+{:else if vehicles.length > 0}
 	<ScrollArea class="w-full whitespace-nowrap" orientation="horizontal">
 		<div class="my-4 flex gap-4">
 			{#each vehicles as vehicle (vehicle.id)}

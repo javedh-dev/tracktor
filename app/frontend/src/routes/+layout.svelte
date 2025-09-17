@@ -7,6 +7,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
+	import Header from '$lib/components/layout/Header.svelte';
 
 	let { children } = $props();
 	let demoMode = env.PUBLIC_DEMO_MODE === 'true';
@@ -16,9 +17,7 @@
 <Toaster position="top-right" richColors expand />
 
 {#if demoMode}
-	<div
-		class="bg-secondary/95 sticky top-0 z-10 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900"
-	>
+	<div class="bg-secondary/95 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900">
 		<LabelWithIcon
 			icon={TriangleAlert}
 			iconClass="h-5 w-5"
@@ -31,8 +30,11 @@
 {/if}
 {#if navigating.to}
 	<div class="flex min-h-screen items-center justify-center">
-		<Jumper size="64" duration="2s" />
+		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
 {:else}
-	{@render children()}
+	<div class="flex min-h-svh w-full flex-col">
+		<Header />
+		{@render children()}
+	</div>
 {/if}

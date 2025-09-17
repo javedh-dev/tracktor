@@ -6,6 +6,8 @@
 	import * as Popover from '../popover';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 	import { formatDate } from '$lib/helper/formatting';
+	import { buttonVariants } from '../button';
+	import { CalendarIcon } from '@lucide/svelte';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
@@ -73,7 +75,7 @@
 			/>
 		</div>
 	{:else if type == 'calendar'}
-		<input
+		<!-- <input
 			bind:this={ref}
 			data-slot="input"
 			disabled
@@ -91,7 +93,34 @@
 			{type}
 			bind:value
 			{...restProps}
-		/>
+		/> -->
+
+		<Popover.Root>
+			<Popover.Trigger
+				class={cn(
+					buttonVariants({
+						variant: 'outline',
+						class: cn(
+							'border-input bg-background selection:bg-primary dark:bg-input/30',
+							'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
+							'flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs',
+							'transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50',
+							'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
+							'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+							'aria-invalid:border-destructive',
+							className,
+							Icon ? 'pr-4 pl-8' : ''
+						)
+					}),
+					!value && 'text-muted-foreground'
+				)}
+			>
+				{value || 'Pick a date'}
+			</Popover.Trigger>
+			<Popover.Content class="w-auto p-0">
+				<Calendar type="single" bind:value />
+			</Popover.Content>
+		</Popover.Root>
 	{:else}
 		<input
 			bind:this={ref}
@@ -120,16 +149,14 @@
 		/>
 	{/if}
 
-	{#if type === 'calendar'}
+	<!-- {#if type === 'calendar'}
 		<Popover.Root bind:open>
 			<Popover.Trigger id={`${ref?.id}-date-picker`}>
 				{#snippet child({ props })}
 					<span
 						{...props}
 						class="absolute top-5 left-8 size-6 w-full -translate-y-1/2 text-sm opacity-50"
-						aria-hidden="true"
 					>
-						{value}
 					</span>
 				{/snippet}
 			</Popover.Trigger>
@@ -146,5 +173,5 @@
 				/>
 			</Popover.Content>
 		</Popover.Root>
-	{/if}
+	{/if} -->
 </div>

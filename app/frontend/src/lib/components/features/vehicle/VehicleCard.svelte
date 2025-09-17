@@ -63,13 +63,9 @@
 	>
 		<Card.Header class="relative h-38 overflow-hidden p-0 ">
 			<div class="w-full">
-				<img
-					src={imageUrl}
-					alt="car"
-					class="rounded-t-xl object-cover opacity-30 dark:opacity-30"
-				/>
+				<img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" />
 			</div>
-			<div class="absolute inset-0 flex flex-col justify-between p-4">
+			<div class="absolute inset-0 flex flex-col justify-between border-b p-4">
 				<div class="flex flex-col">
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2">
