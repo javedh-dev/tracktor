@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { config, configModelStore, type Config } from '$lib/stores/config';
+	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
 	import { Calendar, DollarSign, Ruler, Settings } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -44,6 +45,7 @@
 				config.save(updatedConfig);
 				toast.success('Configuration updated successfully!');
 				configModelStore.hide();
+				vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
 			} else {
 				toast.error('Please fix the errors in the form.');
 				console.error(JSON.stringify(f.data, null, 2));

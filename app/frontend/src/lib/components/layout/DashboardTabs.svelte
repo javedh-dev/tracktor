@@ -4,11 +4,12 @@
 	import FuelLogTab from '../features/fuel/FuelLogTab.svelte';
 	import MaintenenceLogTab from '../features/maintenance/MaintenenceLogTab.svelte';
 	import InsuranceTab from '../features/insurance/InsuranceTab.svelte';
-	import PollutionTab from '../features/pullution/PollutionTab.svelte';
+	import PollutionTab from '../features/pollution/PollutionTab.svelte';
 	import { BadgeInfo, Fuel, Shield, SquareKanban, Wrench } from '@lucide/svelte';
 	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
 
 	let { vehicleId = $bindable() } = $props();
+
 	const tabs: {
 		name: string;
 		id: string;
@@ -46,9 +47,11 @@
 			Icon: BadgeInfo
 		}
 	];
+
+	let currentTab = $state(tabs[0].id);
 </script>
 
-<Tabs.Root value={tabs[0].id} class="w-full">
+<Tabs.Root bind:value={currentTab} class="w-full">
 	<Tabs.List
 		class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 	>
