@@ -53,8 +53,8 @@
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl =
-		vehicle.imageUrl || 'https://www.v3cars.com/media/model-imgs/91-92-062100-daytona-grey.webp';
+	// const imageUrl =
+	// 	vehicle.imageUrl || 'https://www.v3cars.com/media/model-imgs/91-92-062100-daytona-grey.webp';
 </script>
 
 <div tabindex="0" role="button" {onclick} {onkeydown}>
@@ -63,7 +63,7 @@
 	>
 		<Card.Header class="relative h-38 overflow-hidden p-0 ">
 			<div class="w-full">
-				<img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" />
+				<!-- <img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" /> -->
 			</div>
 			<div class="absolute inset-0 flex flex-col justify-between border-b p-4">
 				<div class="flex flex-col">
