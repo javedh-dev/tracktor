@@ -21,7 +21,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "reset": "npm run reset --workspaces --if-present",
+    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
     "install:all": "npm install --workspaces"
   },
   "devDependencies": {
