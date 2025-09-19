@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS `migrations`;
+--> statement-breakpoint
 DROP TABLE IF EXISTS `config`;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS `auth` (

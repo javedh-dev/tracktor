@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { LogOut, Tractor, Settings } from '@lucide/svelte/icons';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
-	import { configModelStore } from '$stores/config';
+	import { configModelStore } from '$lib/stores/setting';
 	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';

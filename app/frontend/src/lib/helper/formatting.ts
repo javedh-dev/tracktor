@@ -1,16 +1,23 @@
-import { config } from '$stores/config';
+import { config } from '$lib/stores/setting';
 import { format, parse } from 'date-fns';
+import { TZDate } from '@date-fns/tz';
 
 export interface ConfigStore {
 	dateFormat: string;
 	currency: string;
-	unitOfMeasure?: string;
+	unitOfDistance: string;
+	unitOfVolume: string;
+	locale: string;
+	timezone: string;
 }
 
 const configs: ConfigStore = {
 	dateFormat: 'dd/MM/yyyy',
 	currency: 'USD',
-	unitOfMeasure: 'metric'
+	unitOfDistance: 'kilometer',
+	unitOfVolume: 'liter',
+	locale: 'en-US',
+	timezone: 'UTC'
 };
 
 config.subscribe((value) => {
@@ -20,8 +27,14 @@ config.subscribe((value) => {
 				configs.dateFormat = item.value || configs.dateFormat;
 			} else if (item.key === 'currency') {
 				configs.currency = item.value || configs.currency;
-			} else if (item.key === 'unitOfMeasure') {
-				configs.unitOfMeasure = item.value || configs.unitOfMeasure;
+			} else if (item.key === 'unitOfVolume') {
+				configs.unitOfVolume = item.value || configs.unitOfVolume;
+			} else if (item.key === 'unitOfDistance') {
+				configs.unitOfDistance = item.value || configs.unitOfDistance;
+			} else if (item.key === 'locale') {
+				configs.locale = item.value || configs.locale;
+			} else if (item.key === 'timezone') {
+				configs.timezone = item.value || configs.timezone;
 			}
 		});
 	}
@@ -47,67 +60,64 @@ const getCurrencySymbol = (): string => {
 };
 
 const formatCurrency = (amount: number): string => {
-	return new Intl.NumberFormat('en-US', {
+	return new Intl.NumberFormat(configs.locale, {
 		style: 'currency',
 		currency: configs.currency
 	}).format(amount);
 };
 
 const getDistanceUnit = (): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return 'km';
-	}
-	if (configs.unitOfMeasure === 'imperial') {
-		return 'mi';
-	}
-	return '';
+	return (
+		new Intl.NumberFormat(configs.locale, {
+			style: 'unit',
+			unit: configs.unitOfDistance
+		})
+			.formatToParts(0)
+			.find((part) => part.type === 'unit')?.value || ''
+	);
 };
 
 const formatDistance = (distance: number): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return `${distance} km`;
-	} else if (configs.unitOfMeasure === 'imperial') {
-		return `${distance} mi`;
-	}
-	return `${distance}`;
+	return new Intl.NumberFormat(configs.locale, {
+		style: 'unit',
+		unit: configs.unitOfDistance
+	}).format(distance);
 };
 
 const getVolumeUnit = (): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return 'l';
-	}
-	if (configs.unitOfMeasure === 'imperial') {
-		return 'gal';
-	}
-	return '';
+	return (
+		new Intl.NumberFormat(configs.locale, {
+			style: 'unit',
+			unit: configs.unitOfVolume
+		})
+			.formatToParts(0)
+			.find((part) => part.type === 'unit')?.value || ''
+	);
 };
 
 const formatVolume = (volume: number): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return `${volume.toFixed(2)} l`;
-	} else if (configs.unitOfMeasure === 'imperial') {
-		return `${volume} gal`;
-	}
-	return `${volume}`;
+	return new Intl.NumberFormat(configs.locale, {
+		style: 'unit',
+		unit: configs.unitOfVolume
+	}).format(volume);
 };
 
 const getMileageUnit = (): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return 'kmpl';
-	}
-	if (configs.unitOfMeasure === 'imperial') {
-		return 'mpg';
-	}
-	return '';
+	return (
+		new Intl.NumberFormat(configs.locale, {
+			style: 'unit',
+			unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
+		})
+			.formatToParts(0)
+			.find((part) => part.type === 'unit')?.value || ''
+	);
 };
 
 const formatMileage = (mileage: number): string => {
-	if (configs.unitOfMeasure === 'metric') {
-		return `${mileage} kmpl`;
-	} else if (configs.unitOfMeasure === 'imperial') {
-		return `${mileage} mpg`;
-	}
-	return `${mileage}`;
+	return new Intl.NumberFormat(configs.locale, {
+		style: 'unit',
+		unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
+	}).format(mileage);
 };
 
 export {

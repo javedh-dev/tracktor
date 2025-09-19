@@ -14,7 +14,7 @@
 </script>
 
 <ModeWatcher />
-<Toaster position="top-right" richColors expand />
+<Toaster position="bottom-right" richColors expand />
 
 {#if demoMode}
 	<div class="bg-secondary/95 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900">

@@ -1,15 +1,25 @@
 <script lang="ts">
 	import AppSheet from '$lib/components/layout/AppSheet.svelte';
 	import * as Form from '$lib/components/ui/form/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { config, configModelStore, type Config } from '$lib/stores/config';
-	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
-	import { Calendar, DollarSign, Ruler, Settings } from '@lucide/svelte';
+	import { config, configModelStore, type Config } from '$lib/stores/setting';
+	import { vehiclesStore } from '$lib/stores/vehicle';
+	import {
+		Calendar,
+		Currency,
+		Earth,
+		Globe2,
+		Languages,
+		PaintBucket,
+		RulerDimensionLine
+	} from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod/v4';
+	import { data as currencies } from 'currency-codes';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import { formatDate } from 'date-fns';
 
 	let open = $state(false);
 	let localConfig: Config[] = $state([]);
@@ -24,9 +34,14 @@
 
 	// Create a dynamic schema based on config items
 	const configSchema = z.object({
-		dateFormat: z.string().min(1, 'Date format is required'),
+		dateFormat: z.string().refine((fmt) => {
+			return checkFormat(fmt).valid;
+		}, 'Format not valid'),
+		locale: z.string().min(2),
+		timezone: z.string().min(3),
 		currency: z.string().min(1, 'Currency is required'),
-		unitOfMeasure: z.string().min(1, 'Unit of measure is required')
+		unitOfDistance: z.enum(['kilometer', 'mile']),
+		unitOfVolume: z.enum(['liter', 'gallon'])
 	});
 
 	const form = superForm(defaults(zod4(configSchema)), {
@@ -54,24 +69,37 @@
 	});
 	const { form: formData, enhance } = form;
 
-	// Options for dropdowns
-	const dateFormatOptions = [
-		{ value: 'dd/MM/yyyy', label: 'dd/MM/yyyy (e.g., 31/12/2000)' },
-		{ value: 'MM/dd/yyyy', label: 'MM/dd/yyyy (e.g., 12/25/2000)' },
-		{ value: 'yyyy-MM-dd', label: 'yyyy-MM-dd (e.g., 2000-12-31)' },
-		{ value: 'dd MMM, yyyy', label: 'dd MMM, yyyy (e.g., 31 Dec, 2000)' }
+	const checkFormat = (
+		format: string
+	): {
+		ex?: string;
+		valid: boolean;
+	} => {
+		try {
+			return {
+				ex: formatDate(new Date(), format),
+				valid: true
+			};
+		} catch (e) {
+			return { valid: false };
+		}
+	};
+
+	const currencyOptions = currencies.map((currency) => {
+		return {
+			value: currency.code,
+			label: `[${currency.code}] - ${currency.currency} `
+		};
+	});
+
+	const uodOptions = [
+		{ value: 'kilometer', label: 'Kilometer' },
+		{ value: 'mile', label: 'Miles' }
 	];
 
-	const currencyOptions = [
-		{ value: 'INR', label: 'INR (₹)' },
-		{ value: 'USD', label: 'USD ($)' },
-		{ value: 'EUR', label: 'EUR (€)' },
-		{ value: 'GBP', label: 'GBP (£)' }
-	];
-
-	const uomOptions = [
-		{ value: 'metric', label: 'Metric' },
-		{ value: 'imperial', label: 'Imperial' }
+	const uovOptions = [
+		{ value: 'liter', label: 'Litre' },
+		{ value: 'gallon', label: 'Gallon' }
 	];
 
 	$effect(() => {
@@ -93,20 +121,50 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label description="Choose your preferred date format">Date Format</Form.Label>
-						<Select.Root bind:value={$formData.dateFormat} type="single">
-							<Select.Trigger {...props} class="w-full">
-								<Calendar class="mr-2 h-4 w-4" />
-								{dateFormatOptions.find((opt) => opt.value === $formData.dateFormat)?.label ||
-									'Select date format'}
-							</Select.Trigger>
-							<Select.Content>
-								{#each dateFormatOptions as option}
-									<Select.Item value={option.value}>
-										{option.label}
-									</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<Input
+							{...props}
+							bind:value={$formData.dateFormat}
+							icon={Calendar}
+							type="text"
+							class="mono"
+						/>
+						<Form.Description>
+							Example - {checkFormat($formData.dateFormat).ex || 'Invalid Format...'}
+						</Form.Description>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<!-- Locale -->
+			<Form.Field {form} name="locale" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Locale for formatting">Locale</Form.Label>
+						<Input
+							{...props}
+							bind:value={$formData.locale}
+							icon={Languages}
+							type="text"
+							class="mono"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<!-- Timezone -->
+			<Form.Field {form} name="timezone" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Locale for formatting">Timezone</Form.Label>
+						<Input
+							{...props}
+							bind:value={$formData.timezone}
+							icon={Earth}
+							type="text"
+							class="mono"
+						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -119,12 +177,40 @@
 						<Form.Label description="Choose your preferred currency">Currency</Form.Label>
 						<Select.Root bind:value={$formData.currency} type="single">
 							<Select.Trigger {...props} class="w-full">
-								<DollarSign class="mr-2 h-4 w-4" />
-								{currencyOptions.find((opt) => opt.value === $formData.currency)?.label ||
-									'Select currency'}
+								<div class="flex items-center justify-start">
+									<Currency class="mr-2 h-4 w-4" />
+									{currencyOptions.find((opt) => opt.value === $formData.currency)?.label ||
+										'Select currency'}
+								</div>
+							</Select.Trigger>
+							<Select.Content class="max-w-xs">
+								{#each currencyOptions as option}
+									<Select.Item value={option.value} class="text-ellipsis">
+										{option.label}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<!-- Unit of Distance -->
+			<Form.Field {form} name="unitOfDistance" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Measurement of distance uint">Unit of Distance</Form.Label>
+						<Select.Root bind:value={$formData.unitOfDistance} type="single">
+							<Select.Trigger {...props} class="w-full">
+								<div class="flex items-center justify-start">
+									<RulerDimensionLine class="mr-2 h-4 w-4" />
+									{uodOptions.find((opt) => opt.value === $formData.unitOfDistance)?.label ||
+										'Select unit system'}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
-								{#each currencyOptions as option}
+								{#each uodOptions as option}
 									<Select.Item value={option.value}>
 										{option.label}
 									</Select.Item>
@@ -136,19 +222,21 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<!-- Unit of Measure -->
-			<Form.Field {form} name="unitOfMeasure" class="w-full">
+			<!-- Unit of Volume -->
+			<Form.Field {form} name="unitOfVolume" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Choose your preferred unit system">Unit of Measure</Form.Label>
-						<Select.Root bind:value={$formData.unitOfMeasure} type="single">
+						<Form.Label description="Measurement of volume unit">Unit of Volume</Form.Label>
+						<Select.Root bind:value={$formData.unitOfVolume} type="single">
 							<Select.Trigger {...props} class="w-full">
-								<Ruler class="mr-2 h-4 w-4" />
-								{uomOptions.find((opt) => opt.value === $formData.unitOfMeasure)?.label ||
-									'Select unit system'}
+								<div class="flex items-center justify-start">
+									<PaintBucket class="mr-2 h-4 w-4" />
+									{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)?.label ||
+										'Select unit system'}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
-								{#each uomOptions as option}
+								{#each uovOptions as option}
 									<Select.Item value={option.value}>
 										{option.label}
 									</Select.Item>

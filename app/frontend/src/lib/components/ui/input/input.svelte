@@ -8,6 +8,7 @@
 	import { formatDate } from '$lib/helper/formatting';
 	import { buttonVariants } from '../button';
 	import { CalendarIcon } from '@lucide/svelte';
+	import { CalendarDate } from '@internationalized/date';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 

@@ -27,7 +27,7 @@ const seedAuthPin = async (pin: string) => {
   await db
     .insert(authTable)
     .values({ id: 1, hash })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({ set: { hash: hash }, target: authTable.id })
     .run();
   console.log("Authentication PIN configured");
 };

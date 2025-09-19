@@ -9,6 +9,12 @@ export type Response<DataType> = {
 	error?: string;
 };
 
+export enum Status {
+	LOADING,
+	DONE,
+	ERROR
+}
+
 // Re-export types from other modules
 export type { Insurance, InsuranceSchema } from './insurance';
 export type { PollutionCertificate, PollutionCertificateSchema } from './pucc';
