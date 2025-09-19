@@ -5,10 +5,7 @@
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import * as Popover from '../popover';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
-	import { formatDate } from '$lib/helper/formatting';
-	import { buttonVariants } from '../button';
-	import { CalendarIcon } from '@lucide/svelte';
-	import { CalendarDate } from '@internationalized/date';
+	import { formatDateForCalendar } from '$lib/helper/formatting';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
@@ -99,7 +96,8 @@
 					captionLayout="dropdown"
 					onValueChange={(v) => {
 						if (v) {
-							value = formatDate(v.toString());
+							console.log(v.toString());
+							value = formatDateForCalendar(v);
 							open = false;
 						}
 					}}

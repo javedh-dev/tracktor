@@ -30,7 +30,6 @@
 		"bits-ui": "^2.9.6",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.1.0",
-		"@date-fns/tz": "^1.4.1",
 		"eslint": "^9.34.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.11.0",
@@ -62,6 +61,7 @@
 		"d3-array": "^3.2.4",
 		"d3-scale": "^4.0.2",
 		"d3-shape": "^3.2.0",
+		"date-fns-tz": "^3.2.0",
 		"dot-env": "^0.0.1",
 		"mode-watcher": "^1.1.0",
 		"svelte-loading-spinners": "^0.3.6"

@@ -1,6 +1,7 @@
 import { config } from '$lib/stores/setting';
+import type { CalendarDate, DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
-import { TZDate } from '@date-fns/tz';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 export interface ConfigStore {
 	dateFormat: string;
@@ -16,7 +17,7 @@ const configs: ConfigStore = {
 	currency: 'USD',
 	unitOfDistance: 'kilometer',
 	unitOfVolume: 'liter',
-	locale: 'en-US',
+	locale: 'en',
 	timezone: 'UTC'
 };
 
@@ -32,7 +33,7 @@ config.subscribe((value) => {
 			} else if (item.key === 'unitOfDistance') {
 				configs.unitOfDistance = item.value || configs.unitOfDistance;
 			} else if (item.key === 'locale') {
-				configs.locale = item.value || configs.locale;
+				// configs.locale = item.value || configs.locale;
 			} else if (item.key === 'timezone') {
 				configs.timezone = item.value || configs.timezone;
 			}
@@ -41,11 +42,18 @@ config.subscribe((value) => {
 });
 
 const formatDate = (date: Date | string): string => {
-	return format(date, configs.dateFormat);
+	const dateObj = typeof date === 'string' ? new Date(date) : date;
+	return formatInTimeZone(dateObj, configs.timezone, configs.dateFormat);
+};
+
+const formatDateForCalendar = (date: DateValue): string => {
+	const dateObj = date.toDate(configs.timezone);
+	return format(dateObj, configs.dateFormat);
 };
 
 const parseDate = (date: string) => {
-	return parse(date, configs.dateFormat, new Date());
+	const parsedDate = parse(date, configs.dateFormat, new Date());
+	return fromZonedTime(parsedDate, configs.timezone);
 };
 
 const getCurrencySymbol = (): string => {
@@ -122,6 +130,7 @@ const formatMileage = (mileage: number): string => {
 
 export {
 	formatDate,
+	formatDateForCalendar,
 	parseDate,
 	getCurrencySymbol,
 	formatCurrency,

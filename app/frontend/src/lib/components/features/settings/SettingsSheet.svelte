@@ -19,7 +19,7 @@
 	import { z } from 'zod/v4';
 	import { data as currencies } from 'currency-codes';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { formatDate } from 'date-fns';
+	import { format as formatDateFns } from 'date-fns';
 
 	let open = $state(false);
 	let localConfig: Config[] = $state([]);
@@ -77,7 +77,7 @@
 	} => {
 		try {
 			return {
-				ex: formatDate(new Date(), format),
+				ex: formatDateFns(new Date(), format),
 				valid: true
 			};
 		} catch (e) {
@@ -100,6 +100,25 @@
 	const uovOptions = [
 		{ value: 'liter', label: 'Litre' },
 		{ value: 'gallon', label: 'Gallon' }
+	];
+
+	const timezoneOptions = [
+		{ value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
+		{ value: 'America/New_York', label: 'Eastern Time (US & Canada)' },
+		{ value: 'America/Chicago', label: 'Central Time (US & Canada)' },
+		{ value: 'America/Denver', label: 'Mountain Time (US & Canada)' },
+		{ value: 'America/Los_Angeles', label: 'Pacific Time (US & Canada)' },
+		{ value: 'Europe/London', label: 'London (GMT/BST)' },
+		{ value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
+		{ value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
+		{ value: 'Europe/Rome', label: 'Rome (CET/CEST)' },
+		{ value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
+		{ value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
+		{ value: 'Asia/Kolkata', label: 'India (IST)' },
+		{ value: 'Asia/Dubai', label: 'Dubai (GST)' },
+		{ value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
+		{ value: 'Australia/Melbourne', label: 'Melbourne (AEST/AEDT)' },
+		{ value: 'Pacific/Auckland', label: 'Auckland (NZST/NZDT)' }
 	];
 
 	$effect(() => {
@@ -136,7 +155,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<!-- Locale -->
+			<!-- Locale
 			<Form.Field {form} name="locale" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -151,20 +170,29 @@
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
-			</Form.Field>
+			</Form.Field> -->
 
 			<!-- Timezone -->
 			<Form.Field {form} name="timezone" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Locale for formatting">Timezone</Form.Label>
-						<Input
-							{...props}
-							bind:value={$formData.timezone}
-							icon={Earth}
-							type="text"
-							class="mono"
-						/>
+						<Form.Label description="Choose your timezone for date display">Timezone</Form.Label>
+						<Select.Root bind:value={$formData.timezone} type="single">
+							<Select.Trigger {...props} class="w-full">
+								<div class="flex items-center justify-start">
+									<Earth class="mr-2 h-4 w-4" />
+									{timezoneOptions.find((opt) => opt.value === $formData.timezone)?.label ||
+										'Select timezone'}
+								</div>
+							</Select.Trigger>
+							<Select.Content class="max-w-sm">
+								{#each timezoneOptions as option}
+									<Select.Item value={option.value} class="text-ellipsis">
+										{option.label}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
