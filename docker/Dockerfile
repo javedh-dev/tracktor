@@ -11,8 +11,7 @@ COPY app/backend/package*.json ./app/backend/
 # Handle npm optional dependency bug for ARM64 Alpine
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/app/.npm \
-    npm ci --include=dev; \
-
+    npm ci --include=dev
 
 # Stage 2: Build application
 FROM node:22-alpine AS builder
@@ -43,7 +42,7 @@ COPY app/backend/package*.json ./app/backend/
 
 # Install only production dependencies
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --workspace=backend --ignore-scripts; \
+    npm ci --omit=dev --workspace=backend --ignore-scripts
 
 # Stage 4: Final production image
 FROM node:22-alpine AS runtime
