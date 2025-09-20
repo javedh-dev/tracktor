@@ -8,7 +8,6 @@
 		Calendar,
 		Currency,
 		Earth,
-		Globe2,
 		Languages,
 		PaintBucket,
 		RulerDimensionLine
@@ -38,7 +37,15 @@
 			return checkFormat(fmt).valid;
 		}, 'Format not valid'),
 		locale: z.string().min(2),
-		timezone: z.string().min(3),
+		timezone: z
+			.string()
+			.min(3)
+			.refine((tz) => {
+				if (typeof Intl.supportedValuesOf === 'function') {
+					return Intl.supportedValuesOf('timeZone').includes(tz);
+				}
+				return true;
+			}, 'Invalid timzone value.'),
 		currency: z.string().min(1, 'Currency is required'),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
 		unitOfVolume: z.enum(['liter', 'gallon'])
@@ -102,25 +109,6 @@
 		{ value: 'gallon', label: 'Gallon' }
 	];
 
-	const timezoneOptions = [
-		{ value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-		{ value: 'America/New_York', label: 'Eastern Time (US & Canada)' },
-		{ value: 'America/Chicago', label: 'Central Time (US & Canada)' },
-		{ value: 'America/Denver', label: 'Mountain Time (US & Canada)' },
-		{ value: 'America/Los_Angeles', label: 'Pacific Time (US & Canada)' },
-		{ value: 'Europe/London', label: 'London (GMT/BST)' },
-		{ value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
-		{ value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
-		{ value: 'Europe/Rome', label: 'Rome (CET/CEST)' },
-		{ value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-		{ value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
-		{ value: 'Asia/Kolkata', label: 'India (IST)' },
-		{ value: 'Asia/Dubai', label: 'Dubai (GST)' },
-		{ value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
-		{ value: 'Australia/Melbourne', label: 'Melbourne (AEST/AEDT)' },
-		{ value: 'Pacific/Auckland', label: 'Auckland (NZST/NZDT)' }
-	];
-
 	$effect(() => {
 		if (localConfig.length > 0) {
 			const configData: any = {};
@@ -155,7 +143,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<!-- Locale
+			<!-- Locale -->
 			<Form.Field {form} name="locale" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -170,29 +158,20 @@
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
-			</Form.Field> -->
+			</Form.Field>
 
 			<!-- Timezone -->
 			<Form.Field {form} name="timezone" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label description="Choose your timezone for date display">Timezone</Form.Label>
-						<Select.Root bind:value={$formData.timezone} type="single">
-							<Select.Trigger {...props} class="w-full">
-								<div class="flex items-center justify-start">
-									<Earth class="mr-2 h-4 w-4" />
-									{timezoneOptions.find((opt) => opt.value === $formData.timezone)?.label ||
-										'Select timezone'}
-								</div>
-							</Select.Trigger>
-							<Select.Content class="max-w-sm">
-								{#each timezoneOptions as option}
-									<Select.Item value={option.value} class="text-ellipsis">
-										{option.label}
-									</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<Input
+							{...props}
+							bind:value={$formData.timezone}
+							icon={Earth}
+							type="text"
+							class="mono"
+						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

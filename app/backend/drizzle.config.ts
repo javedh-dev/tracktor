@@ -10,7 +10,7 @@ export default defineConfig({
   schema: "./src/db/schema",
   dialect: "sqlite",
   dbCredentials: {
-    url: `file:${process.env.DATABASE_PATH! || "./tracktor.db"}`,
+    url: `file:${process.env.DB_PATH! || "./tracktor.db"}`,
   },
   casing: "snake_case",
 });
