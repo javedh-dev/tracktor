@@ -7,7 +7,7 @@
 	import { maintenanceModelStore } from '$lib/stores/maintenance';
 	import type { MaintenanceLog } from '$lib/types';
 	import type { FuelLog } from '$lib/types/fuel';
-	import { EllipsisVertical } from '@lucide/svelte';
+	import { EllipsisVertical } from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =

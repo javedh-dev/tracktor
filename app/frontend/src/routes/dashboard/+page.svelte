@@ -5,7 +5,7 @@
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import { CirclePlus } from '@lucide/svelte';
+	import { CirclePlus } from '@lucide/svelte/icons';
 	import { Jumper } from 'svelte-loading-spinners';
 
 	let selectedVehicleId = $state<string | undefined>();

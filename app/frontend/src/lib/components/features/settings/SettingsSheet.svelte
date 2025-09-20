@@ -11,14 +11,20 @@
 		Languages,
 		PaintBucket,
 		RulerDimensionLine
-	} from '@lucide/svelte';
+	} from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod/v4';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { format as formatDateFns } from 'date-fns';
 	import { data as currencies } from 'currency-codes';
+	import SearchableSelect from '$lib/components/ui/app/SearchableSelect.svelte';
+	import {
+		getCurrencySymbol,
+		getTimezoneOptions,
+		isValidFormat,
+		isValidTimezone
+	} from '$lib/helper/formatting';
 
 	let open = $state(false);
 	let localConfig: Config[] = $state([]);
@@ -34,18 +40,10 @@
 	// Create a dynamic schema based on config items
 	const configSchema = z.object({
 		dateFormat: z.string().refine((fmt) => {
-			return checkFormat(fmt).valid;
+			return isValidFormat(fmt).valid;
 		}, 'Format not valid'),
 		locale: z.string().min(2),
-		timezone: z
-			.string()
-			.min(3)
-			.refine((tz) => {
-				if (typeof Intl.supportedValuesOf === 'function') {
-					return Intl.supportedValuesOf('timeZone').includes(tz);
-				}
-				return true;
-			}, 'Invalid timzone value.'),
+		timezone: z.string().min(3).refine(isValidTimezone, 'Invalid timzone value.'),
 		currency: z.string().min(1, 'Currency is required'),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
 		unitOfVolume: z.enum(['liter', 'gallon'])
@@ -76,26 +74,10 @@
 	});
 	const { form: formData, enhance } = form;
 
-	const checkFormat = (
-		format: string
-	): {
-		ex?: string;
-		valid: boolean;
-	} => {
-		try {
-			return {
-				ex: formatDateFns(new Date(), format),
-				valid: true
-			};
-		} catch (e) {
-			return { valid: false };
-		}
-	};
-
 	const currencyOptions = currencies.map((currency) => {
 		return {
 			value: currency.code,
-			label: `[${currency.code}] - ${currency.currency} `
+			label: `${getCurrencySymbol(currency.code)} - ${currency.currency} `
 		};
 	});
 
@@ -136,7 +118,7 @@
 							class="mono"
 						/>
 						<Form.Description>
-							Example - {checkFormat($formData.dateFormat).ex || 'Invalid Format...'}
+							Example - {isValidFormat($formData.dateFormat).ex || 'Invalid Format...'}
 						</Form.Description>
 					{/snippet}
 				</Form.Control>
@@ -154,7 +136,9 @@
 							icon={Languages}
 							type="text"
 							class="mono"
+							disabled
 						/>
+						<Form.Description>This will be enabled with i18 support</Form.Description>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -165,12 +149,11 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label description="Choose your timezone for date display">Timezone</Form.Label>
-						<Input
-							{...props}
+						<SearchableSelect
 							bind:value={$formData.timezone}
+							options={getTimezoneOptions()}
 							icon={Earth}
-							type="text"
-							class="mono"
+							{...props}
 						/>
 					{/snippet}
 				</Form.Control>
@@ -182,7 +165,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label description="Choose your preferred currency">Currency</Form.Label>
-						<Select.Root bind:value={$formData.currency} type="single">
+						<!-- <Select.Root bind:value={$formData.currency} type="single">
 							<Select.Trigger {...props} class="w-full">
 								<div class="flex items-center justify-start">
 									<Currency class="mr-2 h-4 w-4" />
@@ -197,7 +180,13 @@
 									</Select.Item>
 								{/each}
 							</Select.Content>
-						</Select.Root>
+						</Select.Root> -->
+						<SearchableSelect
+							bind:value={$formData.currency}
+							icon={Currency}
+							options={currencyOptions}
+							{...props}
+						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

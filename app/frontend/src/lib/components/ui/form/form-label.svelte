@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as FormPrimitive from 'formsnap';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { cn, type WithoutChild } from '$lib/utils.js';
-	import { BadgeInfo, Dot, Info, Scroll } from '@lucide/svelte';
+	import { cn } from '$lib/utils.js';
+	import { BadgeInfo } from '@lucide/svelte/icons';
 	import * as Popover from '../popover';
 
 	let {

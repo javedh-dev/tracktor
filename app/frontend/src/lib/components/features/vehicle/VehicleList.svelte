@@ -3,7 +3,7 @@
 	import VehicleCard from './VehicleCard.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
-	import { CircleAlert, CircleSlash2 } from '@lucide/svelte';
+	import { CircleAlert, CircleSlash2 } from '@lucide/svelte/icons';
 	import type { Vehicle } from '$lib/types/vehicle';
 	import { Jumper } from 'svelte-loading-spinners';
 

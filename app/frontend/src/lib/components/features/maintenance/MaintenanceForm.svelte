@@ -10,7 +10,14 @@
 	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
 	import { maintenenceSchema, type MaintenanceLog } from '$lib/types/maintenance';
 	import { fuelSchema, type FuelLog } from '$lib/types/fuel';
-	import { Banknote, Calendar1, CircleGauge, CircleSlash, Fuel, Hammer } from '@lucide/svelte';
+	import {
+		Banknote,
+		Calendar1,
+		CircleGauge,
+		CircleSlash,
+		Fuel,
+		Hammer
+	} from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

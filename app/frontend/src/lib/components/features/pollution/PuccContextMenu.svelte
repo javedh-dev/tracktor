@@ -8,7 +8,7 @@
 	import { maintenanceModelStore } from '$lib/stores/maintenance';
 	import { puccModelStore } from '$lib/stores/pucc';
 	import type { Insurance, PollutionCertificate } from '$lib/types';
-	import { EllipsisVertical } from '@lucide/svelte';
+	import { EllipsisVertical } from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 
 	let { pucc, onaction }: { pucc: PollutionCertificate; onaction: () => void } = $props();

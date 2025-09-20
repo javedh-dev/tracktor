@@ -56,11 +56,46 @@ const parseDate = (date: string) => {
 	return fromZonedTime(parsedDate, configs.timezone);
 };
 
-const getCurrencySymbol = (): string => {
+const isValidFormat = (fmt: string): { ex?: string; valid: boolean } => {
+	try {
+		return {
+			ex: format(new Date(), fmt),
+			valid: true
+		};
+	} catch (e) {
+		return { valid: false };
+	}
+};
+
+const getTimezoneOptions = (): { value: string; label: string; offset: number }[] => {
+	if (typeof Intl.supportedValuesOf === 'function') {
+		return Intl.supportedValuesOf('timeZone')
+			.map((zone) => {
+				const offset = formatInTimeZone(new Date(), zone, 'xxx');
+				return {
+					value: zone,
+					label: `[${offset}] ${zone}`,
+					offset: Number(offset.replace(':', ''))
+				};
+			})
+			.sort((a, b) => a.offset - b.offset);
+	} else {
+		return [];
+	}
+};
+
+const isValidTimezone = (tz: string) => {
+	if (typeof Intl.supportedValuesOf === 'function') {
+		return Intl.supportedValuesOf('timeZone').includes(tz);
+	}
+	return true;
+};
+
+const getCurrencySymbol = (currency?: string): string => {
 	return (
 		new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: configs.currency
+			currency: currency || configs.currency
 		})
 			.formatToParts(0)
 			.find((part) => part.type === 'currency')?.value || ''
@@ -132,6 +167,9 @@ export {
 	formatDate,
 	formatDateForCalendar,
 	parseDate,
+	isValidFormat,
+	getTimezoneOptions,
+	isValidTimezone,
 	getCurrencySymbol,
 	formatCurrency,
 	getDistanceUnit,

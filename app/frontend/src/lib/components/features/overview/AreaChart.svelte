@@ -5,7 +5,7 @@
 	import { Area, AreaChart, Circle, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
 	import type { DataPoint } from '$lib/types';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
-	import { CircleSlash2 } from '@lucide/svelte';
+	import { CircleSlash2 } from '@lucide/svelte/icons';
 
 	let {
 		chartData,

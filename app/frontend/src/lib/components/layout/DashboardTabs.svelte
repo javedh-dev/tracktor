@@ -5,7 +5,7 @@
 	import MaintenenceLogTab from '../features/maintenance/MaintenenceLogTab.svelte';
 	import InsuranceTab from '../features/insurance/InsuranceTab.svelte';
 	import PollutionTab from '../features/pollution/PollutionTab.svelte';
-	import { BadgeInfo, Fuel, Shield, SquareKanban, Wrench } from '@lucide/svelte';
+	import { BadgeInfo, Fuel, Shield, SquareKanban, Wrench } from '@lucide/svelte/icons';
 	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
 
 	let { vehicleId = $bindable() } = $props();

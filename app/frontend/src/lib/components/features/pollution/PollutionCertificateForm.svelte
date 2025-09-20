@@ -8,7 +8,7 @@
 	import { puccModelStore } from '$lib/stores/pucc';
 	import { vehiclesStore } from '$lib/stores/vehicle';
 	import { pollutionCertificateSchema, type PollutionCertificate } from '$lib/types/pucc';
-	import { Calendar1, IdCard, TestTube2, Notebook } from '@lucide/svelte';
+	import { Calendar1, IdCard, TestTube2, Notebook } from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

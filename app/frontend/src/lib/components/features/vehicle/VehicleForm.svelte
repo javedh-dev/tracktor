@@ -13,7 +13,7 @@
 		Fingerprint,
 		IdCard,
 		Paintbrush
-	} from '@lucide/svelte';
+	} from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

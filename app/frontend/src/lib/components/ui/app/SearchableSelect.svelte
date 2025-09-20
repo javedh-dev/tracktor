@@ -1,0 +1,70 @@
+<script lang="ts">
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
+	import { tick, type Component } from 'svelte';
+	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { cn } from '$lib/utils.js';
+
+	let {
+		options,
+		name,
+		value = $bindable(),
+		icon: Icon
+	}: {
+		options: { value: string; label: string }[];
+		name: string;
+		value: string;
+		icon: Component;
+	} = $props();
+
+	let open = $state(false);
+	let triggerRef = $state<HTMLButtonElement>(null!);
+
+	const selectedValue = $derived(options.find((f) => f.value === value)?.label);
+
+	function closeAndFocusTrigger() {
+		open = false;
+		tick().then(() => {
+			triggerRef.focus();
+		});
+	}
+</script>
+
+<Popover.Root bind:open>
+	<Popover.Trigger bind:ref={triggerRef} class="mono flex w-full justify-between">
+		{#snippet child({ props })}
+			<Button variant="outline" {...props} role="combobox" aria-expanded={open}>
+				<div class="flex items-center gap-2 overflow-hidden font-normal">
+					<Icon class="h-5 w-5 opacity-50" />
+					<span class="">{selectedValue || value || `Select ${name}...`}</span>
+				</div>
+
+				<ChevronsUpDownIcon class="ml-2 size-4 shrink-0 opacity-50" />
+			</Button>
+		{/snippet}
+	</Popover.Trigger>
+	<Popover.Content class="min-w-xs p-0">
+		<Command.Root>
+			<Command.Input placeholder={`Search ${name}`} />
+			<Command.List>
+				<Command.Empty>No match found.</Command.Empty>
+				<Command.Group>
+					{#each options as option}
+						<Command.Item
+							value={option.label}
+							onSelect={() => {
+								value = option.value;
+								closeAndFocusTrigger();
+							}}
+						>
+							<CheckIcon class={cn('mr-2 size-4', value !== option.value && 'text-transparent')} />
+							<span class="">{option.label}</span>
+						</Command.Item>
+					{/each}
+				</Command.Group>
+			</Command.List>
+		</Command.Root>
+	</Popover.Content>
+</Popover.Root>

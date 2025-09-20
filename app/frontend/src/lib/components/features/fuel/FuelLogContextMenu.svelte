@@ -5,7 +5,7 @@
 	import { deleteFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
 	import type { FuelLog } from '$lib/types/fuel';
-	import { EllipsisVertical } from '@lucide/svelte';
+	import { EllipsisVertical } from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 
 	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();

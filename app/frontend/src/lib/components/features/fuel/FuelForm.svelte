@@ -9,7 +9,7 @@
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
 	import { vehiclesStore } from '$lib/stores/vehicle';
 	import { fuelSchema, type FuelLog } from '$lib/types/fuel';
-	import { Banknote, Calendar1, CircleGauge, Fuel } from '@lucide/svelte';
+	import { Banknote, Calendar1, CircleGauge, Fuel } from '@lucide/svelte/icons';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
