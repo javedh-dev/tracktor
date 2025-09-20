@@ -11,11 +11,8 @@ COPY app/backend/package*.json ./app/backend/
 # Handle npm optional dependency bug for ARM64 Alpine
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/app/.npm \
-    if [ "$(uname -m)" = "aarch64" ]; then \
-        rm -rf node_modules package-lock.json && npm install --include=dev; \
-    else \
-        npm ci --include=dev; \
-    fi
+    npm ci --include=dev; \
+
 
 # Stage 2: Build application
 FROM node:22-alpine AS builder
@@ -46,11 +43,7 @@ COPY app/backend/package*.json ./app/backend/
 
 # Install only production dependencies
 RUN --mount=type=cache,target=/root/.npm \
-    if [ "$(uname -m)" = "aarch64" ]; then \
-        rm -rf node_modules package-lock.json && npm install --omit=dev --workspace=backend --ignore-scripts; \
-    else \
-        npm ci --omit=dev --workspace=backend --ignore-scripts; \
-    fi
+    npm ci --omit=dev --workspace=backend --ignore-scripts; \
 
 # Stage 4: Final production image
 FROM node:22-alpine AS runtime
