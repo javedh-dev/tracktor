@@ -13,7 +13,7 @@
     "build:backend": "npm run build --workspace=backend",
     "build:frontend": "npm run build --workspace=frontend",
     "start": "npm run start --workspace=backend",
-    "preview": "npm run preview --workspace=backend",
+    "preview": "concurrently \"npm run preview --workspace=backend\" \"npm run preview --workspace=frontend\"",
     "db:migrate": "npm run db:migrate --workspace=backend",
     "db:seed": "npm run db:seed --workspace=backend",
     "db:status": "npm run db:status --workspace=backend",

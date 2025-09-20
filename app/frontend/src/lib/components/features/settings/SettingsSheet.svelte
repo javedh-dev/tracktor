@@ -17,9 +17,9 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod/v4';
-	import { data as currencies } from 'currency-codes';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { format as formatDateFns } from 'date-fns';
+	import { data as currencies } from 'currency-codes';
 
 	let open = $state(false);
 	let localConfig: Config[] = $state([]);

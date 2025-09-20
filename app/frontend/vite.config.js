@@ -2,7 +2,6 @@ import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
-import pkg from "./package.json"
 
 export default defineConfig(({ mode }) => {
 	// Load env file from root directory
@@ -18,21 +17,30 @@ export default defineConfig(({ mode }) => {
 		},
 		envDir: resolve(process.cwd(), '../../'),
 		optimizeDeps: {
-			include: []
+			include: ['currency-codes', 'dayjs', 'validator']
+		},
+		ssr: {
+			noExternal: [
+				'style-to-object',
+				'memoize-weak',
+				'currency-codes',
+				'@dagrejs/dagre',
+				'property-expr',
+				'toposort',
+				'tiny-case',
+				'validator',
+				'dayjs'
+			]
 		},
 		build: {
-			commonjsOptions: {
-				include: [
-					'../../node_modules/style-to-object/**',
-					'../../node_modules/memoize-weak/**',
-					'../../node_modules/currency-codes/**',
-					'../../node_modules/@dagrejs/**',
-					'../../node_modules/property-expr/**',
-					'../../node_modules/toposort/**',
-					'../../node_modules/tiny-case/**',
-					'../../node_modules/validator/**',
-					'../../node_modules/dayjs/**'
-				]
+			rollupOptions: {
+				external: (id) => {
+					// Don't bundle these for client-side, but allow them for SSR
+					if (id.includes('style-to-object') || id.includes('memoize-weak')) {
+						return false;
+					}
+					return false;
+				}
 			}
 		}
 	};
