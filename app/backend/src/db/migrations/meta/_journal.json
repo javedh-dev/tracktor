@@ -15,6 +15,13 @@
       "when": 1757489161441,
       "tag": "20250910072601_seed-config-data",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1758216910072,
+      "tag": "20250918173510_update_configs",
+      "breakpoints": true
     }
   ]
 }

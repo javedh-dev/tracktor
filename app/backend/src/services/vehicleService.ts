@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export const addVehicle = async (vehicleData: any) => {
   const vehicle = await db
     .insert(schema.vehicleTable)
-    .values(vehicleData)
+    .values({ ...vehicleData, id: undefined })
     .returning();
   return { id: vehicle[0]?.id, message: "Vehicle added successfully." };
 };

@@ -1,0 +1,143 @@
+<script lang="ts">
+	import AppSheet from '$lib/components/layout/AppSheet.svelte';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { saveInsurance } from '$lib/services/insurance.service';
+	import { insuranceModelStore } from '$lib/stores/insurance';
+	import { vehiclesStore } from '$lib/stores/vehicle';
+	import { insuranceSchema, type Insurance } from '$lib/types/insurance';
+	import { Building2, Calendar1, IdCard, Banknote, Notebook } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
+	import { superForm, defaults } from 'sveltekit-superforms';
+	import { zod4 } from 'sveltekit-superforms/adapters';
+
+	let open = $state(false);
+	let insuranceToEdit: Insurance | undefined = $state();
+	let vehicleId: string | undefined = $state();
+
+	insuranceModelStore.subscribe((data) => {
+		open = data.show;
+		insuranceToEdit = data.entryToEdit;
+		vehicleId = data.vehicleId;
+	});
+
+	const form = superForm(defaults(zod4(insuranceSchema)), {
+		validators: zod4(insuranceSchema),
+		SPA: true,
+		onUpdate: ({ form: f }) => {
+			if (f.valid) {
+				saveInsurance({
+					...f.data,
+					startDate: parseDate(f.data.startDate),
+					endDate: parseDate(f.data.endDate)
+				}).then((res) => {
+					if (res.status == 'OK') {
+						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
+						toast.success(`Insurance ${insuranceToEdit ? 'updated' : 'saved'} successfully...!!!`);
+						insuranceModelStore.hide();
+					}
+				});
+			} else {
+				toast.error('Please fix the errors in the form.');
+				console.error(JSON.stringify(f.data, null, 2));
+			}
+		}
+	});
+	const { form: formData, enhance } = form;
+
+	$effect(() => {
+		if (insuranceToEdit) {
+			formData.set({
+				...insuranceToEdit,
+				startDate: formatDate(insuranceToEdit.startDate),
+				endDate: formatDate(insuranceToEdit.endDate)
+			});
+		}
+		formData.update((data) => {
+			return { ...data, vehicleId: vehicleId || '' };
+		});
+	});
+</script>
+
+<AppSheet {open} close={() => insuranceModelStore.hide()} title="Add Insurance">
+	<form use:enhance onsubmit={(e) => e.preventDefault()}>
+		<div class="flex flex-col gap-4">
+			<Form.Field {form} name="provider" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Insurance provider name">Provider</Form.Label>
+						<Input {...props} bind:value={$formData.provider} icon={Building2} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="policyNumber" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Insurance policy number">Policy Number</Form.Label>
+						<Input {...props} bind:value={$formData.policyNumber} icon={IdCard} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<div class="flex w-full flex-row gap-4">
+				<Form.Field {form} name="startDate" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Insurance start date">Start Date</Form.Label>
+							<Input {...props} bind:value={$formData.startDate} icon={Calendar1} type="calendar" />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+
+				<Form.Field {form} name="endDate" class="w-full">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label description="Insurance end date">End Date</Form.Label>
+							<Input {...props} bind:value={$formData.endDate} icon={Calendar1} type="calendar" />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+
+			<Form.Field {form} name="cost" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Insurance cost">Cost</Form.Label>
+						<Input
+							{...props}
+							bind:value={$formData.cost}
+							icon={Banknote}
+							type="number"
+							step=".01"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="notes" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Additional notes">Notes</Form.Label>
+						<Textarea
+							{...props}
+							placeholder="Add additional notes..."
+							class="resize-none"
+							bind:value={$formData.notes}
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Button>Submit</Form.Button>
+		</div>
+	</form>
+</AppSheet>

@@ -19,6 +19,7 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
     .insert(schema.fuelLogTable)
     .values({
       ...fuelLogData,
+      id: undefined,
       vehicleId: vehicleId,
     })
     .returning();

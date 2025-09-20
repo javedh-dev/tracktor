@@ -5,9 +5,8 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-// Rate limiter for /pin/verify to prevent brute-force/DoS attacks
 const pinVerifyLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
+  windowMs:  5 * 1000, // 5 seconds
   max: 5, // limit each IP to 5 requests per windowMs
   message: "Too many PIN verification attempts, please try again later."
 });
