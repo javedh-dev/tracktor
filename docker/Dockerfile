@@ -3,15 +3,15 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 
 # Copy package files for dependency installation
-COPY package*.json ./
-COPY app/frontend/package*.json ./app/frontend/
-COPY app/backend/package*.json ./app/backend/
+COPY package.json ./
+COPY app/frontend/package.json ./app/frontend/
+COPY app/backend/package.json ./app/backend/
 
 # Install all dependencies with cache mount
 # Handle npm optional dependency bug for ARM64 Alpine
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/app/.npm \
-    npm ci --include=dev
+    npm install --include=dev
 
 # Stage 2: Build application
 FROM node:22-alpine AS builder
@@ -37,12 +37,11 @@ FROM node:22-alpine AS prod-deps
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
-COPY app/backend/package*.json ./app/backend/
+COPY app/backend/package.json ./
 
 # Install only production dependencies
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --workspace=backend --ignore-scripts
+    npm install --omit=dev --ignore-scripts
 
 # Stage 4: Final production image
 FROM node:22-alpine AS runtime
@@ -58,7 +57,6 @@ COPY --from=builder /app/app/frontend/build ./frontend
 
 # Copy production dependencies
 COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=prod-deps /app/app/backend/node_modules ./backend/node_modules
 
 # Copy package.json files
 COPY --from=builder /app/package.json ./
