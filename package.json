@@ -5,7 +5,6 @@
     "app/*"
   ],
   "scripts": {
-    "setup": "node scripts/setup-env.js",
     "test:cors": "node scripts/test-cors.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --workspace=backend",
@@ -14,7 +13,7 @@
     "build:backend": "npm run build --workspace=backend",
     "build:frontend": "npm run build --workspace=frontend",
     "start": "npm run start --workspace=backend",
-    "preview": "npm run preview --workspace=backend",
+    "preview": "concurrently \"npm run preview --workspace=backend\" \"npm run preview --workspace=frontend\"",
     "db:migrate": "npm run db:migrate --workspace=backend",
     "db:seed": "npm run db:seed --workspace=backend",
     "db:status": "npm run db:status --workspace=backend",
@@ -22,7 +21,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "reset": "npm run reset --workspaces --if-present",
+    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
     "install:all": "npm install --workspaces"
   },
   "devDependencies": {

@@ -1,46 +1,32 @@
-# Stage 1: Build the SvelteKit frontend
-FROM node:22-alpine AS frontend-builder
-WORKDIR /app/frontend
-COPY app/frontend/package*.json ./
+# Stage 1: Build both frontend and backend
+FROM node:22-alpine AS builder
+WORKDIR /tmp
+COPY ./ ./
 RUN npm install
-COPY app/frontend/ ./
 ENV API_BASE_URL=/
 ENV PUBLIC_DEMO_MODE=false
 ENV NODE_ENV=production
 RUN npm run build
 
-# Stage 2: Build the Node.js backend
-FROM node:22-alpine AS backend-builder
-WORKDIR /app/backend
-COPY app/backend/package*.json ./
-RUN npm install
-COPY app/backend/ ./
-ENV NODE_ENV=production
-ENV DB_PATH=./tracktor.db
-RUN npm run build
-
-# Stage 3: Final production image
+# Stage 2: Final production 
 FROM node:22-alpine
 WORKDIR /app
 
 # Copy built backend from backend-builder stage
-COPY --from=backend-builder /app/backend/dist ./backend
-COPY --from=backend-builder /app/backend/src/db/migrations ./backend/src/db/migrations
-COPY --from=backend-builder /app/backend/node_modules ./backend/node_modules
-COPY --from=backend-builder /app/backend/package.json ./backend/package.json
-
+COPY --from=builder /tmp/app/backend/dist ./backend
+COPY --from=builder /tmp/app/backend/src/db/migrations ./backend/src/db/migrations
+COPY --from=builder /tmp/app/backend/package.json ./backend/package.json
 # Copy built frontend from frontend-builder stage
-COPY --from=frontend-builder /app/frontend/build ./frontend
-COPY --from=frontend-builder /app/frontend/package.json ./package.json
+COPY --from=builder /tmp/app/frontend/build ./frontend
+COPY --from=builder /tmp/app/frontend/package.json ./package.json
+WORKDIR /app/backend
+RUN npm install
 
 # Copy and set up entrypoint script
 COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-WORKDIR /app/backend
-
 EXPOSE 3000
-
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV DB_PATH=/data/tracktor.db

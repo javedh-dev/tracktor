@@ -20,6 +20,7 @@ export const addInsurance = async (vehicleId: string, insuranceData: any) => {
     .values({
       ...insuranceData,
       vehicleId: vehicleId,
+      id: undefined,
     })
     .returning();
   return {

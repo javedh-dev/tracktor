@@ -24,6 +24,7 @@ export const addMaintenanceLog = async (
     .values({
       ...maintenanceLogData,
       vehicleId: vehicleId,
+      id: undefined,
     })
     .returning();
   return {

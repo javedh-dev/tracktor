@@ -1,0 +1,108 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { env } from '$env/dynamic/public';
+	import { FileText, Calendar, MapPin, Trash2, BadgeCheck } from '@lucide/svelte/icons';
+	import { formatDate } from '$helper/formatting';
+	import { Jumper } from 'svelte-loading-spinners';
+	import IconButton from '$appui/IconButton.svelte';
+	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
+	import { getApiUrl } from '$helper/api';
+	import { puccModelStore } from '$lib/stores/pucc';
+	import PuccContextMenu from './PuccContextMenu.svelte';
+	import type { PollutionCertificate } from '$lib/types';
+	import { deletePollutionCertificate } from '$lib/services/pucc.service';
+
+	let { vehicleId } = $props();
+
+	let pollutionCertificates: PollutionCertificate[] = $state([]);
+	let loading = $state(false);
+	let error = $state('');
+	let selectedPucc = $state<string>();
+	let deleteDialog = $state(false);
+
+	$effect(() => {
+		if (!vehicleId) {
+			error = 'Vehicle ID is required.';
+			loading = false;
+		} else {
+			fetchPollutionCertificateDetails();
+		}
+	});
+
+	async function fetchPollutionCertificateDetails() {
+		if (!vehicleId) {
+			pollutionCertificates = [];
+			return;
+		}
+		loading = true;
+		error = '';
+		try {
+			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/pucc`), {
+				headers: {
+					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
+				}
+			});
+			if (response.ok) {
+				pollutionCertificates = await response.json();
+			} else {
+				error = 'Failed to fetch Pollution Certificates.';
+			}
+		} catch (e) {
+			console.error(e);
+			error = 'Network error. Please try again.';
+		} finally {
+			loading = false;
+		}
+	}
+
+	onMount(() => {
+		fetchPollutionCertificateDetails();
+	});
+</script>
+
+{#if loading}
+	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
+		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
+	</p>
+{:else if error}
+	<p class="text-red-500">Error: {error}</p>
+{:else if pollutionCertificates.length === 0}
+	<div>No maintenance logs for this vehicle.</div>
+{:else}
+	{#each pollutionCertificates as pucc (pucc.id)}
+		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
+					<BadgeCheck class="h-6 w-6 " />
+					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
+				</div>
+				<PuccContextMenu {pucc} onaction={fetchPollutionCertificateDetails} />
+			</div>
+			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<Calendar class="h-5 w-5" />
+					<span class="font-semibold">Issue Date:</span>
+					<span>{formatDate(pucc.issueDate)}</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<Calendar class="h-5 w-5" />
+					<span class="font-semibold">Expiry Date:</span>
+					<span>{formatDate(pucc.expiryDate)}</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<MapPin class="h-5 w-5" />
+					<span class="font-semibold">Testing Center:</span>
+					<span>{pucc.testingCenter}</span>
+				</div>
+				{#if pucc.notes}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<FileText class="h-5 w-5" />
+						<span class="font-semibold">Notes:</span>
+						<span>{pucc.notes}</span>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/each}
+{/if}

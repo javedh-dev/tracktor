@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
-import type { Vehicle } from '$lib/models/vehicle';
-import { getApiUrl } from '$lib/utils/api';
+import type { Vehicle } from '../types/vehicle';
+import { getApiUrl } from '$lib/helper/api';
 import { writable } from 'svelte/store';
 
 const createVehicleModalStore = () => {
