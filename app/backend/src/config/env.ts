@@ -11,9 +11,7 @@ config({
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;
   if (!origins) {
-    return [
-      "*"
-    ];
+    return ["*"];
   }
 
   return origins
@@ -63,7 +61,7 @@ export function validateEnvironment(): void {
   if (missing.length > 0) {
     console.error(
       "❌ Missing required environment variables:",
-      missing.join(", ")
+      missing.join(", "),
     );
     process.exit(1);
   }

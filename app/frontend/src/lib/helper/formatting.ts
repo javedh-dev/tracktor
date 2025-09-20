@@ -1,5 +1,5 @@
 import { config } from '$lib/stores/setting';
-import type { CalendarDate, DateValue } from '@internationalized/date';
+import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 

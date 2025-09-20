@@ -5,7 +5,7 @@ import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
 	// Load env file from root directory
-	console.log("Running in mode : ",mode);
+	console.log('Running in mode : ', mode);
 	const env = loadEnv(mode, resolve(process.cwd(), '../../'), '');
 	return {
 		plugins: [tailwindcss(), sveltekit()],

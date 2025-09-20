@@ -18,7 +18,6 @@
 	import { insuranceModelStore } from '$stores/insurance';
 	import { puccModelStore } from '$stores/pucc';
 	import { browser } from '$app/environment';
-	import { env } from '$env/dynamic/public';
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import * as Card from '$lib/components/ui/card';

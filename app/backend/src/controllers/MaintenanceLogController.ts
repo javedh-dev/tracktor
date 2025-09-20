@@ -10,7 +10,7 @@ export const addMaintenanceLog = async (req: Request, res: Response) => {
   if (!vehicleId) {
     throw new MaintenanceLogError(
       "Vehicle ID is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   if (
@@ -22,12 +22,12 @@ export const addMaintenanceLog = async (req: Request, res: Response) => {
   ) {
     throw new MaintenanceLogError(
       "Date, Odometer, ServiceCenter, and Cost are required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const result = await maintenanceLogService.addMaintenanceLog(
     vehicleId,
-    req.body
+    req.body,
   );
   res.status(201).json(result);
 };
@@ -37,7 +37,7 @@ export const getMaintenanceLogs = async (req: Request, res: Response) => {
   if (!vehicleId) {
     throw new MaintenanceLogError(
       "Vehicle ID is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const maintenanceLogs =
@@ -50,7 +50,7 @@ export const getMaintenanceLogById = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
 
@@ -65,7 +65,7 @@ export const updateMaintenanceLog = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   if (
@@ -77,7 +77,7 @@ export const updateMaintenanceLog = async (req: Request, res: Response) => {
   ) {
     throw new MaintenanceLogError(
       "Date, Odometer, Service, and Cost are required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const result = await maintenanceLogService.updateMaintenanceLog(id, req.body);
@@ -89,7 +89,7 @@ export const deleteMaintenanceLog = async (req: Request, res: Response) => {
   if (!id) {
     throw new MaintenanceLogError(
       "Maintenance Log ID is required.",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
 

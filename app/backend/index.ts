@@ -47,7 +47,7 @@ seedData()
     app.listen(env.SERVER_PORT, env.SERVER_HOST, () => {
       console.log("─".repeat(75));
       console.log(
-        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`
+        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`,
       );
       console.log(`Environment: ${env.NODE_ENV}`);
       console.log(`Database: ${env.DATABASE_PATH}`);

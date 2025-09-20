@@ -37,7 +37,7 @@ export const verifyPin = async (pin: string) => {
   } else {
     throw new AuthError(
       "Incorrect PIN provided. Please try again with correct PIN",
-      Status.UNAUTHORIZED
+      Status.UNAUTHORIZED,
     );
   }
 };

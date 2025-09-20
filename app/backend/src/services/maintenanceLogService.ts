@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 export const addMaintenanceLog = async (
   vehicleId: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
@@ -15,7 +15,7 @@ export const addMaintenanceLog = async (
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -48,7 +48,7 @@ export const getMaintenanceLogById = async (id: string) => {
   if (!maintenanceLog) {
     throw new MaintenanceLogError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return maintenanceLog;
@@ -56,7 +56,7 @@ export const getMaintenanceLogById = async (id: string) => {
 
 export const updateMaintenanceLog = async (
   id: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   await getMaintenanceLogById(id);
   await db
@@ -76,7 +76,7 @@ export const deleteMaintenanceLog = async (id: string) => {
   if (result.length === 0) {
     throw new MaintenanceLogError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Maintenance log deleted successfully." };

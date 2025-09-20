@@ -77,18 +77,21 @@ export const addFuelLogByLicensePlate = async (req: Request, res: Response) => {
   }
 
   if (!licensePlate) {
-    throw new FuelLogError(
-      "License Plate required.",
-      Status.BAD_REQUEST,
-    );
+    throw new FuelLogError("License Plate required.", Status.BAD_REQUEST);
   }
 
-  const result = await fuelLogService.addFuelLogByLicensePlate(licensePlate, req.body);
+  const result = await fuelLogService.addFuelLogByLicensePlate(
+    licensePlate,
+    req.body,
+  );
   res.status(201).json(result);
 };
 
 // Get FuelLogs by licensePlate
-export const getFuelLogsByLicensePlate = async (req: Request, res: Response) => {
+export const getFuelLogsByLicensePlate = async (
+  req: Request,
+  res: Response,
+) => {
   const { licensePlate } = req.params;
   if (!licensePlate) {
     throw new FuelLogError("License Plate is required.", Status.BAD_REQUEST);

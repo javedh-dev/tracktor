@@ -30,7 +30,7 @@ export const updateConfig = async (req: Request, res: Response) => {
     configs.map(async (config) => {
       const { key, value } = config;
       return await updateAppConfig(key, value);
-    })
+    }),
   );
   res.json(updatedConfigs);
 };

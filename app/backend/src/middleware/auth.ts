@@ -4,7 +4,7 @@ import { getPinStatus, verifyPin } from "@services/pinService.js";
 export const authenticatePin = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const pin = req.headers["x-user-pin"] as string;
 

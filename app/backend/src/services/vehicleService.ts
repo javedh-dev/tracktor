@@ -22,10 +22,10 @@ export const getAllVehicles = async () => {
 
   return vehicles.map((vehicle) => {
     const insurances = allInsurances.filter(
-      (insurance) => insurance.vehicleId === vehicle.id
+      (insurance) => insurance.vehicleId === vehicle.id,
     );
     const pollutionCertificates = allPollutionCertificates.filter(
-      (pucc) => pucc.vehicleId === vehicle.id
+      (pucc) => pucc.vehicleId === vehicle.id,
     );
 
     let insuranceStatus = "Not Available";

@@ -6,13 +6,17 @@ import rateLimit from "express-rate-limit";
 const router = Router();
 
 const pinVerifyLimiter = rateLimit({
-  windowMs:  5 * 1000, // 5 seconds
+  windowMs: 5 * 1000, // 5 seconds
   max: 5, // limit each IP to 5 requests per windowMs
-  message: "Too many PIN verification attempts, please try again later."
+  message: "Too many PIN verification attempts, please try again later.",
 });
 
 router.post("/pin", asyncHandler(setPin));
-router.post("/pin/verify", pinVerifyLimiter as unknown as RequestHandler, asyncHandler(verifyPin));
+router.post(
+  "/pin/verify",
+  pinVerifyLimiter as unknown as RequestHandler,
+  asyncHandler(verifyPin),
+);
 router.get("/pin/status", asyncHandler(getPinStatus));
 
 export default router;

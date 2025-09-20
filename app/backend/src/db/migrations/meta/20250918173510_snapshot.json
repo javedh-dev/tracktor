@@ -173,13 +173,9 @@
         "fuel_logs_vehicle_id_vehicles_id_fk": {
           "name": "fuel_logs_vehicle_id_vehicles_id_fk",
           "tableFrom": "fuel_logs",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
+          "columnsFrom": ["vehicle_id"],
           "tableTo": "vehicles",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -267,13 +263,9 @@
         "insurances_vehicle_id_vehicles_id_fk": {
           "name": "insurances_vehicle_id_vehicles_id_fk",
           "tableFrom": "insurances",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
+          "columnsFrom": ["vehicle_id"],
           "tableTo": "vehicles",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -354,13 +346,9 @@
         "maintenance_logs_vehicle_id_vehicles_id_fk": {
           "name": "maintenance_logs_vehicle_id_vehicles_id_fk",
           "tableFrom": "maintenance_logs",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
+          "columnsFrom": ["vehicle_id"],
           "tableTo": "vehicles",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -441,13 +429,9 @@
         "pollution_certificates_vehicle_id_vehicles_id_fk": {
           "name": "pollution_certificates_vehicle_id_vehicles_id_fk",
           "tableFrom": "pollution_certificates",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
+          "columnsFrom": ["vehicle_id"],
           "tableTo": "vehicles",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }

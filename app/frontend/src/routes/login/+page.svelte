@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import LoginForm from '$feature/login/LoginForm.svelte';
 	import { verifyPin } from '$services/auth.service';
-	import { simulateNetworkDelay } from '$helper/dev';
 	import { toast } from 'svelte-sonner';
 
 	const oncomplete = async (pin: string) => {
