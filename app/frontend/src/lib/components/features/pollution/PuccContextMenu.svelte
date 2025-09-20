@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DeleteConfirmation from '$lib/components/ui/app/DeleteConfirmation.svelte';
+	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deletePollutionCertificate } from '$lib/services/pucc.service';

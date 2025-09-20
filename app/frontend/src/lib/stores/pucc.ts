@@ -6,7 +6,7 @@ const createPuccModalStore = () => {
 		vehicleId?: string;
 		editMode: boolean;
 		show: boolean;
-		callback: (status: boolean) => void;
+		callback: (_status: boolean) => void;
 	}>({
 		entryToEdit: undefined,
 		vehicleId: undefined,

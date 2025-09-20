@@ -4,7 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
-	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { Jumper } from 'svelte-loading-spinners';
 

@@ -3,11 +3,11 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
-	import ThemeToggle from '$appui/ThemeToggle.svelte';
+	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
 	import { configModelStore } from '$lib/stores/setting';
 	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
-	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 	import { page } from '$app/stores';
 
 	let isAuthenticated = $state(false);

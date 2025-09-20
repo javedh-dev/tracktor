@@ -13,7 +13,7 @@
 	} from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import Columns3 from '@lucide/svelte/icons/columns-3';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';

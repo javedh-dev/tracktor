@@ -16,7 +16,7 @@
 	import { z } from 'zod/v4';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { data as currencies } from 'currency-codes';
-	import SearchableSelect from '$lib/components/ui/app/SearchableSelect.svelte';
+	import SearchableSelect from '$lib/components/app/SearchableSelect.svelte';
 	import {
 		getCurrencySymbol,
 		getTimezoneOptions,

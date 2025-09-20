@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 	import * as Card from '$lib/components/ui/card';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	import { Jumper } from 'svelte-loading-spinners';

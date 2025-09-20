@@ -5,7 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$lib/components/layout/Header.svelte';
 

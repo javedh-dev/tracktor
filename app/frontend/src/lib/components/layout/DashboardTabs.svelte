@@ -11,7 +11,7 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import SquareKanban from '@lucide/svelte/icons/square-kanban';
 
-	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 
 	let { vehicleId = $bindable() } = $props();
 

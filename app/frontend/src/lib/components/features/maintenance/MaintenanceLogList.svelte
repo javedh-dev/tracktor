@@ -12,7 +12,7 @@
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
 	import type { MaintenanceLog } from '$lib/types/maintenance';
 

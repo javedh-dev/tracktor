@@ -62,7 +62,7 @@ const isValidFormat = (fmt: string): { ex?: string; valid: boolean } => {
 			ex: format(new Date(), fmt),
 			valid: true
 		};
-	} catch (e) {
+	} catch (_) {
 		return { valid: false };
 	}
 };

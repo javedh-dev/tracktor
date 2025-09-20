@@ -16,7 +16,7 @@
 	import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 	import { compareDesc } from 'date-fns';
 

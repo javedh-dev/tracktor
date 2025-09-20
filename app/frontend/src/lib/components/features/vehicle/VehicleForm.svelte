@@ -18,12 +18,10 @@
 
 	let open = $state(false);
 	let vehicleToEdit: Vehicle | undefined = $state();
-	let editMode = $state(false);
 
 	vehicleModelStore.subscribe((data) => {
 		open = data.show;
 		vehicleToEdit = data.vehicleToEdit;
-		editMode = data.editMode;
 	});
 
 	const form = superForm(defaults(zod4(vehicleSchema)), {

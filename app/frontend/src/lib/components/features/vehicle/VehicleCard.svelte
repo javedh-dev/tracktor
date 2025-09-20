@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LicensePlate from '../../ui/app/LicensePlate.svelte';
+	import LicensePlate from '../../app/LicensePlate.svelte';
 	import Gauge from '@lucide/svelte/icons/gauge';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -18,12 +18,12 @@
 	import { insuranceModelStore } from '$stores/insurance';
 	import { puccModelStore } from '$stores/pucc';
 	import { browser } from '$app/environment';
-	import IconButton from '$appui/IconButton.svelte';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
+	import IconButton from '$lib/components/app/IconButton.svelte';
+	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import IconWithTooltip from '$appui/IconWithTooltip.svelte';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import IconWithTooltip from '$lib/components/app/IconWithTooltip.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';
 

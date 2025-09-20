@@ -4,7 +4,7 @@
 	import { curveCatmullRom } from 'd3-shape';
 	import { Area, AreaChart, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
 	import type { DataPoint } from '$lib/types';
-	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	let {
@@ -19,8 +19,8 @@
 		color?: string;
 		label: string;
 		title: string;
-		xFormatter: (v: Date) => string;
-		yFormatter: (v: number) => string;
+		xFormatter: (_: Date) => string;
+		yFormatter: (_: number) => string;
 	} = $props();
 
 	const chartProps = {

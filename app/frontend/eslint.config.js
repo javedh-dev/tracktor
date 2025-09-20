@@ -28,11 +28,11 @@ export default [
 		},
 		rules: {
 			...ts.configs.recommended.rules,
-			'@typescript-eslint/no-unused-vars': 'off',
 			'unused-imports/no-unused-imports': 'error',
-			'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+			'unused-imports/no-unused-vars': ['off'],
 			'@typescript-eslint/no-explicit-any': 'off',
 			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': ['off'],
 			'no-prototype-builtins': 'off'
 		}
 	},
@@ -57,15 +57,24 @@ export default [
 		},
 		rules: {
 			...svelte.configs.recommended.rules,
-			'@typescript-eslint/no-unused-vars': 'off',
 			'unused-imports/no-unused-imports': 'error',
 			'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-explicit-any': 'off',
 			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': ['error'],
 			'no-prototype-builtins': 'off'
 		}
 	},
 	{
-		ignores: ['node_modules/', '.svelte-kit/', 'build/', 'dist/', '*.config.js', '*.config.ts']
+		ignores: [
+			'node_modules/',
+			'.svelte-kit/',
+			'build/',
+			'dist/',
+			'*.config.js',
+			'*.config.ts',
+			'**/*.svelte.ts',
+			'src/lib/components/ui/**'
+		]
 	}
 ];
