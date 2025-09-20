@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/root/.npm \
     if [ "$(uname -m)" = "aarch64" ]; then \
         rm -rf node_modules package-lock.json && npm install --include=dev; \
     else \
-        npm ci --include=dev \
+        npm ci --include=dev; \
     fi
 
 # Stage 2: Build application
@@ -47,9 +47,9 @@ COPY app/backend/package*.json ./app/backend/
 # Install only production dependencies
 RUN --mount=type=cache,target=/root/.npm \
     if [ "$(uname -m)" = "aarch64" ]; then \
-        rm -rf node_modules package-lock.json && npm install --only=production --workspace=backend --ignore-scripts; \
+        rm -rf node_modules package-lock.json && npm install --omit=dev --workspace=app/backend --ignore-scripts; \
     else \
-        npm ci --only=production --workspace=backend --ignore-scripts; \
+        npm ci --omit=dev --workspace=app/backend --ignore-scripts; \
     fi
 
 # Stage 4: Final production image
