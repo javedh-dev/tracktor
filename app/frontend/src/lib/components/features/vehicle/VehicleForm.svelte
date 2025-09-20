@@ -5,15 +5,13 @@
 	import { saveVehicle } from '$lib/services/vehicle.service';
 	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
 	import { vehicleSchema, type Vehicle } from '$lib/types/vehicle';
-	import {
-		Building2,
-		Calendar,
-		CarFront,
-		CircleGauge,
-		Fingerprint,
-		IdCard,
-		Paintbrush
-	} from '@lucide/svelte/icons';
+	import Building2 from '@lucide/svelte/icons/building-2';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import CarFront from '@lucide/svelte/icons/car-front';
+	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+	import Fingerprint from '@lucide/svelte/icons/fingerprint';
+	import IdCard from '@lucide/svelte/icons/id-card';
+	import Paintbrush from '@lucide/svelte/icons/paintbrush';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
-	import { TriangleAlert } from '@lucide/svelte/icons';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { Toaster } from '$lib/components/ui/sonner';

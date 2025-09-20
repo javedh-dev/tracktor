@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { Shield, Calendar, Hash, Notebook, Banknote } from '@lucide/svelte/icons';
+	import Shield from '@lucide/svelte/icons/shield';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Hash from '@lucide/svelte/icons/hash';
+	import Notebook from '@lucide/svelte/icons/notebook';
+	import Banknote from '@lucide/svelte/icons/banknote';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { getApiUrl } from '$helper/api';

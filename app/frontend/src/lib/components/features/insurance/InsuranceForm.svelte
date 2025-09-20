@@ -8,7 +8,10 @@
 	import { insuranceModelStore } from '$lib/stores/insurance';
 	import { vehiclesStore } from '$lib/stores/vehicle';
 	import { insuranceSchema, type Insurance } from '$lib/types/insurance';
-	import { Building2, Calendar1, IdCard, Banknote, Notebook } from '@lucide/svelte/icons';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import IdCard from '@lucide/svelte/icons/id-card';
+	import Building2 from '@lucide/svelte/icons/building-2';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

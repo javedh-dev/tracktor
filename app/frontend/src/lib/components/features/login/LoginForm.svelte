@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { ShieldEllipsis, Tractor } from '@lucide/svelte/icons';
+	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 	import * as Card from '$lib/components/ui/card';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';

@@ -3,11 +3,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { getApiUrl } from '$lib/helper/api';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
 	import { maintenanceModelStore } from '$lib/stores/maintenance';
 	import type { MaintenanceLog } from '$lib/types';
-	import type { FuelLog } from '$lib/types/fuel';
-	import { EllipsisVertical } from '@lucide/svelte/icons';
+	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =

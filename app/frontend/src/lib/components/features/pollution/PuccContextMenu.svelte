@@ -2,13 +2,10 @@
 	import DeleteConfirmation from '$lib/components/ui/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { deleteInsurance } from '$lib/services/insurance.service';
 	import { deletePollutionCertificate } from '$lib/services/pucc.service';
-	import { insuranceModelStore } from '$lib/stores/insurance';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
 	import { puccModelStore } from '$lib/stores/pucc';
-	import type { Insurance, PollutionCertificate } from '$lib/types';
-	import { EllipsisVertical } from '@lucide/svelte/icons';
+	import type { PollutionCertificate } from '$lib/types';
+	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 
 	let { pucc, onaction }: { pucc: PollutionCertificate; onaction: () => void } = $props();

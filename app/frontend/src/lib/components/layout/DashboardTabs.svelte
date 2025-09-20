@@ -5,7 +5,12 @@
 	import MaintenenceLogTab from '../features/maintenance/MaintenenceLogTab.svelte';
 	import InsuranceTab from '../features/insurance/InsuranceTab.svelte';
 	import PollutionTab from '../features/pollution/PollutionTab.svelte';
-	import { BadgeInfo, Fuel, Shield, SquareKanban, Wrench } from '@lucide/svelte/icons';
+	import Wrench from '@lucide/svelte/icons/wrench';
+	import BadgeInfo from '@lucide/svelte/icons/badge-info';
+	import Fuel from '@lucide/svelte/icons/fuel';
+	import Shield from '@lucide/svelte/icons/shield';
+	import SquareKanban from '@lucide/svelte/icons/square-kanban';
+
 	import LabelWithIcon from '../ui/app/LabelWithIcon.svelte';
 
 	let { vehicleId = $bindable() } = $props();

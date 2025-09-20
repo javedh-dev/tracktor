@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { LogOut, Tractor, Settings } from '@lucide/svelte/icons';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import Tractor from '@lucide/svelte/icons/tractor';
+	import Settings from '@lucide/svelte/icons/settings';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { configModelStore } from '$lib/stores/setting';
 	import { vehiclesStore } from '$stores/vehicle';

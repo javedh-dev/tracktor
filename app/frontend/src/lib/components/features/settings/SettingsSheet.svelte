@@ -4,14 +4,12 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { config, configModelStore, type Config } from '$lib/stores/setting';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import {
-		Calendar,
-		Currency,
-		Earth,
-		Languages,
-		PaintBucket,
-		RulerDimensionLine
-	} from '@lucide/svelte/icons';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Currency from '@lucide/svelte/icons/currency';
+	import Earth from '@lucide/svelte/icons/earth';
+	import Languages from '@lucide/svelte/icons/languages';
+	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
+	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

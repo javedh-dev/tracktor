@@ -1,19 +1,16 @@
 <script lang="ts">
 	import LicensePlate from '../../ui/app/LicensePlate.svelte';
-
-	import {
-		Gauge,
-		Pencil,
-		Trash2,
-		Fuel,
-		Wrench,
-		Shield,
-		BadgeCheck,
-		ShieldCheck,
-		BadgeAlert,
-		ShieldAlert,
-		IdCard
-	} from '@lucide/svelte/icons';
+	import Gauge from '@lucide/svelte/icons/gauge';
+	import Pencil from '@lucide/svelte/icons/pencil';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Fuel from '@lucide/svelte/icons/fuel';
+	import Wrench from '@lucide/svelte/icons/wrench';
+	import Shield from '@lucide/svelte/icons/shield';
+	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import BadgeAlert from '@lucide/svelte/icons/badge-alert';
+	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
+	import IdCard from '@lucide/svelte/icons/id-card';
 	import { formatDistance } from '$helper/formatting';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
 	import { maintenanceModelStore } from '$stores/maintenance';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CircleDotDashed } from '@lucide/svelte/icons';
+	import CircleDotDashed from '@lucide/svelte/icons/circle-dot-dashed';
 
 	let { registrationNumber } = $props();
 </script>

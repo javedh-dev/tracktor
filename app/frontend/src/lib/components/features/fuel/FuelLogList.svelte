@@ -7,15 +7,13 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { formatCurrency, formatDate, formatDistance, formatVolume } from '$lib/helper/formatting';
 	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
-	import {
-		Banknote,
-		Calendar1,
-		CircleGauge,
-		Fuel,
-		Notebook,
-		PaintBucket,
-		SquircleDashed
-	} from '@lucide/svelte/icons';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+	import Fuel from '@lucide/svelte/icons/fuel';
+	import Notebook from '@lucide/svelte/icons/notebook';
+	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
+	import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';

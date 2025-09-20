@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { createRawSnippet, onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { env } from '$env/dynamic/public';
 	import { formatCurrency, formatDate, formatDistance } from '$helper/formatting';
-	import { Banknote, Calendar1, CircleGauge, Notebook, Trash2, Wrench } from '@lucide/svelte/icons';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+	import Notebook from '@lucide/svelte/icons/notebook';
+	import Wrench from '@lucide/svelte/icons/wrench';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$appui/IconButton.svelte';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
@@ -20,8 +21,6 @@
 	let maintenanceLogs: MaintenanceLog[] = $state([]);
 	let loading = $state(false);
 	let error = $state('');
-	let selectedMaintenanceLog = $state<string>();
-	let deleteDialog = $state(false);
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -164,32 +163,6 @@
 			error = 'Network error. Please try again.';
 		} finally {
 			loading = false;
-		}
-	}
-
-	async function deleteMaintenenceLog(logId: string | undefined) {
-		if (!logId) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				`${env.PUBLIC_API_BASE_URL || ''}/api/vehicles/${vehicleId}/maintenance-logs/${logId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-					}
-				}
-			);
-			if (response.ok) {
-				await fetchMaintenanceLogs();
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to delete maintenance log.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Failed to delete maintenance log.';
 		}
 	}
 

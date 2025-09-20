@@ -2,10 +2,10 @@
 	import * as Chart from '$lib/components/ui/chart/index.js';
 	import { scaleUtc } from 'd3-scale';
 	import { curveCatmullRom } from 'd3-shape';
-	import { Area, AreaChart, Circle, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
+	import { Area, AreaChart, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
 	import type { DataPoint } from '$lib/types';
 	import LabelWithIcon from '$lib/components/ui/app/LabelWithIcon.svelte';
-	import { CircleSlash2 } from '@lucide/svelte/icons';
+	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	let {
 		chartData,

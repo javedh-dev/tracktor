@@ -8,7 +8,10 @@
 	import { puccModelStore } from '$lib/stores/pucc';
 	import { vehiclesStore } from '$lib/stores/vehicle';
 	import { pollutionCertificateSchema, type PollutionCertificate } from '$lib/types/pucc';
-	import { Calendar1, IdCard, TestTube2, Notebook } from '@lucide/svelte/icons';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import IdCard from '@lucide/svelte/icons/calendar-1';
+	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
+
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
@@ -113,7 +116,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label description="Testing center name">Testing Center</Form.Label>
-						<Input {...props} bind:value={$formData.testingCenter} icon={TestTube2} />
+						<Input {...props} bind:value={$formData.testingCenter} icon={TestTubeDiagonal} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

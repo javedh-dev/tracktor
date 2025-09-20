@@ -1,23 +1,15 @@
 <script lang="ts">
 	import AppSheet from '$lib/components/layout/AppSheet.svelte';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/formatting';
-	import { saveFuelLog } from '$lib/services/fuel.service';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
+	import { vehiclesStore } from '$lib/stores/vehicle';
 	import { maintenenceSchema, type MaintenanceLog } from '$lib/types/maintenance';
-	import { fuelSchema, type FuelLog } from '$lib/types/fuel';
-	import {
-		Banknote,
-		Calendar1,
-		CircleGauge,
-		CircleSlash,
-		Fuel,
-		Hammer
-	} from '@lucide/svelte/icons';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import Hammer from '@lucide/svelte/icons/hammer';
+	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';

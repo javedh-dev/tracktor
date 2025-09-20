@@ -4,9 +4,8 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deleteInsurance } from '$lib/services/insurance.service';
 	import { insuranceModelStore } from '$lib/stores/insurance';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
 	import type { Insurance } from '$lib/types';
-	import { EllipsisVertical } from '@lucide/svelte/icons';
+	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 
 	let { insurance, onaction }: { insurance: Insurance; onaction: () => void } = $props();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
-	import { Trash2 } from '@lucide/svelte/icons';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Button from './Button.svelte';
 
 	let { onConfirm, open = $bindable() } = $props();

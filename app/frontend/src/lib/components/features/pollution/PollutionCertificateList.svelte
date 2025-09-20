@@ -1,25 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { env } from '$env/dynamic/public';
-	import { FileText, Calendar, MapPin, Trash2, BadgeCheck } from '@lucide/svelte/icons';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import MapPin from '@lucide/svelte/icons/map-pin';
+	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import { formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import IconButton from '$appui/IconButton.svelte';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import { getApiUrl } from '$helper/api';
-	import { puccModelStore } from '$lib/stores/pucc';
 	import PuccContextMenu from './PuccContextMenu.svelte';
 	import type { PollutionCertificate } from '$lib/types';
-	import { deletePollutionCertificate } from '$lib/services/pucc.service';
 
 	let { vehicleId } = $props();
 
 	let pollutionCertificates: PollutionCertificate[] = $state([]);
 	let loading = $state(false);
 	let error = $state('');
-	let selectedPucc = $state<string>();
-	let deleteDialog = $state(false);
 
 	$effect(() => {
 		if (!vehicleId) {
