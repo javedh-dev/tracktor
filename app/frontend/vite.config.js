@@ -5,6 +5,7 @@ import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
 	// Load env file from root directory
+	console.log("Running in mode : ",mode);
 	const env = loadEnv(mode, resolve(process.cwd(), '../../'), '');
 	return {
 		plugins: [tailwindcss(), sveltekit()],
@@ -19,29 +20,33 @@ export default defineConfig(({ mode }) => {
 		optimizeDeps: {
 			include: ['currency-codes', 'dayjs', 'validator']
 		},
-		ssr: {
-			noExternal: [
-				'style-to-object',
-				'memoize-weak',
-				'currency-codes',
-				'@dagrejs/dagre',
-				'property-expr',
-				'toposort',
-				'tiny-case',
-				'validator',
-				'dayjs'
-			]
-		},
+		...(mode === 'production' && {
+			ssr: {
+				noExternal: [
+					'style-to-object',
+					'memoize-weak',
+					'currency-codes',
+					'@dagrejs/dagre',
+					'property-expr',
+					'toposort',
+					'tiny-case',
+					'validator',
+					'dayjs'
+				]
+			}
+		}),
 		build: {
-			rollupOptions: {
-				external: (id) => {
-					// Don't bundle these for client-side, but allow them for SSR
-					if (id.includes('style-to-object') || id.includes('memoize-weak')) {
+			...(mode === 'production' && {
+				rollupOptions: {
+					external: (id) => {
+						// Don't bundle these for client-side, but allow them for SSR
+						if (id.includes('style-to-object') || id.includes('memoize-weak')) {
+							return false;
+						}
 						return false;
 					}
-					return false;
 				}
-			}
+			})
 		}
 	};
 });
