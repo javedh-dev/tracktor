@@ -58,6 +58,6 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: ${{ steps.strategy.outputs.platforms }}
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
-          cache-to: type=gha,mode=${{ steps.strategy.outputs.cache-mode }}
+          cache-to: type=gha,mode=max
