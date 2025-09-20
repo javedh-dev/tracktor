@@ -2,7 +2,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /tmp
 COPY ./ ./
-RUN npm install
+RUN npm ci
 ENV API_BASE_URL=/
 ENV PUBLIC_DEMO_MODE=false
 ENV NODE_ENV=production
