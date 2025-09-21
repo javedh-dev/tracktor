@@ -58,6 +58,9 @@ COPY --from=builder /app/app/frontend/build ./frontend
 # Copy production dependencies
 COPY --from=prod-deps /app/node_modules ./node_modules
 
+# Make directory for database data for no volume attachment
+RUN mkdir -p /data/
+
 # Copy package.json files
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/app/backend/package.json ./backend/
