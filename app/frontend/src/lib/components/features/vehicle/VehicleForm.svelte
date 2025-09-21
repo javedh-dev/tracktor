@@ -27,7 +27,7 @@
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),
 		SPA: true,
-		onUpdate: ({ form: f }) => {
+		onUpdated: ({ form: f }) => {
 			if (f.valid) {
 				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
 				saveVehicle(f.data, vehicleToEdit ? 'PUT' : 'POST').then((res) => {
@@ -35,11 +35,10 @@
 						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
 						toast.success(`Vehicle ${vehicleToEdit ? 'updated' : 'saved'} successfully...!!!`);
 						vehicleModelStore.hide();
+					} else {
+						toast.error(`Error while saving : ${res.error}`);
 					}
 				});
-			} else {
-				toast.error('Please fix the errors in the form.');
-				console.error(JSON.stringify(f.data, null, 2));
 			}
 		}
 	});

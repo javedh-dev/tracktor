@@ -31,7 +31,7 @@
 	const form = superForm(defaults(zod4(pollutionCertificateSchema)), {
 		validators: zod4(pollutionCertificateSchema),
 		SPA: true,
-		onUpdate: ({ form: f }) => {
+		onUpdated: ({ form: f }) => {
 			if (f.valid) {
 				savePollutionCertificate({
 					...f.data,
@@ -44,11 +44,10 @@
 							`Pollution Certificate ${certificateToEdit ? 'updated' : 'saved'} successfully...!!!`
 						);
 						puccModelStore.hide();
+					} else {
+						toast.error(`Error while saving : ${res.error}`);
 					}
 				});
-			} else {
-				toast.error('Please fix the errors in the form.');
-				console.error(JSON.stringify(f.data, null, 2));
 			}
 		}
 	});
@@ -85,32 +84,25 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<div class="flex w-full flex-row gap-4">
-				<Form.Field {form} name="issueDate" class="w-full">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label description="Certificate issue date">Issue Date</Form.Label>
-							<Input {...props} bind:value={$formData.issueDate} icon={Calendar1} type="calendar" />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
+			<Form.Field {form} name="issueDate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Certificate issue date">Issue Date</Form.Label>
+						<Input {...props} bind:value={$formData.issueDate} icon={Calendar1} type="calendar" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-				<Form.Field {form} name="expiryDate" class="w-full">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label description="Certificate expiry date">Expiry Date</Form.Label>
-							<Input
-								{...props}
-								bind:value={$formData.expiryDate}
-								icon={Calendar1}
-								type="calendar"
-							/>
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			</div>
+			<Form.Field {form} name="expiryDate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Certificate expiry date">Expiry Date</Form.Label>
+						<Input {...props} bind:value={$formData.expiryDate} icon={Calendar1} type="calendar" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
 			<Form.Field {form} name="testingCenter" class="w-full">
 				<Form.Control>

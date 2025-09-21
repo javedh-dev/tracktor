@@ -29,18 +29,17 @@
 	const form = superForm(defaults(zod4(maintenenceSchema)), {
 		validators: zod4(maintenenceSchema),
 		SPA: true,
-		onUpdate: ({ form: f }) => {
+		onUpdated: ({ form: f }) => {
 			if (f.valid) {
 				saveMaintenanceLog({ ...f.data, date: parseDate(f.data.date) }).then((res) => {
 					if (res.status == 'OK') {
 						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
 						toast.success(`Maintenance Log ${logToEdit ? 'updated' : 'saved'} successfully...!!!`);
 						maintenanceModelStore.hide();
+					} else {
+						toast.error(`Error while saving : ${res.error}`);
 					}
 				});
-			} else {
-				toast.error('Please fix the errors in the form.');
-				console.error(JSON.stringify(f.data, null, 2));
 			}
 		}
 	});
