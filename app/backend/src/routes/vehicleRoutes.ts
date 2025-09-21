@@ -5,7 +5,7 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
-} from "@controllers/VehicleController.js";
+} from "@controllers/vehicleController.js";
 import { authenticatePin } from "@middleware/auth.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 import fuelLogRoutes from "./fuelLogRoutes.js";

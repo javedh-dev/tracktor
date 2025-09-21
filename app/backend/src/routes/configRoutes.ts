@@ -3,7 +3,7 @@ import {
   getConfig,
   getConfigByKey,
   updateConfig,
-} from "@controllers/ConfigController.js";
+} from "@controllers/configController.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 
 const router = Router();

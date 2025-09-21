@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { setPin, verifyPin, getPinStatus } from "@controllers/PinController.js";
+import { setPin, verifyPin, getPinStatus } from "@controllers/pinController.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 import rateLimit from "express-rate-limit";
 

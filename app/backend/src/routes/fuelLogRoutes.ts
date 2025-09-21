@@ -5,7 +5,7 @@ import {
   getFuelLogById,
   updateFuelLog,
   deleteFuelLog,
-} from "@controllers/FuelLogController.js";
+} from "@controllers/fuelLogController.js";
 import { authenticatePin } from "@middleware/auth.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 

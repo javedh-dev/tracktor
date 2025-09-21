@@ -5,7 +5,7 @@ import {
   getMaintenanceLogById,
   updateMaintenanceLog,
   deleteMaintenanceLog,
-} from "@controllers/MaintenanceLogController.js";
+} from "@controllers/maintenanceLogController.js";
 import { authenticatePin } from "@middleware/auth.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 

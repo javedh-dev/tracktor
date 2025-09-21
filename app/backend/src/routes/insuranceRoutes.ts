@@ -4,7 +4,7 @@ import {
   getInsurances,
   updateInsurance,
   deleteInsurance,
-} from "@controllers/InsuranceController.js";
+} from "@controllers/insuranceController.js";
 import { authenticatePin } from "@middleware/auth.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 

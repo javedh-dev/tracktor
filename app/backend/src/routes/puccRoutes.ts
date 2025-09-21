@@ -4,7 +4,7 @@ import {
   getPollutionCertificates,
   updatePollutionCertificate,
   deletePollutionCertificate,
-} from "@controllers/PUCCController.js";
+} from "@controllers/puccController.js";
 import { authenticatePin } from "@middleware/auth.js";
 import { asyncHandler } from "@middleware/async-handler.js";
 
