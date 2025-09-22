@@ -41,4 +41,3 @@ Thumbs.db
 
 # Keep package-lock.json for reproducible builds
 **/package-lock.json
-scripts/

@@ -66,7 +66,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/app/backend/package.json ./backend/
 
 # Copy and set up start script
-COPY ./scripts/start.sh /app/start.sh
+COPY --from=builder /app/scripts/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Set runtime environment
