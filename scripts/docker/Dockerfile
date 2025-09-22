@@ -30,7 +30,7 @@ ENV PUBLIC_DEMO_MODE=false
 ENV NODE_ENV=production
 
 # Build the application
-RUN npm run build
+RUN npm run build --workspaces
 
 # Stage 3: Production dependencies only
 FROM node:22-alpine AS prod-deps
@@ -51,8 +51,8 @@ WORKDIR /app
 # RUN npm install -g drizzle-kit@^0.31.4
 
 # Copy built application
-COPY --from=builder /app/app/backend/dist ./backend
-COPY --from=builder /app/app/backend/src/db/migrations ./backend/src/db/migrations
+COPY --from=builder /app/app/backend/build ./backend
+COPY --from=builder /app/app/backend/migrations ./backend/migrations
 COPY --from=builder /app/app/frontend/build ./frontend
 
 # Copy production dependencies
@@ -66,8 +66,8 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/app/backend/package.json ./backend/
 
 # Copy and set up entrypoint script
-COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY scripts/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 # Set runtime environment
 EXPOSE 3000
@@ -75,4 +75,4 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV DB_PATH=/data/tracktor.db
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/app/start.sh"]

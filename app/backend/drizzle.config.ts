@@ -2,7 +2,7 @@ import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  out: "./src/db/migrations",
+  out: "./migrations",
   migrations: {
     prefix: "timestamp",
     table: "_migrations",
