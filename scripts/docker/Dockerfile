@@ -65,8 +65,8 @@ RUN mkdir -p /data/
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/app/backend/package.json ./backend/
 
-# Copy and set up entrypoint script
-COPY scripts/start.sh /app/start.sh
+# Copy and set up start script
+COPY ./scripts/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # Set runtime environment
