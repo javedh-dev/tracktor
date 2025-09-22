@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: srcipts/docker/Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -103,7 +103,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: srcipts/docker/Dockerfile
           push: false
           platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
