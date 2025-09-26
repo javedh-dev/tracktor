@@ -20,7 +20,7 @@
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present",
+    "clean": "./scripts/clean.sh",
     "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
     "install:all": "npm install --workspaces"
   },
