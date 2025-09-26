@@ -5,24 +5,14 @@
     "app/*"
   ],
   "scripts": {
-    "test:cors": "node scripts/test-cors.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "npm run dev --workspace=backend",
-    "dev:frontend": "npm run dev --workspace=frontend",
     "build": "./scripts/build.sh",
-    "build:backend": "npm run build --workspace=backend",
-    "build:frontend": "npm run build --workspace=frontend",
     "start": "./build/start.sh",
-    "preview": "concurrently \"npm run preview --workspace=backend\" \"npm run preview --workspace=frontend\"",
-    "db:migrate": "npm run db:migrate --workspace=backend",
-    "db:seed": "npm run db:seed --workspace=backend",
-    "db:status": "npm run db:status --workspace=backend",
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "clean": "./scripts/clean.sh",
-    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
-    "install:all": "npm install --workspaces"
+    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present"
   },
   "devDependencies": {
     "concurrently": "^9.2.0",

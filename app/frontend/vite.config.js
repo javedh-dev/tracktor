@@ -39,10 +39,6 @@ export default defineConfig(({ mode }) => {
 			...(mode === 'production' && {
 				rollupOptions: {
 					external: (id) => {
-						// Don't bundle these for client-side, but allow them for SSR
-						if (id.includes('style-to-object') || id.includes('memoize-weak')) {
-							return false;
-						}
 						return false;
 					}
 				}
