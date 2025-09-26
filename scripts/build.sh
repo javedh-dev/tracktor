@@ -33,10 +33,6 @@ if [ -d "build" ]; then
     log_success "Previous build directory removed"
 fi
 
-# Create build directories
-log_info "Creating build directories..."
-mkdir -p build/frontend/ build/backend/
-log_success "Build directories created"
 
 # Install dependencies
 log_info "Installing dependencies..."
@@ -55,6 +51,11 @@ else
     log_error "Failed to build workspaces"
     exit 1
 fi
+
+# Create build directories
+log_info "Creating build directories..."
+mkdir -p build/frontend/ build/backend/
+log_success "Build directories created"
 
 # Copy frontend build
 log_info "Copying frontend build artifacts..."
