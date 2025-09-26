@@ -31,7 +31,8 @@ export default defineConfig(({ mode }) => {
 					'toposort',
 					'tiny-case',
 					'validator',
-					'dayjs'
+					'dayjs',
+					'zod'
 				]
 			}
 		}),
