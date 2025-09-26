@@ -39,13 +39,8 @@ mkdir -p build/frontend/ build/backend/
 log_success "Build directories created"
 
 # Install dependencies
-log_info "Removing package-lock.json..."
-rm -rf package-lock.json
-log_success "Removing package-lock.json..."
-
-# Install dependencies
 log_info "Installing dependencies..."
-if npm install; then
+if npm run clean && npm install; then
     log_success "Dependencies installed successfully"
 else
     log_error "Failed to install dependencies"
