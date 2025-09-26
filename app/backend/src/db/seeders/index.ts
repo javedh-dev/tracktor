@@ -14,12 +14,18 @@ import { configDotenv } from "dotenv";
 configDotenv();
 
 export const seedData = async () => {
-  const pinEnv = process.env.AUTH_PIN;
-  const enforceEnv = process.env.FORCE_DEMO_SEED_DATA;
-  const demoMode = process.env.PUBLIC_DEMO_MODE;
-  if (!demoMode && pinEnv && pinEnv.trim().length == 6)
+  const pinEnv = process.env.AUTH_PIN || "";
+  const enforceEnv = process.env.FORCE_DEMO_SEED_DATA || "false";
+  const demoMode = process.env.PUBLIC_DEMO_MODE || "false";
+
+  console.log("Seeding data...", {
+    FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA,
+    PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
+  });
+
+  if (demoMode === "false" && pinEnv.trim().length == 6)
     await seedAuthPin(pinEnv);
-  if (demoMode == "true") await seedDemoData(enforceEnv == "true");
+  if (demoMode === "true") await seedDemoData(enforceEnv === "true");
 };
 
 const seedAuthPin = async (pin: string) => {

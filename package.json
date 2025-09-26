@@ -5,7 +5,7 @@
     "app/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "build": "./scripts/build.sh",
     "start": "./build/start.sh",
     "format": "npm run format --workspaces --if-present",
