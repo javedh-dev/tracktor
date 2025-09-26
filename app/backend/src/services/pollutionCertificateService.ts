@@ -37,12 +37,6 @@ export const getPollutionCertificates = async (vehicleId: string) => {
     await db.query.pollutionCertificateTable.findMany({
       where: (certificates, { eq }) => eq(certificates.vehicleId, vehicleId),
     });
-  if (!pollutionCertificates || pollutionCertificates.length === 0) {
-    throw new PollutionCertificateError(
-      `No PUCC found for vehicle id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
   return pollutionCertificates;
 };
 

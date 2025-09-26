@@ -64,7 +64,7 @@
 {:else if error}
 	<p class="text-red-500">Error: {error}</p>
 {:else if pollutionCertificates.length === 0}
-	<div>No maintenance logs for this vehicle.</div>
+	<div>No Pollution Certificates for this vehicle.</div>
 {:else}
 	{#each pollutionCertificates as pucc (pucc.id)}
 		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
