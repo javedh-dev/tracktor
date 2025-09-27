@@ -11,6 +11,7 @@ export interface Vehicle {
 	odometer: number | null;
 	insuranceStatus?: string;
 	puccStatus?: string;
+	image: string | null;
 }
 
 export const vehicleSchema = z.object({
@@ -41,7 +42,8 @@ export const vehicleSchema = z.object({
 		.string()
 		.regex(/^(#[0-9a-fA-F]{3})|(#[0-9a-fA-F]{6})$/, 'Only hex color codes allowed.')
 		.default('#A1A1A1'),
-	odometer: z.number().nonnegative().nullable()
+	odometer: z.number().nonnegative().nullable(),
+	image: z.string().nullable(),
 });
 
 export type VehicleSchema = typeof vehicleSchema;

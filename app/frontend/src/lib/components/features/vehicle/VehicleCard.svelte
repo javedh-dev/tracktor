@@ -49,17 +49,18 @@
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	// const imageUrl =
-	// 	vehicle.imageUrl || 'https://www.v3cars.com/media/model-imgs/91-92-062100-daytona-grey.webp';
+	const imageUrl = vehicle.image ? `/api/upload/${vehicle.image}` : undefined;
 </script>
 
 <div tabindex="0" role="button" {onclick} {onkeydown}>
 	<Card.Root
-		class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary' : 'border-transparent'}`}
+		class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
 	>
 		<Card.Header class="relative h-38 overflow-hidden p-0 ">
 			<div class="w-full">
-				<!-- <img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" /> -->
+				{#if imageUrl}
+					<img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" />
+				{/if}
 			</div>
 			<div class="absolute inset-0 flex flex-col justify-between border-b p-4">
 				<div class="flex flex-col">

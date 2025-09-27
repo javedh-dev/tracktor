@@ -1,6 +1,7 @@
 import { getApiUrl } from '$lib/helper/api';
 import type { DataPoint, Response } from '$lib/types';
 import type { Vehicle } from '$lib/types/vehicle';
+import { uploadFile } from './file.service';
 
 export const fetchMileageData = async (vehicleId: string): Promise<DataPoint[]> => {
 	let mileageData: DataPoint[] = [];
@@ -64,10 +65,28 @@ export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => 
 	return costData;
 };
 
-export const saveVehicle = async (
+export const saveVehicleWithImage = async (
 	vehicle: Vehicle,
+	image: File | undefined,
 	method: 'PUT' | 'POST'
 ): Promise<Response<Vehicle>> => {
+	if (image) {
+		const res = await uploadFile(image);
+		if (res.status === 'OK') {
+			vehicle.image = res.data || null;
+		} else {
+			return {
+				status: 'ERROR',
+				error: res.error
+			};
+		}
+	}
+	return saveVehicle(vehicle, method);
+};
+
+const saveVehicle = async (vehicle: Vehicle,
+	method: 'PUT' | 'POST') => {
+
 	const res: Response<Vehicle> = { status: 'OK' };
 	try {
 		const response = await fetch(getApiUrl(`/api/vehicles/`), {
@@ -91,7 +110,7 @@ export const saveVehicle = async (
 		res.error = 'Error while saving vehicle : ' + e;
 	}
 	return res;
-};
+}
 
 export const deleteVehicle = async (vehicleId: string): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };

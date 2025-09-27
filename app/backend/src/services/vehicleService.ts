@@ -69,6 +69,7 @@ export const getAllVehicles = async () => {
       color: true,
       odometer: true,
       vin: true,
+      image: true
     },
   });
 
@@ -157,6 +158,7 @@ export const getAllVehicles = async () => {
       vin: vehicle.vin,
       color: vehicle.color,
       odometer: currentOdometer,
+      image: vehicle.image,
       overallMileage: mileageData?.overallMileage,
       insuranceStatus,
       puccStatus,

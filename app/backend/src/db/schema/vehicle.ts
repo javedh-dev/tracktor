@@ -14,5 +14,6 @@ export const vehicleTable = table("vehicles", {
   vin: t.text(),
   color: t.text(),
   odometer: t.integer(),
+  image: t.text(),
   ...timestamps,
 });
