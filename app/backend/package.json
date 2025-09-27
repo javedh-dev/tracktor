@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "@tracktor/backend",
   "version": "0.0.1",
-  "description": "@tracktor/backend",
+  "description": "Tracktor backend",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

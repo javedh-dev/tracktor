@@ -101,7 +101,7 @@ export const getAllVehicles = async () => {
         },
       });
       return { vehicleId: vehicle.id, latestOdometer: latestLog?.odometer };
-    }),
+    })
   );
 
   // Calculate overall mileage for each vehicle
@@ -109,18 +109,18 @@ export const getAllVehicles = async () => {
     vehicles.map(async (vehicle) => ({
       vehicleId: vehicle.id,
       overallMileage: await calculateOverallMileage(vehicle.id),
-    })),
+    }))
   );
 
   return vehicles.map((vehicle) => {
     // Find insurance status
     const vehicleInsurances = activeInsurances.filter(
-      (insurance) => insurance.vehicleId === vehicle.id,
+      (insurance) => insurance.vehicleId === vehicle.id
     );
     let insuranceStatus = "Not Available";
     if (vehicleInsurances.length > 0) {
       insuranceStatus = vehicleInsurances.some(
-        (insurance) => new Date(insurance.endDate) > today,
+        (insurance) => new Date(insurance.endDate) > today
       )
         ? "Active"
         : "Expired";
@@ -128,12 +128,12 @@ export const getAllVehicles = async () => {
 
     // Find PUCC status
     const vehiclePollutionCerts = activePollutionCertificates.filter(
-      (pucc) => pucc.vehicleId === vehicle.id,
+      (pucc) => pucc.vehicleId === vehicle.id
     );
     let puccStatus = "Not Available";
     if (vehiclePollutionCerts.length > 0) {
       puccStatus = vehiclePollutionCerts.some(
-        (pucc) => new Date(pucc.expiryDate) > today,
+        (pucc) => new Date(pucc.expiryDate) > today
       )
         ? "Active"
         : "Expired";
@@ -141,7 +141,7 @@ export const getAllVehicles = async () => {
 
     // Get current odometer and overall mileage
     const latestFuelLog = latestFuelLogs.find(
-      (log) => log.vehicleId === vehicle.id,
+      (log) => log.vehicleId === vehicle.id
     );
     const mileageData = vehicleMileages.find((m) => m.vehicleId === vehicle.id);
 
@@ -154,6 +154,7 @@ export const getAllVehicles = async () => {
       model: vehicle.model,
       year: vehicle.year,
       licensePlate: vehicle.licensePlate,
+      vin: vehicle.vin,
       color: vehicle.color,
       odometer: currentOdometer,
       overallMileage: mileageData?.overallMileage,
