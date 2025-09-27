@@ -1,27 +1,20 @@
 #!/bin/sh
-set -e
-
-# Colors for better output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# set -e
 
 log_info() {
-    echo "${BLUE}...${NC} $1"
+    echo "[ℹ] $1"
 }
 
 log_success() {
-    echo "${GREEN}✓${NC} $1"
+    echo "[✓] $1"
 }
 
 log_warning() {
-    echo "${YELLOW}⚠️${NC} $1"
+    echo "[⚠] $1"
 }
 
 log_error() {
-    echo "${RED}✗${NC} $1"
+    echo "[✗] $1"
 }
 
 log_info "Starting build process..."
@@ -35,8 +28,16 @@ fi
 
 
 # Install dependencies
-log_info "Installing dependencies..."
-if npm run clean && npm install; then
+log_info "Cleaning Up..."
+if npm run clean; then
+    log_success "Clean Up successfully..."
+else
+    log_error "Failed to install dependencies"
+    exit 1
+fi
+log_info "Installing Dependencies..."
+NODE_ENV=development
+if npm install; then
     log_success "Dependencies installed successfully"
 else
     log_error "Failed to install dependencies"
@@ -45,7 +46,8 @@ fi
 
 # Build workspaces
 log_info "Building workspaces..."
-if npm run build --workspaces --if-present; then
+NODE_ENV=production
+if npm run build --workspaces; then
     log_success "Workspaces built successfully"
 else
     log_error "Failed to build workspaces"
@@ -111,6 +113,14 @@ if [ -f "app/backend/package.json" ]; then
     log_success "Backend package.json copied"
 else
     log_error "Backend package.json not found"
+    exit 1
+fi
+
+if [ -f "app/frontend/package.json" ]; then
+    cp app/frontend/package.json build/frontend/package.json
+    log_success "Frontend package.json copied"
+else
+    log_error "Frontend package.json not found"
     exit 1
 fi
 

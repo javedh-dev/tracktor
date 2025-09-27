@@ -1,11 +1,13 @@
 {
   "name": "tracktor",
   "private": true,
+  "type": "module",
   "workspaces": [
-    "app/*"
+    "./app/frontend",
+    "./app/backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "dev": "concurrently \"npm run dev --workspace=@tracktor/backend\" \"npm run dev --workspace=@tracktor/frontend\"",
     "build": "./scripts/build.sh",
     "start": "./build/start.sh",
     "format": "npm run format --workspaces --if-present",
@@ -15,8 +17,7 @@
     "reset": "rm -rf node_modules && npm run reset --workspaces --if-present"
   },
   "devDependencies": {
-    "concurrently": "^9.2.0",
-    "tsx": "^4.20.5"
+    "concurrently": "^9.2.0"
   },
   "dependencies": {
     "dotenv": "^17.2.2"

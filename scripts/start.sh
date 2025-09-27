@@ -1,23 +1,16 @@
 #!/bin/sh
-set -e
-
-# Colors for better output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# set -e
 
 log_info() {
-    echo "[${BLUE}-${NC}] $1"
+    echo "[ℹ] $1"
 }
 
 log_success() {
-    echo "[${GREEN}✓${NC}] $1"
+    echo "[✓] $1"
 }
 
 log_error() {
-    echo "[${RED}✗${NC}] $1"
+    echo "[✗] $1"
 }
 
 log_info "Starting application..."

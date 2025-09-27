@@ -1,43 +1,29 @@
 # Dependencies
 **/node_modules
-.npm
 
 # Build artifacts
-**/dist
 **/build
-**/.next
-**/.nuxt
 
 # Development files
 .git
 .gitignore
 .env*
-!.env.example
 .vscode
 .idea
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Documentation
 README.md
 docs/
 *.md
-!docker/
 
 # CI/CD
 .github/
-.gitlab-ci.yml
 
 # OS generated files
 .DS_Store
 .DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+*.db
 
-# Keep package-lock.json for reproducible builds
+# Package lock file (commented out to allow proper dependency resolution)
 **/package-lock.json
