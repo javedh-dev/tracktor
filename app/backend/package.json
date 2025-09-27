@@ -9,7 +9,7 @@
     "dev": "tsx --watch index.ts",
     "start": "node dist/index.js",
     "preview": "npm run build && npm run start",
-    "db:generate": "NODE_OPTIONS='--import tsx' drizzle-kit generate --custom",
+    "db:generate": "NODE_OPTIONS='--import tsx' drizzle-kit generate --custom --name",
     "db:migrate": "NODE_OPTIONS='--import tsx' drizzle-kit migrate",
     "format": "(eslint --fix . || true) && prettier --write .",
     "lint": "eslint . && prettier --check .",

@@ -6,6 +6,7 @@ import configRoutes from "@routes/configRoutes.js";
 import { errorHandler } from "@middleware/error-handler.js";
 import env, { validateEnvironment } from "@config/env.js";
 import { seedData } from "@db/seeders/index.js";
+import { initializePatches } from "@db/patch/index.js";
 
 // Validate environment before starting
 validateEnvironment();
@@ -42,12 +43,14 @@ if (env.isProduction()) {
 
 app.use(errorHandler);
 
-seedData()
+// Initialize database patches first, then seed data
+initializePatches()
+  .then(() => seedData())
   .then(() => {
     app.listen(env.SERVER_PORT, env.SERVER_HOST, () => {
       console.log("─".repeat(75));
       console.log(
-        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`,
+        `🚀 Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`
       );
       console.log(`Environment: ${env.NODE_ENV}`);
       console.log(`Database: ${env.DATABASE_PATH}`);
@@ -58,6 +61,6 @@ seedData()
     });
   })
   .catch((err) => {
-    console.error("❌ Failed to seed database:", err);
+    console.error("❌ Failed to initialize database or seed data:", err);
     process.exit(1);
   });
