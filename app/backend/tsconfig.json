@@ -17,8 +17,8 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "paths": {
-      "@config": ["./src/config"],
-      "@config/*": ["./src/config/*"],
+      "@utils": ["./src/utils"],
+      "@utils/*": ["./src/utils/*"],
       "@controllers": ["./src/controllers"],
       "@controllers/*": ["./src/controllers/*"],
       "@db": ["./src/db"],

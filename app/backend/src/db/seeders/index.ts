@@ -10,7 +10,7 @@ import {
 import { db } from "@db/index.js";
 import { faker } from "@faker-js/faker";
 import { configDotenv } from "dotenv";
-import logger from "@config/logger.js";
+import logger from "../../utils/logger.js";
 
 configDotenv();
 

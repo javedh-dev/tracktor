@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 });
 
 // Configure multer with file size limits and file type validation
-export const upload = multer({
+export const uploadHandler = multer({
   storage: storage,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
@@ -28,13 +28,19 @@ export const upload = multer({
   fileFilter: (_, file, cb) => {
     // Allow common image and document types
     const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = allowedTypes.test(file.mimetype);
 
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only images and documents are allowed.'));
+      cb(
+        new Error("Invalid file type. Only images and documents are allowed.")
+      );
     }
-  }
+  },
 });
+
+export default uploadHandler;

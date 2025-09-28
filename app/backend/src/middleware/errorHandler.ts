@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-export const errorHandler = (
+const errorHandler = (
   err: any,
   req: Request,
   res: Response,
-  _: NextFunction,
+  _: NextFunction
 ) => {
   // Log the error for debugging
   console.error("Error in %s %s:", req.method, req.path, err);
@@ -44,3 +44,5 @@ export const errorHandler = (
 
   res.status(statusCode).json(body);
 };
+
+export default errorHandler;

@@ -1,4 +1,4 @@
-import logger from "@config/logger.js";
+import logger from "../../utils/logger.js";
 import { db } from "../index.js";
 import { sql } from "drizzle-orm";
 

@@ -6,24 +6,21 @@ import {
   updateVehicle,
   deleteVehicle,
 } from "@controllers/vehicleController.js";
-import { authenticatePin } from "@middleware/auth.js";
-import { asyncHandler } from "@middleware/async-handler.js";
+import { asyncHandler } from "@middleware/index.js";
 import fuelLogRoutes from "./fuelLogRoutes.js";
-import fuelLogLPRoutes from "./fuelLogLPRoutes.js";
 import insuranceRoutes from "./insuranceRoutes.js";
 import maintenanceLogRoutes from "./maintenanceLogRoutes.js";
 import puccRoutes from "./puccRoutes.js";
 
 const router = Router();
 
-router.post("/", authenticatePin, asyncHandler(addVehicle));
-router.get("/", authenticatePin, asyncHandler(getAllVehicles));
-router.get("/:id", authenticatePin, asyncHandler(getVehicleById));
-router.put("/", authenticatePin, asyncHandler(updateVehicle));
-router.delete("/:id", authenticatePin, asyncHandler(deleteVehicle));
+router.post("/", asyncHandler(addVehicle));
+router.get("/", asyncHandler(getAllVehicles));
+router.get("/:id", asyncHandler(getVehicleById));
+router.put("/", asyncHandler(updateVehicle));
+router.delete("/:id", asyncHandler(deleteVehicle));
 
 router.use("/:vehicleId/fuel-logs", fuelLogRoutes);
-router.use("/lp/:licensePlate/fuel-logs", fuelLogLPRoutes);
 router.use("/:vehicleId/insurance", insuranceRoutes);
 router.use("/:vehicleId/maintenance-logs", maintenanceLogRoutes);
 router.use("/:vehicleId/pucc", puccRoutes);

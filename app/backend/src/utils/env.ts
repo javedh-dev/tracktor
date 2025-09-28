@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { resolve } from "path";
 import logger from "./logger.js";
+import { accessSync, constants } from "fs";
 
 // Load environment variables from root directory
 config({
@@ -51,7 +52,6 @@ export function validateEnvironment(): void {
     process.exit(1);
   }
 
-  // Validate port numbers
   if (
     isNaN(env.SERVER_PORT) ||
     env.SERVER_PORT < 1 ||
@@ -59,6 +59,39 @@ export function validateEnvironment(): void {
   ) {
     logger.error(`Invalid SERVER_PORT: ${process.env.SERVER_PORT}`);
     process.exit(1);
+  }
+
+  if (env.CORS_ORIGINS.length === 0) {
+    logger.error("CORS_ORIGINS cannot be an empty list");
+    process.exit(1);
+  }
+
+  if (env.DEMO_MODE && env.FORCE_SEED) {
+    logger.warn("Running in FORCE_SEED mode. All data will be reset.");
+  }
+
+  if (env.DATABASE_PATH) {
+    try {
+      accessSync(env.DATABASE_PATH, constants.F_OK | constants.W_OK);
+    } catch (err) {
+      logger.error(
+        `DATABASE_PATH "${env.DATABASE_PATH}" does not exist or is not writable`,
+        err
+      );
+      process.exit(1);
+    }
+  }
+
+  if (env.UPLOAD_DIR) {
+    try {
+      accessSync(env.UPLOAD_DIR, constants.F_OK | constants.W_OK);
+    } catch (err) {
+      logger.error(
+        `UPLOAD_DIR "${env.UPLOAD_DIR}" does not exist or is not writable`,
+        err
+      );
+      process.exit(1);
+    }
   }
 
   logger.info("Environment validation passed...!!!");

@@ -4,7 +4,7 @@ import {
   getConfigByKey,
   updateConfig,
 } from "@controllers/configController.js";
-import { asyncHandler } from "@middleware/async-handler.js";
+import { asyncHandler } from "@middleware/index.js";
 
 const router = Router();
 

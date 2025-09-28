@@ -5,14 +5,13 @@ import {
   updateInsurance,
   deleteInsurance,
 } from "@controllers/insuranceController.js";
-import { authenticatePin } from "@middleware/auth.js";
-import { asyncHandler } from "@middleware/async-handler.js";
+import { asyncHandler } from "@middleware/index.js";
 
 const router = Router({ mergeParams: true });
 
-router.post("/", authenticatePin, asyncHandler(addInsurance));
-router.get("/", authenticatePin, asyncHandler(getInsurances));
-router.put("/:id", authenticatePin, asyncHandler(updateInsurance));
-router.delete("/:id", authenticatePin, asyncHandler(deleteInsurance));
+router.post("/", asyncHandler(addInsurance));
+router.get("/", asyncHandler(getInsurances));
+router.put("/:id", asyncHandler(updateInsurance));
+router.delete("/:id", asyncHandler(deleteInsurance));
 
 export default router;
