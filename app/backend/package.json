@@ -31,7 +31,8 @@
     "express-rate-limit": "^8.0.1",
     "multer": "^2.0.2",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

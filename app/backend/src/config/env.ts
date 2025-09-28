@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { resolve } from "path";
+import logger from "./logger.js";
 
 // Load environment variables from root directory
 config({
@@ -21,47 +22,31 @@ const getOrigins = (): string[] => {
 };
 
 export const env = {
-  // Application Environment
-  NODE_ENV: process.env.NODE_ENV || "development",
-
-  // Server Configuration
+  ENVIRONMENT: process.env.NODE_ENV || "development",
   SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
+  AUTH_PIN: process.env.AUTH_PIN || "123456",
   SERVER_PORT: Number(process.env.SERVER_PORT) || 3000,
-
-  // Database Configuration
   DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
-
-  // Application Features
+  UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
   DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
-  FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA === "true",
-
-  // CORS Configuration
+  FORCE_SEED: process.env.FORCE_SEED === "true",
   CORS_ORIGINS: getOrigins(),
-
-  // Logging Configuration
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
-
-  // Helper methods
-  isDevelopment: () =>
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development",
-  isProduction: () => process.env.NODE_ENV === "production",
-  isTest: () => process.env.NODE_ENV === "test",
+  LOG_DIR: process.env.LOG_DIR || "./logs",
 } as const;
-
-export default env;
 
 /**
  * Validate required environment variables
  */
 export function validateEnvironment(): void {
+  logger.info("Validating environment...");
   const required: string[] = [];
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
-    console.error(
-      "❌ Missing required environment variables:",
-      missing.join(", "),
+    logger.error(
+      `Missing required environment variables: ${missing.join(", ")}`
     );
     process.exit(1);
   }
@@ -72,9 +57,9 @@ export function validateEnvironment(): void {
     env.SERVER_PORT < 1 ||
     env.SERVER_PORT > 65535
   ) {
-    console.error("❌ Invalid SERVER_PORT:", process.env.SERVER_PORT);
+    logger.error(`Invalid SERVER_PORT: ${process.env.SERVER_PORT}`);
     process.exit(1);
   }
 
-  console.log("✅ Environment validation passed");
+  logger.info("Environment validation passed...!!!");
 }
