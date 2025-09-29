@@ -6,3 +6,4 @@ export { default as rateLimiter } from "./rateLimiter.js";
 export { default as requestLogger } from "./requestLogger.js";
 export { default as uploadHandler } from "./uploadHandler.js";
 export { default as authHandler } from "./authHandler.js";
+export { default as validationHandler } from "./validationHandler.js";

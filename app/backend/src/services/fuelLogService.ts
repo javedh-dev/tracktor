@@ -12,7 +12,7 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   const fuelLog = await db
@@ -84,13 +84,17 @@ export const getFuelLogById = async (id: string) => {
   if (!fuelLog) {
     throw new FuelLogError(
       `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   return fuelLog;
 };
 
-export const updateFuelLog = async (id: string, fuelLogData: any) => {
+export const updateFuelLog = async (
+  vehicleId: string,
+  id: string,
+  fuelLogData: any
+) => {
   getFuelLogById(id);
   await db
     .update(schema.fuelLogTable)
@@ -109,7 +113,7 @@ export const deleteFuelLog = async (id: string) => {
   if (result.length === 0) {
     throw new FuelLogError(
       `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   return { message: "Fuel log deleted successfully." };
@@ -117,7 +121,7 @@ export const deleteFuelLog = async (id: string) => {
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
-  fuelLogData: any,
+  fuelLogData: any
 ) => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
@@ -125,7 +129,7 @@ export const addFuelLogByLicensePlate = async (
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   return await addFuelLog(vehicle.id, fuelLogData);
@@ -138,7 +142,7 @@ export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   return await getFuelLogs(vehicle.id);

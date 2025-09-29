@@ -26,7 +26,7 @@ export const updateAppConfig = async (key: string, value: string) => {
   if (!key || value === undefined) {
     throw new ConfigError(
       "Key and value are required for each configuration",
-      Status.BAD_REQUEST,
+      Status.BAD_REQUEST
     );
   }
   const config = await getAppConfigByKey(key);

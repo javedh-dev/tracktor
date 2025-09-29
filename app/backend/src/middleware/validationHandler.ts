@@ -1,0 +1,36 @@
+import { NextFunction, Request, Response } from "express";
+import { body, buildCheckFunction, ValidationChain } from "express-validator";
+
+// can be reused by many routes
+const validationHandler = (validations: ValidationChain[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    for (const validation of validations) {
+      const result = await validation.run(req);
+      if (!result.isEmpty()) {
+        return res.status(400).json({ errors: result.array() });
+      }
+    }
+
+    next();
+  };
+};
+
+export const idValidator = (key: string) =>
+  buildCheckFunction(["body", "params"])(key)
+    .isUUID()
+    .withMessage(`${key} must be a valid UUID`);
+export const dateValidator = (key: string) =>
+  body(key).isISO8601().withMessage(`${key} must be in ISO 8601 format`);
+export const floatValidator = (key: string) =>
+  body(key).isFloat({ gt: 0 }).withMessage(`${key} must be a positive number`);
+export const numberValidator = (key: string) =>
+  body(key).isInt().withMessage(`${key} must be a integer number`);
+
+export const stringValidator = (key: string) =>
+  buildCheckFunction(["body", "params"])(key)
+    .isString()
+    .trim()
+    .notEmpty()
+    .withMessage(`${key} must be an non-empty string`);
+
+export default validationHandler;

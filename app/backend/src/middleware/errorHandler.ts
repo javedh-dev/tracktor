@@ -1,3 +1,4 @@
+import logger from "@utils/logger.js";
 import { Request, Response, NextFunction } from "express";
 
 const errorHandler = (
@@ -6,8 +7,7 @@ const errorHandler = (
   res: Response,
   _: NextFunction
 ) => {
-  // Log the error for debugging
-  console.error("Error in %s %s:", req.method, req.path, err);
+  logger.error(`Error in ${req.method} - ${req.path}`, err);
 
   res.setHeader("Content-Type", "application/json");
 
