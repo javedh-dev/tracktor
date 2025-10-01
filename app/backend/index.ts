@@ -1,8 +1,10 @@
 import express from "express";
-import pinRoutes from "@routes/pinRoutes.js";
-import vehicleRoutes from "@routes/vehicleRoutes.js";
-import configRoutes from "@routes/configRoutes.js";
-import uploadRoutes from "@routes/uploadRoutes.js";
+import {
+  authRoutes,
+  vehicleRoutes,
+  configRoutes,
+  uploadRoutes,
+} from "@routes/index.js";
 import {
   errorHandler,
   corsHandler,
@@ -65,7 +67,7 @@ const start = async (app: express.Express) => {
   app.use(authHandler);
 
   // Define API routes
-  app.use("/api/pin", pinRoutes);
+  app.use("/api/auth", authRoutes);
   app.use("/api/vehicles", vehicleRoutes);
   app.use("/api/config", configRoutes);
   app.use("/api/upload", uploadRoutes);

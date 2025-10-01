@@ -24,5 +24,5 @@ export const updateConfig = async (req: Request, res: Response) => {
       return await updateAppConfig(key, value);
     })
   );
-  res.json(updatedConfigs);
+  res.status(200).json(updatedConfigs);
 };

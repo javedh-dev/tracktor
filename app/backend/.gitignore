@@ -4,3 +4,4 @@ tracktor.db
 build/
 uploads/
 logs/
+coverage/

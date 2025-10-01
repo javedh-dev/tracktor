@@ -1,4 +1,4 @@
-export { default as pinRoutes } from "./pinRoutes.js";
+export { default as authRoutes } from "./authRoutes.js";
 export { default as vehicleRoutes } from "./vehicleRoutes.js";
 export { default as configRoutes } from "./configRoutes.js";
 export { default as fuelLogRotes } from "./fuelLogRoutes.js";
