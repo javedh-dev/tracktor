@@ -1,8 +1,8 @@
-import { FuelLogError } from "@exceptions/FuelLogError.js";
-import { Status } from "@exceptions/ServiceError.js";
-import { VehicleError } from "@exceptions/VehicleError.js";
-import * as schema from "@db/schema/index.js";
-import { db } from "@db/index.js";
+import { FuelLogError } from "@exceptions/FuelLogError";
+import { Status } from "@exceptions/ServiceError";
+import { VehicleError } from "@exceptions/VehicleError";
+import * as schema from "@db/schema/index";
+import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 
 export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {

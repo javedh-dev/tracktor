@@ -4,13 +4,13 @@ import {
   getPollutionCertificates,
   updatePollutionCertificate,
   deletePollutionCertificate,
-} from "@controllers/puccController.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
+} from "@controllers/puccController";
+import { asyncHandler, validationHandler } from "@middleware/index";
 import {
   dateValidator,
   idValidator,
   stringValidator,
-} from "@middleware/validationHandler.js";
+} from "@middleware/validationHandler";
 
 const router = Router({ mergeParams: true });
 

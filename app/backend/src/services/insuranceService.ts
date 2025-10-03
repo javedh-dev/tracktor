@@ -1,8 +1,8 @@
-import { InsuranceError } from "@exceptions/InsuranceError.js";
-import { Status } from "@exceptions/ServiceError.js";
-import { VehicleError } from "@exceptions/VehicleError.js";
-import * as schema from "@db/schema/index.js";
-import { db } from "@db/index.js";
+import { InsuranceError } from "@exceptions/InsuranceError";
+import { Status } from "@exceptions/ServiceError";
+import { VehicleError } from "@exceptions/VehicleError";
+import * as schema from "@db/schema/index";
+import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 
 export const addInsurance = async (vehicleId: string, insuranceData: any) => {
@@ -12,7 +12,7 @@ export const addInsurance = async (vehicleId: string, insuranceData: any) => {
   if (!vehicle) {
     throw new VehicleError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   const insurance = await db
@@ -39,7 +39,7 @@ export const getInsurances = async (vehicleId: string) => {
 export const updateInsurance = async (
   vehicleId: string,
   id: string,
-  insuranceData: any,
+  insuranceData: any
 ) => {
   const insurance = await db.query.insuranceTable.findFirst({
     where: (insurances, { eq, and }) =>
@@ -48,7 +48,7 @@ export const updateInsurance = async (
   if (!insurance) {
     throw new InsuranceError(
       `No Insurances found for id: ${id}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   await db
@@ -68,7 +68,7 @@ export const deleteInsurance = async (id: string) => {
   if (result.length === 0) {
     throw new InsuranceError(
       `No Insurances found for id: ${id}`,
-      Status.NOT_FOUND,
+      Status.NOT_FOUND
     );
   }
   return { message: "Insurance details deleted successfully." };

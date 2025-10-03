@@ -1,4 +1,4 @@
-import { env, logger } from "@utils/index.js";
+import { env, logger } from "@utils/index";
 import { NextFunction, Request, Response } from "express";
 
 const requestLogger = (req: Request, _: Response, next: NextFunction) => {

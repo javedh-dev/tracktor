@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { resolve } from "path";
-import logger from "./logger.js";
+import logger from "./logger";
 import { accessSync, constants } from "fs";
 
 // Load environment variables from root directory

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as insuranceService from "@services/insuranceService.js";
+import * as insuranceService from "@services/insuranceService";
 
 export const addInsurance = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;

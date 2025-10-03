@@ -6,11 +6,11 @@ import {
   maintenanceLogTable,
   pollutionCertificateTable,
   vehicleTable,
-} from "@db/schema/index.js";
-import { db } from "@db/index.js";
+} from "@db/schema/index";
+import { db } from "@db/index";
 import { faker } from "@faker-js/faker";
 import { configDotenv } from "dotenv";
-import logger from "../../utils/logger.js";
+import logger from "../../utils/logger";
 
 configDotenv();
 

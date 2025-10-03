@@ -5,17 +5,17 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
-} from "@controllers/vehicleController.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
-import fuelLogRoutes from "./fuelLogRoutes.js";
-import insuranceRoutes from "./insuranceRoutes.js";
-import maintenanceLogRoutes from "./maintenanceLogRoutes.js";
-import puccRoutes from "./puccRoutes.js";
+} from "@controllers/vehicleController";
+import { asyncHandler, validationHandler } from "@middleware/index";
+import fuelLogRoutes from "./fuelLogRoutes";
+import insuranceRoutes from "./insuranceRoutes";
+import maintenanceLogRoutes from "./maintenanceLogRoutes";
+import puccRoutes from "./puccRoutes";
 import {
   idValidator,
   numberValidator,
   stringValidator,
-} from "@middleware/validationHandler.js";
+} from "@middleware/validationHandler";
 
 const router = Router();
 

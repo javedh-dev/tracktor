@@ -1,7 +1,7 @@
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
-import { vehicleTable } from "./vehicle.js";
-import { timestamps } from "./audit.js";
+import { vehicleTable } from "./vehicle";
+import { timestamps } from "./audit";
 
 export const fuelLogTable = table("fuel_logs", {
   id: t

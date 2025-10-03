@@ -5,14 +5,14 @@ import {
   getMaintenanceLogById,
   updateMaintenanceLog,
   deleteMaintenanceLog,
-} from "@controllers/maintenanceLogController.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
+} from "@controllers/maintenanceLogController";
+import { asyncHandler, validationHandler } from "@middleware/index";
 import {
   dateValidator,
   floatValidator,
   idValidator,
   stringValidator,
-} from "@middleware/validationHandler.js";
+} from "@middleware/validationHandler";
 
 const router = Router({ mergeParams: true });
 

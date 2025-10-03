@@ -3,7 +3,7 @@ import {
   getAppConfigs,
   getAppConfigByKey,
   updateAppConfig,
-} from "@services/configService.js";
+} from "@services/configService";
 
 export const getConfig = async (_: Request, res: Response) => {
   const config = await getAppConfigs();

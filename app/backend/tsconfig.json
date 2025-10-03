@@ -12,8 +12,8 @@
     "allowJs": true,
     // "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "nodenext",
-    "module": "nodenext",
+    "moduleResolution": "bundler",
+    "module": "preserve",
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "paths": {

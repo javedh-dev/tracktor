@@ -6,5 +6,5 @@ export const appAsciiArt = `
                      \\__/_/   \\__,_/\\___/_/|_|\\__/\\____/_/         
 `;
 
-export { env, validateEnvironment } from "./env.js";
-export { default as logger } from "./logger.js";
+export { env, validateEnvironment } from "./env";
+export { default as logger } from "./logger";

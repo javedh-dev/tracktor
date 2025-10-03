@@ -1,4 +1,4 @@
-import { env } from "@utils/env.js";
+import { env } from "@utils/env";
 import cors from "cors";
 
 export default cors({

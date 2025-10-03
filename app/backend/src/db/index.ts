@@ -1,5 +1,5 @@
 import "dotenv/config";
-import * as schema from "@db/schema/index.js";
+import * as schema from "@db/schema/index";
 import { drizzle } from "drizzle-orm/libsql";
 
 const db = drizzle({

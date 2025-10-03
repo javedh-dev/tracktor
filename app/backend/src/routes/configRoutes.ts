@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getConfig, getConfigByKey, updateConfig } from "@controllers/index.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
+import { getConfig, getConfigByKey, updateConfig } from "@controllers/index";
+import { asyncHandler, validationHandler } from "@middleware/index";
 import { body } from "express-validator";
-import { stringValidator } from "@middleware/validationHandler.js";
+import { stringValidator } from "@middleware/validationHandler";
 
 const router = Router();
 

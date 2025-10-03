@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { verifyPin, getPinStatus } from "@controllers/pinController.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
-import { stringValidator } from "@middleware/validationHandler.js";
+import { verifyPin, getPinStatus } from "@controllers/pinController";
+import { asyncHandler, validationHandler } from "@middleware/index";
+import { stringValidator } from "@middleware/validationHandler";
 
 const router = Router();
 

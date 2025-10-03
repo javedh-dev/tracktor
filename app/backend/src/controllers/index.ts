@@ -1,1 +1,1 @@
-export { getConfig, getConfigByKey, updateConfig } from "./configController.js";
+export { getConfig, getConfigByKey, updateConfig } from "./configController";

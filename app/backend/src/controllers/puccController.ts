@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as pollutionCertificateService from "@services/pollutionCertificateService.js";
+import * as pollutionCertificateService from "@services/pollutionCertificateService";
 
 export const addPollutionCertificate = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;

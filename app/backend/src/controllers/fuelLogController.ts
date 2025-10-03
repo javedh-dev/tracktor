@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as fuelLogService from "@services/fuelLogService.js";
+import * as fuelLogService from "@services/fuelLogService";
 
 export const addFuelLog = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;

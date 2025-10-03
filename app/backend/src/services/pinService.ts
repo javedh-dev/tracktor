@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import { AuthError } from "@exceptions/AuthError.js";
-import { Status } from "@exceptions/ServiceError.js";
-import * as schema from "@db/schema/index.js";
-import { db } from "@db/index.js";
+import { AuthError } from "@exceptions/AuthError";
+import { Status } from "@exceptions/ServiceError";
+import * as schema from "@db/schema/index";
+import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 
 export const setPin = async (pin: string) => {
@@ -37,7 +37,7 @@ export const verifyPin = async (pin: string) => {
   } else {
     throw new AuthError(
       "Incorrect PIN provided. Please try again with correct PIN",
-      Status.UNAUTHORIZED,
+      Status.UNAUTHORIZED
     );
   }
 };

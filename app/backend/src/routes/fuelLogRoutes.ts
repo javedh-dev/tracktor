@@ -5,20 +5,20 @@ import {
   getFuelLogById,
   updateFuelLog,
   deleteFuelLog,
-} from "@controllers/fuelLogController.js";
-import { asyncHandler, validationHandler } from "@middleware/index.js";
+} from "@controllers/fuelLogController";
+import { asyncHandler, validationHandler } from "@middleware/index";
 import {
   dateValidator,
   floatValidator,
   idValidator,
-} from "@middleware/validationHandler.js";
+} from "@middleware/validationHandler";
 
 // TODO: Enable by licence plate number
 
 // import {
 //   addFuelLogByLicensePlate,
 //   getFuelLogsByLicensePlate,
-// } from "@services/fuelLogService.js";
+// } from "@services/fuelLogService";
 
 const router = Router({ mergeParams: true });
 

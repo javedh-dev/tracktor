@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { uploadHandler, asyncHandler } from "@middleware/index.js";
+import { uploadHandler, asyncHandler } from "@middleware/index";
 
 const router = Router({ mergeParams: true });
 

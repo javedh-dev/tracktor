@@ -1,8 +1,8 @@
-export { default as authRoutes } from "./authRoutes.js";
-export { default as vehicleRoutes } from "./vehicleRoutes.js";
-export { default as configRoutes } from "./configRoutes.js";
-export { default as fuelLogRotes } from "./fuelLogRoutes.js";
-export { default as insuranceRoutes } from "./insuranceRoutes.js";
-export { default as maintenanceLogRoutes } from "./maintenanceLogRoutes.js";
-export { default as puccRoutes } from "./puccRoutes.js";
-export { default as uploadRoutes } from "./uploadRoutes.js";
+export { default as authRoutes } from "./authRoutes";
+export { default as vehicleRoutes } from "./vehicleRoutes";
+export { default as configRoutes } from "./configRoutes";
+export { default as fuelLogRotes } from "./fuelLogRoutes";
+export { default as insuranceRoutes } from "./insuranceRoutes";
+export { default as maintenanceLogRoutes } from "./maintenanceLogRoutes";
+export { default as puccRoutes } from "./puccRoutes";
+export { default as uploadRoutes } from "./uploadRoutes";

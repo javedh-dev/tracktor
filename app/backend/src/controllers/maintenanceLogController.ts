@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as maintenanceLogService from "@services/maintenanceLogService.js";
+import * as maintenanceLogService from "@services/maintenanceLogService";
 
 export const addMaintenanceLog = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;

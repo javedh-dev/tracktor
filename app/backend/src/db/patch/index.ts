@@ -1,5 +1,5 @@
-import logger from "../../utils/logger.js";
-import { db } from "../index.js";
+import logger from "../../utils/logger";
+import { db } from "../index";
 import { sql } from "drizzle-orm";
 
 /**

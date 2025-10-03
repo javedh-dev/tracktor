@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as pinService from "@services/pinService.js";
+import * as pinService from "@services/pinService";
 
 export const verifyPin = async (req: Request, res: Response) => {
   const { pin } = req.body;

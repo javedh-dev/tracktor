@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { getPinStatus, verifyPin } from "@services/pinService.js";
-import { logger } from "@utils/index.js";
+import { getPinStatus, verifyPin } from "@services/pinService";
+import { logger } from "@utils/index";
 
-const bypassPaths = ["/api/pin/(\\w)+", "/api/upload/(\\w)+"];
+const bypassPaths = ["/api/auth/(\\w)+", "/api/upload/(\\w)+"];
 
 const authHandler = async (req: Request, res: Response, next: NextFunction) => {
-  bypassPaths.forEach((path) => {
+  for (const path of bypassPaths) {
     if (req.path.match(path)) {
       return next();
     }
-  });
+  }
 
   const pin = req.headers["x-user-pin"] as string;
 
