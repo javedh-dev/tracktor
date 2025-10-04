@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../app";
+import { randomUUID } from "crypto";
 
 describe("Vehicle API", () => {
   let vehicleId: number;
@@ -8,7 +9,7 @@ describe("Vehicle API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
-    licensePlate: "ABC123"
+    licensePlate: "ABC123",
   };
 
   describe("POST /api/vehicles", () => {
@@ -16,7 +17,7 @@ describe("Vehicle API", () => {
       const res = await request(app)
         .post("/api/vehicles")
         .send(validVehicleData);
-      
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -25,7 +26,7 @@ describe("Vehicle API", () => {
       expect(res.body.data.model).toBe(validVehicleData.model);
       expect(res.body.data.year).toBe(validVehicleData.year);
       expect(res.body.data.licensePlate).toBe(validVehicleData.licensePlate);
-      
+
       vehicleId = res.body.data.id;
     });
 
@@ -35,10 +36,8 @@ describe("Vehicle API", () => {
         // missing model, year, licensePlate
       };
 
-      const res = await request(app)
-        .post("/api/vehicles")
-        .send(invalidData);
-      
+      const res = await request(app).post("/api/vehicles").send(invalidData);
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -48,13 +47,11 @@ describe("Vehicle API", () => {
         make: "Toyota",
         model: "Camry",
         year: "invalid", // should be number
-        licensePlate: "ABC123"
+        licensePlate: "ABC123",
       };
 
-      const res = await request(app)
-        .post("/api/vehicles")
-        .send(invalidData);
-      
+      const res = await request(app).post("/api/vehicles").send(invalidData);
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -63,7 +60,7 @@ describe("Vehicle API", () => {
   describe("GET /api/vehicles", () => {
     test("should return all vehicles", async () => {
       const res = await request(app).get("/api/vehicles");
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -74,7 +71,7 @@ describe("Vehicle API", () => {
   describe("GET /api/vehicles/:id", () => {
     test("should return specific vehicle by id", async () => {
       const res = await request(app).get(`/api/vehicles/${vehicleId}`);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -82,15 +79,15 @@ describe("Vehicle API", () => {
     });
 
     test("should return 404 for non-existent vehicle", async () => {
-      const res = await request(app).get("/api/vehicles/99999");
-      
+      const res = await request(app).get(`/api/vehicles/${randomUUID()}`);
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate id parameter", async () => {
       const res = await request(app).get("/api/vehicles/invalid");
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -103,13 +100,13 @@ describe("Vehicle API", () => {
         make: "Honda",
         model: "Accord",
         year: 2021,
-        licensePlate: "XYZ789"
+        licensePlate: "XYZ789",
       };
 
-      const res = await request(app)
-        .put("/api/vehicles")
-        .send(updateData);
-      
+      const res = await request(app).put("/api/vehicles").send(updateData);
+
+      console.log(res.body);
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data.make).toBe(updateData.make);
@@ -123,27 +120,23 @@ describe("Vehicle API", () => {
         // missing other required fields
       };
 
-      const res = await request(app)
-        .put("/api/vehicles")
-        .send(invalidData);
-      
+      const res = await request(app).put("/api/vehicles").send(invalidData);
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should return 404 for non-existent vehicle update", async () => {
       const updateData = {
-        id: 99999,
+        id: randomUUID(),
         make: "Honda",
         model: "Accord",
         year: 2021,
-        licensePlate: "XYZ789"
+        licensePlate: "XYZ789",
       };
 
-      const res = await request(app)
-        .put("/api/vehicles")
-        .send(updateData);
-      
+      const res = await request(app).put("/api/vehicles").send(updateData);
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -152,21 +145,21 @@ describe("Vehicle API", () => {
   describe("DELETE /api/vehicles/:id", () => {
     test("should delete vehicle", async () => {
       const res = await request(app).delete(`/api/vehicles/${vehicleId}`);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
     });
 
     test("should return 404 for non-existent vehicle deletion", async () => {
-      const res = await request(app).delete("/api/vehicles/99999");
-      
+      const res = await request(app).delete(`/api/vehicles/${randomUUID()}`);
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate id parameter for deletion", async () => {
       const res = await request(app).delete("/api/vehicles/invalid");
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
