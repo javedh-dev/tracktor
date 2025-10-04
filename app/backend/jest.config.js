@@ -13,11 +13,11 @@ export default {
   testMatch: ["**/__tests__/**/*.test.ts"],
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/__tests__/**"],
   moduleNameMapper: {
-    "^@configs/(.*)$": "<rootDir>/src/configs/$1",
+    "^@config/(.*)$": "<rootDir>/src/config/$1",
     "^@controllers/(.*)$": "<rootDir>/src/controllers/$1",
     "^@db/(.*)$": "<rootDir>/src/db/$1",
     "^@exceptions/(.*)$": "<rootDir>/src/exceptions/$1",
-    "^@middleware/(.*)$": "<rootDir>/src/middleware/$1",
+    "^@middlewares/(.*)$": "<rootDir>/src/middlewares/$1",
     "^@routes/(.*)$": "<rootDir>/src/routes/$1",
     "^@services/(.*)$": "<rootDir>/src/services/$1",
   },

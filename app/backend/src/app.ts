@@ -15,7 +15,7 @@ import {
 import { seedData } from "@db/seeders";
 import { initializePatches } from "@db/patch";
 import { validateEnvironment, env, logger } from "@config/index";
-import { isProduction } from "@config/env";
+import { isProduction, isTest } from "@config/env";
 
 validateEnvironment();
 
@@ -65,11 +65,14 @@ const start = async (app: express.Express) => {
 };
 
 // Apply middlewares
-app.use(corsHandler);
-app.use(rateLimiter);
 app.use(express.json());
 app.use(requestLogger);
-app.use(authHandler);
+
+if (!isTest) {
+  app.use(corsHandler);
+  app.use(rateLimiter);
+  app.use(authHandler);
+}
 
 // Define API routes
 app.use("/api/auth", authRoutes);

@@ -7,20 +7,18 @@
   "author": "Javed Hussain",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV='dev' && tsx --watch index.ts",
-    "build": "NODE_ENV='prod' && tsc && tsc-alias",
-    "preview": "npm run build && npm run start:dev",
-    "start": "node --env-file=../../env/.env.production dist/index",
+    "dev": "NODE_ENV='dev' tsx --watch index.ts",
+    "build": "NODE_ENV='prod' tsc && tsc-alias && tsc-esm-fix ./build/",
+    "start": "NODE_ENV='prod' node build/index.js",
     "db:generate": "NODE_OPTIONS='--import tsx' drizzle-kit generate --custom --name",
-    "db:migrate": "NODE_OPTIONS='--import tsx' drizzle-kit migrate",
-    "db:migrate:dev": "NODE_OPTIONS='--import tsx' --env-file=../../env/.env.development drizzle-kit migrate",
-    "db:migrate:test": "NODE_OPTIONS='--import tsx' --env-file=../../env/.env.test drizzle-kit migrate",
-    "db:migrate:prod": "NODE_OPTIONS='--import tsx' --env-file=../../env/.env.production drizzle-kit migrate",
+    "db:migrate": "NODE_OPTIONS='--import tsx' NODE_ENV='prod' drizzle-kit migrate",
+    "db:migrate:dev": "NODE_OPTIONS='--import tsx' NODE_ENV='dev' drizzle-kit migrate",
+    "db:migrate:test": "NODE_OPTIONS='--import tsx' NODE_ENV='test' drizzle-kit migrate",
     "format": "(eslint --fix . || true) && prettier --write .",
     "lint": "eslint . && prettier --check .",
-    "clean": "rm -rf dist && rm -rf tracktor.db tracktor-test.db",
+    "clean": "rm -rf build *.db uploads logs",
     "reset": "npm run clean && rm -rf tracktor.db tracktor-test.db node_modules && npm install",
-    "test": "npm run db:migrate:test && NODE_OPTIONS='--import tsx'  jest --env-file=../../env/.env.test --passWithNoTests"
+    "test": "npm run db:migrate:test && jest  --passWithNoTests"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
@@ -58,6 +56,7 @@
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.4",
     "tsc-alias": "^1.8.16",
+    "tsc-esm-fix": "^3.1.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }

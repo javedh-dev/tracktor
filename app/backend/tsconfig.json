@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "esnext",
     "rootDir": ".",
     "outDir": "./build",
     "esModuleInterop": true,
@@ -12,7 +12,7 @@
     "allowJs": true,
     // "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node10",
     "module": "esnext",
     "noUncheckedIndexedAccess": true,
     "declaration": true,
