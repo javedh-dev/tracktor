@@ -4,8 +4,11 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
+		"dev": "vite dev --mode development",
+		"dev:test": "vite dev --mode test",
+		"build": "vite build --mode production",
+		"build:dev": "vite build --mode development",
+		"build:test": "vite build --mode test",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

@@ -37,8 +37,8 @@ export default [
     ignores: [
       "node_modules/",
       "dist/",
-      "*.config.js",
-      "*.config.ts",
+      // "*.config.js",
+      // "*.config.ts",
       "**/*.test.{js,ts}",
     ],
   },

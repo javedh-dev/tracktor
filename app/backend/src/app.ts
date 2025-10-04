@@ -1,24 +1,29 @@
 import express from "express";
-import { authRoutes, vehicleRoutes, configRoutes, uploadRoutes } from "@routes";
+import {
+  authRoutes,
+  vehicleRoutes,
+  configRoutes,
+  uploadRoutes,
+} from "@routes/index";
 import {
   errorHandler,
   corsHandler,
   rateLimiter,
   requestLogger,
   authHandler,
-} from "@middleware";
+} from "@middlewares/index";
 import { seedData } from "@db/seeders";
 import { initializePatches } from "@db/patch";
-import { appAsciiArt, validateEnvironment, env, logger } from "@utils";
+import { validateEnvironment, env, logger } from "@config/index";
+import { isProduction } from "@config/env";
 
-logger.info(appAsciiArt);
 validateEnvironment();
 
 const app = express();
 
 const frontendHandler = async () => {
   // Serve frontend using vite in development and static files in production
-  if (env.ENVIRONMENT === "production") {
+  if (isProduction) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const { handler } = await import("../frontend/handler");
@@ -33,7 +38,7 @@ const frontendHandler = async () => {
 const startupCallback = () => {
   logger.info("─".repeat(75));
   logger.info(`Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`);
-  logger.info(`Environment: ${env.ENVIRONMENT}`);
+  logger.info(`Environment: ${env.NODE_ENV}`);
   logger.info(`Database: ${env.DATABASE_PATH}`);
   logger.info(`Log Level: ${env.LOG_LEVEL}`);
   // logger.info(`App Version: ${env.APP_VERSION}`);

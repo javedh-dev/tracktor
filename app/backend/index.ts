@@ -1,4 +1,5 @@
-import app, { start } from "./src/app.js";
+import app, { start } from "./src/app";
+import { appAsciiArt, logger } from "@config/index";
 
-// Start the server
+logger.info(appAsciiArt);
 start(app);

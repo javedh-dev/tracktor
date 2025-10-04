@@ -1,4 +1,4 @@
-import { env } from "@utils/env";
+import { env } from "@config/index";
 import cors from "cors";
 
 export default cors({

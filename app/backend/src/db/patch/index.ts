@@ -1,5 +1,5 @@
-import logger from "../../utils/logger";
-import { db } from "../index";
+import { logger } from "@config/index";
+import { db } from "@db/index";
 import { sql } from "drizzle-orm";
 
 /**
@@ -26,7 +26,7 @@ async function addFuelLogColumns(): Promise<void> {
   try {
     // First check if the fuel_logs table exists
     const tableExists = await db.all(sql`
-      SELECT name FROM sqlite_master 
+      SELECT name FROM sqlite_master
       WHERE type='table' AND name='fuel_logs'
     `);
 
@@ -48,7 +48,7 @@ async function addFuelLogColumns(): Promise<void> {
       logger.info("Adding 'filled' column to fuel_logs table...");
       try {
         await db.run(sql`
-          ALTER TABLE fuel_logs 
+          ALTER TABLE fuel_logs
           ADD COLUMN filled INTEGER DEFAULT 1 NOT NULL
         `);
         logger.info("Successfully added 'filled' column");
@@ -71,7 +71,7 @@ async function addFuelLogColumns(): Promise<void> {
       logger.info("Adding 'missed_last' column to fuel_logs table...");
       try {
         await db.run(sql`
-          ALTER TABLE fuel_logs 
+          ALTER TABLE fuel_logs
           ADD COLUMN missed_last INTEGER DEFAULT 0 NOT NULL
         `);
         logger.info("Successfully added 'missed_last' column");

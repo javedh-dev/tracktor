@@ -1,11 +1,11 @@
-import logger from "@utils/logger";
+import { logger } from "@config/index";
 import { Request, Response, NextFunction } from "express";
 
 const errorHandler = (
   err: any,
   req: Request,
   res: Response,
-  _: NextFunction
+  _: NextFunction,
 ) => {
   logger.error(`Error in ${req.method} - ${req.path}`, err);
 

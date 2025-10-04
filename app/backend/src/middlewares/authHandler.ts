@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getPinStatus, verifyPin } from "@services/pinService";
-import { logger } from "@utils/index";
+import { logger } from "@config/index";
 
 const bypassPaths = ["/api/auth/(\\w)+", "/api/upload/(\\w)+"];
 

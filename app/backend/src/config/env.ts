@@ -1,14 +1,14 @@
 import { config } from "dotenv";
 import { resolve } from "path";
 import logger from "./logger";
-import { accessSync, constants } from "fs";
+import { accessSync } from "fs";
+import { constants } from "fs/promises";
 
-// Load environment variables from root directory
-config({
-  path: resolve(process.cwd(), "../../.env"),
-  override: true,
-  quiet: true,
-});
+// Load environment variables based on NODE_ENV
+const nodeEnv = process.env.NODE_ENV || "dev";
+const envPath = resolve(process.cwd(), "../../env", `.env.${nodeEnv}`);
+
+config({ path: envPath });
 
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;
@@ -23,19 +23,23 @@ const getOrigins = (): string[] => {
 };
 
 export const env = {
-  ENVIRONMENT: process.env.NODE_ENV || "development",
-  SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
-  AUTH_PIN: process.env.AUTH_PIN || "123456",
-  SERVER_PORT: Number(process.env.SERVER_PORT) || 3000,
+  NODE_ENV: process.env.NODE_ENV || "dev",
+  SERVER_HOST: process.env.SERVER_HOST || "localhost",
+  SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
   DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
-  UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
-  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
-  FORCE_SEED: process.env.FORCE_SEED === "true",
+  UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
+  AUTH_PIN: process.env.AUTH_PIN || "123456",
   CORS_ORIGINS: getOrigins(),
-  LOG_LEVEL: process.env.LOG_LEVEL || "info",
+  FORCE_DATA_SEED: process.env.FORCE_DATA_SEED === "true",
+  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
+  LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_DIR: process.env.LOG_DIR || "./logs",
 } as const;
+
+export const isDevelopment = env.NODE_ENV === "development";
+export const isProduction = env.NODE_ENV === "production";
+export const isTest = env.NODE_ENV === "test";
 
 /**
  * Validate required environment variables
@@ -47,7 +51,7 @@ export function validateEnvironment(): void {
 
   if (missing.length > 0) {
     logger.error(
-      `Missing required environment variables: ${missing.join(", ")}`
+      `Missing required environment variables: ${missing.join(", ")}`,
     );
     process.exit(1);
   }
@@ -66,7 +70,7 @@ export function validateEnvironment(): void {
     process.exit(1);
   }
 
-  if (env.DEMO_MODE && env.FORCE_SEED) {
+  if (env.DEMO_MODE && env.FORCE_DATA_SEED) {
     logger.warn("Running in FORCE_SEED mode. All data will be reset.");
   }
 
@@ -76,19 +80,19 @@ export function validateEnvironment(): void {
     } catch (err) {
       logger.error(
         `DATABASE_PATH "${env.DATABASE_PATH}" does not exist or is not writable`,
-        err
+        err,
       );
       process.exit(1);
     }
   }
 
-  if (env.UPLOAD_DIR) {
+  if (env.UPLOADS_DIR) {
     try {
-      accessSync(env.UPLOAD_DIR, constants.F_OK | constants.W_OK);
+      accessSync(env.UPLOADS_DIR, constants.F_OK | constants.W_OK);
     } catch (err) {
       logger.error(
-        `UPLOAD_DIR "${env.UPLOAD_DIR}" does not exist or is not writable`,
-        err
+        `UPLOADS_DIR "${env.UPLOADS_DIR}" does not exist or is not writable`,
+        err,
       );
       process.exit(1);
     }

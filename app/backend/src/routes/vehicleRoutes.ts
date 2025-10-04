@@ -6,7 +6,7 @@ import {
   updateVehicle,
   deleteVehicle,
 } from "@controllers/vehicleController";
-import { asyncHandler, validationHandler } from "@middleware/index";
+import { asyncHandler, validationHandler } from "../middlewares/index";
 import fuelLogRoutes from "./fuelLogRoutes";
 import insuranceRoutes from "./insuranceRoutes";
 import maintenanceLogRoutes from "./maintenanceLogRoutes";
@@ -15,7 +15,7 @@ import {
   idValidator,
   numberValidator,
   stringValidator,
-} from "@middleware/validationHandler";
+} from "../middlewares/validationHandler";
 
 const router = Router();
 

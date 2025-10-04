@@ -7,13 +7,26 @@ export default defineConfig(({ mode }) => {
 	// Load env file from root directory
 	console.log('Running in mode : ', mode);
 	const env = loadEnv(mode, resolve(process.cwd(), '../../'), '');
+
+	// Determine API URL for proxy based on environment
+	const getApiUrl = () => {
+		switch (mode) {
+			case 'test':
+				return 'http://localhost:3001';
+			case 'production':
+				return env.VITE_API_URL || 'https://api.yourdomain.com';
+			default:
+				return 'http://localhost:3000';
+		}
+	};
+
 	return {
 		plugins: [tailwindcss(), sveltekit()],
 		server: {
 			port: Number(env.CLIENT_PORT) || 5173,
 			host: env.CLIENT_HOST || '0.0.0.0',
 			proxy: {
-				'/api': `http://localhost:3000`
+				'/api': getApiUrl()
 			}
 		},
 		envDir: resolve(process.cwd(), '../../'),

@@ -6,12 +6,12 @@ import {
   updateFuelLog,
   deleteFuelLog,
 } from "@controllers/fuelLogController";
-import { asyncHandler, validationHandler } from "@middleware/index";
+import { asyncHandler, validationHandler } from "../middlewares/index";
 import {
   dateValidator,
   floatValidator,
   idValidator,
-} from "@middleware/validationHandler";
+} from "../middlewares/validationHandler";
 
 // TODO: Enable by licence plate number
 

@@ -5,12 +5,12 @@ import {
   updatePollutionCertificate,
   deletePollutionCertificate,
 } from "@controllers/puccController";
-import { asyncHandler, validationHandler } from "@middleware/index";
+import { asyncHandler, validationHandler } from "../middlewares/index";
 import {
   dateValidator,
   idValidator,
   stringValidator,
-} from "@middleware/validationHandler";
+} from "../middlewares/validationHandler";
 
 const router = Router({ mergeParams: true });
 

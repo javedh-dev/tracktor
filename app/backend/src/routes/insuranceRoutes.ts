@@ -5,13 +5,13 @@ import {
   updateInsurance,
   deleteInsurance,
 } from "@controllers/insuranceController";
-import { asyncHandler, validationHandler } from "@middleware/index";
+import { asyncHandler, validationHandler } from "../middlewares/index";
 import {
   dateValidator,
   floatValidator,
   idValidator,
   stringValidator,
-} from "@middleware/validationHandler";
+} from "../middlewares/validationHandler";
 
 const router = Router({ mergeParams: true });
 

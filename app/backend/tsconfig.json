@@ -13,28 +13,19 @@
     // "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "bundler",
-    "module": "preserve",
+    "module": "esnext",
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "paths": {
-      "@utils": ["./src/utils"],
-      "@utils/*": ["./src/utils/*"],
-      "@controllers": ["./src/controllers"],
+      "@config/*": ["./src/config/*"],
       "@controllers/*": ["./src/controllers/*"],
-      "@db": ["./src/db"],
       "@db/*": ["./src/db/*"],
-      "@exceptions": ["./src/exceptions"],
       "@exceptions/*": ["./src/exceptions/*"],
-      "@routes": ["./src/routes"],
+      "@middlewares/*": ["./src/middlewares/*"],
       "@routes/*": ["./src/routes/*"],
-      "@services": ["./src/services"],
-      "@services/*": ["./src/services/*"],
-      "@middleware": ["./src/middleware"],
-      "@middleware/*": ["./src/middleware/*"],
-      "@frontend": ["./frontend"],
-      "@frontend/*": ["./frontend/*"]
+      "@services/*": ["./src/services/*"]
     }
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "drizzle.config.js"],
   "exclude": ["node_modules", "./build"]
 }

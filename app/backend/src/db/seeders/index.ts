@@ -10,7 +10,7 @@ import {
 import { db } from "@db/index";
 import { faker } from "@faker-js/faker";
 import { configDotenv } from "dotenv";
-import logger from "../../utils/logger";
+import { logger } from "@config/index";
 
 configDotenv();
 
@@ -18,6 +18,7 @@ export const seedData = async () => {
   const pinEnv = process.env.AUTH_PIN || "";
   const enforceEnv = process.env.FORCE_DEMO_SEED_DATA || "false";
   const demoMode = process.env.PUBLIC_DEMO_MODE || "false";
+  const nodeEnv = process.env.NODE_ENV || "development";
 
   logger.info("Seeding data ", {
     FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA,
@@ -26,7 +27,8 @@ export const seedData = async () => {
 
   if (demoMode === "false" && pinEnv.trim().length == 6)
     await seedAuthPin(pinEnv);
-  if (demoMode === "true") await seedDemoData(enforceEnv === "true");
+  if (demoMode === "true" && nodeEnv !== "test")
+    await seedDemoData(enforceEnv === "true");
 };
 
 const seedAuthPin = async (pin: string) => {

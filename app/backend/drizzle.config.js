@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { env } from "@config/env";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
@@ -10,7 +10,7 @@ export default defineConfig({
   schema: "./src/db/schema",
   dialect: "sqlite",
   dbCredentials: {
-    url: `file:${process.env.DB_PATH! || "./tracktor.db"}`,
+    url: `file:${env.DATABASE_PATH || "./tracktor.db"}`,
   },
   casing: "snake_case",
 });

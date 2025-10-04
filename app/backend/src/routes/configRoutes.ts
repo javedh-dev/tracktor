@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { getConfig, getConfigByKey, updateConfig } from "@controllers/index";
-import { asyncHandler, validationHandler } from "@middleware/index";
+import { asyncHandler, validationHandler } from "../middlewares/index";
 import { body } from "express-validator";
-import { stringValidator } from "@middleware/validationHandler";
+import { stringValidator } from "../middlewares/validationHandler";
 
 const router = Router();
 
