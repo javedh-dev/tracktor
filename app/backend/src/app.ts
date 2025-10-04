@@ -11,6 +11,7 @@ import {
   rateLimiter,
   requestLogger,
   authHandler,
+  jsonHandler,
 } from "@middlewares/index";
 import { seedData } from "@db/seeders";
 import { initializePatches } from "@db/patch";
@@ -65,13 +66,13 @@ const start = async (app: express.Express) => {
 };
 
 // Apply middlewares
-app.use(express.json());
+app.use(jsonHandler);
 app.use(requestLogger);
+app.use(authHandler);
 
 if (!isTest) {
   app.use(corsHandler);
   app.use(rateLimiter);
-  app.use(authHandler);
 }
 
 // Define API routes

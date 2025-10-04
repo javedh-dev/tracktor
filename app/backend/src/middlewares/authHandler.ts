@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { getPinStatus, verifyPin } from "@services/pinService";
-import { logger } from "@config/index";
+import { getPinStatus, verifyPin } from "@services/authService";
+import { AppError, Status } from "@exceptions/AppError";
 
 const bypassPaths = ["/api/auth/(\\w)+", "/api/upload/(\\w)+"];
 
@@ -14,28 +14,21 @@ const authHandler = async (req: Request, res: Response, next: NextFunction) => {
   const pin = req.headers["x-user-pin"] as string;
 
   if (!pin) {
-    logger.error("No PIN provided in request headers.");
-    return res
-      .status(401)
-      .json({ message: "PIN is required in X-User-PIN header." });
+    throw new AppError(
+      "PIN is required in X-User-PIN header.",
+      Status.BAD_REQUEST,
+    );
   }
 
-  try {
-    const user = await getPinStatus();
-    if (!user.exists) {
-      logger.error("PIN is not set. Access denied.");
-      return res
-        .status(401)
-        .json({ message: "PIN is not set. Please set the PIN first." });
-    }
-    await verifyPin(pin);
-    next();
-  } catch (error: any) {
-    logger.error("PIN authentication failed:", error.message);
-    return res
-      .status(500)
-      .json({ message: "Error authenticating PIN.", error: error.message });
+  const user = await getPinStatus();
+  if (!user.data.exists) {
+    throw new AppError(
+      "PIN is not set. Please set the PIN first.",
+      Status.BAD_REQUEST,
+    );
   }
+  await verifyPin(pin);
+  next();
 };
 
 export default authHandler;

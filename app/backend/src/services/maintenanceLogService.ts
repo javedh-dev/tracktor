@@ -1,21 +1,19 @@
-import { MaintenanceLogError } from "@exceptions/MaintenanceLogError";
-import { Status } from "@exceptions/ServiceError";
-import { VehicleError } from "@exceptions/VehicleError";
+import { AppError, Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 
 export const addMaintenanceLog = async (
   vehicleId: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
   });
   if (!vehicle) {
-    throw new VehicleError(
+    throw new AppError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
 
@@ -46,9 +44,9 @@ export const getMaintenanceLogById = async (id: string) => {
     where: (logs, { eq }) => eq(logs.id, id),
   });
   if (!maintenanceLog) {
-    throw new MaintenanceLogError(
+    throw new AppError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return maintenanceLog;
@@ -56,7 +54,7 @@ export const getMaintenanceLogById = async (id: string) => {
 
 export const updateMaintenanceLog = async (
   id: string,
-  maintenanceLogData: any
+  maintenanceLogData: any,
 ) => {
   await getMaintenanceLogById(id);
   await db
@@ -74,9 +72,9 @@ export const deleteMaintenanceLog = async (id: string) => {
     .where(eq(schema.maintenanceLogTable.id, id))
     .returning();
   if (result.length === 0) {
-    throw new MaintenanceLogError(
+    throw new AppError(
       `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return { message: "Maintenance log deleted successfully." };

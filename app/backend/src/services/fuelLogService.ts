@@ -1,6 +1,4 @@
-import { FuelLogError } from "@exceptions/FuelLogError";
-import { Status } from "@exceptions/ServiceError";
-import { VehicleError } from "@exceptions/VehicleError";
+import { AppError, Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
@@ -10,9 +8,9 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
     where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
   });
   if (!vehicle) {
-    throw new VehicleError(
+    throw new AppError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   const fuelLog = await db
@@ -82,10 +80,7 @@ export const getFuelLogById = async (id: string) => {
   });
 
   if (!fuelLog) {
-    throw new FuelLogError(
-      `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND
-    );
+    throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
   return fuelLog;
 };
@@ -93,7 +88,7 @@ export const getFuelLogById = async (id: string) => {
 export const updateFuelLog = async (
   vehicleId: string,
   id: string,
-  fuelLogData: any
+  fuelLogData: any,
 ) => {
   getFuelLogById(id);
   await db
@@ -111,25 +106,22 @@ export const deleteFuelLog = async (id: string) => {
     .where(eq(schema.fuelLogTable.id, id))
     .returning();
   if (result.length === 0) {
-    throw new FuelLogError(
-      `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND
-    );
+    throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
   return { message: "Fuel log deleted successfully." };
 };
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
-  fuelLogData: any
+  fuelLogData: any,
 ) => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
   if (!vehicle) {
-    throw new VehicleError(
+    throw new AppError(
       `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return await addFuelLog(vehicle.id, fuelLogData);
@@ -140,9 +132,9 @@ export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
   if (!vehicle) {
-    throw new VehicleError(
+    throw new AppError(
       `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   return await getFuelLogs(vehicle.id);

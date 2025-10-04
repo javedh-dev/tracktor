@@ -8,7 +8,7 @@ import { constants } from "fs/promises";
 const nodeEnv = process.env.NODE_ENV || "dev";
 const envPath = resolve(process.cwd(), "../../env", `.env.${nodeEnv}`);
 
-config({ path: envPath });
+config({ path: envPath, quiet: true, override: true });
 
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;

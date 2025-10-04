@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "./app/common",
     "./app/frontend",
     "./app/backend"
   ],

@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
-import { AuthError } from "@exceptions/AuthError";
-import { Status } from "@exceptions/ServiceError";
+import { AppError } from "@exceptions/AppError";
+import { Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
+import { type ApiResponse } from "@tracktor/common";
 
 export const setPin = async (pin: string) => {
   const hash = await bcrypt.hash(pin, 10);
@@ -24,27 +25,38 @@ export const setPin = async (pin: string) => {
   }
 };
 
-export const verifyPin = async (pin: string) => {
+export const verifyPin = async (pin: string): Promise<ApiResponse> => {
   const auth = await db.query.authTable.findFirst({
     where: (auth, { eq }) => eq(auth.id, 1),
   });
   if (!auth) {
-    throw new AuthError("PIN is not set yet. Please set PIN first.");
+    throw new AppError(
+      "PIN is not set yet. Please set PIN first.",
+      Status.BAD_REQUEST,
+    );
   }
   const match = await bcrypt.compare(pin, auth.hash);
   if (match) {
-    return { message: "PIN verified successfully." };
+    return {
+      data: { message: "PIN verified successfully." },
+      success: true,
+    };
   } else {
-    throw new AuthError(
+    throw new AppError(
       "Incorrect PIN provided. Please try again with correct PIN",
-      Status.UNAUTHORIZED
+      Status.UNAUTHORIZED,
     );
   }
 };
 
-export const getPinStatus = async () => {
+export const getPinStatus = async (): Promise<ApiResponse> => {
   const auth = await db.query.authTable.findFirst({
     where: (auth, { eq }) => eq(auth.id, 1),
   });
-  return { exists: !!auth };
+  return {
+    data: {
+      exists: !!auth,
+    },
+    success: true,
+  };
 };

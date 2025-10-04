@@ -22,11 +22,13 @@ cd app/backend || exit
 rm -rf node_modules
 rm -rf dist
 rm -rf build
+npm run clean
 
 cd ../..
 cd app/frontend || exit
 rm -rf node_modules
 rm -rf dist
 rm -rf build
+npm run clean
 cd ../..
 log_success "Backend and frontend directories cleaned"

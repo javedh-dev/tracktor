@@ -1,5 +1,5 @@
-import { Status } from "@exceptions/ServiceError";
-import { VehicleError } from "@exceptions/VehicleError";
+import { Status } from "@exceptions/AppError";
+import { AppError } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
@@ -102,7 +102,7 @@ export const getAllVehicles = async () => {
         },
       });
       return { vehicleId: vehicle.id, latestOdometer: latestLog?.odometer };
-    })
+    }),
   );
 
   // Calculate overall mileage for each vehicle
@@ -110,18 +110,18 @@ export const getAllVehicles = async () => {
     vehicles.map(async (vehicle) => ({
       vehicleId: vehicle.id,
       overallMileage: await calculateOverallMileage(vehicle.id),
-    }))
+    })),
   );
 
   return vehicles.map((vehicle) => {
     // Find insurance status
     const vehicleInsurances = activeInsurances.filter(
-      (insurance) => insurance.vehicleId === vehicle.id
+      (insurance) => insurance.vehicleId === vehicle.id,
     );
     let insuranceStatus = "Not Available";
     if (vehicleInsurances.length > 0) {
       insuranceStatus = vehicleInsurances.some(
-        (insurance) => new Date(insurance.endDate) > today
+        (insurance) => new Date(insurance.endDate) > today,
       )
         ? "Active"
         : "Expired";
@@ -129,12 +129,12 @@ export const getAllVehicles = async () => {
 
     // Find PUCC status
     const vehiclePollutionCerts = activePollutionCertificates.filter(
-      (pucc) => pucc.vehicleId === vehicle.id
+      (pucc) => pucc.vehicleId === vehicle.id,
     );
     let puccStatus = "Not Available";
     if (vehiclePollutionCerts.length > 0) {
       puccStatus = vehiclePollutionCerts.some(
-        (pucc) => new Date(pucc.expiryDate) > today
+        (pucc) => new Date(pucc.expiryDate) > today,
       )
         ? "Active"
         : "Expired";
@@ -142,7 +142,7 @@ export const getAllVehicles = async () => {
 
     // Get current odometer and overall mileage
     const latestFuelLog = latestFuelLogs.find(
-      (log) => log.vehicleId === vehicle.id
+      (log) => log.vehicleId === vehicle.id,
     );
     const mileageData = vehicleMileages.find((m) => m.vehicleId === vehicle.id);
 
@@ -171,7 +171,7 @@ export const getVehicleById = async (id: string) => {
     where: (vehicles, { eq }) => eq(vehicles.id, id),
   });
   if (!vehicle) {
-    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
+    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
 
   // Get current odometer from latest fuel log
@@ -212,7 +212,7 @@ export const deleteVehicle = async (id: string) => {
     .where(eq(schema.vehicleTable.id, id))
     .returning();
   if (result.length === 0) {
-    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
+    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
   return { message: "Vehicle deleted successfully." };
 };

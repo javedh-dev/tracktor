@@ -1,21 +1,19 @@
-import { PollutionCertificateError } from "@exceptions/PollutionCertificateError";
-import { Status } from "@exceptions/ServiceError";
-import { VehicleError } from "@exceptions/VehicleError";
+import { AppError, Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 
 export const addPollutionCertificate = async (
   vehicleId: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: any,
 ) => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
   });
   if (!vehicle) {
-    throw new VehicleError(
+    throw new AppError(
       `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND
+      Status.NOT_FOUND,
     );
   }
   const pollutionCertificate = await db
@@ -43,7 +41,7 @@ export const getPollutionCertificates = async (vehicleId: string) => {
 export const updatePollutionCertificate = async (
   vehicleId: string,
   id: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: any,
 ) => {
   const pollutionCertificate =
     await db.query.pollutionCertificateTable.findFirst({
@@ -51,10 +49,7 @@ export const updatePollutionCertificate = async (
         and(eq(certificates.vehicleId, vehicleId), eq(certificates.id, id)),
     });
   if (!pollutionCertificate) {
-    throw new PollutionCertificateError(
-      `No PUCC found for id : ${id}`,
-      Status.NOT_FOUND
-    );
+    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
   }
 
   await db
@@ -72,10 +67,7 @@ export const deletePollutionCertificate = async (id: string) => {
     .where(eq(schema.pollutionCertificateTable.id, id))
     .returning();
   if (result.length === 0) {
-    throw new PollutionCertificateError(
-      `No PUCC found for id : ${id}`,
-      Status.NOT_FOUND
-    );
+    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
   }
   return { message: "Pollution certificate deleted successfully." };
 };

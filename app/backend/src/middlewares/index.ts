@@ -7,3 +7,4 @@ export { default as requestLogger } from "./requestLogger";
 export { default as uploadHandler } from "./uploadHandler";
 export { default as authHandler } from "./authHandler";
 export { default as validationHandler } from "./validationHandler";
+export { default as jsonHandler } from "./jsonHandler";

@@ -1,3 +1,4 @@
+import { AppValidationError } from "@exceptions/AppValidationError";
 import { NextFunction, Request, Response } from "express";
 import { body, buildCheckFunction, ValidationChain } from "express-validator";
 
@@ -7,7 +8,7 @@ const validationHandler = (validations: ValidationChain[]) => {
     for (const validation of validations) {
       const result = await validation.run(req);
       if (!result.isEmpty()) {
-        return res.status(400).json({ errors: result.array() });
+        throw new AppValidationError(result.array());
       }
     }
 

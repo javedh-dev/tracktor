@@ -9,26 +9,18 @@ import {
 } from "@db/schema/index";
 import { db } from "@db/index";
 import { faker } from "@faker-js/faker";
-import { configDotenv } from "dotenv";
-import { logger } from "@config/index";
-
-configDotenv();
+import { env, logger } from "@config/index";
 
 export const seedData = async () => {
-  const pinEnv = process.env.AUTH_PIN || "";
-  const enforceEnv = process.env.FORCE_DEMO_SEED_DATA || "false";
-  const demoMode = process.env.PUBLIC_DEMO_MODE || "false";
-  const nodeEnv = process.env.NODE_ENV || "development";
-
   logger.info("Seeding data ", {
     FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA,
     PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
   });
 
-  if (demoMode === "false" && pinEnv.trim().length == 6)
-    await seedAuthPin(pinEnv);
-  if (demoMode === "true" && nodeEnv !== "test")
-    await seedDemoData(enforceEnv === "true");
+  if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6)
+    await seedAuthPin(env.AUTH_PIN.trim());
+  if (env.DEMO_MODE && env.NODE_ENV !== "test")
+    await seedDemoData(env.FORCE_DATA_SEED);
 };
 
 const seedAuthPin = async (pin: string) => {

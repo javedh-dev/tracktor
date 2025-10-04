@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { AppError, Status } from "@exceptions/AppError";
 
 // Ensure uploads directory exists
 const uploadsDir = process.env.UPLOAD_DIR || "./uploads";
@@ -29,7 +30,7 @@ export const uploadHandler = multer({
     // Allow common image and document types
     const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt/;
     const extname = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase()
+      path.extname(file.originalname).toLowerCase(),
     );
     const mimetype = allowedTypes.test(file.mimetype);
 
@@ -37,7 +38,10 @@ export const uploadHandler = multer({
       return cb(null, true);
     } else {
       cb(
-        new Error("Invalid file type. Only images and documents are allowed.")
+        new AppError(
+          "Invalid file type. Only images and documents are allowed.",
+          Status.BAD_REQUEST,
+        ),
       );
     }
   },

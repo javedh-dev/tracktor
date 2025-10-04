@@ -1,8 +1,11 @@
 import { logger } from "@config/index";
+import { AppError, Status } from "@exceptions/AppError";
+import { AppValidationError } from "@exceptions/AppValidationError";
+import { ApiResponse } from "@tracktor/common";
 import { Request, Response, NextFunction } from "express";
 
 const errorHandler = (
-  err: any,
+  err: Error,
   req: Request,
   res: Response,
   _: NextFunction,
@@ -12,33 +15,30 @@ const errorHandler = (
   res.setHeader("Content-Type", "application/json");
 
   let statusCode = 500;
-  let body = {};
+  let body: ApiResponse;
 
   switch (err.name) {
-    case "SequelizeValidationError":
-      statusCode = 400;
+    case "AppValidationError":
+      statusCode = Status.BAD_REQUEST;
       body = {
-        type: "ValidationError",
-        errors: err.errors.map((e: any) => ({
-          message: e.message,
-          path: e.path,
-        })),
+        success: false,
+        errors: (err as AppValidationError).errors,
+        message: err.message,
       };
       break;
-    case "AuthError":
-      // Use the status from the error if available, otherwise default to 500
-      statusCode = err.status || 500;
+    case "AppError":
+      statusCode = (err as AppError).status;
       body = {
-        type: "AuthError",
-        errors: [{ message: err.message }],
+        success: false,
+        errors: [err],
+        message: err.message,
       };
       break;
     default:
-      // Check if error has a status property
-      statusCode = err.status || err.statusCode || 500;
       body = {
-        type: err.name || "Error",
-        errors: [{ message: err.message || "Internal server error" }],
+        success: false,
+        errors: [err],
+        message: err.message,
       };
   }
 

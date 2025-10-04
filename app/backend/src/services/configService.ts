@@ -1,5 +1,5 @@
-import { ConfigError } from "@exceptions/ConfigError";
-import { Status } from "@exceptions/ServiceError";
+import { AppError } from "@exceptions/AppError";
+import { Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
@@ -17,16 +17,16 @@ export const getAppConfigByKey = async (key: string) => {
     where: (configs, { eq }) => eq(configs.key, key),
   });
   if (!config) {
-    throw new ConfigError(`No config found for key : ${key}`, Status.NOT_FOUND);
+    throw new AppError(`No config found for key : ${key}`, Status.NOT_FOUND);
   }
   return config;
 };
 
 export const updateAppConfig = async (key: string, value: string) => {
   if (!key || value === undefined) {
-    throw new ConfigError(
+    throw new AppError(
       "Key and value are required for each configuration",
-      Status.BAD_REQUEST
+      Status.BAD_REQUEST,
     );
   }
   const config = await getAppConfigByKey(key);
