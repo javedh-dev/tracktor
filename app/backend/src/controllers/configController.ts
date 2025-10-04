@@ -6,8 +6,8 @@ import {
 } from "@services/configService";
 
 export const getConfig = async (_: Request, res: Response) => {
-  const config = await getAppConfigs();
-  res.status(200).json(config);
+  const configs = await getAppConfigs();
+  res.status(200).json(configs);
 };
 
 export const getConfigByKey = async (req: Request, res: Response) => {
@@ -18,11 +18,6 @@ export const getConfigByKey = async (req: Request, res: Response) => {
 
 export const updateConfig = async (req: Request, res: Response) => {
   const configs: { key: string; value: string }[] = req.body;
-  const updatedConfigs = await Promise.all(
-    configs.map(async (config) => {
-      const { key, value } = config;
-      return await updateAppConfig(key, value);
-    })
-  );
-  res.status(200).json(updatedConfigs);
+  const response = await updateAppConfig(configs);
+  res.status(200).json(response);
 };

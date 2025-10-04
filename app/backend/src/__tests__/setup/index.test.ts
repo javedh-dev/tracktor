@@ -11,7 +11,7 @@ beforeAll(async () => {
     logger.transports.forEach((transport) => {
       transport.silent = true;
     });
-    logger.transports.push(new Console());
+    // logger.transports.push(new Console());
 
     // Initialize database for testing
     await initializePatches();
@@ -25,3 +25,9 @@ beforeAll(async () => {
 afterAll(async () => {
   // Cleanup if needed
 });
+
+export const validateError = (body: any) => {
+  expect(body).toHaveProperty("success", false);
+  expect(body).toHaveProperty("errors");
+  expect(body.errors.length).toBeGreaterThanOrEqual(1);
+};

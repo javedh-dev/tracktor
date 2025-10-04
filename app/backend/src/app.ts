@@ -68,9 +68,9 @@ const start = async (app: express.Express) => {
 // Apply middlewares
 app.use(jsonHandler);
 app.use(requestLogger);
-app.use(authHandler);
 
 if (!isTest) {
+  app.use(authHandler);
   app.use(corsHandler);
   app.use(rateLimiter);
 }

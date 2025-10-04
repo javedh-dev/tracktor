@@ -1,7 +1,9 @@
 import request from "supertest";
 import app from "../app";
-import { validateError } from "./config/common.test";
-import logger from "@config/logger";
+import { validateError } from "./setup/index.test";
+import authHandler from "@middlewares/authHandler";
+
+app.use(authHandler);
 
 describe("Auth API", () => {
   describe("GET /api/auth/status", () => {

@@ -26,6 +26,6 @@ export default {
     "^.+\\.(t|j)s$": ["ts-jest", { useESM: true }],
   },
   transformIgnorePatterns: ["node_modules/(?!@faker-js).+"],
-  setupFilesAfterEnv: ["<rootDir>/src/__tests__/config/setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup/index.test.ts"],
   testTimeout: 30000,
 };
