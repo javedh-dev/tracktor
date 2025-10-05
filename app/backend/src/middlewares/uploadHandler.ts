@@ -6,7 +6,7 @@ import { AppError, Status } from "@exceptions/AppError";
 import logger from "@config/logger";
 
 // Ensure uploads directory exists
-const uploadsDir = process.env.UPLOAD_DIR || "./uploads";
+const uploadsDir = process.env.UPLOADS_DIR || "./uploads";
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }

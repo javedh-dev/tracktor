@@ -1,5 +1,7 @@
+import { env } from "@config/env";
 import { AppError, Status } from "@exceptions/AppError";
 import { Request, Response } from "express";
+import path from "path";
 
 export const uploadFile = async (req: Request, res: Response) => {
   const file = req.file;
@@ -22,7 +24,7 @@ export const uploadFile = async (req: Request, res: Response) => {
 
 export const downloadFile = async (req: Request, res: Response) => {
   const { filename } = req.params;
-  const filePath = `./uploads/${filename}`;
+  const filePath = path.join(env.UPLOADS_DIR, filename || "");
 
   res.sendFile(filePath, { root: process.cwd() }, (err) => {
     if (err) {

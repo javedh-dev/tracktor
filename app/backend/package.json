@@ -18,7 +18,7 @@
     "lint": "eslint . && prettier --check .",
     "clean": "rm -rf build *.db uploads logs",
     "reset": "npm run clean && rm -rf tracktor.db tracktor-test.db node_modules && npm install",
-    "test": "npm run db:migrate:test && jest  --passWithNoTests"
+    "test": "npm run db:migrate:test && jest"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",

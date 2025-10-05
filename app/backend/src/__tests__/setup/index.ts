@@ -4,13 +4,10 @@ import { clearDb, seedData } from "@db/seeders";
 import { beforeAll, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
+import winston from "winston";
 
 beforeAll(async () => {
   try {
-    logger.transports.forEach((transport) => {
-      transport.silent = true;
-    });
-
     await initializePatches();
     await seedData();
   } catch (error) {
@@ -21,7 +18,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await clearDb();
-  fs.rmSync(path.join(process.cwd(), "uploads/test"), {
+  fs.rmSync(path.join(process.cwd(), "uploads", "test"), {
     recursive: true,
   });
 });
