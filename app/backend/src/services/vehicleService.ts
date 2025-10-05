@@ -6,12 +6,12 @@ import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
 
 export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
-  const vehicle = await db
+  const vehicles = await db
     .insert(schema.vehicleTable)
     .values({ ...vehicleData, id: undefined })
     .returning();
   return {
-    data: vehicle[0],
+    data: vehicles[0],
     success: true,
     message: "Vehicle added successfully.",
   };

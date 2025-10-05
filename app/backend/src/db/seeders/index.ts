@@ -33,6 +33,14 @@ const seedAuthPin = async (pin: string) => {
   logger.info("Authentication PIN configured");
 };
 
+export const clearDb = async () => {
+  await db.delete(pollutionCertificateTable);
+  await db.delete(maintenanceLogTable);
+  await db.delete(fuelLogTable);
+  await db.delete(insuranceTable);
+  await db.delete(vehicleTable);
+};
+
 const seedDemoData = async (enforce: boolean = false) => {
   seedAuthPin("123456");
   if (!enforce) {
@@ -43,11 +51,7 @@ const seedDemoData = async (enforce: boolean = false) => {
     }
   } else {
     logger.warn("Forcing demo data seed. Deleting existing data...");
-    await db.delete(pollutionCertificateTable);
-    await db.delete(maintenanceLogTable);
-    await db.delete(fuelLogTable);
-    await db.delete(insuranceTable);
-    await db.delete(vehicleTable);
+    await clearDb();
   }
 
   const vehicles = await db

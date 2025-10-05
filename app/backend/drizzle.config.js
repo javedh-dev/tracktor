@@ -13,4 +13,5 @@ export default defineConfig({
     url: `file:${env.DATABASE_PATH || "./tracktor.db"}`,
   },
   casing: "snake_case",
+  verbose: true,
 });

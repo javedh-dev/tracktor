@@ -18,6 +18,8 @@ describe("Vehicle API", () => {
         .post("/api/vehicles")
         .send(validVehicleData);
 
+      console.log(res.body);
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -104,8 +106,6 @@ describe("Vehicle API", () => {
       };
 
       const res = await request(app).put("/api/vehicles").send(updateData);
-
-      console.log(res.body);
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);

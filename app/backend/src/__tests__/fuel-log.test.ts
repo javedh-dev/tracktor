@@ -1,22 +1,23 @@
 import request from "supertest";
 import app from "../app";
+import { UUID } from "crypto";
 
 describe("Fuel Log API", () => {
-  let vehicleId: number;
-  let fuelLogId: number;
+  let vehicleId: UUID;
+  let fuelLogId: UUID;
 
   const validVehicleData = {
     make: "Toyota",
     model: "Camry",
     year: 2020,
-    licensePlate: "FUEL123"
+    licensePlate: "FUEL123",
   };
 
   const validFuelLogData = {
     date: "2024-01-15",
     odometer: 50000.5,
     fuelAmount: 45.2,
-    cost: 67.80
+    cost: 67.8,
   };
 
   beforeAll(async () => {
@@ -24,6 +25,7 @@ describe("Fuel Log API", () => {
     const vehicleRes = await request(app)
       .post("/api/vehicles")
       .send(validVehicleData);
+    console.log(vehicleRes.body, vehicleRes.status);
     vehicleId = vehicleRes.body.data.id;
   });
 
@@ -32,7 +34,7 @@ describe("Fuel Log API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/fuel-logs`)
         .send({ ...validFuelLogData, vehicleId });
-      
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -42,7 +44,7 @@ describe("Fuel Log API", () => {
       expect(res.body.data.odometer).toBe(validFuelLogData.odometer);
       expect(res.body.data.fuelAmount).toBe(validFuelLogData.fuelAmount);
       expect(res.body.data.cost).toBe(validFuelLogData.cost);
-      
+
       fuelLogId = res.body.data.id;
     });
 
@@ -56,7 +58,7 @@ describe("Fuel Log API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/fuel-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -65,13 +67,13 @@ describe("Fuel Log API", () => {
       const invalidData = {
         ...validFuelLogData,
         vehicleId,
-        date: "invalid-date"
+        date: "invalid-date",
       };
 
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/fuel-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -82,13 +84,13 @@ describe("Fuel Log API", () => {
         vehicleId,
         odometer: "invalid", // should be number
         fuelAmount: "invalid", // should be number
-        cost: "invalid" // should be number
+        cost: "invalid", // should be number
       };
 
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/fuel-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -97,7 +99,7 @@ describe("Fuel Log API", () => {
       const res = await request(app)
         .post("/api/vehicles/99999/fuel-logs")
         .send({ ...validFuelLogData, vehicleId: 99999 });
-      
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -105,8 +107,10 @@ describe("Fuel Log API", () => {
 
   describe("GET /api/vehicles/:vehicleId/fuel-logs", () => {
     test("should return all fuel logs for vehicle", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/fuel-logs`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/fuel-logs`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -116,24 +120,24 @@ describe("Fuel Log API", () => {
 
     test("should validate vehicle id parameter", async () => {
       const res = await request(app).get("/api/vehicles/invalid/fuel-logs");
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should return empty array for vehicle with no fuel logs", async () => {
       // Create another vehicle
-      const vehicleRes = await request(app)
-        .post("/api/vehicles")
-        .send({
-          make: "Honda",
-          model: "Civic",
-          year: 2019,
-          licensePlate: "EMPTY123"
-        });
-      
-      const res = await request(app).get(`/api/vehicles/${vehicleRes.body.data.id}/fuel-logs`);
-      
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Honda",
+        model: "Civic",
+        year: 2019,
+        licensePlate: "EMPTY123",
+      });
+
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleRes.body.data.id}/fuel-logs`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data).toEqual([]);
@@ -142,8 +146,10 @@ describe("Fuel Log API", () => {
 
   describe("GET /api/vehicles/:vehicleId/fuel-logs/:id", () => {
     test("should return specific fuel log", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -152,15 +158,19 @@ describe("Fuel Log API", () => {
     });
 
     test("should return 404 for non-existent fuel log", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/fuel-logs/99999`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/fuel-logs/99999`,
+      );
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate parameters", async () => {
-      const res = await request(app).get(`/api/vehicles/invalid/fuel-logs/invalid`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/invalid/fuel-logs/invalid`,
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -174,13 +184,13 @@ describe("Fuel Log API", () => {
         date: "2024-01-16",
         odometer: 50100.0,
         fuelAmount: 50.0,
-        cost: 75.00
+        cost: 75.0,
       };
 
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data.date).toBe(updateData.date);
@@ -200,7 +210,7 @@ describe("Fuel Log API", () => {
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -212,13 +222,13 @@ describe("Fuel Log API", () => {
         date: "2024-01-16",
         odometer: 50100.0,
         fuelAmount: 50.0,
-        cost: 75.00
+        cost: 75.0,
       };
 
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/fuel-logs/99999`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -226,22 +236,28 @@ describe("Fuel Log API", () => {
 
   describe("DELETE /api/vehicles/:vehicleId/fuel-logs/:id", () => {
     test("should delete fuel log", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/fuel-logs/${fuelLogId}`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
     });
 
     test("should return 404 for non-existent fuel log deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/fuel-logs/99999`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/fuel-logs/99999`,
+      );
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate id parameter for deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/fuel-logs/invalid`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/fuel-logs/invalid`,
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });

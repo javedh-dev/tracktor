@@ -2,8 +2,12 @@ import { AppError, Status } from "@exceptions/AppError";
 import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
+import { ApiResponse } from "@tracktor/common";
 
-export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
+export const addFuelLog = async (
+  vehicleId: string,
+  fuelLogData: any,
+): Promise<ApiResponse> => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
   });
@@ -21,17 +25,21 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
       vehicleId: vehicleId,
     })
     .returning();
-  return { id: fuelLog[0]?.id, message: "Fuel log added successfully." };
+  return {
+    data: fuelLog[0],
+    success: true,
+    message: "Fuel log added successfully.",
+  };
 };
 
-export const getFuelLogs = async (vehicleId: string) => {
+export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
     orderBy: (log, { asc }) => asc(log.date),
   });
 
   // Calculate mileage
-  return fuelLogs.map((log, index, arr) => {
+  const mileageData = fuelLogs.map((log, index, arr) => {
     // mileage can only be calculated for a full tank and a previous log is needed
     if (index === 0 || !log.filled || log.missedLast) {
       return { ...log, mileage: null };
@@ -72,9 +80,13 @@ export const getFuelLogs = async (vehicleId: string) => {
     const mileage = distance / totalFuel;
     return { ...log, mileage: parseFloat(mileage.toFixed(2)) };
   });
+  return {
+    data: mileageData,
+    success: true,
+  };
 };
 
-export const getFuelLogById = async (id: string) => {
+export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
   const fuelLog = await db.query.fuelLogTable.findFirst({
     where: (log, { eq }) => eq(log.id, id),
   });
@@ -82,7 +94,7 @@ export const getFuelLogById = async (id: string) => {
   if (!fuelLog) {
     throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
-  return fuelLog;
+  return { data: fuelLog, success: true };
 };
 
 export const updateFuelLog = async (
@@ -91,16 +103,21 @@ export const updateFuelLog = async (
   fuelLogData: any,
 ) => {
   getFuelLogById(id);
-  await db
+  const updatedLog = await db
     .update(schema.fuelLogTable)
     .set({
       ...fuelLogData,
     })
-    .where(eq(schema.fuelLogTable.id, id));
-  return { message: "Fuel log updated successfully." };
+    .where(eq(schema.fuelLogTable.id, id))
+    .returning();
+  return {
+    data: updatedLog,
+    success: true,
+    message: "Fuel log updated successfully.",
+  };
 };
 
-export const deleteFuelLog = async (id: string) => {
+export const deleteFuelLog = async (id: string): Promise<ApiResponse> => {
   const result = await db
     .delete(schema.fuelLogTable)
     .where(eq(schema.fuelLogTable.id, id))
@@ -108,13 +125,17 @@ export const deleteFuelLog = async (id: string) => {
   if (result.length === 0) {
     throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
-  return { message: "Fuel log deleted successfully." };
+  return {
+    data: { id },
+    success: true,
+    message: "Fuel log deleted successfully.",
+  };
 };
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
   fuelLogData: any,
-) => {
+): Promise<ApiResponse> => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
@@ -127,7 +148,9 @@ export const addFuelLogByLicensePlate = async (
   return await addFuelLog(vehicle.id, fuelLogData);
 };
 
-export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
+export const getFuelLogsByLicensePlate = async (
+  licensePlate: string,
+): Promise<ApiResponse> => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
