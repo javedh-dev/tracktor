@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { resolve } from "path";
 import logger from "./logger";
-import { accessSync } from "fs";
+import { accessSync, mkdirSync } from "fs";
 import { constants } from "fs/promises";
 
 // Load environment variables based on NODE_ENV
@@ -90,11 +90,11 @@ export function validateEnvironment(): void {
     try {
       accessSync(env.UPLOADS_DIR, constants.F_OK | constants.W_OK);
     } catch (err) {
-      logger.error(
-        `UPLOADS_DIR "${env.UPLOADS_DIR}" does not exist or is not writable`,
+      logger.warn(
+        `UPLOADS_DIR "${env.UPLOADS_DIR}" does not exist. Creating...`,
         err,
       );
-      process.exit(1);
+      mkdirSync(env.UPLOADS_DIR, { recursive: true });
     }
   }
 

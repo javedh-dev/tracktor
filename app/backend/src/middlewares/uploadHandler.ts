@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { AppError, Status } from "@exceptions/AppError";
+import logger from "@config/logger";
 
 // Ensure uploads directory exists
 const uploadsDir = process.env.UPLOAD_DIR || "./uploads";
@@ -28,18 +29,18 @@ export const uploadHandler = multer({
   },
   fileFilter: (_, file, cb) => {
     // Allow common image and document types
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt/;
-    const extname = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase(),
-    );
-    const mimetype = allowedTypes.test(file.mimetype);
+    const allowedTypes = ["image/", "application/pdf", "text/plain"];
+    logger.info(`File Type : ${file.mimetype}`);
+    const matchedMime = allowedTypes.filter((mt) => {
+      return file.mimetype.startsWith(mt);
+    });
 
-    if (mimetype && extname) {
+    if (matchedMime.length >= 1) {
       return cb(null, true);
     } else {
       cb(
         new AppError(
-          "Invalid file type. Only images and documents are allowed.",
+          "Invalid file type. Only images, pdf and text files are allowed.",
           Status.BAD_REQUEST,
         ),
       );

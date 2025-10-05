@@ -3,7 +3,7 @@ import {
   authRoutes,
   vehicleRoutes,
   configRoutes,
-  uploadRoutes,
+  fileRoutes,
 } from "@routes/index";
 import {
   errorHandler,
@@ -79,7 +79,7 @@ if (!isTest) {
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/config", configRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/files", fileRoutes);
 
 // Global error handler
 app.use(errorHandler);

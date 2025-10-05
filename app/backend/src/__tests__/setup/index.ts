@@ -2,6 +2,8 @@ import logger from "@config/logger";
 import { initializePatches } from "@db/patch";
 import { clearDb, seedData } from "@db/seeders";
 import { beforeAll, afterAll } from "@jest/globals";
+import fs from "fs";
+import path from "path";
 
 beforeAll(async () => {
   try {
@@ -19,6 +21,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await clearDb();
+  fs.rmSync(path.join(process.cwd(), "uploads/test"), {
+    recursive: true,
+  });
 });
 
 export const validateError = (body: any) => {
