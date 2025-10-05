@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../app";
+import { randomUUID } from "crypto";
 
 describe("Maintenance Log API", () => {
   let vehicleId: number;
@@ -9,14 +10,14 @@ describe("Maintenance Log API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
-    licensePlate: "MAINT123"
+    licensePlate: "MAINT123",
   };
 
   const validMaintenanceLogData = {
     date: "2024-01-15",
     odometer: 50000.0,
     serviceCenter: "Toyota Service Center",
-    cost: 250.00
+    cost: 250.0,
   };
 
   beforeAll(async () => {
@@ -32,7 +33,7 @@ describe("Maintenance Log API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/maintenance-logs`)
         .send({ ...validMaintenanceLogData, vehicleId });
-      
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -40,9 +41,11 @@ describe("Maintenance Log API", () => {
       expect(res.body.data.vehicleId).toBe(vehicleId);
       expect(res.body.data.date).toBe(validMaintenanceLogData.date);
       expect(res.body.data.odometer).toBe(validMaintenanceLogData.odometer);
-      expect(res.body.data.serviceCenter).toBe(validMaintenanceLogData.serviceCenter);
+      expect(res.body.data.serviceCenter).toBe(
+        validMaintenanceLogData.serviceCenter,
+      );
       expect(res.body.data.cost).toBe(validMaintenanceLogData.cost);
-      
+
       maintenanceLogId = res.body.data.id;
     });
 
@@ -56,7 +59,7 @@ describe("Maintenance Log API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/maintenance-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -65,13 +68,13 @@ describe("Maintenance Log API", () => {
       const invalidData = {
         ...validMaintenanceLogData,
         vehicleId,
-        date: "invalid-date"
+        date: "invalid-date",
       };
 
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/maintenance-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -81,22 +84,22 @@ describe("Maintenance Log API", () => {
         ...validMaintenanceLogData,
         vehicleId,
         odometer: "invalid",
-        cost: "invalid"
+        cost: "invalid",
       };
 
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/maintenance-logs`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate vehicle exists", async () => {
       const res = await request(app)
-        .post("/api/vehicles/99999/maintenance-logs")
-        .send({ ...validMaintenanceLogData, vehicleId: 99999 });
-      
+        .post(`/api/vehicles/${randomUUID()}/maintenance-logs`)
+        .send({ ...validMaintenanceLogData, vehicleId: randomUUID() });
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -104,8 +107,10 @@ describe("Maintenance Log API", () => {
 
   describe("GET /api/vehicles/:vehicleId/maintenance-logs", () => {
     test("should return all maintenance logs for vehicle", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/maintenance-logs`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/maintenance-logs`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -114,25 +119,27 @@ describe("Maintenance Log API", () => {
     });
 
     test("should validate vehicle id parameter", async () => {
-      const res = await request(app).get("/api/vehicles/invalid/maintenance-logs");
-      
+      const res = await request(app).get(
+        "/api/vehicles/invalid/maintenance-logs",
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should return empty array for vehicle with no maintenance logs", async () => {
       // Create another vehicle
-      const vehicleRes = await request(app)
-        .post("/api/vehicles")
-        .send({
-          make: "Honda",
-          model: "Civic",
-          year: 2019,
-          licensePlate: "NOMAINT123"
-        });
-      
-      const res = await request(app).get(`/api/vehicles/${vehicleRes.body.data.id}/maintenance-logs`);
-      
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Honda",
+        model: "Civic",
+        year: 2019,
+        licensePlate: "NOMAINT123",
+      });
+
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleRes.body.data.id}/maintenance-logs`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data).toEqual([]);
@@ -141,8 +148,10 @@ describe("Maintenance Log API", () => {
 
   describe("GET /api/vehicles/:vehicleId/maintenance-logs/:id", () => {
     test("should return specific maintenance log", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -151,15 +160,19 @@ describe("Maintenance Log API", () => {
     });
 
     test("should return 404 for non-existent maintenance log", async () => {
-      const res = await request(app).get(`/api/vehicles/${vehicleId}/maintenance-logs/99999`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleId}/maintenance-logs/${randomUUID()}`,
+      );
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate parameters", async () => {
-      const res = await request(app).get(`/api/vehicles/invalid/maintenance-logs/invalid`);
-      
+      const res = await request(app).get(
+        `/api/vehicles/invalid/maintenance-logs/invalid`,
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -173,13 +186,13 @@ describe("Maintenance Log API", () => {
         date: "2024-01-16",
         odometer: 50100.0,
         serviceCenter: "Honda Service Center",
-        cost: 300.00
+        cost: 300.0,
       };
 
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data.date).toBe(updateData.date);
@@ -199,7 +212,7 @@ describe("Maintenance Log API", () => {
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -207,17 +220,17 @@ describe("Maintenance Log API", () => {
     test("should return 404 for non-existent maintenance log update", async () => {
       const updateData = {
         vehicleId,
-        id: 99999,
+        id: randomUUID(),
         date: "2024-01-16",
         odometer: 50100.0,
         serviceCenter: "Honda Service Center",
-        cost: 300.00
+        cost: 300.0,
       };
 
       const res = await request(app)
-        .put(`/api/vehicles/${vehicleId}/maintenance-logs/99999`)
+        .put(`/api/vehicles/${vehicleId}/maintenance-logs/${randomUUID()}`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -225,22 +238,28 @@ describe("Maintenance Log API", () => {
 
   describe("DELETE /api/vehicles/:vehicleId/maintenance-logs/:id", () => {
     test("should delete maintenance log", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/maintenance-logs/${maintenanceLogId}`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
     });
 
     test("should return 404 for non-existent maintenance log deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/maintenance-logs/99999`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/maintenance-logs/${randomUUID()}`,
+      );
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate parameters for deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/invalid/maintenance-logs/invalid`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/invalid/maintenance-logs/invalid`,
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
