@@ -1,7 +1,8 @@
 import { goto } from '$app/navigation';
 import type { Vehicle } from '../types/vehicle';
-import { getApiUrl } from '$lib/helper/api';
+import { axiosAuth } from '$lib/helper/api';
 import { writable } from 'svelte/store';
+import type { ApiResponse } from '@tracktor/common';
 
 const createVehicleModalStore = () => {
 	const { subscribe, set } = writable<{
@@ -49,7 +50,7 @@ const createVehiclesStore = () => {
 		selectedVehicleId: undefined
 	});
 
-	async function fetchVehicles(pin: string) {
+	async function fetchVehicles(pin?: string) {
 		let tempSelection: string | undefined = undefined;
 		update((current) => {
 			if (current.selectedVehicleId) {
@@ -64,13 +65,9 @@ const createVehiclesStore = () => {
 		});
 		// await simulateNetworkDelay(2000); // Simulate network delay for development
 		try {
-			const response = await fetch(getApiUrl('/api/vehicles'), {
-				headers: {
-					'X-User-PIN': pin || ''
-				}
-			});
-			if (response.ok) {
-				const vehicles = await response.json();
+			const response = await axiosAuth.get<ApiResponse>('/vehicles');
+			if (response.status === 200) {
+				const vehicles = response.data.data;
 				if (Array.isArray(vehicles)) {
 					set({
 						loading: false,
@@ -90,7 +87,7 @@ const createVehiclesStore = () => {
 					goto('/login', { replaceState: true });
 				}
 				console.log('Failed to fetch vehicles', response);
-				const data = await response.json();
+				const data = response.data.data;
 				const error = data.message || 'Failed to fetch vehicles.';
 				set({
 					loading: false,

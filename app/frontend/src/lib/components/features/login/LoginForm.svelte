@@ -6,14 +6,16 @@
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	import { Jumper } from 'svelte-loading-spinners';
+	import { authStore } from '$lib/stores/authStore';
 
 	let { class: className = '', oncomplete, ...restProps } = $props();
 
 	let pin = $state('');
+	let disabled = $state(!authStore.isPinConfigured());
 	let processing = $state(false);
 
 	const handleChange = () => {
-		if (pin.length == 6) {
+		if (pin.length == 6 && !processing) {
 			processing = true;
 			oncomplete(pin).finally(() => {
 				processing = false;
@@ -36,7 +38,7 @@
 		pattern={REGEXP_ONLY_DIGITS}
 		pushPasswordManagerStrategy={'increase-width'}
 		onValueChange={handleChange}
-		disabled={processing}
+		disabled={disabled || processing}
 	>
 		{#snippet children({ cells })}
 			{#each cells as cell (cell)}

@@ -8,23 +8,18 @@
 	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { authStore } from '$lib/stores/authStore';
 
 	let isAuthenticated = $state(false);
 
 	$effect(() => {
-		const pin = localStorage.getItem('userPin');
-		isAuthenticated = !!pin;
+		isAuthenticated = !!$authStore;
 
-		if (!isAuthenticated && $page.url.pathname !== '/login') {
+		if (!isAuthenticated && page.url.pathname !== '/login') {
 			goto('/login', { replaceState: true });
 		}
 	});
-
-	const logout = () => {
-		localStorage.removeItem('userPin');
-		isAuthenticated = false;
-	};
 
 	const fetchVehicles = () => {
 		const pin = localStorage.getItem('userPin') || undefined;
@@ -56,7 +51,7 @@
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					<Button variant="ghost" onclick={logout}>
+					<Button variant="ghost" onclick={authStore.logout}>
 						<LogOut class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
 				{/if}

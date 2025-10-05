@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { vehiclesStore } from '$stores/vehicle';
+	import { vehicleStore } from '$stores/vehicleStore';
 	import VehicleCard from './VehicleCard.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
@@ -11,13 +11,13 @@
 	let { selectedVehicleId = $bindable(), updateCallback } = $props();
 	let vehicles = $state<Vehicle[]>([]);
 	let loading = $state(true);
-	let error = $state('');
+	let error = $state<string>();
 
-	vehiclesStore.subscribe((data) => {
+	vehicleStore.subscribe((data) => {
 		vehicles = data.vehicles;
-		loading = data.loading;
+		loading = data.processing;
 		error = data.error;
-		selectedVehicleId = data.selectedVehicleId;
+		selectedVehicleId = data.selectedId;
 		if (vehicles.length > 0) {
 			selectedVehicleId = selectedVehicleId || vehicles[0].id;
 		} else {
@@ -27,7 +27,7 @@
 
 	const selectVehicle = (vehicleId: string | null) => {
 		if (vehicleId) {
-			vehiclesStore.selectVehicle(vehicleId);
+			vehicleStore.selectVehicle(vehicleId);
 		}
 	};
 </script>

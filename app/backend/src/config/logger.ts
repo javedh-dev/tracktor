@@ -10,23 +10,25 @@ const logFormatter = winston.format.combine(
   }),
 );
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
-  exitOnError: false,
-  format: logFormatter,
-  transports: [
-    new winston.transports.File({
-      filename: `${process.env.LOG_DIR || "./logs"}/tracktor.log`,
-    }),
-  ],
-});
+const transports: winston.transport[] = [
+  new winston.transports.File({
+    filename: `${process.env.LOG_DIR || "./logs"}/tracktor.log`,
+  }),
+];
 
 if (process.env.NODE_ENV !== "test") {
-  logger.transports.push(
+  transports.push(
     new winston.transports.Console({
       format: winston.format.combine(winston.format.colorize(), logFormatter),
     }),
   );
 }
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "info",
+  exitOnError: false,
+  format: logFormatter,
+  transports,
+});
 
 export default logger;

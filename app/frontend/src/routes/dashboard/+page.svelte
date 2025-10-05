@@ -1,6 +1,6 @@
 <script lang="ts">
 	import VehicleList from '$feature/vehicle/VehicleList.svelte';
-	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
+	import { vehicleStore } from '$stores/vehicleStore';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
@@ -11,15 +11,14 @@
 	let selectedVehicleId = $state<string | undefined>();
 	let loading = $state(false);
 
-	const updateCallback = (success: boolean) => success && fetchVehicles();
+	const updateCallback = (success: boolean) => success && vehicleStore.refreshVehicles();
 
-	const fetchVehicles = async () => {
-		loading = true;
-		const pin = localStorage.getItem('userPin') || undefined;
-		if (pin) vehiclesStore.fetchVehicles(pin).finally(() => (loading = false));
-	};
+	vehicleStore.subscribe(({ processing, selectedId }) => {
+		loading = processing;
+		selectedVehicleId = selectedId;
+	});
 
-	onMount(() => fetchVehicles());
+	onMount(() => vehicleStore.refreshVehicles());
 </script>
 
 {#if loading}
@@ -34,7 +33,7 @@
 				variant="outline"
 				size="default"
 				class="cursor-pointer"
-				onclick={() => vehicleModelStore.show()}
+				onclick={() => vehicleStore.openSheet(true, false)}
 			>
 				<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />
 			</Button>

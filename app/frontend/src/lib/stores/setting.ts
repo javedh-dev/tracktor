@@ -52,8 +52,6 @@ const createConfigStore = () => {
 		}
 	}
 
-	fetchConfig();
-
 	return {
 		subscribe,
 		save: (localConfig: Config[]) => {
