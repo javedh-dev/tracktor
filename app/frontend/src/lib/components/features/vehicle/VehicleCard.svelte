@@ -14,7 +14,7 @@
 	import { formatDistance } from '$helper/formatting';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
 	import { maintenanceModelStore } from '$stores/maintenance';
-	import { fuelLogModelStore } from '$stores/fuel-log';
+	import { fuelLogStore } from '$stores/fuelLogStore';
 	import { insuranceModelStore } from '$stores/insurance';
 	import { puccModelStore } from '$stores/pucc';
 	import { browser } from '$app/environment';
@@ -123,7 +123,7 @@
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
-						onclick={() => fuelLogModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => fuelLogStore.openSheet(true, false)}
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton

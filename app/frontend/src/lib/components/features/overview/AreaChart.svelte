@@ -31,7 +31,7 @@
 			motion: 'tween'
 		},
 		xAxis: {
-			format: xFormatter,
+			format: (v) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
 			tickLabelProps: {
 				rotate: 325,
 				textAnchor: 'end'

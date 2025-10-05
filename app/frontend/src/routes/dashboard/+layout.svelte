@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FuelForm from '$lib/components/features/fuel/FuelForm.svelte';
+	import FuelForm from '$lib/components/features/fuel/FuelLogForm.svelte';
 	import MaintenanceForm from '$lib/components/features/maintenance/MaintenanceForm.svelte';
 	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
 	import PollutionCertificateForm from '$lib/components/features/pollution/PollutionCertificateForm.svelte';

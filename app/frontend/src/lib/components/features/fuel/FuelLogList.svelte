@@ -18,13 +18,14 @@
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
-	import { compareDesc } from 'date-fns';
+
+	import { fuelLogStore } from '$lib/stores/fuelLogStore';
 
 	const { vehicleId } = $props();
 
 	let fuelLogs: FuelLog[] = $state([]);
 	let loading = $state(true);
-	let error = $state('');
+	let error = $state<string>();
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -156,40 +157,14 @@
 		}
 	];
 
-	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchFuelLogs();
-		}
+	fuelLogStore.subscribe((data) => {
+		fuelLogs = data.fuelLogs;
+		loading = data.processing;
+		error = data.error;
 	});
 
-	async function fetchFuelLogs() {
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/fuel-logs`), {
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			});
-			if (response.ok) {
-				fuelLogs = await response.json();
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to fetch fuel logs.';
-			}
-		} catch (e) {
-			console.error('Failed to connect to the server.', e);
-			error = 'Failed to connect to the server.';
-		}
-		fuelLogs.sort((a, b) => compareDesc(a.date, b.date));
-		loading = false;
-	}
-
-	onMount(() => {
-		fetchFuelLogs();
+	$effect(() => {
+		fuelLogStore.refreshFuelLogs(vehicleId);
 	});
 </script>
 
