@@ -39,7 +39,7 @@ export default [
       "build/",
       // "*.config.js",
       // "*.config.ts",
-      "**/*.test.{js,ts}",
+      "**/__tests__/**/*.ts",
     ],
   },
 ];

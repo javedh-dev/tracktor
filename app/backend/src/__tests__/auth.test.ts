@@ -1,6 +1,6 @@
 import request from "supertest";
 import app from "../app";
-import { validateError } from "./setup/index.test";
+import { validateError } from "./setup/index";
 import authHandler from "@middlewares/authHandler";
 
 app.use(authHandler);

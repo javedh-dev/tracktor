@@ -1,9 +1,14 @@
+import logger from "@config/logger";
 import { initializePatches } from "@db/patch";
 import { clearDb, seedData } from "@db/seeders";
 import { beforeAll, afterAll } from "@jest/globals";
 
 beforeAll(async () => {
   try {
+    logger.transports.forEach((transport) => {
+      transport.silent = true;
+    });
+
     await initializePatches();
     await seedData();
   } catch (error) {

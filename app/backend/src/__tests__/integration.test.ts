@@ -1,14 +1,15 @@
 import request from "supertest";
 import app from "../app";
+import { randomUUID, UUID } from "crypto";
 
 describe("Integration Tests", () => {
-  let vehicleId: number;
+  let vehicleId: UUID;
 
   const vehicleData = {
     make: "Toyota",
     model: "Prius",
     year: 2022,
-    licensePlate: "INT123"
+    licensePlate: "INT123",
   };
 
   describe("Complete Vehicle Lifecycle", () => {
@@ -29,7 +30,9 @@ describe("Integration Tests", () => {
           date: "2024-01-15",
           odometer: 25000.0,
           fuelAmount: 40.0,
-          cost: 60.00
+          cost: 60.0,
+          filled: true,
+          missedLast: false,
         });
 
       expect(fuelLogRes.statusCode).toBe(201);
@@ -43,7 +46,7 @@ describe("Integration Tests", () => {
           policyNumber: "SF123456",
           startDate: "2024-01-01",
           endDate: "2024-12-31",
-          cost: 1200.00
+          cost: 1200.0,
         });
 
       expect(insuranceRes.statusCode).toBe(201);
@@ -56,7 +59,7 @@ describe("Integration Tests", () => {
           date: "2024-01-10",
           odometer: 24500.0,
           serviceCenter: "Toyota Service",
-          cost: 150.00
+          cost: 150.0,
         });
 
       expect(maintenanceRes.statusCode).toBe(201);
@@ -69,28 +72,38 @@ describe("Integration Tests", () => {
           certificateNumber: "PUCC123456",
           issueDate: "2024-01-01",
           expiryDate: "2024-12-31",
-          testingCenter: "Authorized Center"
+          testingCenter: "Authorized Center",
         });
 
       expect(puccRes.statusCode).toBe(201);
 
       // 6. Verify all records exist
-      const vehicleDetailsRes = await request(app).get(`/api/vehicles/${vehicleId}`);
+      const vehicleDetailsRes = await request(app).get(
+        `/api/vehicles/${vehicleId}`,
+      );
       expect(vehicleDetailsRes.statusCode).toBe(200);
 
-      const fuelLogsRes = await request(app).get(`/api/vehicles/${vehicleId}/fuel-logs`);
+      const fuelLogsRes = await request(app).get(
+        `/api/vehicles/${vehicleId}/fuel-logs`,
+      );
       expect(fuelLogsRes.statusCode).toBe(200);
       expect(fuelLogsRes.body.data.length).toBe(1);
 
-      const insurancesRes = await request(app).get(`/api/vehicles/${vehicleId}/insurance`);
+      const insurancesRes = await request(app).get(
+        `/api/vehicles/${vehicleId}/insurance`,
+      );
       expect(insurancesRes.statusCode).toBe(200);
       expect(insurancesRes.body.data.length).toBe(1);
 
-      const maintenanceLogsRes = await request(app).get(`/api/vehicles/${vehicleId}/maintenance-logs`);
+      const maintenanceLogsRes = await request(app).get(
+        `/api/vehicles/${vehicleId}/maintenance-logs`,
+      );
       expect(maintenanceLogsRes.statusCode).toBe(200);
       expect(maintenanceLogsRes.body.data.length).toBe(1);
 
-      const puccRes2 = await request(app).get(`/api/vehicles/${vehicleId}/pucc`);
+      const puccRes2 = await request(app).get(
+        `/api/vehicles/${vehicleId}/pucc`,
+      );
       expect(puccRes2.statusCode).toBe(200);
       expect(puccRes2.body.data.length).toBe(1);
     });
@@ -103,14 +116,12 @@ describe("Integration Tests", () => {
       const initialCount = initialVehiclesRes.body.data.length;
 
       // Create a new vehicle
-      const newVehicleRes = await request(app)
-        .post("/api/vehicles")
-        .send({
-          make: "Honda",
-          model: "Civic",
-          year: 2021,
-          licensePlate: "CONSIST123"
-        });
+      const newVehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Honda",
+        model: "Civic",
+        year: 2021,
+        licensePlate: "CONSIST123",
+      });
 
       expect(newVehicleRes.statusCode).toBe(201);
       const newVehicleId = newVehicleRes.body.data.id;
@@ -120,7 +131,9 @@ describe("Integration Tests", () => {
       expect(afterCreateRes.body.data.length).toBe(initialCount + 1);
 
       // Delete the vehicle
-      const deleteRes = await request(app).delete(`/api/vehicles/${newVehicleId}`);
+      const deleteRes = await request(app).delete(
+        `/api/vehicles/${newVehicleId}`,
+      );
       expect(deleteRes.statusCode).toBe(200);
 
       // Verify vehicle count returned to original
@@ -140,21 +153,21 @@ describe("Integration Tests", () => {
               make: "Test",
               model: `Model${i}`,
               year: 2020 + i,
-              licensePlate: `CONC${i}`
-            })
+              licensePlate: `CONC${i}`,
+            }),
         );
       }
 
       const results = await Promise.all(promises);
 
       // All should succeed
-      results.forEach(res => {
+      results.forEach((res) => {
         expect(res.statusCode).toBe(201);
         expect(res.body.success).toBe(true);
       });
 
       // All should have unique IDs
-      const ids = results.map(res => res.body.data.id);
+      const ids = results.map((res) => res.body.data.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
@@ -164,13 +177,13 @@ describe("Integration Tests", () => {
     test("should handle cascading validation errors", async () => {
       // Try to create fuel log for non-existent vehicle
       const fuelLogRes = await request(app)
-        .post("/api/vehicles/99999/fuel-logs")
+        .post(`/api/vehicles/${randomUUID()}/fuel-logs`)
         .send({
-          vehicleId: 99999,
+          vehicleId: randomUUID(),
           date: "2024-01-15",
           odometer: 25000.0,
           fuelAmount: 40.0,
-          cost: 60.00
+          cost: 60.0,
         });
 
       expect(fuelLogRes.statusCode).toBe(404);
@@ -186,7 +199,7 @@ describe("Integration Tests", () => {
 
       const results = await Promise.all(invalidRequests);
 
-      results.forEach(res => {
+      results.forEach((res) => {
         expect(res.statusCode).toBe(400);
         expect(res.body.success).toBe(false);
       });
@@ -205,11 +218,13 @@ describe("Integration Tests", () => {
             .post(`/api/vehicles/${vehicleId}/fuel-logs`)
             .send({
               vehicleId,
-              date: `2024-01-${String(i + 1).padStart(2, '0')}`,
-              odometer: 25000.0 + (i * 100),
+              date: `2024-01-${String(i + 1).padStart(2, "0")}`,
+              odometer: 25000.0 + i * 100,
               fuelAmount: 40.0 + i,
-              cost: 60.00 + i
-            })
+              cost: 60.0 + i,
+              filled: true,
+              missedLast: true,
+            }),
         );
       }
 
@@ -217,7 +232,7 @@ describe("Integration Tests", () => {
       const endTime = Date.now();
 
       // All should succeed
-      results.forEach(res => {
+      results.forEach((res) => {
         expect(res.statusCode).toBe(201);
       });
 
@@ -229,17 +244,17 @@ describe("Integration Tests", () => {
   describe("API Response Format Consistency", () => {
     test("should have consistent response format across all endpoints", async () => {
       const endpoints = [
-        { method: 'get' as const, url: '/api/vehicles' },
-        { method: 'get' as const, url: '/api/config' },
-        { method: 'get' as const, url: '/api/auth/status' },
-        { method: 'get' as const, url: `/api/vehicles/${vehicleId}` },
-        { method: 'get' as const, url: `/api/vehicles/${vehicleId}/fuel-logs` },
+        { method: "get" as const, url: "/api/vehicles" },
+        { method: "get" as const, url: "/api/config" },
+        { method: "get" as const, url: "/api/auth/status" },
+        { method: "get" as const, url: `/api/vehicles/${vehicleId}` },
+        { method: "get" as const, url: `/api/vehicles/${vehicleId}/fuel-logs` },
       ];
 
       for (const endpoint of endpoints) {
         let res;
 
-        if (endpoint.method === 'get') {
+        if (endpoint.method === "get") {
           res = await request(app).get(endpoint.url);
         }
 
@@ -252,18 +267,20 @@ describe("Integration Tests", () => {
 
     test("should have consistent error response format", async () => {
       const errorEndpoints = [
-        { method: 'get' as const, url: '/api/vehicles/99999' },
-        { method: 'get' as const, url: '/api/config/nonexistent' },
-        { method: 'post' as const, url: '/api/vehicles', data: {} },
+        { method: "get" as const, url: "/api/vehicles/99999" },
+        { method: "get" as const, url: "/api/config/nonexistent" },
+        { method: "post" as const, url: "/api/vehicles", data: {} },
       ];
 
       for (const endpoint of errorEndpoints) {
         let res;
 
-        if (endpoint.method === 'get') {
+        if (endpoint.method === "get") {
           res = await request(app).get(endpoint.url);
-        } else if (endpoint.method === 'post') {
-          res = await request(app).post(endpoint.url).send(endpoint.data || {});
+        } else if (endpoint.method === "post") {
+          res = await request(app)
+            .post(endpoint.url)
+            .send(endpoint.data || {});
         }
 
         if (res && res.statusCode >= 400) {
