@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../app";
-import { UUID } from "crypto";
+import { randomUUID, UUID } from "crypto";
+import logger from "@config/logger";
 
 describe("Fuel Log API", () => {
   let vehicleId: UUID;
@@ -15,9 +16,11 @@ describe("Fuel Log API", () => {
 
   const validFuelLogData = {
     date: "2024-01-15",
-    odometer: 50000.5,
+    odometer: 50000,
     fuelAmount: 45.2,
     cost: 67.8,
+    filled: true,
+    missedLast: false,
   };
 
   beforeAll(async () => {
@@ -25,7 +28,6 @@ describe("Fuel Log API", () => {
     const vehicleRes = await request(app)
       .post("/api/vehicles")
       .send(validVehicleData);
-    console.log(vehicleRes.body, vehicleRes.status);
     vehicleId = vehicleRes.body.data.id;
   });
 
@@ -34,6 +36,8 @@ describe("Fuel Log API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/fuel-logs`)
         .send({ ...validFuelLogData, vehicleId });
+
+      logger.error(res.body);
 
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
@@ -97,8 +101,8 @@ describe("Fuel Log API", () => {
 
     test("should validate vehicle exists", async () => {
       const res = await request(app)
-        .post("/api/vehicles/99999/fuel-logs")
-        .send({ ...validFuelLogData, vehicleId: 99999 });
+        .post(`/api/vehicles/${randomUUID()}/fuel-logs`)
+        .send({ ...validFuelLogData, vehicleId: randomUUID() });
 
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
@@ -159,7 +163,7 @@ describe("Fuel Log API", () => {
 
     test("should return 404 for non-existent fuel log", async () => {
       const res = await request(app).get(
-        `/api/vehicles/${vehicleId}/fuel-logs/99999`,
+        `/api/vehicles/${vehicleId}/fuel-logs/${randomUUID()}`,
       );
 
       expect(res.statusCode).toBe(404);
@@ -218,7 +222,7 @@ describe("Fuel Log API", () => {
     test("should return 404 for non-existent fuel log update", async () => {
       const updateData = {
         vehicleId,
-        id: 99999,
+        id: randomUUID(),
         date: "2024-01-16",
         odometer: 50100.0,
         fuelAmount: 50.0,
@@ -226,7 +230,7 @@ describe("Fuel Log API", () => {
       };
 
       const res = await request(app)
-        .put(`/api/vehicles/${vehicleId}/fuel-logs/99999`)
+        .put(`/api/vehicles/${vehicleId}/fuel-logs/${randomUUID()}`)
         .send(updateData);
 
       expect(res.statusCode).toBe(404);
@@ -246,7 +250,7 @@ describe("Fuel Log API", () => {
 
     test("should return 404 for non-existent fuel log deletion", async () => {
       const res = await request(app).delete(
-        `/api/vehicles/${vehicleId}/fuel-logs/99999`,
+        `/api/vehicles/${vehicleId}/fuel-logs/${randomUUID()}`,
       );
 
       expect(res.statusCode).toBe(404);

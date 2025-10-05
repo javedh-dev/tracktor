@@ -101,8 +101,8 @@ export const updateFuelLog = async (
   vehicleId: string,
   id: string,
   fuelLogData: any,
-) => {
-  getFuelLogById(id);
+): Promise<ApiResponse> => {
+  await getFuelLogById(id);
   const updatedLog = await db
     .update(schema.fuelLogTable)
     .set({
@@ -111,7 +111,7 @@ export const updateFuelLog = async (
     .where(eq(schema.fuelLogTable.id, id))
     .returning();
   return {
-    data: updatedLog,
+    data: updatedLog[0],
     success: true,
     message: "Fuel log updated successfully.",
   };

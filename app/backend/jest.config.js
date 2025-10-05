@@ -28,4 +28,6 @@ export default {
   transformIgnorePatterns: ["node_modules/(?!@faker-js).+"],
   setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup/index.test.ts"],
   testTimeout: 30000,
+  maxWorkers: 1,
+  passWithNoTests: true,
 };
