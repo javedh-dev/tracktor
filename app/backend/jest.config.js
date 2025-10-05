@@ -11,7 +11,46 @@ export default {
   moduleDirectories: ["node_modules", "src"],
   roots: ["<rootDir>/src"],
   testMatch: ["**/__tests__/**/*.test.ts"],
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/__tests__/**"],
+
+  // Enhanced coverage configuration
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/**/*.d.ts",
+    "!src/__tests__/**",
+    "!src/db/migrations/**",
+    "!src/db/seeders/**",
+    "!src/config/env.ts", // Environment validation might be hard to test
+    "!index.ts", // Entry point
+  ],
+
+  // // Coverage thresholds to maintain quality
+  // coverageThreshold: {
+  //   global: {
+  //     branches: 80,
+  //     functions: 80,
+  //     lines: 80,
+  //     statements: 80,
+  //   },
+  //   // Stricter thresholds for critical components
+  //   "./src/services/": {
+  //     branches: 85,
+  //     functions: 90,
+  //     lines: 85,
+  //     statements: 85,
+  //   },
+  //   "./src/controllers/": {
+  //     branches: 85,
+  //     functions: 90,
+  //     lines: 85,
+  //     statements: 85,
+  //   },
+  // },
+
+  // Coverage reporting
+  coverageReporters: ["text", "text-summary", "html", "lcov", "json-summary"],
+  coverageDirectory: "coverage",
+
   moduleNameMapper: {
     "^@config/(.*)$": "<rootDir>/src/config/$1",
     "^@controllers/(.*)$": "<rootDir>/src/controllers/$1",
@@ -30,5 +69,6 @@ export default {
   testTimeout: 30000,
   maxWorkers: 1,
   passWithNoTests: true,
-  silent: true,
+  silent: false, // Enable output to see coverage reports
+  verbose: true, // Show individual test results
 };

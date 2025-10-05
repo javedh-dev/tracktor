@@ -4,10 +4,13 @@ import { clearDb, seedData } from "@db/seeders";
 import { beforeAll, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
-import winston from "winston";
 
+// Global test setup
 beforeAll(async () => {
   try {
+    // Suppress logs during testing
+    logger.silent = true;
+
     await initializePatches();
     await seedData();
   } catch (error) {
@@ -17,10 +20,17 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await clearDb();
-  fs.rmSync(path.join(process.cwd(), "uploads", "test"), {
-    recursive: true,
-  });
+  try {
+    await clearDb();
+
+    // Clean up test uploads directory
+    const testUploadsPath = path.join(process.cwd(), "uploads", "test");
+    if (fs.existsSync(testUploadsPath)) {
+      fs.rmSync(testUploadsPath, { recursive: true, force: true });
+    }
+  } catch (error) {
+    console.error("Test cleanup failed:", error);
+  }
 });
 
 export const validateError = (body: any) => {
