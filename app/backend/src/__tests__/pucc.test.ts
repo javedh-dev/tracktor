@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../app";
+import { randomUUID } from "crypto";
 
 describe("Pollution Certificate (PUCC) API", () => {
   let vehicleId: number;
@@ -9,14 +10,14 @@ describe("Pollution Certificate (PUCC) API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
-    licensePlate: "PUCC123"
+    licensePlate: "PUCC123",
   };
 
   const validPuccData = {
     certificateNumber: "PUCC123456789",
     issueDate: "2024-01-01",
     expiryDate: "2024-12-31",
-    testingCenter: "Authorized Testing Center"
+    testingCenter: "Authorized Testing Center",
   };
 
   beforeAll(async () => {
@@ -32,17 +33,19 @@ describe("Pollution Certificate (PUCC) API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/pucc`)
         .send({ ...validPuccData, vehicleId });
-      
+
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
       expect(res.body.data).toHaveProperty("id");
       expect(res.body.data.vehicleId).toBe(vehicleId);
-      expect(res.body.data.certificateNumber).toBe(validPuccData.certificateNumber);
+      expect(res.body.data.certificateNumber).toBe(
+        validPuccData.certificateNumber,
+      );
       expect(res.body.data.issueDate).toBe(validPuccData.issueDate);
       expect(res.body.data.expiryDate).toBe(validPuccData.expiryDate);
       expect(res.body.data.testingCenter).toBe(validPuccData.testingCenter);
-      
+
       puccId = res.body.data.id;
     });
 
@@ -56,7 +59,7 @@ describe("Pollution Certificate (PUCC) API", () => {
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/pucc`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -66,22 +69,22 @@ describe("Pollution Certificate (PUCC) API", () => {
         ...validPuccData,
         vehicleId,
         issueDate: "invalid-date",
-        expiryDate: "invalid-date"
+        expiryDate: "invalid-date",
       };
 
       const res = await request(app)
         .post(`/api/vehicles/${vehicleId}/pucc`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate vehicle exists", async () => {
       const res = await request(app)
-        .post("/api/vehicles/99999/pucc")
-        .send({ ...validPuccData, vehicleId: 99999 });
-      
+        .post(`/api/vehicles/${randomUUID()}/pucc`)
+        .send({ ...validPuccData, vehicleId: randomUUID() });
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -90,7 +93,7 @@ describe("Pollution Certificate (PUCC) API", () => {
   describe("GET /api/vehicles/:vehicleId/pucc", () => {
     test("should return all pollution certificates for vehicle", async () => {
       const res = await request(app).get(`/api/vehicles/${vehicleId}/pucc`);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("data");
@@ -100,24 +103,24 @@ describe("Pollution Certificate (PUCC) API", () => {
 
     test("should validate vehicle id parameter", async () => {
       const res = await request(app).get("/api/vehicles/invalid/pucc");
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should return empty array for vehicle with no pollution certificates", async () => {
       // Create another vehicle
-      const vehicleRes = await request(app)
-        .post("/api/vehicles")
-        .send({
-          make: "Honda",
-          model: "Civic",
-          year: 2019,
-          licensePlate: "NOPUCC123"
-        });
-      
-      const res = await request(app).get(`/api/vehicles/${vehicleRes.body.data.id}/pucc`);
-      
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Honda",
+        model: "Civic",
+        year: 2019,
+        licensePlate: "NOPUCC123",
+      });
+
+      const res = await request(app).get(
+        `/api/vehicles/${vehicleRes.body.data.id}/pucc`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data).toEqual([]);
@@ -132,16 +135,18 @@ describe("Pollution Certificate (PUCC) API", () => {
         certificateNumber: "PUCC987654321",
         issueDate: "2024-02-01",
         expiryDate: "2025-01-31",
-        testingCenter: "New Testing Center"
+        testingCenter: "New Testing Center",
       };
 
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/pucc/${puccId}`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
-      expect(res.body.data.certificateNumber).toBe(updateData.certificateNumber);
+      expect(res.body.data.certificateNumber).toBe(
+        updateData.certificateNumber,
+      );
       expect(res.body.data.issueDate).toBe(updateData.issueDate);
       expect(res.body.data.expiryDate).toBe(updateData.expiryDate);
       expect(res.body.data.testingCenter).toBe(updateData.testingCenter);
@@ -158,7 +163,7 @@ describe("Pollution Certificate (PUCC) API", () => {
       const res = await request(app)
         .put(`/api/vehicles/${vehicleId}/pucc/${puccId}`)
         .send(invalidData);
-      
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -166,17 +171,17 @@ describe("Pollution Certificate (PUCC) API", () => {
     test("should return 404 for non-existent pollution certificate update", async () => {
       const updateData = {
         vehicleId,
-        id: 99999,
+        id: randomUUID(),
         certificateNumber: "PUCC987654321",
         issueDate: "2024-02-01",
         expiryDate: "2025-01-31",
-        testingCenter: "New Testing Center"
+        testingCenter: "New Testing Center",
       };
 
       const res = await request(app)
-        .put(`/api/vehicles/${vehicleId}/pucc/99999`)
+        .put(`/api/vehicles/${vehicleId}/pucc/${randomUUID()}`)
         .send(updateData);
-      
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
@@ -184,22 +189,28 @@ describe("Pollution Certificate (PUCC) API", () => {
 
   describe("DELETE /api/vehicles/:vehicleId/pucc/:id", () => {
     test("should delete pollution certificate", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/pucc/${puccId}`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/pucc/${puccId}`,
+      );
+
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
     });
 
     test("should return 404 for non-existent pollution certificate deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/${vehicleId}/pucc/99999`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/${vehicleId}/pucc/${randomUUID()}`,
+      );
+
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
     });
 
     test("should validate parameters for deletion", async () => {
-      const res = await request(app).delete(`/api/vehicles/invalid/pucc/invalid`);
-      
+      const res = await request(app).delete(
+        `/api/vehicles/invalid/pucc/invalid`,
+      );
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
     });
