@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { formatMileage, getMileageUnit } from '$lib/helper/formatting';
-	import { fuelLogStore } from '$lib/stores/fuelLogStore';
+	import { chartDataStore } from '$lib/stores/chartDataStore';
 	import type { DataPoint } from '$lib/types';
 	import AreaChart from './AreaChart.svelte';
 
 	let chartData: DataPoint[] = $state([]);
 
-	fuelLogStore.subscribe((data) => {
+	chartDataStore.subscribe((data) => {
 		chartData = data.mileageData || [];
 	});
 </script>

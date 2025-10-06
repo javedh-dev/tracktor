@@ -2,11 +2,11 @@
 	import { formatCurrency, getCurrencySymbol } from '$helper/formatting';
 	import type { DataPoint } from '$lib/types';
 	import AreaChart from './AreaChart.svelte';
-	import { fuelLogStore } from '$lib/stores/fuelLogStore';
+	import { chartDataStore } from '$lib/stores/chartDataStore';
 
 	let chartData: DataPoint[] = $state([]);
 
-	fuelLogStore.subscribe((data) => {
+	chartDataStore.subscribe((data) => {
 		chartData = data.costData || [];
 	});
 </script>

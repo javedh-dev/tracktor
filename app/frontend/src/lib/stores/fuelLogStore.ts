@@ -1,14 +1,11 @@
 import { axiosAuth } from '$lib/helper/api';
-import type { DataPoint } from '$lib/types';
 import type { FuelLog } from '$lib/types/fuel';
 import type { ApiResponse } from '@tracktor/common';
 import { compareDesc } from 'date-fns';
 import { writable } from 'svelte/store';
 
-type FuelLogStore = {
+export type FuelLogStore = {
 	fuelLogs: FuelLog[];
-	mileageData?: DataPoint[];
-	costData?: DataPoint[];
 	openSheet: boolean;
 	vehicleId?: string;
 	editMode?: boolean;
@@ -24,32 +21,6 @@ const createFuelLogStore = () => {
 		processing: false
 	});
 
-	const updateCostData = (logs: FuelLog[]) => {
-		const costData = logs
-			.filter((log) => log.cost)
-			.map((log) => {
-				return {
-					x: new Date(log.date),
-					y: log.cost
-				};
-			})
-			.sort((a, b) => a.x.getTime() - b.x.getTime());
-		update((prev) => ({ ...prev, costData }));
-	};
-
-	const updateMileageData = (logs: FuelLog[]) => {
-		const mileageData = logs
-			.filter((log) => log.mileage)
-			.map((log) => {
-				return {
-					x: new Date(log.date),
-					y: log.mileage || 0
-				};
-			})
-			.sort((a, b) => a.x.getTime() - b.x.getTime());
-		update((prev) => ({ ...prev, mileageData }));
-	};
-
 	const refreshFuelLogs = (vehicleId: string) => {
 		update((prev) => ({ ...prev, processing: true }));
 		axiosAuth
@@ -57,8 +28,6 @@ const createFuelLogStore = () => {
 			.then(({ data: res }) => {
 				const logs: FuelLog[] = res.data;
 				logs.sort((a, b) => compareDesc(a.date, b.date));
-				updateCostData(logs);
-				updateMileageData(logs);
 				update((prev) => ({ ...prev, fuelLogs: res.data, error: undefined }));
 			})
 			.catch((err) => {

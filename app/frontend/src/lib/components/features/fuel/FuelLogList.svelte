@@ -1,13 +1,18 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import { type FuelLog } from '$lib/types/fuel';
 	import { createRawSnippet } from 'svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { formatCurrency, formatDate, formatDistance, formatVolume } from '$lib/helper/formatting';
+	import {
+		formatCurrency,
+		formatDate,
+		formatDistance,
+		formatMileage,
+		formatVolume
+	} from '$lib/helper/formatting';
 	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
 	import Banknote from '@lucide/svelte/icons/banknote';
+	import Rabbit from '@lucide/svelte/icons/rabbit';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 	import Fuel from '@lucide/svelte/icons/fuel';
@@ -128,6 +133,28 @@
 			}
 		},
 		{
+			accessorKey: 'mileage',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Rabbit,
+					iconClass: 'h-4 w-4 ',
+					label: 'Mileage',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">
+							${!mileage() ? '-' : formatMileage(mileage())}
+							</div>`
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('mileage'));
+			}
+		},
+		{
 			accessorKey: 'notes',
 			header: () =>
 				renderComponent(LabelWithIcon, {
@@ -151,7 +178,7 @@
 				renderComponent(FuelLogContextMenu, {
 					fuelLog: row.original,
 					onaction: () => {
-						fetchFuelLogs();
+						fuelLogStore.refreshFuelLogs(row.original.vehicleId);
 					}
 				})
 		}
