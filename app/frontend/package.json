@@ -65,7 +65,6 @@
 		"@types/d3-array": "^3.2.1",
 		"@types/d3-scale": "^4.0.9",
 		"@types/d3-shape": "^3.1.7",
-		"axios": "^1.12.2",
 		"dot-env": "^0.0.1",
 		"mode-watcher": "^1.1.0",
 		"svelte-loading-spinners": "^0.3.6"

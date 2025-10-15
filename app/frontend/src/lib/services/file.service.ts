@@ -1,4 +1,4 @@
-import { axiosAuth } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api';
 import type { Response } from '$lib/types';
 import type { ApiResponse } from '@tracktor/common';
 
@@ -8,7 +8,7 @@ export const uploadFile = async (file: File): Promise<Response<string>> => {
 		const formData = new FormData();
 		formData.append('file', file);
 
-		const response = await axiosAuth.post<ApiResponse>('/api/files', formData, {
+		const response = await apiClient.post<ApiResponse>('/api/files', formData, {
 			headers: {
 				'X-User-PIN': localStorage.getItem('userPin') || ''
 			}

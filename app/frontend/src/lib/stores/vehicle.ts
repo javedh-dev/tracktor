@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import type { Vehicle } from '../types/vehicle';
-import { axiosAuth } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api';
 import { writable } from 'svelte/store';
 import type { ApiResponse } from '@tracktor/common';
 
@@ -65,7 +65,7 @@ const createVehiclesStore = () => {
 		});
 		// await simulateNetworkDelay(2000); // Simulate network delay for development
 		try {
-			const response = await axiosAuth.get<ApiResponse>('/vehicles');
+			const response = await apiClient.get<ApiResponse>('/vehicles');
 			if (response.status === 200) {
 				const vehicles = response.data.data;
 				if (Array.isArray(vehicles)) {

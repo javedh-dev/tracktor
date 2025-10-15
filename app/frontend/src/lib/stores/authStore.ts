@@ -1,20 +1,20 @@
 import { browser } from '$app/environment';
+import { apiClient } from '$lib/helper/api';
 import type { ApiResponse } from '@tracktor/common';
-import { axios } from '$lib/helper/axios';
 import { writable } from 'svelte/store';
 
 const createAuthStore = () => {
 	const { set, subscribe } = writable<string | null>();
 
 	const isPinConfigured = async () => {
-		return axios
+		return apiClient
 			.get<ApiResponse>('/auth/status')
 			.then(({ data: res }) => res.data.exists as boolean)
 			.catch(() => false);
 	};
 
 	const login = async (pin: string) => {
-		return axios
+		return apiClient
 			.post<ApiResponse>('/auth/verify', { pin })
 			.then(({ data: res }) => {
 				if (res.success) {

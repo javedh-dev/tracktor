@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import Shield from '@lucide/svelte/icons/shield';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Hash from '@lucide/svelte/icons/hash';
@@ -8,53 +6,24 @@
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import { formatCurrency, formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
 	import type { Insurance } from '$lib/types';
+	import { insuranceStore } from '$lib/stores/insuranceStore';
 
 	let { vehicleId } = $props();
 
 	let insurances: Insurance[] = $state([]);
 	let loading = $state(false);
-	let error = $state('');
+	let error = $state<string>();
 
-	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchInsuranceDetails();
-		}
+	insuranceStore.subscribe((data) => {
+		insurances = data.insurances;
+		loading = data.processing;
+		error = data.error;
 	});
 
-	async function fetchInsuranceDetails() {
-		if (!vehicleId) {
-			insurances = [];
-			return;
-		}
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/insurance`), {
-				headers: {
-					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-				}
-			});
-			if (response.ok) {
-				insurances = await response.json();
-			} else {
-				error = 'Failed to fetch insurance data.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		fetchInsuranceDetails();
+	$effect(() => {
+		insuranceStore.refreshInsurances(vehicleId);
 	});
 </script>
 
@@ -74,7 +43,12 @@
 					<Shield class="h-6 w-6" />
 					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{ins.provider}</span>
 				</div>
-				<InsuranceContextMenu insurance={ins} onaction={fetchInsuranceDetails} />
+				<InsuranceContextMenu
+					insurance={ins}
+					onaction={() => {
+						insuranceStore.refreshInsurances(vehicleId);
+					}}
+				/>
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2">

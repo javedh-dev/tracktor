@@ -1,4 +1,4 @@
-import { axiosAuth } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api';
 import type { Vehicle } from '$lib/types/vehicle';
 import type { ApiResponse } from '@tracktor/common';
 import { toast } from 'svelte-sonner';
@@ -22,7 +22,7 @@ const createVehicleStore = () => {
 
 	const refreshVehicles = () => {
 		update((prev) => ({ ...prev, processing: true }));
-		axiosAuth
+		apiClient
 			.get<ApiResponse>('/vehicles')
 			.then(({ data: res }) => {
 				update((prev) => ({ ...prev, vehicles: res.data }));

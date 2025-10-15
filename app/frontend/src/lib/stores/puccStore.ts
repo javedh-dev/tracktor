@@ -1,11 +1,10 @@
 import { apiClient } from '$lib/helper/api';
-import type { FuelLog } from '$lib/types/fuel';
+import type { PollutionCertificate } from '$lib/types';
 import type { ApiResponse } from '@tracktor/common';
-import { compareDesc } from 'date-fns';
 import { writable } from 'svelte/store';
 
-export type FuelLogStore = {
-	fuelLogs: FuelLog[];
+export type PuccStore = {
+	puccs: PollutionCertificate[];
 	openSheet: boolean;
 	vehicleId?: string;
 	editMode?: boolean;
@@ -14,21 +13,20 @@ export type FuelLogStore = {
 	error?: string;
 };
 
-const createFuelLogStore = () => {
-	const { subscribe, update } = writable<FuelLogStore>({
-		fuelLogs: [],
+const createPuccStore = () => {
+	const { subscribe, update } = writable<PuccStore>({
+		puccs: [],
 		openSheet: false,
 		processing: false
 	});
 
-	const refreshFuelLogs = (vehicleId: string) => {
+	const refreshPuccs = (vehicleId: string) => {
 		update((prev) => ({ ...prev, processing: true }));
 		apiClient
-			.get<ApiResponse>(`/vehicles/${vehicleId}/fuel-logs`)
+			.get<ApiResponse>(`/vehicles/${vehicleId}/pucc`)
 			.then(({ data: res }) => {
-				const logs: FuelLog[] = res.data;
-				logs.sort((a, b) => compareDesc(a.date, b.date));
-				update((prev) => ({ ...prev, fuelLogs: logs, error: undefined }));
+				const puccs: PollutionCertificate[] = res.data;
+				update((prev) => ({ ...prev, puccs, error: undefined }));
 			})
 			.catch((err) => {
 				console.log(err);
@@ -41,7 +39,7 @@ const createFuelLogStore = () => {
 		update((prev) => ({ ...prev, openSheet: state, editMode }));
 	};
 
-	return { subscribe, refreshFuelLogs, openSheet };
+	return { subscribe, refreshPuccs, openSheet };
 };
 
-export const fuelLogStore = createFuelLogStore();
+export const puccStore = createPuccStore();

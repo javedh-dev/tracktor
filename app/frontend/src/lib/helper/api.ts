@@ -1,10 +1,6 @@
+import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
-import type { ApiResponse } from '@tracktor/common';
-import axios, { type AxiosResponse } from 'axios';
-import { toast } from 'svelte-sonner';
-import { authStore } from '$lib/stores/authStore';
-import { get } from 'svelte/store';
-import { createAxiosInstnace } from './axios';
+import { HttpClient } from './http';
 
 /**
  * Constructs API URLs properly, handling base URL concatenation
@@ -24,14 +20,11 @@ export function getApiUrl(path: string): string {
 	return `${cleanBaseUrl}/${cleanPath}`;
 }
 
-const axiosAuth = createAxiosInstnace();
-
-axiosAuth.interceptors.request.use((config) => {
-	const pin = get(authStore);
-	if (pin) {
-		config.headers.set({ 'X-User-PIN': pin }, true);
-	}
-	return config;
+// Example of creating a custom client with base configuration
+export const apiClient = new HttpClient({
+	baseURL: '/api',
+	headers: {
+		'x-user-pin': browser ? localStorage.getItem('userPin') || '' : ''
+	},
+	timeout: 5000
 });
-
-export { axiosAuth };

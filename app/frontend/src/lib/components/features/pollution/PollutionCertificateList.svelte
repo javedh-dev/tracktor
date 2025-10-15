@@ -1,59 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import { formatDate } from '$helper/formatting';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import PuccContextMenu from './PuccContextMenu.svelte';
 	import type { PollutionCertificate } from '$lib/types';
+	import { puccStore } from '$lib/stores/puccStore';
 
 	let { vehicleId } = $props();
 
 	let pollutionCertificates: PollutionCertificate[] = $state([]);
 	let loading = $state(false);
-	let error = $state('');
+	let error = $state<string>();
 
-	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchPollutionCertificateDetails();
-		}
+	puccStore.subscribe((data) => {
+		pollutionCertificates = data.puccs;
+		loading = data.processing;
+		error = data.error;
 	});
 
-	async function fetchPollutionCertificateDetails() {
-		if (!vehicleId) {
-			pollutionCertificates = [];
-			return;
-		}
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/pucc`), {
-				headers: {
-					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-				}
-			});
-			if (response.ok) {
-				pollutionCertificates = await response.json();
-			} else {
-				error = 'Failed to fetch Pollution Certificates.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		fetchPollutionCertificateDetails();
+	$effect(() => {
+		puccStore.refreshPuccs(vehicleId);
 	});
 </script>
 
@@ -73,7 +42,12 @@
 					<BadgeCheck class="h-6 w-6 " />
 					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
 				</div>
-				<PuccContextMenu {pucc} onaction={fetchPollutionCertificateDetails} />
+				<PuccContextMenu
+					{pucc}
+					onaction={() => {
+						puccStore.refreshPuccs(vehicleId);
+					}}
+				/>
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">

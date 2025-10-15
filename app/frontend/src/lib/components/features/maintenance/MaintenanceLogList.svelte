@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { createRawSnippet, onMount } from 'svelte';
-	import { browser } from '$app/environment';
+	import { createRawSnippet } from 'svelte';
 	import { formatCurrency, formatDate, formatDistance } from '$helper/formatting';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
@@ -8,19 +7,19 @@
 	import Notebook from '@lucide/svelte/icons/notebook';
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
 	import type { MaintenanceLog } from '$lib/types/maintenance';
+	import { maintenanceLogStore } from '$lib/stores/maintenanceLogStore';
 
 	let { vehicleId } = $props();
 
 	let maintenanceLogs: MaintenanceLog[] = $state([]);
 	let loading = $state(false);
-	let error = $state('');
+	let error = $state<string>();
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -124,50 +123,20 @@
 				renderComponent(MaintenanceContextMenu, {
 					maintenanceLog: row.original,
 					onaction: () => {
-						fetchMaintenanceLogs();
+						maintenanceLogStore.refreshMaintenanceLogs(vehicleId);
 					}
 				})
 		}
 	];
 
-	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchMaintenanceLogs();
-		}
+	maintenanceLogStore.subscribe((data) => {
+		maintenanceLogs = data.maintenanceLogs;
+		loading = data.processing;
+		error = data.error;
 	});
 
-	async function fetchMaintenanceLogs() {
-		if (!vehicleId) {
-			maintenanceLogs = [];
-			return;
-		}
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/maintenance-logs`), {
-				headers: {
-					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-				}
-			});
-			if (response.ok) {
-				const data = await response.json();
-				maintenanceLogs = data;
-			} else {
-				error = 'Failed to fetch maintenance logs.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		fetchMaintenanceLogs();
+	$effect(() => {
+		maintenanceLogStore.refreshMaintenanceLogs(vehicleId);
 	});
 </script>
 
