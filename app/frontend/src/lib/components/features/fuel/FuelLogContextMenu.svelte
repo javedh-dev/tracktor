@@ -4,7 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deleteFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import type { FuelLog } from '$lib/types/fuel';
+	import type { FuelLog } from '$lib/domain/fuel';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 

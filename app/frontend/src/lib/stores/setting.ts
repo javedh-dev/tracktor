@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { getApiUrl } from '$helper/api';
+import { getApiUrl } from '$lib/helper/api.helper';
 
 export interface Config {
 	key: string;

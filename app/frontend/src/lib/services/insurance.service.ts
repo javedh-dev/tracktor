@@ -1,4 +1,4 @@
-import { getApiUrl } from '$lib/helper/api';
+import { getApiUrl } from '$lib/helper/api.helper';
 import type { Response } from '$lib/types';
 import type { Insurance } from '$lib/types/insurance';
 

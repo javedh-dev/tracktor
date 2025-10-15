@@ -3,11 +3,11 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveInsurance } from '$lib/services/insurance.service';
 	import { insuranceModelStore } from '$lib/stores/insurance';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { insuranceSchema, type Insurance } from '$lib/types/insurance';
+	import { insuranceSchema, type Insurance } from '$lib/domain/insurance';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';

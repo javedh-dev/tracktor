@@ -1,21 +1,15 @@
-import { getApiUrl } from '$lib/helper/api';
-import type { FuelLog } from '$lib/types/fuel';
-import type { Response } from '$lib/types';
+import type { FuelLog, Response } from '$lib/domain';
 
 export const saveFuelLog = async (fuelLog: FuelLog): Promise<Response<FuelLog>> => {
 	const res: Response<FuelLog> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(`/api/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id || ''}`),
-			{
-				method: `${fuelLog.id ? 'PUT' : 'POST'}`,
-				headers: {
-					'Content-Type': 'application/json',
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				},
-				body: JSON.stringify(fuelLog)
-			}
-		);
+		const response = await fetch(`/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id || ''}`, {
+			method: `${fuelLog.id ? 'PUT' : 'POST'}`,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(fuelLog)
+		});
 		if (response.ok) {
 			res.data = await response.json();
 		} else {
@@ -33,15 +27,9 @@ export const saveFuelLog = async (fuelLog: FuelLog): Promise<Response<FuelLog>> 
 export const deleteFuelLog = async (fuelLog: FuelLog): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(`/api/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`),
-			{
-				method: 'DELETE',
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			}
-		);
+		const response = await fetch(`/api/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`, {
+			method: 'DELETE'
+		});
 		if (response.ok) {
 			res.data = await response.json();
 		} else {

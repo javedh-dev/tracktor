@@ -3,11 +3,11 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { savePollutionCertificate } from '$lib/services/pucc.service';
 	import { puccModelStore } from '$lib/stores/pucc';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { pollutionCertificateSchema, type PollutionCertificate } from '$lib/types/pucc';
+	import { pollutionCertificateSchema, type PollutionCertificate } from '$lib/domain/pucc';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/calendar-1';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';

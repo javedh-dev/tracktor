@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { formatMileage, getMileageUnit } from '$lib/helper/formatting';
+	import { formatMileage, getMileageUnit } from '$lib/helper/format.helper';
 	import { chartDataStore } from '$lib/stores/chartDataStore';
-	import type { DataPoint } from '$lib/types';
+	import type { DataPoint } from '$lib/domain';
 	import AreaChart from './AreaChart.svelte';
 
 	let chartData: DataPoint[] = $state([]);

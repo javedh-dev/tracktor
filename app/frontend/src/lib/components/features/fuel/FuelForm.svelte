@@ -4,11 +4,12 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
+	import { fuelLogStore, type FuelLogStore } from '$lib/stores/fuelLogStore';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { fuelSchema, type FuelLog } from '$lib/types/fuel';
+	import { fuelSchema, type FuelLog } from '$lib/domain/fuel';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -22,9 +23,9 @@
 	let logToEdit: FuelLog | undefined = $state();
 	let vehicleId: string | undefined = $state();
 
-	fuelLogModelStore.subscribe((data) => {
-		open = data.show;
-		logToEdit = data.logToEdit;
+	fuelLogStore.subscribe((data) => {
+		open = data.openSheet;
+		logToEdit = getSelectedLog(data);
 		vehicleId = data.vehicleId;
 	});
 
@@ -38,7 +39,7 @@
 					if (res.status == 'OK') {
 						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
 						toast.success(`FuelLog ${logToEdit ? 'updated' : 'saved'} successfully...!!!`);
-						fuelLogModelStore.hide();
+						fuelLogStore.openSheet(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
@@ -46,6 +47,7 @@
 			}
 		}
 	});
+
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
@@ -56,6 +58,12 @@
 			return { ...data, vehicleId: vehicleId || '' };
 		});
 	});
+
+	function getSelectedLog(data: FuelLogStore): FuelLog | undefined {
+		if (data.editMode) {
+			return data.fuelLogs.find((log) => log.id == data.selectedId);
+		}
+	}
 </script>
 
 <AppSheet {open} close={() => fuelLogModelStore.hide()} title="Add Fuel Log">

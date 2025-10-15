@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRawSnippet } from 'svelte';
-	import { formatCurrency, formatDate, formatDistance } from '$helper/formatting';
+	import { formatCurrency, formatDate, formatDistance } from '$lib/helper/format.helper';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -12,7 +12,7 @@
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
-	import type { MaintenanceLog } from '$lib/types/maintenance';
+	import type { MaintenanceLog } from '$lib/domain/maintenance';
 	import { maintenanceLogStore } from '$lib/stores/maintenanceLogStore';
 
 	let { vehicleId } = $props();

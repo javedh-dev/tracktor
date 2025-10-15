@@ -2,9 +2,9 @@
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { getApiUrl } from '$lib/helper/api';
+	import { getApiUrl } from '$lib/helper/api.helper';
 	import { maintenanceModelStore } from '$lib/stores/maintenance';
-	import type { MaintenanceLog } from '$lib/types';
+	import type { MaintenanceLog } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 

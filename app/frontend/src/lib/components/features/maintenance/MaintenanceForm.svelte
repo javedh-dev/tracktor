@@ -3,9 +3,9 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { maintenenceSchema, type MaintenanceLog } from '$lib/types/maintenance';
+	import { maintenenceSchema, type MaintenanceLog } from '$lib/domain/maintenance';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Hammer from '@lucide/svelte/icons/hammer';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';

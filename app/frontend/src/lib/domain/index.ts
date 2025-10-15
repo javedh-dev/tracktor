@@ -16,6 +16,8 @@ export enum Status {
 }
 
 // Re-export types from other modules
+export type { FuelLog, FuelSchema } from './fuel';
+export type { Vehicle, VehicleSchema } from './vehicle';
 export type { Insurance, InsuranceSchema } from './insurance';
 export type { PollutionCertificate, PollutionCertificateSchema } from './pucc';
 export type { MaintenanceLog, MaintenenceSchema } from './maintenance';

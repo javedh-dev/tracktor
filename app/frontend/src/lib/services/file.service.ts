@@ -1,28 +1,8 @@
-import { apiClient } from '$lib/helper/api';
-import type { Response } from '$lib/types';
-import type { ApiResponse } from '@tracktor/common';
+import { apiClient } from '$lib/helper/api.helper';
+import type { Response } from '$lib/helper/http.helper';
 
 export const uploadFile = async (file: File): Promise<Response<string>> => {
-	const res: Response<string> = { status: 'OK' };
-	try {
-		const formData = new FormData();
-		formData.append('file', file);
-
-		const response = await apiClient.post<ApiResponse>('/api/files', formData, {
-			headers: {
-				'X-User-PIN': localStorage.getItem('userPin') || ''
-			}
-		});
-
-		if (response.status === 200) {
-			res.data = response.data.data.filename;
-		} else {
-			res.status = 'ERROR';
-			res.error = response.data.errors![0] || 'Failed to upload file.';
-		}
-	} catch (e) {
-		res.status = 'ERROR';
-		res.error = 'Error while uploading file : ' + e;
-	}
-	return res;
+	const formData = new FormData();
+	formData.append('file', file);
+	return apiClient.post<string>('/api/files', formData);
 };

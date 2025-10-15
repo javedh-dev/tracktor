@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 	import { page } from '$app/state';
-	import { authStore } from '$lib/stores/authStore';
+	import { authStore } from '$lib/stores/auth.store';
 
 	let isAuthenticated = $state(false);
 

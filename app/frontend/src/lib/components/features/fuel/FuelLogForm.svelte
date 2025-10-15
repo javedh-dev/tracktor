@@ -4,11 +4,11 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate } from '$lib/helper/formatting';
+	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogModelStore } from '$lib/stores/fuel-log';
 	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { fuelSchema, type FuelLog } from '$lib/types/fuel';
+	import { fuelSchema, type FuelLog } from '$lib/domain/fuel';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';

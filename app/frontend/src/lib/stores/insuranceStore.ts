@@ -1,4 +1,4 @@
-import { apiClient } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api.helper';
 import type { Insurance } from '$lib/types';
 import type { ApiResponse } from '@tracktor/common';
 import { writable } from 'svelte/store';

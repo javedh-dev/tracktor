@@ -35,6 +35,7 @@ class HttpClient {
 		'Content-Type': 'application/json'
 	};
 	private timeout: number = 10000;
+	private requestInterceptors: ((req: RequestConfig) => void)[] = [];
 
 	constructor(config?: { baseURL?: string; headers?: Record<string, string>; timeout?: number }) {
 		if (config?.baseURL) this.baseURL = config.baseURL;
@@ -97,6 +98,7 @@ class HttpClient {
 		const timeoutId = setTimeout(() => controller.abort(), timeout);
 		fetchOptions.signal = controller.signal;
 
+		this.requestInterceptors.forEach((intercept) => intercept(config));
 		try {
 			const response = await fetch(fullURL, fetchOptions);
 			clearTimeout(timeoutId);
@@ -210,6 +212,10 @@ class HttpClient {
 		const client = new HttpClient();
 		return client.delete<T>(url, config);
 	}
+
+	addRequestInterceptor = (interceptor: (req: RequestConfig) => void) => {
+		this.requestInterceptors.push(interceptor);
+	};
 
 	// Interceptors (simplified version)
 	setDefaultHeader(key: string, value: string): void {

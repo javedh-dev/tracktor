@@ -11,7 +11,7 @@
 	import BadgeAlert from '@lucide/svelte/icons/badge-alert';
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import IdCard from '@lucide/svelte/icons/id-card';
-	import { formatDistance } from '$helper/formatting';
+	import { formatDistance } from '$lib/helper/format.helper';
 	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
 	import { maintenanceModelStore } from '$stores/maintenance';
 	import { fuelLogStore } from '$stores/fuelLogStore';
@@ -22,7 +22,7 @@
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import IconWithTooltip from '$lib/components/app/IconWithTooltip.svelte';
+	import IconWithTooltip from '$lib/components/app/IconWithPopover.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';

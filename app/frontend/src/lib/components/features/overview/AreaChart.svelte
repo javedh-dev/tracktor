@@ -3,7 +3,7 @@
 	import { scaleUtc } from 'd3-scale';
 	import { curveCatmullRom } from 'd3-shape';
 	import { Area, AreaChart, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
-	import type { DataPoint } from '$lib/types';
+	import type { DataPoint } from '$lib/domain';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 

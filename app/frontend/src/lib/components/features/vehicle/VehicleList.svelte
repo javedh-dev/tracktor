@@ -5,7 +5,7 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import type { Vehicle } from '$lib/types/vehicle';
+	import type { Vehicle } from '$lib/domain/vehicle';
 	import { Jumper } from 'svelte-loading-spinners';
 
 	let { selectedVehicleId = $bindable(), updateCallback } = $props();

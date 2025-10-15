@@ -4,7 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deletePollutionCertificate } from '$lib/services/pucc.service';
 	import { puccModelStore } from '$lib/stores/pucc';
-	import type { PollutionCertificate } from '$lib/types';
+	import type { PollutionCertificate } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 

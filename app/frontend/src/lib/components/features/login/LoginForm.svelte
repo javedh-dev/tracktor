@@ -6,7 +6,7 @@
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { authStore } from '$lib/stores/authStore';
+	import { authStore } from '$lib/stores/auth.store';
 
 	let { class: className = '', oncomplete, ...restProps } = $props();
 

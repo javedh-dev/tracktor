@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import type { Vehicle } from '../types/vehicle';
-import { apiClient } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api.helper';
 import { writable } from 'svelte/store';
 import type { ApiResponse } from '@tracktor/common';
 

@@ -1,4 +1,4 @@
-import { apiClient } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api.helper';
 import type { FuelLog } from '$lib/types/fuel';
 import type { ApiResponse } from '@tracktor/common';
 import { compareDesc } from 'date-fns';

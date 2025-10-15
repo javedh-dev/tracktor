@@ -8,7 +8,7 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$lib/components/layout/Header.svelte';
-	import { authStore } from '$lib/stores/authStore';
+	import { authStore } from '$lib/stores/auth.store';
 	import { goto } from '$app/navigation';
 
 	let { children } = $props();

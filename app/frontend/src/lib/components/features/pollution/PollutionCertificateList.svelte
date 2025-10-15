@@ -3,10 +3,10 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
-	import { formatDate } from '$helper/formatting';
+	import { formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
 	import PuccContextMenu from './PuccContextMenu.svelte';
-	import type { PollutionCertificate } from '$lib/types';
+	import type { PollutionCertificate } from '$lib/domain';
 	import { puccStore } from '$lib/stores/puccStore';
 
 	let { vehicleId } = $props();

@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { apiClient } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
 import { writable } from 'svelte/store';
 

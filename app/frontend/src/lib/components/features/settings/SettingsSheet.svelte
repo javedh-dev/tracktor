@@ -22,7 +22,7 @@
 		getTimezoneOptions,
 		isValidFormat,
 		isValidTimezone
-	} from '$lib/helper/formatting';
+	} from '$lib/helper/format.helper';
 
 	let open = $state(false);
 	let localConfig: Config[] = $state([]);

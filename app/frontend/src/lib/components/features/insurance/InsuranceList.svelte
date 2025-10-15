@@ -4,10 +4,10 @@
 	import Hash from '@lucide/svelte/icons/hash';
 	import Notebook from '@lucide/svelte/icons/notebook';
 	import Banknote from '@lucide/svelte/icons/banknote';
-	import { formatCurrency, formatDate } from '$helper/formatting';
+	import { formatCurrency, formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
-	import type { Insurance } from '$lib/types';
+	import type { Insurance } from '$lib/domain';
 	import { insuranceStore } from '$lib/stores/insuranceStore';
 
 	let { vehicleId } = $props();

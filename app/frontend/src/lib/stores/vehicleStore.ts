@@ -1,4 +1,4 @@
-import { apiClient } from '$lib/helper/api';
+import { apiClient } from '$lib/helper/api.helper';
 import type { Vehicle } from '$lib/types/vehicle';
 import type { ApiResponse } from '@tracktor/common';
 import { toast } from 'svelte-sonner';

@@ -5,7 +5,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { saveVehicleWithImage } from '$lib/services/vehicle.service';
 	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
-	import { vehicleSchema, type Vehicle } from '$lib/types/vehicle';
+	import { vehicleSchema, type Vehicle } from '$lib/domain/vehicle';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import CarFront from '@lucide/svelte/icons/car-front';

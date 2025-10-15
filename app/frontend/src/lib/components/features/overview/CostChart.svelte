@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { formatCurrency, getCurrencySymbol } from '$helper/formatting';
-	import type { DataPoint } from '$lib/types';
+	import { formatCurrency, getCurrencySymbol } from '$lib/helper/format.helper';
+	import type { DataPoint } from '$lib/domain';
 	import AreaChart from './AreaChart.svelte';
 	import { chartDataStore } from '$lib/stores/chartDataStore';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Jumper } from 'svelte-loading-spinners';
-	import { type FuelLog } from '$lib/types/fuel';
+	import { type FuelLog } from '$lib/domain/fuel';
 	import { createRawSnippet } from 'svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import {
@@ -9,7 +9,7 @@
 		formatDistance,
 		formatMileage,
 		formatVolume
-	} from '$lib/helper/formatting';
+	} from '$lib/helper/format.helper';
 	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Rabbit from '@lucide/svelte/icons/rabbit';
