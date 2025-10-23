@@ -16,7 +16,7 @@ export const addVehicle = async (vehicleData: any) => {
 const calculateOverallMileage = async (vehicleId: string) => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
-    orderBy: (log, { asc }) => asc(log.date),
+    orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)],
   });
 
   if (fuelLogs.length < 2) return null;
@@ -95,7 +95,7 @@ export const getAllVehicles = async () => {
     vehicles.map(async (vehicle) => {
       const latestLog = await db.query.fuelLogTable.findFirst({
         where: (log, { eq }) => eq(log.vehicleId, vehicle.id),
-        orderBy: (log, { desc }) => desc(log.date),
+        orderBy: (log, { desc }) => [log(logs.date), desc(log.odometer)],
         columns: {
           odometer: true,
         },
@@ -174,7 +174,7 @@ export const getVehicleById = async (id: string) => {
   // Get current odometer from latest fuel log
   const latestFuelLog = await db.query.fuelLogTable.findFirst({
     where: (log, { eq }) => eq(log.vehicleId, id),
-    orderBy: (log, { desc }) => desc(log.date),
+    orderBy: (log, { desc }) => [desc(log.date), desc(log.odometer)],
     columns: {
       odometer: true,
     },

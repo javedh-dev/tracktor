@@ -29,7 +29,7 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
 export const getFuelLogs = async (vehicleId: string) => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
-    orderBy: (log, { asc }) => asc(log.date),
+    orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)],
   });
 
   // Calculate mileage
