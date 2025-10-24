@@ -43,7 +43,11 @@ config.subscribe((value) => {
 
 const formatDate = (date: Date | string): string => {
 	const dateObj = typeof date === 'string' ? new Date(date) : date;
-	return formatInTimeZone(dateObj, configs.timezone, configs.dateFormat);
+	try {
+		return formatInTimeZone(dateObj, configs.timezone, configs.dateFormat);
+	} catch (e) {
+		return date.toString();
+	}
 };
 
 const formatDateForCalendar = (date: DateValue): string => {
@@ -92,14 +96,19 @@ const isValidTimezone = (tz: string) => {
 };
 
 const getCurrencySymbol = (currency?: string): string => {
-	return (
-		new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: currency || configs.currency
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'currency')?.value || ''
-	);
+	try {
+		return (
+			new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: currency || configs.currency
+			})
+				.formatToParts(0)
+				.find((part) => part.type === 'currency')?.value || ''
+		);
+	} catch (e) {
+		// console.debug('Unable to find currency Symbol : ', currency);
+		return '';
+	}
 };
 
 const formatCurrency = (amount: number): string => {

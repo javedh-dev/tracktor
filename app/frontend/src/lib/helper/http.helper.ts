@@ -63,6 +63,8 @@ class HttpClient {
 		url: string,
 		config: RequestConfig = {}
 	): Promise<Response<T>> {
+		this.requestInterceptors.forEach((intercept) => intercept(config));
+
 		const {
 			method = 'GET',
 			headers = {},
@@ -98,10 +100,8 @@ class HttpClient {
 		const timeoutId = setTimeout(() => controller.abort(), timeout);
 		fetchOptions.signal = controller.signal;
 
-		this.requestInterceptors.forEach((intercept) => intercept(config));
 		try {
 			const response = await fetch(fullURL, fetchOptions);
-			clearTimeout(timeoutId);
 
 			let responseData: T;
 			const contentType = response.headers.get('content-type');
@@ -111,6 +111,8 @@ class HttpClient {
 			} else {
 				responseData = (await response.text()) as T;
 			}
+
+			clearTimeout(timeoutId);
 
 			const result: Response<T> = {
 				data: responseData,
