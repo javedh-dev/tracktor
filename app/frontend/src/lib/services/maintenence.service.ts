@@ -1,35 +1,19 @@
-import { getApiUrl } from '$lib/helper/api.helper';
-import type { Response } from '$lib/types';
-import type { MaintenanceLog } from '$lib/types/maintenance';
+import type { Response, MaintenanceLog } from '$lib/domain';
+import { apiClient } from '$lib/helper/api.helper';
 
 export const saveMaintenanceLog = async (
 	maintenanceLog: MaintenanceLog
 ): Promise<Response<MaintenanceLog>> => {
 	const res: Response<MaintenanceLog> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(
-				`/api/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id || ''}`
-			),
-			{
-				method: `${maintenanceLog.id ? 'PUT' : 'POST'}`,
-				headers: {
-					'Content-Type': 'application/json',
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				},
-				body: JSON.stringify(maintenanceLog)
-			}
-		);
-		if (response.ok) {
-			res.data = await response.json();
-		} else {
-			res.status = 'ERROR';
-			const data = await response.json();
-			res.error = (data.message as string) || 'Failed to save maintenance log.';
-		}
-	} catch (e) {
+		const method = maintenanceLog.id ? 'PUT' : 'POST';
+		const url = `/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id || ''}`;
+
+		const response = await apiClient[method.toLowerCase() as 'put' | 'post'](url, maintenanceLog);
+		res.data = response.data;
+	} catch (e: any) {
 		res.status = 'ERROR';
-		res.error = 'Error while saving maintenance log : ' + e;
+		res.error = e.response?.data?.message || 'Failed to save maintenance log.';
 	}
 	return res;
 };
@@ -39,25 +23,11 @@ export const deleteMaintenanceLog = async (
 ): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(`/api/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id}`),
-			{
-				method: 'DELETE',
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			}
-		);
-		if (response.ok) {
-			res.data = await response.json();
-		} else {
-			res.status = 'ERROR';
-			const data = await response.json();
-			res.error = (data.message as string) || 'Failed to delete maintenance log.';
-		}
-	} catch (e) {
+		const response = await apiClient.delete(`/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id}`);
+		res.data = response.data;
+	} catch (e: any) {
 		res.status = 'ERROR';
-		res.error = 'Error while deleting maintenance log : ' + e;
+		res.error = e.response?.data?.message || 'Failed to delete maintenance log.';
 	}
 	return res;
 };

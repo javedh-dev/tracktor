@@ -5,9 +5,9 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveInsurance } from '$lib/services/insurance.service';
-	import { insuranceModelStore } from '$lib/stores/insurance';
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { insuranceSchema, type Insurance } from '$lib/domain/insurance';
+	import { insuranceStore } from '$lib/stores/insurance.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+	import { insuranceSchema } from '$lib/domain/insurance';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -16,15 +16,15 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 
-	let open = $state(false);
-	let insuranceToEdit: Insurance | undefined = $state();
-	let vehicleId: string | undefined = $state();
+	// let open = $state(false);
+	// let insuranceToEdit: Insurance | undefined = $state();
+	// let vehicleId: string | undefined = $state();
 
-	insuranceModelStore.subscribe((data) => {
-		open = data.show;
-		insuranceToEdit = data.entryToEdit;
-		vehicleId = data.vehicleId;
-	});
+	// insuranceModelStore.subscribe((data) => {
+	// 	open = data.show;
+	// 	insuranceToEdit = data.entryToEdit;
+	// 	vehicleId = data.vehicleId;
+	// });
 
 	const form = superForm(defaults(zod4(insuranceSchema)), {
 		validators: zod4(insuranceSchema),
@@ -37,9 +37,11 @@
 					endDate: parseDate(f.data.endDate)
 				}).then((res) => {
 					if (res.status == 'OK') {
-						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
-						toast.success(`Insurance ${insuranceToEdit ? 'updated' : 'saved'} successfully...!!!`);
-						insuranceModelStore.hide();
+						vehicleStore.refreshVehicles();
+						toast.success(
+							`Insurance ${insuranceStore.selectedId ? 'updated' : 'saved'} successfully...!!!`
+						);
+						insuranceStore.openForm(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
@@ -50,6 +52,9 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
+		const insuranceToEdit = insuranceStore.insurances?.find(
+			(ins) => ins.id == insuranceStore.selectedId
+		);
 		if (insuranceToEdit) {
 			formData.set({
 				...insuranceToEdit,
@@ -58,12 +63,16 @@
 			});
 		}
 		formData.update((data) => {
-			return { ...data, vehicleId: vehicleId || '' };
+			return { ...data, vehicleId: insuranceStore.vehicleId || '' };
 		});
 	});
 </script>
 
-<AppSheet {open} close={() => insuranceModelStore.hide()} title="Add Insurance">
+<AppSheet
+	open={insuranceStore.openSheet}
+	close={() => insuranceStore.openForm(false)}
+	title="Add Insurance"
+>
 	<form use:enhance onsubmit={(e) => e.preventDefault()}>
 		<div class="flex flex-col gap-4">
 			<Form.Field {form} name="provider" class="w-full">

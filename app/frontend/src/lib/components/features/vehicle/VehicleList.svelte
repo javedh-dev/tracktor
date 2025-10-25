@@ -1,25 +1,17 @@
 <script lang="ts">
-	import { vehicleStore } from '$stores/vehicleStore';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 	import VehicleCard from './VehicleCard.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import type { Vehicle } from '$lib/domain/vehicle';
 	import { Jumper } from 'svelte-loading-spinners';
 
-	let { selectedVehicleId = $bindable(), updateCallback } = $props();
-	let vehicles = $state<Vehicle[]>([]);
-	let loading = $state(true);
-	let error = $state<string>();
+	let { selectedVehicleId = $bindable() } = $props();
 
-	vehicleStore.subscribe((data) => {
-		vehicles = data.vehicles;
-		loading = data.processing;
-		error = data.error;
-		selectedVehicleId = data.selectedId;
-		if (vehicles.length > 0) {
-			selectedVehicleId = selectedVehicleId || vehicles[0].id;
+	$effect(() => {
+		if (vehicleStore.vehicles && vehicleStore.vehicles.length > 0) {
+			selectedVehicleId = selectedVehicleId || vehicleStore.vehicles[0].id;
 		} else {
 			selectedVehicleId = undefined;
 		}
@@ -27,29 +19,28 @@
 
 	const selectVehicle = (vehicleId: string | null) => {
 		if (vehicleId) {
-			vehicleStore.selectVehicle(vehicleId);
+			selectedVehicleId = vehicleId;
 		}
 	};
 </script>
 
-{#if loading}
+{#if vehicleStore.processing}
 	<div class="flex items-center justify-center">
 		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
-{:else if error}
+{:else if vehicleStore.error}
 	<LabelWithIcon
 		icon={CircleAlert}
 		iconClass="h-6 w-6"
 		style="flex min-h-98 items-center justify-center gap-4 text-xl text-rose-500"
-		label={error}
+		label={vehicleStore.error}
 	/>
-{:else if vehicles.length > 0}
+{:else if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
 	<ScrollArea class="w-full whitespace-nowrap" orientation="horizontal">
 		<div class="my-4 flex gap-4">
-			{#each vehicles as vehicle (vehicle.id)}
+			{#each vehicleStore.vehicles as vehicle (vehicle.id)}
 				<VehicleCard
 					{vehicle}
-					{updateCallback}
 					isSelected={selectedVehicleId === vehicle.id}
 					onclick={() => selectVehicle(vehicle.id)}
 					onkeydown={(e: { key: string }) => {

@@ -4,8 +4,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { maintenenceSchema, type MaintenanceLog } from '$lib/domain/maintenance';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+	import { maintenenceSchema } from '$lib/domain/maintenance';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Hammer from '@lucide/svelte/icons/hammer';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -13,18 +13,8 @@
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
 	import { saveMaintenanceLog } from '$lib/services/maintenence.service';
-
-	let open = $state(false);
-	let logToEdit: MaintenanceLog | undefined = $state();
-	let vehicleId: string | undefined = $state();
-
-	maintenanceModelStore.subscribe((data) => {
-		open = data.show;
-		logToEdit = data.logToEdit;
-		vehicleId = data.vehicleId;
-	});
 
 	const form = superForm(defaults(zod4(maintenenceSchema)), {
 		validators: zod4(maintenenceSchema),
@@ -33,9 +23,11 @@
 			if (f.valid) {
 				saveMaintenanceLog({ ...f.data, date: parseDate(f.data.date) }).then((res) => {
 					if (res.status == 'OK') {
-						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
-						toast.success(`Maintenance Log ${logToEdit ? 'updated' : 'saved'} successfully...!!!`);
-						maintenanceModelStore.hide();
+						vehicleStore.refreshVehicles();
+						toast.success(
+							`Maintenance Log ${maintenanceStore.editMode ? 'updated' : 'saved'} successfully...!!!`
+						);
+						maintenanceStore.openForm(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
@@ -46,16 +38,25 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (logToEdit) {
-			formData.set({ ...logToEdit, date: formatDate(logToEdit.date) });
+		if (maintenanceStore.selectedId && maintenanceStore.editMode) {
+			const logToEdit = maintenanceStore.maintenanceLogs?.find(
+				(log) => log.id == maintenanceStore.selectedId
+			);
+			if (logToEdit) {
+				formData.set({ ...logToEdit, date: formatDate(logToEdit.date) });
+			}
 		}
 		formData.update((data) => {
-			return { ...data, vehicleId: vehicleId || '' };
+			return { ...data, vehicleId: maintenanceStore.vehicleId || '' };
 		});
 	});
 </script>
 
-<AppSheet {open} close={() => maintenanceModelStore.hide()} title="Add Maintenance Log">
+<AppSheet
+	open={maintenanceStore.openSheet}
+	close={() => maintenanceStore.openForm(false)}
+	title="Add Maintenance Log"
+>
 	<form use:enhance onsubmit={(e) => e.preventDefault()}>
 		<div class="flex flex-col gap-4">
 			<!-- <div class="flex w-full flex-row gap-4"> -->

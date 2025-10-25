@@ -6,9 +6,9 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveFuelLog } from '$lib/services/fuel.service';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { fuelSchema, type FuelLog } from '$lib/domain/fuel';
+	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+	import { fuelSchema } from '$lib/domain/fuel';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -18,16 +18,6 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 
-	let open = $state(false);
-	let logToEdit: FuelLog | undefined = $state();
-	let vehicleId: string | undefined = $state();
-
-	fuelLogModelStore.subscribe((data) => {
-		open = data.show;
-		logToEdit = data.logToEdit;
-		vehicleId = data.vehicleId;
-	});
-
 	const form = superForm(defaults(zod4(fuelSchema)), {
 		validators: zod4(fuelSchema),
 		SPA: true,
@@ -36,9 +26,11 @@
 			if (f.valid) {
 				saveFuelLog({ ...f.data, date: parseDate(f.data.date) }).then((res) => {
 					if (res.status == 'OK') {
-						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
-						toast.success(`FuelLog ${logToEdit ? 'updated' : 'saved'} successfully...!!!`);
-						fuelLogModelStore.hide();
+						vehicleStore.refreshVehicles();
+						toast.success(
+							`FuelLog ${fuelLogStore.editMode ? 'updated' : 'saved'} successfully...!!!`
+						);
+						fuelLogStore.openForm(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
@@ -46,19 +38,34 @@
 			}
 		}
 	});
+
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (logToEdit) {
-			formData.set({ ...logToEdit, date: formatDate(logToEdit.date) });
+		if (fuelLogStore.selectedId && fuelLogStore.editMode) {
+			const logToEdit = fuelLogStore.fuelLogs?.find((log) => log.id == fuelLogStore.selectedId);
+
+			if (logToEdit) {
+				formData.set({ ...logToEdit, date: formatDate(logToEdit.date) });
+			}
 		}
 		formData.update((data) => {
-			return { ...data, vehicleId: vehicleId || '' };
+			return { ...data, vehicleId: fuelLogStore.vehicleId || '' };
 		});
 	});
+
+	// function getSelectedLog(data: FuelLogStore): FuelLog | undefined {
+	// 	if (data.editMode) {
+	// 		return data.fuelLogs.find((log) => log.id == data.selectedId);
+	// 	}
+	// }
 </script>
 
-<AppSheet {open} close={() => fuelLogModelStore.hide()} title="Add Fuel Log">
+<AppSheet
+	open={fuelLogStore.openSheet}
+	close={() => fuelLogStore.openForm(false)}
+	title="Add Fuel Log"
+>
 	<form use:enhance onsubmit={(e) => e.preventDefault()}>
 		<div class="flex flex-col gap-4">
 			<!-- <div class="flex w-full flex-row gap-4"> -->

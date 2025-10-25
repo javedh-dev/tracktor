@@ -4,5 +4,5 @@ import type { Response } from '$lib/helper/http.helper';
 export const uploadFile = async (file: File): Promise<Response<string>> => {
 	const formData = new FormData();
 	formData.append('file', file);
-	return apiClient.post<string>('/api/files', formData);
+	return apiClient.post<string>('/files', formData);
 };

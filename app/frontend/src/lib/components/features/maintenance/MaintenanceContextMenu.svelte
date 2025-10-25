@@ -2,41 +2,27 @@
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { getApiUrl } from '$lib/helper/api.helper';
-	import { maintenanceModelStore } from '$lib/stores/maintenance';
+	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
 	import type { MaintenanceLog } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
+	import { deleteMaintenanceLog } from '$lib/services/maintenence.service';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =
 		$props();
 	let showDeleteDialog = $state(false);
 
-	async function deleteFuelLog() {
-		if (!maintenanceLog.id) {
-			return;
-		}
-		try {
-			const response = await fetch(
-				getApiUrl(`/api/vehicles/${maintenanceLog.vehicleId}/fuel-logs/${maintenanceLog.id}`),
-				{
-					method: 'DELETE',
-					headers: {
-						'X-User-PIN': localStorage.getItem('userPin') || ''
-					}
-				}
-			);
-			if (response.ok) {
+	const deleteLog = () => {
+		deleteMaintenanceLog(maintenanceLog).then((res) => {
+			if (res.status === 'OK') {
 				showDeleteDialog = false;
 				toast.success('Deleted Fuel Log');
 				onaction();
 			} else {
-				toast.error('Failed to delete the Fuel Log');
+				toast.error(res.error || 'Some error occurred while deleting vehicle.');
 			}
-		} catch (e) {
-			console.error('Failed to connect to the server.', e);
-		}
-	}
+		});
+	};
 </script>
 
 <div class=" flex flex-row justify-end">
@@ -52,7 +38,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					maintenanceModelStore.show(maintenanceLog.vehicleId, maintenanceLog, true, onaction);
+					maintenanceStore.openForm(true, maintenanceLog.id, maintenanceLog.vehicleId);
 				}}
 			>
 				Edit
@@ -64,4 +50,4 @@
 	</DropdownMenu.Root>
 </div>
 
-<DeleteConfirmation onConfirm={() => deleteFuelLog()} bind:open={showDeleteDialog} />
+<DeleteConfirmation onConfirm={() => deleteLog()} bind:open={showDeleteDialog} />

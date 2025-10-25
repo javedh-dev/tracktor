@@ -1,31 +1,17 @@
-import { getApiUrl } from '$lib/helper/api.helper';
-import type { Response } from '$lib/types';
-import type { Insurance } from '$lib/types/insurance';
+import type { Response, Insurance } from '$lib/domain';
+import { apiClient } from '$lib/helper/api.helper';
 
 export const saveInsurance = async (insurance: Insurance): Promise<Response<Insurance>> => {
 	const res: Response<Insurance> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(`/api/vehicles/${insurance.vehicleId}/insurance/${insurance.id || ''}`),
-			{
-				method: `${insurance.id ? 'PUT' : 'POST'}`,
-				headers: {
-					'Content-Type': 'application/json',
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				},
-				body: JSON.stringify(insurance)
-			}
-		);
-		if (response.ok) {
-			res.data = await response.json();
-		} else {
-			res.status = 'ERROR';
-			const data = await response.json();
-			res.error = (data.message as string) || 'Failed to save insurance.';
-		}
-	} catch (e) {
+		const method = insurance.id ? 'PUT' : 'POST';
+		const url = `/vehicles/${insurance.vehicleId}/insurance/${insurance.id || ''}`;
+
+		const response = await apiClient[method.toLowerCase() as 'put' | 'post'](url, insurance);
+		res.data = response.data;
+	} catch (e: any) {
 		res.status = 'ERROR';
-		res.error = 'Error while saving insurance : ' + e;
+		res.error = e.response?.data?.message || 'Failed to save insurance.';
 	}
 	return res;
 };
@@ -33,25 +19,11 @@ export const saveInsurance = async (insurance: Insurance): Promise<Response<Insu
 export const deleteInsurance = async (insurance: Insurance): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await fetch(
-			getApiUrl(`/api/vehicles/${insurance.vehicleId}/insurance/${insurance.id}`),
-			{
-				method: 'DELETE',
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			}
-		);
-		if (response.ok) {
-			res.data = await response.json();
-		} else {
-			res.status = 'ERROR';
-			const data = await response.json();
-			res.error = (data.message as string) || 'Failed to delete insurance.';
-		}
-	} catch (e) {
+		const response = await apiClient.delete(`/vehicles/${insurance.vehicleId}/insurance/${insurance.id}`);
+		res.data = response.data;
+	} catch (e: any) {
 		res.status = 'ERROR';
-		res.error = 'Error while deleting insurance : ' + e;
+		res.error = e.response?.data?.message || 'Failed to delete insurance.';
 	}
 	return res;
 };

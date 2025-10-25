@@ -1,6 +1,6 @@
 <script lang="ts">
 	import VehicleList from '$feature/vehicle/VehicleList.svelte';
-	import { vehicleStore } from '$stores/vehicleStore';
+	import { vehicleStore } from '$stores/vehicle.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
@@ -8,20 +8,14 @@
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { Jumper } from 'svelte-loading-spinners';
 
-	let selectedVehicleId = $state<string | undefined>();
-	let loading = $state(false);
+	let selectedVehicleId = vehicleStore.selectedId;
 
-	const updateCallback = (success: boolean) => success && vehicleStore.refreshVehicles();
-
-	vehicleStore.subscribe(({ processing, selectedId }) => {
-		loading = processing;
-		selectedVehicleId = selectedId;
-	});
+	// const updateCallback = (success: boolean) => success && vehicleStore.refreshVehicles();
 
 	onMount(() => vehicleStore.refreshVehicles());
 </script>
 
-{#if loading}
+{#if vehicleStore.processing}
 	<div class="flex min-h-screen items-center justify-center">
 		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
@@ -33,13 +27,13 @@
 				variant="outline"
 				size="default"
 				class="cursor-pointer"
-				onclick={() => vehicleStore.openSheet(true, false)}
+				onclick={() => vehicleStore.openForm(true, selectedVehicleId)}
 			>
 				<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />
 			</Button>
 		</div>
 
-		<VehicleList bind:selectedVehicleId {updateCallback} />
+		<VehicleList bind:selectedVehicleId />
 
 		{#if selectedVehicleId}
 			<DashboardTabs vehicleId={selectedVehicleId} />

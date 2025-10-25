@@ -6,36 +6,26 @@
 	import { formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
 	import PuccContextMenu from './PuccContextMenu.svelte';
-	import type { PollutionCertificate } from '$lib/domain';
-	import { puccStore } from '$lib/stores/puccStore';
+	import { puccStore } from '$lib/stores/pucc.svelte';
 
 	let { vehicleId } = $props();
 
-	let pollutionCertificates: PollutionCertificate[] = $state([]);
-	let loading = $state(false);
-	let error = $state<string>();
-
-	puccStore.subscribe((data) => {
-		pollutionCertificates = data.puccs;
-		loading = data.processing;
-		error = data.error;
-	});
-
 	$effect(() => {
-		puccStore.refreshPuccs(vehicleId);
+		puccStore.setVehicleId(vehicleId);
+		puccStore.refreshPollutionCertificates();
 	});
 </script>
 
-{#if loading}
+{#if puccStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if pollutionCertificates.length === 0}
+{:else if puccStore.error}
+	<p class="text-red-500">Error: {puccStore.error}</p>
+{:else if puccStore.pollutionCertificates?.length === 0}
 	<div>No Pollution Certificates for this vehicle.</div>
 {:else}
-	{#each pollutionCertificates as pucc (pucc.id)}
+	{#each puccStore.pollutionCertificates as pucc (pucc.id)}
 		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
@@ -45,7 +35,7 @@
 				<PuccContextMenu
 					{pucc}
 					onaction={() => {
-						puccStore.refreshPuccs(vehicleId);
+						puccStore.refreshPollutionCertificates();
 					}}
 				/>
 			</div>

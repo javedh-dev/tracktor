@@ -1,18 +1,11 @@
 <script lang="ts">
 	import { formatCurrency, getCurrencySymbol } from '$lib/helper/format.helper';
-	import type { DataPoint } from '$lib/domain';
+	import { chartStore } from '$lib/stores/chart.svelte';
 	import AreaChart from './AreaChart.svelte';
-	import { chartDataStore } from '$lib/stores/chartDataStore';
-
-	let chartData: DataPoint[] = $state([]);
-
-	chartDataStore.subscribe((data) => {
-		chartData = data.costData || [];
-	});
 </script>
 
 <AreaChart
-	{chartData}
+	chartData={chartStore.costData || []}
 	label="Cost"
 	title={`Cost over Time in (${getCurrencySymbol()})`}
 	xFormatter={(v: Date) =>

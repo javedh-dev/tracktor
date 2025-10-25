@@ -1,4 +1,4 @@
-import { config } from '$lib/stores/setting';
+import { configStore } from '$lib/stores/config.svelte';
 import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
@@ -21,23 +21,19 @@ const configs: ConfigStore = {
 	timezone: 'UTC'
 };
 
-config.subscribe((value) => {
-	if (value && value.length > 0) {
-		value.forEach((item) => {
-			if (item.key === 'dateFormat') {
-				configs.dateFormat = item.value || configs.dateFormat;
-			} else if (item.key === 'currency') {
-				configs.currency = item.value || configs.currency;
-			} else if (item.key === 'unitOfVolume') {
-				configs.unitOfVolume = item.value || configs.unitOfVolume;
-			} else if (item.key === 'unitOfDistance') {
-				configs.unitOfDistance = item.value || configs.unitOfDistance;
-			} else if (item.key === 'locale') {
-				// configs.locale = item.value || configs.locale;
-			} else if (item.key === 'timezone') {
-				configs.timezone = item.value || configs.timezone;
-			}
-		});
+configStore.configs.forEach((item) => {
+	if (item.key === 'dateFormat') {
+		configs.dateFormat = item.value || configs.dateFormat;
+	} else if (item.key === 'currency') {
+		configs.currency = item.value || configs.currency;
+	} else if (item.key === 'unitOfVolume') {
+		configs.unitOfVolume = item.value || configs.unitOfVolume;
+	} else if (item.key === 'unitOfDistance') {
+		configs.unitOfDistance = item.value || configs.unitOfDistance;
+	} else if (item.key === 'locale') {
+		// configs.locale = item.value || configs.locale;
+	} else if (item.key === 'timezone') {
+		configs.timezone = item.value || configs.timezone;
 	}
 });
 

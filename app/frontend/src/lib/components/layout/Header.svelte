@@ -4,27 +4,21 @@
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
-	import { configModelStore } from '$lib/stores/setting';
-	import { vehiclesStore } from '$stores/vehicle';
+	import { configStore } from '$stores/config.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 	import { page } from '$app/state';
-	import { authStore } from '$lib/stores/auth.store';
+	import { authStore } from '$stores/auth.svelte';
 
 	let isAuthenticated = $state(false);
 
 	$effect(() => {
-		isAuthenticated = !!$authStore;
+		isAuthenticated = !!authStore.pin;
 
 		if (!isAuthenticated && page.url.pathname !== '/login') {
 			goto('/login', { replaceState: true });
 		}
 	});
-
-	const fetchVehicles = () => {
-		const pin = localStorage.getItem('userPin') || undefined;
-		if (pin) vehiclesStore.fetchVehicles(pin);
-	};
 </script>
 
 <header
@@ -44,9 +38,7 @@
 					<Button
 						variant="ghost"
 						onclick={() => {
-							configModelStore.show((status: boolean) => {
-								status && fetchVehicles();
-							});
+							configStore.openForm(true);
 						}}
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />

@@ -2,8 +2,7 @@
 	import AppSheet from '$lib/components/layout/AppSheet.svelte';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { config, configModelStore, type Config } from '$lib/stores/setting';
-	import { vehiclesStore } from '$lib/stores/vehicle';
+	import { configStore } from '$lib/stores/config.svelte';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Currency from '@lucide/svelte/icons/currency';
 	import Earth from '@lucide/svelte/icons/earth';
@@ -23,16 +22,14 @@
 		isValidFormat,
 		isValidTimezone
 	} from '$lib/helper/format.helper';
+	import type { Config } from '$lib/domain/config';
+	import { saveConfig } from '$lib/services/config.service';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
-	let open = $state(false);
 	let localConfig: Config[] = $state([]);
 
-	configModelStore.subscribe((data) => {
-		open = data.show;
-	});
-
-	config.subscribe((value) => {
-		localConfig = JSON.parse(JSON.stringify(value));
+	$effect(() => {
+		localConfig = JSON.parse(JSON.stringify(configStore.configs));
 	});
 
 	// Create a dynamic schema based on config items
@@ -59,10 +56,10 @@
 					return item;
 				});
 
-				config.save(updatedConfig);
+				saveConfig(updatedConfig);
 				toast.success('Configuration updated successfully!');
-				configModelStore.hide();
-				vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
+				configStore.openForm(false);
+				vehicleStore.refreshVehicles();
 			}
 		}
 	});
@@ -96,7 +93,7 @@
 	});
 </script>
 
-<AppSheet {open} close={() => configModelStore.hide()} title="Settings">
+<AppSheet open={configStore.openSheet} close={() => configStore.openForm(false)} title="Settings">
 	<form use:enhance onsubmit={(e) => e.preventDefault()}>
 		<div class="flex flex-col gap-6">
 			<!-- Date Format -->

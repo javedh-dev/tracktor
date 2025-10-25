@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deleteInsurance } from '$lib/services/insurance.service';
-	import { insuranceModelStore } from '$lib/stores/insurance';
+	import { insuranceStore } from '$lib/stores/insurance.svelte';
 	import type { Insurance } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
@@ -37,7 +37,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					insuranceModelStore.show(insurance.vehicleId, insurance, true, onaction);
+					insuranceStore.openForm(true, insurance.id, insurance.vehicleId);
 				}}
 			>
 				Edit

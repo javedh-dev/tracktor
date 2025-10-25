@@ -24,13 +24,9 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 
-	import { fuelLogStore } from '$lib/stores/fuelLogStore';
+	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
 
 	const { vehicleId } = $props();
-
-	let fuelLogs: FuelLog[] = $state([]);
-	let loading = $state(true);
-	let error = $state<string>();
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -178,33 +174,34 @@
 				renderComponent(FuelLogContextMenu, {
 					fuelLog: row.original,
 					onaction: () => {
-						fuelLogStore.refreshFuelLogs(row.original.vehicleId);
+						fuelLogStore.refreshFuelLogs();
 					}
 				})
 		}
 	];
 
-	fuelLogStore.subscribe((data) => {
-		fuelLogs = data.fuelLogs;
-		loading = data.processing;
-		error = data.error;
-	});
+	// fuelLogStore.subscribe((data) => {
+	// 	fuelLogs = data.fuelLogs;
+	// 	loading = data.processing;
+	// 	error = data.error;
+	// });
 
 	$effect(() => {
-		fuelLogStore.refreshFuelLogs(vehicleId);
+		fuelLogStore.setVehicleId(vehicleId);
+		fuelLogStore.refreshFuelLogs();
 	});
 </script>
 
-{#if loading}
+{#if fuelLogStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if fuelLogs.length === 0}
+{:else if fuelLogStore.error}
+	<p class="text-red-500">Error: {fuelLogStore.error}</p>
+{:else if fuelLogStore.fuelLogs?.length === 0}
 	<p>No fuel refill logs found for this vehicle.</p>
 {:else}
-	<AppTable data={fuelLogs} {columns} />
+	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}
 
 {#snippet badge(status: boolean)}

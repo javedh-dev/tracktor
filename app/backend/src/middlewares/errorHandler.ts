@@ -22,7 +22,7 @@ const errorHandler = (
       statusCode = Status.BAD_REQUEST;
       body = {
         success: false,
-        errors: (err as AppValidationError).errors,
+        errors: (err as AppValidationError).errors as any,
         message: err.message,
       };
       break;

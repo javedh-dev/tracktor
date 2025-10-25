@@ -5,28 +5,16 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { savePollutionCertificate } from '$lib/services/pucc.service';
-	import { puccModelStore } from '$lib/stores/pucc';
-	import { vehiclesStore } from '$lib/stores/vehicle';
-	import { pollutionCertificateSchema, type PollutionCertificate } from '$lib/domain/pucc';
+	import { puccStore } from '$lib/stores/pucc.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+	import { pollutionCertificateSchema } from '$lib/domain/pucc';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
-	import IdCard from '@lucide/svelte/icons/calendar-1';
+	import IdCard from '@lucide/svelte/icons/id-card';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
 
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
-
-	let open = $state(false);
-	let certificateToEdit: PollutionCertificate | undefined = $state();
-	let vehicleId: string | undefined = $state();
-	let editMode = $state(false);
-
-	puccModelStore.subscribe((data) => {
-		open = data.show;
-		certificateToEdit = data.entryToEdit;
-		vehicleId = data.vehicleId;
-		editMode = data.editMode;
-	});
 
 	const form = superForm(defaults(zod4(pollutionCertificateSchema)), {
 		validators: zod4(pollutionCertificateSchema),
@@ -39,11 +27,11 @@
 					expiryDate: parseDate(f.data.expiryDate)
 				}).then((res) => {
 					if (res.status == 'OK') {
-						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
+						vehicleStore.refreshVehicles();
 						toast.success(
-							`Pollution Certificate ${certificateToEdit ? 'updated' : 'saved'} successfully...!!!`
+							`Pollution Certificate ${puccStore.editMode ? 'updated' : 'saved'} successfully...!!!`
 						);
-						puccModelStore.hide();
+						puccStore.openForm(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
@@ -54,23 +42,28 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (certificateToEdit) {
-			formData.set({
-				...certificateToEdit,
-				issueDate: formatDate(certificateToEdit.issueDate),
-				expiryDate: formatDate(certificateToEdit.expiryDate)
-			});
+		if (puccStore.selectedId && puccStore.editMode) {
+			const certificateToEdit = puccStore.pollutionCertificates?.find(
+				(cert) => cert.id == puccStore.selectedId
+			);
+			if (certificateToEdit) {
+				formData.set({
+					...certificateToEdit,
+					issueDate: formatDate(certificateToEdit.issueDate),
+					expiryDate: formatDate(certificateToEdit.expiryDate)
+				});
+			}
 		}
 		formData.update((data) => {
-			return { ...data, vehicleId: vehicleId || '' };
+			return { ...data, vehicleId: puccStore.vehicleId || '' };
 		});
 	});
 </script>
 
 <AppSheet
-	{open}
-	close={() => puccModelStore.hide()}
-	title={editMode ? 'Edit Pollution Certificate' : 'Add Pollution Certificate'}
+	open={puccStore.openSheet}
+	close={() => puccStore.openForm(false)}
+	title={puccStore.editMode ? 'Edit Pollution Certificate' : 'Add Pollution Certificate'}
 >
 	<form use:enhance onsubmit={(e) => e.preventDefault()}>
 		<div class="flex flex-col gap-4">

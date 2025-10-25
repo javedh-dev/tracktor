@@ -1,18 +1,11 @@
 <script lang="ts">
 	import { formatMileage, getMileageUnit } from '$lib/helper/format.helper';
-	import { chartDataStore } from '$lib/stores/chartDataStore';
-	import type { DataPoint } from '$lib/domain';
+	import { chartStore } from '$lib/stores/chart.svelte';
 	import AreaChart from './AreaChart.svelte';
-
-	let chartData: DataPoint[] = $state([]);
-
-	chartDataStore.subscribe((data) => {
-		chartData = data.mileageData || [];
-	});
 </script>
 
 <AreaChart
-	{chartData}
+	chartData={chartStore.mileageData || []}
 	label="Milage"
 	title={`Mileage over Time in ( ${getMileageUnit()} )`}
 	xFormatter={(v: Date) =>

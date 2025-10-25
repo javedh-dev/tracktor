@@ -4,8 +4,8 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { saveVehicleWithImage } from '$lib/services/vehicle.service';
-	import { vehicleModelStore, vehiclesStore } from '$lib/stores/vehicle';
-	import { vehicleSchema, type Vehicle } from '$lib/domain/vehicle';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+	import { vehicleSchema } from '$lib/domain/vehicle';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import CarFront from '@lucide/svelte/icons/car-front';
@@ -18,30 +18,26 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 
-	let open = $state(false);
-	let vehicleToEdit: Vehicle | undefined = $state();
 	let image = $state<File>();
 	let processing = $state(false);
-
-	vehicleModelStore.subscribe((data) => {
-		open = data.show;
-		vehicleToEdit = data.vehicleToEdit;
-	});
 
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),
 		SPA: true,
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
+				processing = true;
+				const vehicleToEdit = vehicleStore.vehicles?.find((v) => v.id == vehicleStore.selectedId);
 				saveVehicleWithImage(f.data, image, vehicleToEdit ? 'PUT' : 'POST').then((res) => {
 					if (res.status == 'OK') {
-						vehiclesStore.fetchVehicles(localStorage.getItem('userPin') || '');
+						vehicleStore.refreshVehicles();
 						toast.success(`Vehicle ${vehicleToEdit ? 'updated' : 'saved'} successfully...!!!`);
 						image = undefined;
-						vehicleModelStore.hide();
+						vehicleStore.openForm(false);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
+					processing = false;
 				});
 			}
 		}
@@ -49,13 +45,18 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (vehicleToEdit) {
+		const vehicleToEdit = vehicleStore.vehicles?.find((v) => v.id == vehicleStore.selectedId);
+		if (vehicleToEdit && vehicleStore.editMode) {
 			formData.set(vehicleToEdit);
 		}
 	});
 </script>
 
-<AppSheet {open} close={() => vehicleModelStore.hide()} title="Add Vehicle">
+<AppSheet
+	open={vehicleStore.openSheet}
+	close={() => vehicleStore.openForm(false)}
+	title={vehicleStore.editMode ? 'Edit Vehicle' : 'Add Vehicle'}
+>
 	<form
 		use:enhance
 		onsubmit={(e) => e.preventDefault()}

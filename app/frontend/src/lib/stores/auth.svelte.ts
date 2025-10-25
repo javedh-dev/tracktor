@@ -1,44 +1,43 @@
 import { browser } from '$app/environment';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
-import { writable } from 'svelte/store';
 
-const createAuthStore = () => {
-	const { set, subscribe } = writable<string | null>();
+class AuthStore {
+	pin = $state<string>();
 
-	const isPinConfigured = async () => {
+	constructor() {
+		if (browser) {
+			const pin = localStorage.getItem('userPin');
+			if (pin) {
+				this.login(pin);
+			}
+		}
+	}
+
+	isPinConfigured = async () => {
 		return apiClient
 			.get<ApiResponse>('/auth/status')
 			.then(({ data: res }) => res.data.exists as boolean)
 			.catch(() => false);
 	};
 
-	const login = async (pin: string) => {
+	login = async (pin: string) => {
 		return apiClient
 			.post<ApiResponse>('/auth/verify', { pin })
 			.then(({ data: res }) => {
 				if (res.success) {
-					set(pin);
+					this.pin = pin;
 					if (browser) {
 						localStorage.setItem('userPin', pin);
 					}
 				}
 			})
-			.catch((err) => set(null));
+			.catch((err) => (this.pin = undefined));
 	};
 
-	const logout = () => {
-		set(null);
+	logout = () => {
+		this.pin = undefined;
 	};
+}
 
-	if (browser) {
-		const pin = localStorage.getItem('userPin');
-		if (pin) {
-			login(pin);
-		}
-	}
-
-	return { subscribe, login, logout, isPinConfigured };
-};
-
-export const authStore = createAuthStore();
+export const authStore = new AuthStore();

@@ -13,13 +13,9 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
 	import type { MaintenanceLog } from '$lib/domain/maintenance';
-	import { maintenanceLogStore } from '$lib/stores/maintenanceLogStore';
+	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
 
 	let { vehicleId } = $props();
-
-	let maintenanceLogs: MaintenanceLog[] = $state([]);
-	let loading = $state(false);
-	let error = $state<string>();
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -123,31 +119,26 @@
 				renderComponent(MaintenanceContextMenu, {
 					maintenanceLog: row.original,
 					onaction: () => {
-						maintenanceLogStore.refreshMaintenanceLogs(vehicleId);
+						maintenanceStore.refreshMaintenanceLogs();
 					}
 				})
 		}
 	];
 
-	maintenanceLogStore.subscribe((data) => {
-		maintenanceLogs = data.maintenanceLogs;
-		loading = data.processing;
-		error = data.error;
-	});
-
 	$effect(() => {
-		maintenanceLogStore.refreshMaintenanceLogs(vehicleId);
+		maintenanceStore.setVehicleId(vehicleId);
+		maintenanceStore.refreshMaintenanceLogs();
 	});
 </script>
 
-{#if loading}
+{#if maintenanceStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if maintenanceLogs.length === 0}
+{:else if maintenanceStore.error}
+	<p class="text-red-500">Error: {maintenanceStore.error}</p>
+{:else if maintenanceStore.maintenanceLogs?.length === 0}
 	<div>No maintenance logs for this vehicle.</div>
 {:else}
-	<AppTable data={maintenanceLogs} {columns} />
+	<AppTable data={maintenanceStore.maintenanceLogs} {columns} />
 {/if}

@@ -12,11 +12,11 @@
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import { formatDistance } from '$lib/helper/format.helper';
-	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
-	import { maintenanceModelStore } from '$stores/maintenance';
-	import { fuelLogStore } from '$stores/fuelLogStore';
-	import { insuranceModelStore } from '$stores/insurance';
-	import { puccModelStore } from '$stores/pucc';
+	import { vehicleStore } from '$stores/vehicle.svelte';
+	import { maintenanceStore } from '$stores/maintenance.svelte';
+	import { fuelLogStore } from '$stores/fuel-log.svelte';
+	import { insuranceStore } from '$stores/insurance.svelte';
+	import { puccStore } from '$stores/pucc.svelte';
 	import { browser } from '$app/environment';
 	import IconButton from '$lib/components/app/IconButton.svelte';
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
@@ -27,7 +27,7 @@
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';
 
-	const { vehicle, updateCallback, onclick, onkeydown, isSelected = false } = $props();
+	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
 
 	const performDelete = async (vehicleId: string) => {
@@ -44,7 +44,7 @@
 	const fetchVehicles = () => {
 		if (browser) {
 			const pin = localStorage.getItem('userPin') || undefined;
-			if (pin) vehiclesStore.fetchVehicles(pin);
+			if (pin) vehicleStore.refreshVehicles();
 		}
 	};
 
@@ -123,28 +123,28 @@
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
-						onclick={() => fuelLogStore.openSheet(true, false)}
+						onclick={() => fuelLogStore.openForm(true, null, vehicle.id)}
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 						iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 						icon={Wrench}
-						onclick={() => maintenanceModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => maintenanceStore.openForm(true, null, vehicle.id)}
 						ariaLabel="Maintenence"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 						iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 						icon={Shield}
-						onclick={() => insuranceModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => insuranceStore.openForm(true, null, vehicle.id)}
 						ariaLabel="Insurance"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
 						iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 						icon={BadgeCheck}
-						onclick={() => puccModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => puccStore.openForm(true, null, vehicle.id)}
 						ariaLabel="Pollution Certificate"
 					/>
 				</div>
@@ -154,7 +154,7 @@
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
 						icon={Pencil}
 						onclick={() => {
-							vehicleModelStore.show(vehicle, true);
+							vehicleStore.openForm(true, vehicle.id);
 						}}
 						ariaLabel="Edit"
 					/>
