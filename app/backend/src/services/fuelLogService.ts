@@ -32,6 +32,7 @@ export const addFuelLog = async (
 export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
+    orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)],
   });
 
   // Calculate mileage
