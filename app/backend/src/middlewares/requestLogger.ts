@@ -3,11 +3,10 @@ import { NextFunction, Request, Response } from "express";
 
 const requestLogger = (req: Request, _: Response, next: NextFunction) => {
   if (env.LOG_REQUESTS) {
-    logger.info(
-      `${req.method} ${req.originalUrl} - IP: ${req.ip} - Body: ${JSON.stringify(
-        req.body,
-      )}`,
-    );
+    let message = `${req.method} ${req.originalUrl} - IP: ${req.ip} `;
+    if (req.body) message += `- Body: ${JSON.stringify(req.body, null, 2)}`;
+
+    logger.info(message);
   }
   next();
 };

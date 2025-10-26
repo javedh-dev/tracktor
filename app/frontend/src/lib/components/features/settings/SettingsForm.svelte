@@ -29,7 +29,7 @@
 	let localConfig: Config[] = $state([]);
 
 	$effect(() => {
-		localConfig = JSON.parse(JSON.stringify(configStore.configs));
+		localConfig = JSON.parse(JSON.stringify(configStore.rawConfig));
 	});
 
 	// Create a dynamic schema based on config items
@@ -58,6 +58,7 @@
 
 				saveConfig(updatedConfig);
 				toast.success('Configuration updated successfully!');
+				configStore.refreshConfigs();
 				sheetStore.closeSheet(vehicleStore.refreshVehicles);
 			}
 		}

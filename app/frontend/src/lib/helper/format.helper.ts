@@ -1,43 +1,7 @@
-import { configStore } from '$lib/stores/config.svelte';
+import configs from '$lib/stores/config.svelte';
 import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
-
-export interface ConfigStore {
-	dateFormat: string;
-	currency: string;
-	unitOfDistance: string;
-	unitOfVolume: string;
-	locale: string;
-	timezone: string;
-}
-
-const configs: ConfigStore = {
-	dateFormat: 'dd/MM/yyyy',
-	currency: 'USD',
-	unitOfDistance: 'kilometer',
-	unitOfVolume: 'liter',
-	locale: 'en',
-	timezone: 'UTC'
-};
-
-configStore.refreshConfigs();
-
-configStore.configs.forEach((item) => {
-	if (item.key === 'dateFormat') {
-		configs.dateFormat = item.value || configs.dateFormat;
-	} else if (item.key === 'currency') {
-		configs.currency = item.value || configs.currency;
-	} else if (item.key === 'unitOfVolume') {
-		configs.unitOfVolume = item.value || configs.unitOfVolume;
-	} else if (item.key === 'unitOfDistance') {
-		configs.unitOfDistance = item.value || configs.unitOfDistance;
-	} else if (item.key === 'locale') {
-		// configs.locale = item.value || configs.locale;
-	} else if (item.key === 'timezone') {
-		configs.timezone = item.value || configs.timezone;
-	}
-});
 
 const formatDate = (date: Date | string): string => {
 	const dateObj = typeof date === 'string' ? new Date(date) : date;
