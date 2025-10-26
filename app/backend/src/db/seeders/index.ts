@@ -13,7 +13,7 @@ import { env, logger } from "@config/index";
 
 export const seedData = async () => {
   logger.info("Seeding data ", {
-    FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA,
+    FORCE_DATA_SEED: process.env.FORCE_DATA_SEED,
     PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
   });
 

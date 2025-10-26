@@ -26,12 +26,16 @@ export const downloadFile = async (req: Request, res: Response) => {
   const { filename } = req.params;
   const filePath = path.join(env.UPLOADS_DIR, filename || "");
 
-  res.sendFile(filePath, { root: env.UPLOADS_DIR.startsWith("/") ? undefined : process.cwd() }, (err) => {
-    if (err) {
-      res.status(404).json({
-        success: false,
-        message: "File not found",
-      });
-    }
-  });
+  res.sendFile(
+    filePath,
+    { root: env.UPLOADS_DIR.startsWith("/") ? undefined : process.cwd() },
+    (err) => {
+      if (err) {
+        res.status(404).json({
+          success: false,
+          message: "File not found",
+        });
+      }
+    },
+  );
 };
