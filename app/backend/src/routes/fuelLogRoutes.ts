@@ -31,19 +31,19 @@ router.post(
     floatValidator("fuelAmount"),
     floatValidator("cost"),
   ]),
-  asyncHandler(addFuelLog)
+  asyncHandler(addFuelLog),
 );
 
 router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
-  asyncHandler(getFuelLogs)
+  asyncHandler(getFuelLogs),
 );
 
 router.get(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(getFuelLogById)
+  asyncHandler(getFuelLogById),
 );
 
 router.put(
@@ -56,12 +56,12 @@ router.put(
     floatValidator("fuelAmount"),
     floatValidator("cost"),
   ]),
-  asyncHandler(updateFuelLog)
+  asyncHandler(updateFuelLog),
 );
 router.delete(
   "/:id",
   validationHandler([idValidator("id")]),
-  asyncHandler(deleteFuelLog)
+  asyncHandler(deleteFuelLog),
 );
 // router.post("/:lpn", asyncHandler(addFuelLogByLicensePlate));
 // router.get("/:lpn", asyncHandler(getFuelLogsByLicensePlate));

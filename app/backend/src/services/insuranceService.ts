@@ -5,7 +5,10 @@ import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
 import { validateVehicleExists, performDelete } from "@utils/serviceUtils";
 
-export const addInsurance = async (vehicleId: string, insuranceData: any): Promise<ApiResponse> => {
+export const addInsurance = async (
+  vehicleId: string,
+  insuranceData: any,
+): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
   const insurance = await db
     .insert(schema.insuranceTable)
@@ -22,7 +25,9 @@ export const addInsurance = async (vehicleId: string, insuranceData: any): Promi
   };
 };
 
-export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => {
+export const getInsurances = async (
+  vehicleId: string,
+): Promise<ApiResponse> => {
   const insurance = await db.query.insuranceTable.findMany({
     where: (insurances, { eq }) => eq(insurances.vehicleId, vehicleId),
   });

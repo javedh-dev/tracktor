@@ -11,7 +11,7 @@ router.get("/", asyncHandler(getConfig));
 router.get(
   "/:key",
   validationHandler([stringValidator("key")]),
-  asyncHandler(getConfigByKey)
+  asyncHandler(getConfigByKey),
 );
 
 router.put(
@@ -23,7 +23,7 @@ router.put(
     stringValidator("*.key"),
     stringValidator("*.value"),
   ]),
-  asyncHandler(updateConfig)
+  asyncHandler(updateConfig),
 );
 
 export default router;

@@ -18,9 +18,7 @@ export const savePucc = async (
 	return res;
 };
 
-export const deletePucc = async (
-	pucc: PollutionCertificate
-): Promise<Response<string>> => {
+export const deletePucc = async (pucc: PollutionCertificate): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
 		const response = await apiClient.delete(`/vehicles/${pucc.vehicleId}/pucc/${pucc.id}`);

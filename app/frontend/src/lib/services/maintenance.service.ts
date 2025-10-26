@@ -23,7 +23,9 @@ export const deleteMaintenanceLog = async (
 ): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await apiClient.delete(`/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id}`);
+		const response = await apiClient.delete(
+			`/vehicles/${maintenanceLog.vehicleId}/maintenance-logs/${maintenanceLog.id}`
+		);
 		res.data = response.data;
 	} catch (e: any) {
 		res.status = 'ERROR';

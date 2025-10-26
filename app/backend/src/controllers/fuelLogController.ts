@@ -24,7 +24,7 @@ export const updateFuelLog = async (req: Request, res: Response) => {
   const result = await fuelLogService.updateFuelLog(
     vehicleId as string,
     id as string,
-    req.body
+    req.body,
   );
   res.status(200).json(result);
 };
@@ -40,7 +40,7 @@ export const addFuelLogByLicensePlate = async (req: Request, res: Response) => {
   const { licensePlate } = req.params;
   const result = await fuelLogService.addFuelLogByLicensePlate(
     licensePlate as string,
-    req.body
+    req.body,
   );
   res.status(201).json(result);
 };
@@ -48,11 +48,11 @@ export const addFuelLogByLicensePlate = async (req: Request, res: Response) => {
 // Get FuelLogs by licensePlate
 export const getFuelLogsByLicensePlate = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { licensePlate } = req.params;
   const fuelLogs = await fuelLogService.getFuelLogsByLicensePlate(
-    licensePlate as string
+    licensePlate as string,
   );
   res.status(200).json(fuelLogs);
 };

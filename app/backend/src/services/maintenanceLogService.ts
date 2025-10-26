@@ -26,7 +26,9 @@ export const addMaintenanceLog = async (
   };
 };
 
-export const getMaintenanceLogs = async (vehicleId: string): Promise<ApiResponse> => {
+export const getMaintenanceLogs = async (
+  vehicleId: string,
+): Promise<ApiResponse> => {
   const maintenanceLogs = await db.query.maintenanceLogTable.findMany({
     where: (logs, { eq }) => eq(logs.vehicleId, vehicleId),
     orderBy: (logs, { asc }) => [asc(logs.date), asc(logs.odometer)],
@@ -37,7 +39,9 @@ export const getMaintenanceLogs = async (vehicleId: string): Promise<ApiResponse
   };
 };
 
-export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> => {
+export const getMaintenanceLogById = async (
+  id: string,
+): Promise<ApiResponse> => {
   const maintenanceLog = await db.query.maintenanceLogTable.findFirst({
     where: (logs, { eq }) => eq(logs.id, id),
   });
@@ -72,6 +76,8 @@ export const updateMaintenanceLog = async (
   };
 };
 
-export const deleteMaintenanceLog = async (id: string): Promise<ApiResponse> => {
+export const deleteMaintenanceLog = async (
+  id: string,
+): Promise<ApiResponse> => {
   return await performDelete(schema.maintenanceLogTable, id, "Maintenance log");
 };

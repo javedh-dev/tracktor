@@ -27,13 +27,13 @@ router.post(
     numberValidator("year"),
     stringValidator("licensePlate"),
   ]),
-  asyncHandler(addVehicle)
+  asyncHandler(addVehicle),
 );
 router.get("/", asyncHandler(getAllVehicles));
 router.get(
   "/:id",
   validationHandler([idValidator("id")]),
-  asyncHandler(getVehicleById)
+  asyncHandler(getVehicleById),
 );
 router.put(
   "/",
@@ -44,12 +44,12 @@ router.put(
     numberValidator("year"),
     stringValidator("licensePlate"),
   ]),
-  asyncHandler(updateVehicle)
+  asyncHandler(updateVehicle),
 );
 router.delete(
   "/:id",
   validationHandler([idValidator("id")]),
-  asyncHandler(deleteVehicle)
+  asyncHandler(deleteVehicle),
 );
 
 router.use("/:vehicleId/fuel-logs", fuelLogRoutes);

@@ -24,19 +24,19 @@ router.post(
     dateValidator("expiryDate"),
     stringValidator("testingCenter"),
   ]),
-  asyncHandler(addPucc)
+  asyncHandler(addPucc),
 );
 
 router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
-  asyncHandler(getPuccs)
+  asyncHandler(getPuccs),
 );
 
 router.get(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(getPuccById)
+  asyncHandler(getPuccById),
 );
 
 router.put(
@@ -49,13 +49,13 @@ router.put(
     dateValidator("expiryDate"),
     stringValidator("testingCenter"),
   ]),
-  asyncHandler(updatePucc)
+  asyncHandler(updatePucc),
 );
 
 router.delete(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(deletePucc)
+  asyncHandler(deletePucc),
 );
 
 export default router;

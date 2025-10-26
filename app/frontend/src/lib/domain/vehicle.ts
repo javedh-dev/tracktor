@@ -43,7 +43,7 @@ export const vehicleSchema = z.object({
 		.regex(/^(#[0-9a-fA-F]{3})|(#[0-9a-fA-F]{6})$/, 'Only hex color codes allowed.')
 		.default('#A1A1A1'),
 	odometer: z.number().nonnegative().nullable(),
-	image: z.string().nullable(),
+	image: z.string().nullable()
 });
 
 export type VehicleSchema = typeof vehicleSchema;

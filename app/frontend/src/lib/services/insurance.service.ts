@@ -19,7 +19,9 @@ export const saveInsurance = async (insurance: Insurance): Promise<Response<Insu
 export const deleteInsurance = async (insurance: Insurance): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await apiClient.delete(`/vehicles/${insurance.vehicleId}/insurance/${insurance.id}`);
+		const response = await apiClient.delete(
+			`/vehicles/${insurance.vehicleId}/insurance/${insurance.id}`
+		);
 		res.data = response.data;
 	} catch (e: any) {
 		res.status = 'ERROR';

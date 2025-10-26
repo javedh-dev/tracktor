@@ -20,13 +20,13 @@ export const setPin = async (pin: string): Promise<ApiResponse> => {
       .where(eq(schema.authTable.id, 1));
     return {
       success: true,
-      message: "PIN updated successfully."
+      message: "PIN updated successfully.",
     };
   } else {
     await db.insert(schema.authTable).values({ id: 1, hash: hash });
     return {
       success: true,
-      message: "PIN set successfully."
+      message: "PIN set successfully.",
     };
   }
 };

@@ -19,7 +19,9 @@ export const saveFuelLog = async (fuelLog: FuelLog): Promise<Response<FuelLog>> 
 export const deleteFuelLog = async (fuelLog: FuelLog): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
 	try {
-		const response = await apiClient.delete(`/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`);
+		const response = await apiClient.delete(
+			`/vehicles/${fuelLog.vehicleId}/fuel-logs/${fuelLog.id}`
+		);
 		res.data = response.data;
 	} catch (e: any) {
 		res.status = 'ERROR';

@@ -3,7 +3,11 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
-import { validateVehicleExists, validateVehicleExistsByLicensePlate, performDelete } from "@utils/serviceUtils";
+import {
+  validateVehicleExists,
+  validateVehicleExistsByLicensePlate,
+  performDelete,
+} from "@utils/serviceUtils";
 
 export const addFuelLog = async (
   vehicleId: string,

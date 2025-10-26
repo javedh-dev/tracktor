@@ -6,52 +6,52 @@ export { getConfig, getConfigByKey, updateConfig } from "./configController";
 
 // Vehicle Controller
 export {
-    addVehicle,
-    getAllVehicles,
-    getVehicleById,
-    updateVehicle,
-    deleteVehicle
+  addVehicle,
+  getAllVehicles,
+  getVehicleById,
+  updateVehicle,
+  deleteVehicle,
 } from "./vehicleController";
 
 // Fuel Log Controller
 export {
-    addFuelLog,
-    getFuelLogs,
-    getFuelLogById,
-    updateFuelLog,
-    deleteFuelLog
+  addFuelLog,
+  getFuelLogs,
+  getFuelLogById,
+  updateFuelLog,
+  deleteFuelLog,
 } from "./fuelLogController";
 
 // Insurance Controller
 export {
-    addInsurance,
-    getInsurances,
-    getInsuranceById,
-    updateInsurance,
-    deleteInsurance
+  addInsurance,
+  getInsurances,
+  getInsuranceById,
+  updateInsurance,
+  deleteInsurance,
 } from "./insuranceController";
 
 // Maintenance Log Controller
 export {
-    addMaintenanceLog,
-    getMaintenanceLogs,
-    getMaintenanceLogById,
-    updateMaintenanceLog,
-    deleteMaintenanceLog
+  addMaintenanceLog,
+  getMaintenanceLogs,
+  getMaintenanceLogById,
+  updateMaintenanceLog,
+  deleteMaintenanceLog,
 } from "./maintenanceLogController";
 
 // PUCC Controller
 export {
-    addPucc,
-    getPuccs,
-    getPuccById,
-    updatePucc,
-    deletePucc,
-    // Backward compatibility aliases
-    addPollutionCertificate,
-    getPollutionCertificates,
-    updatePollutionCertificate,
-    deletePollutionCertificate
+  addPucc,
+  getPuccs,
+  getPuccById,
+  updatePucc,
+  deletePucc,
+  // Backward compatibility aliases
+  addPollutionCertificate,
+  getPollutionCertificates,
+  updatePollutionCertificate,
+  deletePollutionCertificate,
 } from "./puccController";
 
 // File Controller

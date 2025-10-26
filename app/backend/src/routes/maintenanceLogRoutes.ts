@@ -25,19 +25,19 @@ router.post(
     stringValidator("serviceCenter"),
     floatValidator("cost"),
   ]),
-  asyncHandler(addMaintenanceLog)
+  asyncHandler(addMaintenanceLog),
 );
 
 router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
-  asyncHandler(getMaintenanceLogs)
+  asyncHandler(getMaintenanceLogs),
 );
 
 router.get(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(getMaintenanceLogById)
+  asyncHandler(getMaintenanceLogById),
 );
 
 router.put(
@@ -50,13 +50,13 @@ router.put(
     stringValidator("serviceCenter"),
     floatValidator("cost"),
   ]),
-  asyncHandler(updateMaintenanceLog)
+  asyncHandler(updateMaintenanceLog),
 );
 
 router.delete(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(deleteMaintenanceLog)
+  asyncHandler(deleteMaintenanceLog),
 );
 
 export default router;

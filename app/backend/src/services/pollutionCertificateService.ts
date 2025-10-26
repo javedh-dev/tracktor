@@ -25,7 +25,9 @@ export const addPollutionCertificate = async (
   };
 };
 
-export const getPollutionCertificates = async (vehicleId: string): Promise<ApiResponse> => {
+export const getPollutionCertificates = async (
+  vehicleId: string,
+): Promise<ApiResponse> => {
   const pollutionCertificates =
     await db.query.pollutionCertificateTable.findMany({
       where: (certificates, { eq }) => eq(certificates.vehicleId, vehicleId),
@@ -36,10 +38,13 @@ export const getPollutionCertificates = async (vehicleId: string): Promise<ApiRe
   };
 };
 
-export const getPollutionCertificateById = async (id: string): Promise<ApiResponse> => {
-  const pollutionCertificate = await db.query.pollutionCertificateTable.findFirst({
-    where: (certificates, { eq }) => eq(certificates.id, id),
-  });
+export const getPollutionCertificateById = async (
+  id: string,
+): Promise<ApiResponse> => {
+  const pollutionCertificate =
+    await db.query.pollutionCertificateTable.findFirst({
+      where: (certificates, { eq }) => eq(certificates.id, id),
+    });
   if (!pollutionCertificate) {
     throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
   }
@@ -77,6 +82,12 @@ export const updatePollutionCertificate = async (
   };
 };
 
-export const deletePollutionCertificate = async (id: string): Promise<ApiResponse> => {
-  return await performDelete(schema.pollutionCertificateTable, id, "Pollution certificate");
+export const deletePollutionCertificate = async (
+  id: string,
+): Promise<ApiResponse> => {
+  return await performDelete(
+    schema.pollutionCertificateTable,
+    id,
+    "Pollution certificate",
+  );
 };

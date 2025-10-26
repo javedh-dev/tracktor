@@ -26,17 +26,17 @@ router.post(
     dateValidator("endDate"),
     floatValidator("cost"),
   ]),
-  asyncHandler(addInsurance)
+  asyncHandler(addInsurance),
 );
 router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
-  asyncHandler(getInsurances)
+  asyncHandler(getInsurances),
 );
 router.get(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(getInsuranceById)
+  asyncHandler(getInsuranceById),
 );
 router.put(
   "/:id",
@@ -49,12 +49,12 @@ router.put(
     dateValidator("endDate"),
     floatValidator("cost"),
   ]),
-  asyncHandler(updateInsurance)
+  asyncHandler(updateInsurance),
 );
 router.delete(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(deleteInsurance)
+  asyncHandler(deleteInsurance),
 );
 
 export default router;

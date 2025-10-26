@@ -5,7 +5,7 @@ export const addPucc = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
   const result = await pollutionCertificateService.addPollutionCertificate(
     vehicleId as string,
-    req.body
+    req.body,
   );
   res.status(201).json(result);
 };
@@ -17,7 +17,7 @@ export const getPuccs = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
   const pollutionCertificates =
     await pollutionCertificateService.getPollutionCertificates(
-      vehicleId as string
+      vehicleId as string,
     );
   res.status(200).json(pollutionCertificates);
 };
@@ -27,21 +27,17 @@ export const getPollutionCertificates = getPuccs;
 
 export const getPuccById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const pollutionCertificate = await pollutionCertificateService.getPollutionCertificateById(
-    id as string
-  );
+  const pollutionCertificate =
+    await pollutionCertificateService.getPollutionCertificateById(id as string);
   res.status(200).json(pollutionCertificate);
 };
 
-export const updatePucc = async (
-  req: Request,
-  res: Response
-) => {
+export const updatePucc = async (req: Request, res: Response) => {
   const { vehicleId, id } = req.params;
   const result = await pollutionCertificateService.updatePollutionCertificate(
     vehicleId as string,
     id as string,
-    req.body
+    req.body,
   );
   res.status(200).json(result);
 };
@@ -49,13 +45,10 @@ export const updatePucc = async (
 // Alias for backward compatibility
 export const updatePollutionCertificate = updatePucc;
 
-export const deletePucc = async (
-  req: Request,
-  res: Response
-) => {
+export const deletePucc = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await pollutionCertificateService.deletePollutionCertificate(
-    id as string
+    id as string,
   );
   res.status(200).json(result);
 };

@@ -10,10 +10,6 @@
 	import { sheetStore } from '$lib/stores/sheet.svelte';
 	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
 
-	let selectedVehicleId = vehicleStore.selectedId;
-
-	// const updateCallback = (success: boolean) => success && vehicleStore.refreshVehicles();
-
 	onMount(() => vehicleStore.refreshVehicles());
 </script>
 
