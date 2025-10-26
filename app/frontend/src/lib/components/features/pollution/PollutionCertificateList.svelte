@@ -7,12 +7,10 @@
 	import { Jumper } from 'svelte-loading-spinners';
 	import PuccContextMenu from './PuccContextMenu.svelte';
 	import { puccStore } from '$lib/stores/pucc.svelte';
-
-	let { vehicleId } = $props();
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	$effect(() => {
-		puccStore.setVehicleId(vehicleId);
-		puccStore.refreshPollutionCertificates();
+		if (vehicleStore.selectedId) puccStore.refreshPuccs();
 	});
 </script>
 
@@ -22,10 +20,10 @@
 	</p>
 {:else if puccStore.error}
 	<p class="text-red-500">Error: {puccStore.error}</p>
-{:else if puccStore.pollutionCertificates?.length === 0}
+{:else if puccStore.pollutionCerts?.length === 0}
 	<div>No Pollution Certificates for this vehicle.</div>
 {:else}
-	{#each puccStore.pollutionCertificates as pucc (pucc.id)}
+	{#each puccStore.pollutionCerts as pucc (pucc.id)}
 		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
@@ -35,7 +33,7 @@
 				<PuccContextMenu
 					{pucc}
 					onaction={() => {
-						puccStore.refreshPollutionCertificates();
+						puccStore.refreshPuccs();
 					}}
 				/>
 			</div>

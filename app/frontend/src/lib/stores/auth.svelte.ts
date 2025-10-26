@@ -36,6 +36,9 @@ class AuthStore {
 	};
 
 	logout = () => {
+		if (browser) {
+			localStorage.removeItem('userPin');
+		}
 		this.pin = undefined;
 	};
 }

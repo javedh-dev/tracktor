@@ -5,17 +5,14 @@ import { vehicleStore } from './vehicle.svelte';
 
 class MaintenanceStore {
 	maintenanceLogs = $state<MaintenanceLog[]>();
-	vehicleId = $derived<string | undefined>(vehicleStore.selectedId);
-	selectedId = $state<string>();
 	processing = $state(false);
-	openSheet = $state(false);
-	editMode = $state(false);
 	error = $state<string>();
 
 	refreshMaintenanceLogs = () => {
+		if (!vehicleStore.selectedId) return;
 		this.processing = true;
 		apiClient
-			.get<ApiResponse>(`/vehicles/${this.vehicleId}/maintenance-logs`)
+			.get<ApiResponse>(`/vehicles/${vehicleStore.selectedId}/maintenance-logs`)
 			.then(({ data: res }) => {
 				const logs: MaintenanceLog[] = res.data;
 				this.maintenanceLogs = logs;
@@ -23,15 +20,6 @@ class MaintenanceStore {
 			})
 			.catch((err) => (this.error = 'Failed to fetch Maintenance Logs'))
 			.finally(() => (this.processing = false));
-	};
-
-	openForm = (state: boolean, id?: string | null, vehicleId?: string) => {
-		this.openSheet = state;
-		if (id) {
-			this.selectedId = id;
-			this.vehicleId = vehicleId;
-			this.editMode = true;
-		}
 	};
 }
 

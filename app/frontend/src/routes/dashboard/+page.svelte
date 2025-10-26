@@ -7,6 +7,8 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { Jumper } from 'svelte-loading-spinners';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
 
 	let selectedVehicleId = vehicleStore.selectedId;
 
@@ -27,16 +29,16 @@
 				variant="outline"
 				size="default"
 				class="cursor-pointer"
-				onclick={() => vehicleStore.openForm(true, selectedVehicleId)}
+				onclick={() => sheetStore.openSheet(VehicleForm, 'Add Vehicle')}
 			>
 				<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />
 			</Button>
 		</div>
 
-		<VehicleList bind:selectedVehicleId />
+		<VehicleList />
 
-		{#if selectedVehicleId}
-			<DashboardTabs vehicleId={selectedVehicleId} />
+		{#if vehicleStore.selectedId}
+			<DashboardTabs />
 		{/if}
 	</div>
 {/if}

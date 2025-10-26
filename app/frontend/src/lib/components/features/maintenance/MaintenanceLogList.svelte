@@ -14,8 +14,7 @@
 	import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
 	import type { MaintenanceLog } from '$lib/domain/maintenance';
 	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
-
-	let { vehicleId } = $props();
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -126,8 +125,7 @@
 	];
 
 	$effect(() => {
-		maintenanceStore.setVehicleId(vehicleId);
-		maintenanceStore.refreshMaintenanceLogs();
+		if (vehicleStore.selectedId) maintenanceStore.refreshMaintenanceLogs();
 	});
 </script>
 
@@ -140,5 +138,5 @@
 {:else if maintenanceStore.maintenanceLogs?.length === 0}
 	<div>No maintenance logs for this vehicle.</div>
 {:else}
-	<AppTable data={maintenanceStore.maintenanceLogs} {columns} />
+	<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
 {/if}

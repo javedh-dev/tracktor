@@ -3,7 +3,7 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
-import { validateVehicleExists } from "@utils/serviceUtils";
+import { validateVehicleExists, performDelete } from "@utils/serviceUtils";
 
 export const addMaintenanceLog = async (
   vehicleId: string,
@@ -73,19 +73,5 @@ export const updateMaintenanceLog = async (
 };
 
 export const deleteMaintenanceLog = async (id: string): Promise<ApiResponse> => {
-  const result = await db
-    .delete(schema.maintenanceLogTable)
-    .where(eq(schema.maintenanceLogTable.id, id))
-    .returning();
-  if (result.length === 0) {
-    throw new AppError(
-      `No Maintenence log found for id : ${id}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return {
-    data: { id },
-    success: true,
-    message: "Maintenance log deleted successfully.",
-  };
+  return await performDelete(schema.maintenanceLogTable, id, "Maintenance log");
 };

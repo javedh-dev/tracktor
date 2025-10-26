@@ -21,6 +21,8 @@ const configs: ConfigStore = {
 	timezone: 'UTC'
 };
 
+configStore.refreshConfigs();
+
 configStore.configs.forEach((item) => {
 	if (item.key === 'dateFormat') {
 		configs.dateFormat = item.value || configs.dateFormat;
@@ -168,6 +170,10 @@ const formatMileage = (mileage: number): string => {
 	}).format(mileage);
 };
 
+const roundNumber = (num: number, decimal: number = 2): number => {
+	return Number(num.toFixed(2));
+};
+
 export {
 	formatDate,
 	formatDateForCalendar,
@@ -182,7 +188,8 @@ export {
 	getVolumeUnit,
 	formatVolume,
 	getMileageUnit,
-	formatMileage
+	formatMileage,
+	roundNumber
 };
 
 export const cleanup = (obj: Record<string, any>): Record<string, any> => {

@@ -4,6 +4,7 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
+import { performDelete } from "@utils/serviceUtils";
 
 export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
   const vehicles = await db
@@ -227,20 +228,7 @@ export const updateVehicle = async (
 };
 
 export const deleteVehicle = async (id: string): Promise<ApiResponse> => {
-  const result = await db
-    .delete(schema.vehicleTable)
-    .where(eq(schema.vehicleTable.id, id))
-    .returning();
-  if (result.length === 0) {
-    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: {
-      id,
-    },
-    success: true,
-    message: "Vehicle deleted successfully.",
-  };
+  return await performDelete(schema.vehicleTable, id, "Vehicle");
 };
 
 // Get vehicles with minimal data for dropdown/selection purposes

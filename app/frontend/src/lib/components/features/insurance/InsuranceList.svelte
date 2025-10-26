@@ -8,12 +8,12 @@
 	import { Jumper } from 'svelte-loading-spinners';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
 	import { insuranceStore } from '$lib/stores/insurance.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
-	let { vehicleId } = $props();
+	let vehicleId = $derived(vehicleStore.selectedId);
 
 	$effect(() => {
-		insuranceStore.setVehicleId(vehicleId);
-		insuranceStore.refreshInsurances();
+		if (vehicleId) insuranceStore.refreshInsurances();
 	});
 </script>
 

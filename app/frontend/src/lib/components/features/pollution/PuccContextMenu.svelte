@@ -3,10 +3,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deletePollutionCertificate } from '$lib/services/pucc.service';
-	import { puccStore } from '$lib/stores/pucc.svelte';
 	import type { PollutionCertificate } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import PollutionCertificateForm from './PollutionCertificateForm.svelte';
 
 	let { pucc, onaction }: { pucc: PollutionCertificate; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -37,7 +38,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					puccStore.openForm(true, pucc.id, pucc.vehicleId);
+					sheetStore.openSheet(PollutionCertificateForm, 'Update Pollution Certificate', '', pucc);
 				}}
 			>
 				Edit

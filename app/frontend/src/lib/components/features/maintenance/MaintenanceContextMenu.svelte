@@ -2,11 +2,12 @@
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
 	import type { MaintenanceLog } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
 	import { deleteMaintenanceLog } from '$lib/services/maintenance.service';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import MaintenanceForm from './MaintenanceForm.svelte';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =
 		$props();
@@ -38,7 +39,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					maintenanceStore.openForm(true, maintenanceLog.id, maintenanceLog.vehicleId);
+					sheetStore.openSheet(MaintenanceForm, 'Update Maintenance Log', '', maintenanceLog);
 				}}
 			>
 				Edit

@@ -2,6 +2,7 @@ import type { PollutionCertificate } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
 import { vehicleStore } from './vehicle.svelte';
+import { onMount } from 'svelte';
 
 class PuccStore {
 	pollutionCerts = $state<PollutionCertificate[]>();
@@ -13,6 +14,7 @@ class PuccStore {
 	error = $state<string>();
 
 	refreshPuccs = () => {
+		if (!this.vehicleId) return;
 		this.processing = true;
 		apiClient
 			.get<ApiResponse>(`/vehicles/${this.vehicleId}/pucc`)
@@ -20,7 +22,7 @@ class PuccStore {
 				this.pollutionCerts = res.data;
 				this.error = undefined;
 			})
-			.catch((err) => (this.error = 'Failed to fetch Fuel Logs'))
+			.catch((err) => (this.error = 'Failed to fetch PUCCs'))
 			.finally(() => (this.processing = false));
 	};
 

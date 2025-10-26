@@ -3,10 +3,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deleteInsurance } from '$lib/services/insurance.service';
-	import { insuranceStore } from '$lib/stores/insurance.svelte';
 	import type { Insurance } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import InsuranceForm from './InsuranceForm.svelte';
 
 	let { insurance, onaction }: { insurance: Insurance; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -37,7 +38,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					insuranceStore.openForm(true, insurance.id, insurance.vehicleId);
+					sheetStore.openSheet(InsuranceForm, 'Update Insurance', '', insurance);
 				}}
 			>
 				Edit

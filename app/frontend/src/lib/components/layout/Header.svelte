@@ -4,11 +4,12 @@
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
-	import { configStore } from '$stores/config.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 	import { page } from '$app/state';
 	import { authStore } from '$stores/auth.svelte';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import SettingsForm from '../features/settings/SettingsForm.svelte';
 
 	let isAuthenticated = $state(false);
 
@@ -38,7 +39,7 @@
 					<Button
 						variant="ghost"
 						onclick={() => {
-							configStore.openForm(true);
+							sheetStore.openSheet(SettingsForm, 'Settings');
 						}}
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />

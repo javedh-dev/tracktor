@@ -25,8 +25,7 @@
 	import AppTable from '$lib/components/layout/AppTable.svelte';
 
 	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
-
-	const { vehicleId } = $props();
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -180,15 +179,8 @@
 		}
 	];
 
-	// fuelLogStore.subscribe((data) => {
-	// 	fuelLogs = data.fuelLogs;
-	// 	loading = data.processing;
-	// 	error = data.error;
-	// });
-
 	$effect(() => {
-		fuelLogStore.setVehicleId(vehicleId);
-		fuelLogStore.refreshFuelLogs();
+		if (vehicleStore.selectedId) fuelLogStore.refreshFuelLogs();
 	});
 </script>
 

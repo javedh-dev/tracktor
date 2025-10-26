@@ -54,7 +54,7 @@ export const saveVehicleWithImage = async (
 	if (image) {
 		try {
 			const res = await uploadFile(image);
-			vehicle.image = res.data || null;
+			vehicle.image = res.data.filename || null;
 		} catch (e: any) {
 			return {
 				status: 'ERROR',
@@ -65,7 +65,10 @@ export const saveVehicleWithImage = async (
 	return saveVehicle(vehicle, method);
 };
 
-const saveVehicle = async (vehicle: Vehicle, method: 'PUT' | 'POST'): Promise<Response<Vehicle>> => {
+const saveVehicle = async (
+	vehicle: Vehicle,
+	method: 'PUT' | 'POST'
+): Promise<Response<Vehicle>> => {
 	const res: Response<Vehicle> = { status: 'OK' };
 	try {
 		const response = await apiClient[method.toLowerCase() as 'put' | 'post']('/vehicles/', vehicle);

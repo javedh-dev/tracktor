@@ -3,7 +3,7 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
-import { validateVehicleExists } from "@utils/serviceUtils";
+import { validateVehicleExists, performDelete } from "@utils/serviceUtils";
 
 export const addPollutionCertificate = async (
   vehicleId: string,
@@ -78,16 +78,5 @@ export const updatePollutionCertificate = async (
 };
 
 export const deletePollutionCertificate = async (id: string): Promise<ApiResponse> => {
-  const result = await db
-    .delete(schema.pollutionCertificateTable)
-    .where(eq(schema.pollutionCertificateTable.id, id))
-    .returning();
-  if (result.length === 0) {
-    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: { id },
-    success: true,
-    message: "Pollution certificate deleted successfully.",
-  };
+  return await performDelete(schema.pollutionCertificateTable, id, "Pollution certificate");
 };

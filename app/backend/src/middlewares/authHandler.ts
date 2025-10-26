@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { getPinStatus, verifyPin } from "@services/authService";
 import { AppError, Status } from "@exceptions/AppError";
 
-const bypassPaths = ["/api/auth/(\\w)+", "/api/upload/(\\w)+"];
+const bypassPaths = ["/api/auth/(\\w)+", "/api/files/(\\w)+"];
 
 const authHandler = async (req: Request, res: Response, next: NextFunction) => {
   for (const path of bypassPaths) {

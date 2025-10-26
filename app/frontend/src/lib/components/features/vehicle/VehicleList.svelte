@@ -7,19 +7,9 @@
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import { Jumper } from 'svelte-loading-spinners';
 
-	let { selectedVehicleId = $bindable() } = $props();
-
-	$effect(() => {
-		if (vehicleStore.vehicles && vehicleStore.vehicles.length > 0) {
-			selectedVehicleId = selectedVehicleId || vehicleStore.vehicles[0].id;
-		} else {
-			selectedVehicleId = undefined;
-		}
-	});
-
 	const selectVehicle = (vehicleId: string | null) => {
 		if (vehicleId) {
-			selectedVehicleId = vehicleId;
+			vehicleStore.selectedId = vehicleId;
 		}
 	};
 </script>
@@ -41,7 +31,7 @@
 			{#each vehicleStore.vehicles as vehicle (vehicle.id)}
 				<VehicleCard
 					{vehicle}
-					isSelected={selectedVehicleId === vehicle.id}
+					isSelected={vehicleStore.selectedId === vehicle.id}
 					onclick={() => selectVehicle(vehicle.id)}
 					onkeydown={(e: { key: string }) => {
 						if (e.key === 'Enter' || e.key === ' ') selectVehicle(vehicle.id);

@@ -97,7 +97,15 @@ export const updateFuelLog = async (
   id: string,
   fuelLogData: any,
 ): Promise<ApiResponse> => {
-  await getFuelLogById(id);
+  // Validate that the fuel log exists and belongs to the specified vehicle
+  const fuelLog = await db.query.fuelLogTable.findFirst({
+    where: (log, { eq, and }) =>
+      and(eq(log.vehicleId, vehicleId), eq(log.id, id)),
+  });
+  if (!fuelLog) {
+    throw new AppError(`No Fuel Log found for id: ${id}`, Status.NOT_FOUND);
+  }
+
   const updatedLog = await db
     .update(schema.fuelLogTable)
     .set({

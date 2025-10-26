@@ -3,7 +3,7 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
-import { validateVehicleExists } from "@utils/serviceUtils";
+import { validateVehicleExists, performDelete } from "@utils/serviceUtils";
 
 export const addInsurance = async (vehicleId: string, insuranceData: any): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
@@ -72,16 +72,5 @@ export const updateInsurance = async (
 };
 
 export const deleteInsurance = async (id: string): Promise<ApiResponse> => {
-  const result = await db
-    .delete(schema.insuranceTable)
-    .where(eq(schema.insuranceTable.id, id))
-    .returning();
-  if (result.length === 0) {
-    throw new AppError(`No Insurances found for id: ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: { id },
-    success: true,
-    message: "Insurance details deleted successfully.",
-  };
+  return await performDelete(schema.insuranceTable, id, "Insurance");
 };
