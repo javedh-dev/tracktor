@@ -24,7 +24,7 @@ const getOrigins = (): string[] => {
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || "dev",
-  SERVER_HOST: process.env.SERVER_HOST || "localhost",
+  SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
   SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
   DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
   UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
@@ -37,7 +37,7 @@ export const env = {
   LOG_DIR: process.env.LOG_DIR || "./logs",
 } as const;
 
-export const isDevelopment = env.NODE_ENV === "development";
+export const isDevelopment = env.NODE_ENV === "dev";
 export const isProduction = env.NODE_ENV === "production";
 export const isTest = env.NODE_ENV === "test";
 

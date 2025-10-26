@@ -6,7 +6,7 @@ const bypassPaths = ["/api/auth/(\\w)+", "/api/files/(\\w)+"];
 
 const authHandler = async (req: Request, res: Response, next: NextFunction) => {
   for (const path of bypassPaths) {
-    if (req.path.match(path)) {
+    if (!req.path.startsWith("/api") || req.path.match(path)) {
       return next();
     }
   }
