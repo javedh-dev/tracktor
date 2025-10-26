@@ -19,7 +19,7 @@ log_error() {
 
 log_info "Starting build process..."
 
-Clean previous build
+# Clean previous build
 log_info "Cleaning previous build artifacts..."
 if [ -d "build" ]; then
     rm -rf build/
@@ -27,7 +27,7 @@ if [ -d "build" ]; then
 fi
 
 
-Install dependencies
+# Install dependencies
 log_info "Cleaning Up..."
 if npm run clean; then
     log_success "Clean Up successfully..."
