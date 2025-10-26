@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=builder /app/build ./build
 
 # Make directory for database data for no volume attachment
-RUN mkdir -p /data/
+RUN mkdir -p /data/uploads
 
 # Copy and set up start script
 COPY --from=builder /app/scripts/start.sh /app/start.sh
@@ -34,6 +34,7 @@ RUN chmod +x /app/start.sh
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV DB_PATH=/data/tracktor.db
+ENV DATABASE_PATH=/data/tracktor.db
+ENV UPLOADS_DIR=/data/uploads
 
 ENTRYPOINT ["/app/start.sh"]

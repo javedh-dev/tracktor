@@ -8,9 +8,15 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$lib/components/layout/Header.svelte';
+	import { authStore } from '$lib/stores/auth.svelte';
+	import { goto } from '$app/navigation';
 
 	let { children } = $props();
 	let demoMode = env.PUBLIC_DEMO_MODE === 'true';
+
+	$effect(() => {
+		if (authStore.pin) goto('/dashboard', { replaceState: true });
+	});
 </script>
 
 <ModeWatcher />

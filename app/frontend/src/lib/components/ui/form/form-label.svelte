@@ -4,6 +4,7 @@
 	import { cn } from '$lib/utils.js';
 	import BadgeInfo from '@lucide/svelte/icons/badge-info';
 	import * as Popover from '../popover';
+	import IconWithPopover from '$lib/components/app/IconWithPopover.svelte';
 
 	let {
 		ref = $bindable(null),
@@ -25,14 +26,12 @@
 				{@render children?.()}
 			</Label>
 			{#if description}
-				<Popover.Root>
-					<Popover.Trigger>
-						<BadgeInfo class="text-foreground/50 cursor-pointer" size="15px" />
-					</Popover.Trigger>
-					<Popover.Content class="w-fit px-2 py-0.5 text-sm" side="left" align="end">
-						{description}
-					</Popover.Content>
-				</Popover.Root>
+				<IconWithPopover
+					icon={BadgeInfo}
+					tooltip={description}
+					side="left"
+					className="h-4 w-4 text-foreground/50"
+				/>
 			{/if}
 		</div>
 	{/snippet}

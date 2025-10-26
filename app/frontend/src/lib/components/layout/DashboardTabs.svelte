@@ -13,8 +13,6 @@
 
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
 
-	let { vehicleId = $bindable() } = $props();
-
 	const tabs: {
 		name: string;
 		id: string;
@@ -68,7 +66,7 @@
 	</Tabs.List>
 	{#each tabs as { id, Component } (id)}
 		<Tabs.Content class="w-full" value={id}>
-			<Component {vehicleId} />
+			<Component />
 		</Tabs.Content>
 	{/each}
 </Tabs.Root>

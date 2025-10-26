@@ -5,25 +5,54 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
-} from "@controllers/vehicleController.js";
-import { authenticatePin } from "@middleware/auth.js";
-import { asyncHandler } from "@middleware/async-handler.js";
-import fuelLogRoutes from "./fuelLogRoutes.js";
-import fuelLogLPRoutes from "./fuelLogLPRoutes.js";
-import insuranceRoutes from "./insuranceRoutes.js";
-import maintenanceLogRoutes from "./maintenanceLogRoutes.js";
-import puccRoutes from "./puccRoutes.js";
+} from "@controllers/vehicleController";
+import { asyncHandler, validationHandler } from "../middlewares/index";
+import fuelLogRoutes from "./fuelLogRoutes";
+import insuranceRoutes from "./insuranceRoutes";
+import maintenanceLogRoutes from "./maintenanceLogRoutes";
+import puccRoutes from "./puccRoutes";
+import {
+  idValidator,
+  numberValidator,
+  stringValidator,
+} from "../middlewares/validationHandler";
 
 const router = Router();
 
-router.post("/", authenticatePin, asyncHandler(addVehicle));
-router.get("/", authenticatePin, asyncHandler(getAllVehicles));
-router.get("/:id", authenticatePin, asyncHandler(getVehicleById));
-router.put("/", authenticatePin, asyncHandler(updateVehicle));
-router.delete("/:id", authenticatePin, asyncHandler(deleteVehicle));
+router.post(
+  "/",
+  validationHandler([
+    stringValidator("make"),
+    stringValidator("model"),
+    numberValidator("year"),
+    stringValidator("licensePlate"),
+  ]),
+  asyncHandler(addVehicle),
+);
+router.get("/", asyncHandler(getAllVehicles));
+router.get(
+  "/:id",
+  validationHandler([idValidator("id")]),
+  asyncHandler(getVehicleById),
+);
+router.put(
+  "/",
+  validationHandler([
+    idValidator("id"),
+    stringValidator("make"),
+    stringValidator("model"),
+    numberValidator("year"),
+    stringValidator("licensePlate"),
+  ]),
+  asyncHandler(updateVehicle),
+);
+router.delete(
+  "/:id",
+  validationHandler([idValidator("id")]),
+  asyncHandler(deleteVehicle),
+);
 
 router.use("/:vehicleId/fuel-logs", fuelLogRoutes);
-router.use("/lp/:licensePlate/fuel-logs", fuelLogLPRoutes);
 router.use("/:vehicleId/insurance", insuranceRoutes);
 router.use("/:vehicleId/maintenance-logs", maintenanceLogRoutes);
 router.use("/:vehicleId/pucc", puccRoutes);

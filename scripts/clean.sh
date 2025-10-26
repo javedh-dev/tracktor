@@ -1,13 +1,13 @@
 log_info() {
-    echo "[ℹ] $1"
+    echo "[i] $1"
 }
 
 log_success() {
-    echo "[✓] $1"
+    echo "[v] $1"
 }
 
 log_error() {
-    echo "[✗] $1"
+    echo "[x] $1"
 }
 
 log_info "Cleaning root directory..."
@@ -22,11 +22,13 @@ cd app/backend || exit
 rm -rf node_modules
 rm -rf dist
 rm -rf build
+npm run clean
 
 cd ../..
 cd app/frontend || exit
 rm -rf node_modules
 rm -rf dist
 rm -rf build
+npm run clean
 cd ../..
 log_success "Backend and frontend directories cleaned"

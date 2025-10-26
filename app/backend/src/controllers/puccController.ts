@@ -1,84 +1,57 @@
 import { Request, Response } from "express";
-import * as pollutionCertificateService from "@services/pollutionCertificateService.js";
-import { PollutionCertificateError } from "@exceptions/PollutionCertificateError.js";
-import { Status } from "@exceptions/ServiceError.js";
+import * as pollutionCertificateService from "@services/pollutionCertificateService";
 
-export const addPollutionCertificate = async (req: Request, res: Response) => {
+export const addPucc = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
-  const { certificateNumber, issueDate, expiryDate, testingCenter } = req.body;
-
-  if (!vehicleId) {
-    throw new PollutionCertificateError(
-      "Vehicle ID is required.",
-      Status.BAD_REQUEST,
-    );
-  }
-  if (!certificateNumber || !issueDate || !expiryDate || !testingCenter) {
-    throw new PollutionCertificateError(
-      "Certificate Number, Issue Date, Expiry Date, and Testing Center are required.",
-      Status.BAD_REQUEST,
-    );
-  }
-
   const result = await pollutionCertificateService.addPollutionCertificate(
-    vehicleId,
+    vehicleId as string,
     req.body,
   );
   res.status(201).json(result);
 };
 
-export const getPollutionCertificates = async (req: Request, res: Response) => {
+// Alias for backward compatibility
+export const addPollutionCertificate = addPucc;
+
+export const getPuccs = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
-  if (!vehicleId) {
-    throw new PollutionCertificateError(
-      "Vehicle ID is required.",
-      Status.BAD_REQUEST,
-    );
-  }
   const pollutionCertificates =
-    await pollutionCertificateService.getPollutionCertificates(vehicleId);
+    await pollutionCertificateService.getPollutionCertificates(
+      vehicleId as string,
+    );
   res.status(200).json(pollutionCertificates);
 };
 
-export const updatePollutionCertificate = async (
-  req: Request,
-  res: Response,
-) => {
-  const { vehicleId, id } = req.params;
-  const { certificateNumber, issueDate, expiryDate, testingCenter } = req.body;
+// Alias for backward compatibility
+export const getPollutionCertificates = getPuccs;
 
-  if (!vehicleId || !id) {
-    throw new PollutionCertificateError(
-      "Vehicle ID and certificate ID are required.",
-      Status.BAD_REQUEST,
-    );
-  }
-  if (!certificateNumber || !issueDate || !expiryDate || !testingCenter) {
-    throw new PollutionCertificateError(
-      "Certificate Number, Issue Date, Expiry Date, and Testing Center are required.",
-      Status.BAD_REQUEST,
-    );
-  }
+export const getPuccById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const pollutionCertificate =
+    await pollutionCertificateService.getPollutionCertificateById(id as string);
+  res.status(200).json(pollutionCertificate);
+};
+
+export const updatePucc = async (req: Request, res: Response) => {
+  const { vehicleId, id } = req.params;
   const result = await pollutionCertificateService.updatePollutionCertificate(
-    vehicleId,
-    id,
+    vehicleId as string,
+    id as string,
     req.body,
   );
   res.status(200).json(result);
 };
 
-export const deletePollutionCertificate = async (
-  req: Request,
-  res: Response,
-) => {
-  const { vehicleId } = req.params;
-  if (!vehicleId) {
-    throw new PollutionCertificateError(
-      "Vehicle ID is required.",
-      Status.BAD_REQUEST,
-    );
-  }
-  const result =
-    await pollutionCertificateService.deletePollutionCertificate(vehicleId);
+// Alias for backward compatibility
+export const updatePollutionCertificate = updatePucc;
+
+export const deletePucc = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await pollutionCertificateService.deletePollutionCertificate(
+    id as string,
+  );
   res.status(200).json(result);
 };
+
+// Alias for backward compatibility
+export const deletePollutionCertificate = deletePucc;

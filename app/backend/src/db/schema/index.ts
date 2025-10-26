@@ -1,10 +1,10 @@
-import { authTable } from "./auth.js";
-import { configTable } from "./config.js";
-import { fuelLogTable } from "./fuel-log.js";
-import { insuranceTable } from "./insurance.js";
-import { maintenanceLogTable } from "./maintenance-logs.js";
-import { vehicleTable } from "./vehicle.js";
-import { pollutionCertificateTable } from "./pucc.js";
+import { authTable } from "./auth";
+import { configTable } from "./config";
+import { fuelLogTable } from "./fuel-log";
+import { insuranceTable } from "./insurance";
+import { maintenanceLogTable } from "./maintenance-logs";
+import { vehicleTable } from "./vehicle";
+import { pollutionCertificateTable } from "./pucc";
 
 export {
   authTable,

@@ -5,7 +5,7 @@
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import * as Popover from '../popover';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
-	import { formatDateForCalendar } from '$lib/helper/formatting';
+	import { formatDateForCalendar } from '$lib/helper/format.helper';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 

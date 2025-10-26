@@ -3,23 +3,30 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "./app/common",
     "./app/frontend",
     "./app/backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=@tracktor/backend\" \"npm run dev --workspace=@tracktor/frontend\"",
+    "dev": "NODE_ENV=development concurrently \"npm run dev --workspace=@tracktor/backend\" \"npm run dev --workspace=@tracktor/frontend\"",
+    "dev:test": "NODE_ENV=test concurrently \"npm run dev:test --workspace=@tracktor/backend\" \"npm run dev:test --workspace=@tracktor/frontend\"",
     "build": "./scripts/build.sh",
+    "build:prod": "NODE_ENV=production ./scripts/build.sh",
+    "db:migrate": "npm run db:migrate --workspace=@tracktor/backend",
+    "db:migrate:dev": "npm run db:migrate:dev --workspace=@tracktor/backend",
     "start": "./build/start.sh",
+    "start:prod": "NODE_ENV=production ./build/start.sh",
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "clean": "./scripts/clean.sh",
-    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present"
+    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
+    "test": "NODE_ENV=test npm run test --workspaces --if-present"
   },
   "devDependencies": {
-    "concurrently": "^9.2.0"
+    "concurrently": "^9.2.1"
   },
   "dependencies": {
-    "dotenv": "^17.2.2"
+    "dotenv": "^17.2.3"
   }
 }
