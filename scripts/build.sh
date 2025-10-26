@@ -19,7 +19,7 @@ log_error() {
 
 log_info "Starting build process..."
 
-# Clean previous build
+Clean previous build
 log_info "Cleaning previous build artifacts..."
 if [ -d "build" ]; then
     rm -rf build/
@@ -28,21 +28,21 @@ fi
 
 
 # Install dependencies
-log_info "Cleaning Up..."
-if npm run clean; then
-    log_success "Clean Up successfully..."
-else
-    log_error "Failed to install dependencies"
-    exit 1
-fi
-log_info "Installing Dependencies..."
-NODE_ENV=development
-if npm install; then
-    log_success "Dependencies installed successfully"
-else
-    log_error "Failed to install dependencies"
-    exit 1
-fi
+# log_info "Cleaning Up..."
+# if npm run clean; then
+#     log_success "Clean Up successfully..."
+# else
+#     log_error "Failed to install dependencies"
+#     exit 1
+# fi
+# log_info "Installing Dependencies..."
+# NODE_ENV=development
+# if npm install; then
+#     log_success "Dependencies installed successfully"
+# else
+#     log_error "Failed to install dependencies"
+#     exit 1
+# fi
 
 # Build workspaces
 log_info "Building workspaces..."

@@ -27,7 +27,7 @@ const frontendHandler = async () => {
   if (isProduction) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const { handler } = await import("../frontend/handler");
+    const { handler } = await import("../../frontend/handler.js");
     app.use(handler);
   } else {
     app.get("/", (_, res) => {
