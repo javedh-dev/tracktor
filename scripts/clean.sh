@@ -1,3 +1,6 @@
+#!/bin/sh
+# set -e
+
 log_info() {
     echo "[i] $1"
 }
