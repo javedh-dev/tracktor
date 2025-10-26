@@ -24,6 +24,12 @@ vi.mock('$lib/stores/setting', () => ({
 	config: writable([])
 }));
 
+vi.mock('$env/dynamic/public', () => ({
+	env: {
+		PUBLIC_API_BASE_URL: 'https://api.test.com'
+	}
+}));
+
 // Mock DateValue for calendar tests
 const mockDateValue = {
 	toDate: vi.fn().mockReturnValue(new Date('2024-01-15T10:30:00Z'))

@@ -12,6 +12,8 @@
     "dev:test": "NODE_ENV=test concurrently \"npm run dev:test --workspace=@tracktor/backend\" \"npm run dev:test --workspace=@tracktor/frontend\"",
     "build": "./scripts/build.sh",
     "build:prod": "NODE_ENV=production ./scripts/build.sh",
+    "db:migrate": "npm run db:migrate --workspace=@tracktor/backend",
+    "db:migrate:dev": "npm run db:migrate:dev --workspace=@tracktor/backend",
     "start": "./build/start.sh",
     "start:prod": "NODE_ENV=production ./build/start.sh",
     "format": "npm run format --workspaces --if-present",

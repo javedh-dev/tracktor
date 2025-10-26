@@ -3,20 +3,13 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
+import { validateVehicleExists } from "@utils/serviceUtils";
 
 export const addPollutionCertificate = async (
   vehicleId: string,
   pollutionCertificateData: any,
 ): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
-  });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
+  await validateVehicleExists(vehicleId);
   const pollutionCertificate = await db
     .insert(schema.pollutionCertificateTable)
     .values({
@@ -39,6 +32,19 @@ export const getPollutionCertificates = async (vehicleId: string): Promise<ApiRe
     });
   return {
     data: pollutionCertificates,
+    success: true,
+  };
+};
+
+export const getPollutionCertificateById = async (id: string): Promise<ApiResponse> => {
+  const pollutionCertificate = await db.query.pollutionCertificateTable.findFirst({
+    where: (certificates, { eq }) => eq(certificates.id, id),
+  });
+  if (!pollutionCertificate) {
+    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
+  }
+  return {
+    data: pollutionCertificate,
     success: true,
   };
 };

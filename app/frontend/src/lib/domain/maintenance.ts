@@ -11,7 +11,7 @@ export interface MaintenanceLog {
 	notes: string | null;
 }
 
-export const maintenenceSchema = z.object({
+export const maintenanceSchema = z.object({
 	id: z.string().nullable(),
 	vehicleId: z.uuid(),
 	date: z.string().refine((val) => {
@@ -31,4 +31,4 @@ export const maintenenceSchema = z.object({
 	notes: z.string().nullable()
 });
 
-export type MaintenenceSchema = typeof maintenenceSchema;
+export type MaintenanceSchema = typeof maintenanceSchema;

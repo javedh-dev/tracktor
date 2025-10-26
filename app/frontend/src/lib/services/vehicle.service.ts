@@ -3,14 +3,13 @@ import { apiClient } from '$lib/helper/api.helper';
 import { uploadFile } from './file.service';
 
 export const fetchMileageData = async (vehicleId: string): Promise<DataPoint[]> => {
-	let mileageData: DataPoint[] = [];
 	try {
 		const response = await apiClient.get(`/vehicles/${vehicleId}/fuel-logs`);
 		const data: {
 			date: string;
 			mileage: number | null;
 		}[] = response.data;
-		mileageData = data
+		return data
 			.filter((log) => log.mileage != null)
 			.map((log) => {
 				return {
@@ -21,19 +20,18 @@ export const fetchMileageData = async (vehicleId: string): Promise<DataPoint[]> 
 			.sort((a, b) => a.x.getTime() - b.x.getTime());
 	} catch (e) {
 		console.error('Failed to fetch mileage data:', e);
+		return [];
 	}
-	return mileageData;
 };
 
 export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => {
-	let costData: DataPoint[] = [];
 	try {
 		const response = await apiClient.get(`/vehicles/${vehicleId}/fuel-logs`);
 		const data: {
 			date: string;
 			cost: number | null;
 		}[] = response.data;
-		costData = data
+		return data
 			.filter((log) => log.cost != null)
 			.map((log) => {
 				return {
@@ -44,8 +42,8 @@ export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => 
 			.sort((a, b) => a.x.getTime() - b.x.getTime());
 	} catch (e) {
 		console.error('Failed to fetch cost data:', e);
+		return [];
 	}
-	return costData;
 };
 
 export const saveVehicleWithImage = async (

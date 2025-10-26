@@ -3,20 +3,13 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
+import { validateVehicleExists } from "@utils/serviceUtils";
 
 export const addMaintenanceLog = async (
   vehicleId: string,
   maintenanceLogData: any,
 ): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
-  });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
+  await validateVehicleExists(vehicleId);
 
   const maintenanceLog = await db
     .insert(schema.maintenanceLogTable)

@@ -3,17 +3,10 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
+import { validateVehicleExists } from "@utils/serviceUtils";
 
 export const addInsurance = async (vehicleId: string, insuranceData: any): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
-  });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
+  await validateVehicleExists(vehicleId);
   const insurance = await db
     .insert(schema.insuranceTable)
     .values({
@@ -33,6 +26,19 @@ export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => 
   const insurance = await db.query.insuranceTable.findMany({
     where: (insurances, { eq }) => eq(insurances.vehicleId, vehicleId),
   });
+  return {
+    data: insurance,
+    success: true,
+  };
+};
+
+export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
+  const insurance = await db.query.insuranceTable.findFirst({
+    where: (insurances, { eq }) => eq(insurances.id, id),
+  });
+  if (!insurance) {
+    throw new AppError(`No insurance found for id: ${id}`, Status.NOT_FOUND);
+  }
   return {
     data: insurance,
     success: true,

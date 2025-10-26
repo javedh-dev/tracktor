@@ -1,7 +1,7 @@
 import type { Response, PollutionCertificate } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
 
-export const savePollutionCertificate = async (
+export const savePucc = async (
 	certificate: PollutionCertificate
 ): Promise<Response<PollutionCertificate>> => {
 	const res: Response<PollutionCertificate> = { status: 'OK' };
@@ -18,7 +18,7 @@ export const savePollutionCertificate = async (
 	return res;
 };
 
-export const deletePollutionCertificate = async (
+export const deletePucc = async (
 	pucc: PollutionCertificate
 ): Promise<Response<string>> => {
 	const res: Response<string> = { status: 'OK' };
@@ -31,3 +31,6 @@ export const deletePollutionCertificate = async (
 	}
 	return res;
 };
+// Backward compatibility aliases
+export const savePollutionCertificate = savePucc;
+export const deletePollutionCertificate = deletePucc;

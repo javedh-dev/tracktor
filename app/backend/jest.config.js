@@ -59,6 +59,7 @@ export default {
     "^@middlewares/(.*)$": "<rootDir>/src/middlewares/$1",
     "^@routes/(.*)$": "<rootDir>/src/routes/$1",
     "^@services/(.*)$": "<rootDir>/src/services/$1",
+    "^@utils/(.*)$": "<rootDir>/src/utils/$1",
   },
   transform: {
     ...tsJestTransformCfg,

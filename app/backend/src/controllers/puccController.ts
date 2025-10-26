@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as pollutionCertificateService from "@services/pollutionCertificateService";
 
-export const addPollutionCertificate = async (req: Request, res: Response) => {
+export const addPucc = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
   const result = await pollutionCertificateService.addPollutionCertificate(
     vehicleId as string,
@@ -10,7 +10,10 @@ export const addPollutionCertificate = async (req: Request, res: Response) => {
   res.status(201).json(result);
 };
 
-export const getPollutionCertificates = async (req: Request, res: Response) => {
+// Alias for backward compatibility
+export const addPollutionCertificate = addPucc;
+
+export const getPuccs = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
   const pollutionCertificates =
     await pollutionCertificateService.getPollutionCertificates(
@@ -19,7 +22,18 @@ export const getPollutionCertificates = async (req: Request, res: Response) => {
   res.status(200).json(pollutionCertificates);
 };
 
-export const updatePollutionCertificate = async (
+// Alias for backward compatibility
+export const getPollutionCertificates = getPuccs;
+
+export const getPuccById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const pollutionCertificate = await pollutionCertificateService.getPollutionCertificateById(
+    id as string
+  );
+  res.status(200).json(pollutionCertificate);
+};
+
+export const updatePucc = async (
   req: Request,
   res: Response
 ) => {
@@ -32,7 +46,10 @@ export const updatePollutionCertificate = async (
   res.status(200).json(result);
 };
 
-export const deletePollutionCertificate = async (
+// Alias for backward compatibility
+export const updatePollutionCertificate = updatePucc;
+
+export const deletePucc = async (
   req: Request,
   res: Response
 ) => {
@@ -42,3 +59,6 @@ export const deletePollutionCertificate = async (
   );
   res.status(200).json(result);
 };
+
+// Alias for backward compatibility
+export const deletePollutionCertificate = deletePucc;

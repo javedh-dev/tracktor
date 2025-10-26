@@ -5,7 +5,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
-	import { maintenenceSchema } from '$lib/domain/maintenance';
+	import { maintenanceSchema } from '$lib/domain/maintenance';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Hammer from '@lucide/svelte/icons/hammer';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -14,10 +14,10 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { maintenanceStore } from '$lib/stores/maintenance.svelte';
-	import { saveMaintenanceLog } from '$lib/services/maintenence.service';
+	import { saveMaintenanceLog } from '$lib/services/maintenance.service';
 
-	const form = superForm(defaults(zod4(maintenenceSchema)), {
-		validators: zod4(maintenenceSchema),
+	const form = superForm(defaults(zod4(maintenanceSchema)), {
+		validators: zod4(maintenanceSchema),
 		SPA: true,
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {

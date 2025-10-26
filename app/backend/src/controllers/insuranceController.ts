@@ -16,6 +16,12 @@ export const getInsurances = async (req: Request, res: Response) => {
   res.status(200).json(insurances);
 };
 
+export const getInsuranceById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const insurance = await insuranceService.getInsuranceById(id as string);
+  res.status(200).json(insurance);
+};
+
 export const updateInsurance = async (req: Request, res: Response) => {
   const { vehicleId, id } = req.params;
   const result = await insuranceService.updateInsurance(

@@ -47,23 +47,30 @@ export default defineConfig(({ mode = 'development' }) => {
 			include: ['currency-codes', 'dayjs', 'validator']
 		},
 
-		...(mode === 'production'
-			? {
-					ssr: {
-						noExternal: [
-							'style-to-object',
-							'memoize-weak',
-							'currency-codes',
-							'@dagrejs/dagre',
-							'property-expr',
-							'toposort',
-							'tiny-case',
-							'validator',
-							'dayjs',
-							'zod'
-						]
+		...(mode === 'production' && {
+			ssr: {
+				noExternal: [
+					'style-to-object',
+					'memoize-weak',
+					'currency-codes',
+					'@dagrejs/dagre',
+					'property-expr',
+					'toposort',
+					'tiny-case',
+					'validator',
+					'dayjs',
+					'zod'
+				]
+			}
+		}),
+		build: {
+			...(mode === 'production' && {
+				rollupOptions: {
+					external: (id) => {
+						return false;
 					}
 				}
-			: {})
+			})
+		}
 	};
 });

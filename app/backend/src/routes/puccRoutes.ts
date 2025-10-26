@@ -1,9 +1,10 @@
 import { Router } from "express";
 import {
-  addPollutionCertificate,
-  getPollutionCertificates,
-  updatePollutionCertificate,
-  deletePollutionCertificate,
+  addPucc,
+  getPuccs,
+  getPuccById,
+  updatePucc,
+  deletePucc,
 } from "@controllers/puccController";
 import { asyncHandler, validationHandler } from "../middlewares/index";
 import {
@@ -23,13 +24,19 @@ router.post(
     dateValidator("expiryDate"),
     stringValidator("testingCenter"),
   ]),
-  asyncHandler(addPollutionCertificate)
+  asyncHandler(addPucc)
 );
 
 router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
-  asyncHandler(getPollutionCertificates)
+  asyncHandler(getPuccs)
+);
+
+router.get(
+  "/:id",
+  validationHandler([idValidator("vehicleId"), idValidator("id")]),
+  asyncHandler(getPuccById)
 );
 
 router.put(
@@ -42,13 +49,13 @@ router.put(
     dateValidator("expiryDate"),
     stringValidator("testingCenter"),
   ]),
-  asyncHandler(updatePollutionCertificate)
+  asyncHandler(updatePucc)
 );
 
 router.delete(
   "/:id",
   validationHandler([idValidator("vehicleId"), idValidator("id")]),
-  asyncHandler(deletePollutionCertificate)
+  asyncHandler(deletePucc)
 );
 
 export default router;

@@ -6,7 +6,7 @@
 	import type { MaintenanceLog } from '$lib/domain';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
-	import { deleteMaintenanceLog } from '$lib/services/maintenence.service';
+	import { deleteMaintenanceLog } from '$lib/services/maintenance.service';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =
 		$props();

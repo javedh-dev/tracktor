@@ -6,7 +6,7 @@ import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { type ApiResponse } from "@tracktor/common";
 
-export const setPin = async (pin: string) => {
+export const setPin = async (pin: string): Promise<ApiResponse> => {
   const hash = await bcrypt.hash(pin, 10);
 
   const existingAuth = await db.query.authTable.findFirst({
@@ -18,10 +18,16 @@ export const setPin = async (pin: string) => {
       .update(schema.authTable)
       .set({ hash: hash })
       .where(eq(schema.authTable.id, 1));
-    return { message: "PIN updated successfully." };
+    return {
+      success: true,
+      message: "PIN updated successfully."
+    };
   } else {
     await db.insert(schema.authTable).values({ id: 1, hash: hash });
-    return { message: "PIN set successfully." };
+    return {
+      success: true,
+      message: "PIN set successfully."
+    };
   }
 };
 

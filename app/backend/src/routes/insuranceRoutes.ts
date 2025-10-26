@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addInsurance,
   getInsurances,
+  getInsuranceById,
   updateInsurance,
   deleteInsurance,
 } from "@controllers/insuranceController";
@@ -31,6 +32,11 @@ router.get(
   "/",
   validationHandler([idValidator("vehicleId")]),
   asyncHandler(getInsurances)
+);
+router.get(
+  "/:id",
+  validationHandler([idValidator("vehicleId"), idValidator("id")]),
+  asyncHandler(getInsuranceById)
 );
 router.put(
   "/:id",

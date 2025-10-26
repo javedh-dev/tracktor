@@ -3,20 +3,13 @@ import * as schema from "@db/schema/index";
 import { db } from "@db/index";
 import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
+import { validateVehicleExists, validateVehicleExistsByLicensePlate, performDelete } from "@utils/serviceUtils";
 
 export const addFuelLog = async (
   vehicleId: string,
   fuelLogData: any,
 ): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
-  });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
+  await validateVehicleExists(vehicleId);
   const fuelLog = await db
     .insert(schema.fuelLogTable)
     .values({
@@ -93,7 +86,10 @@ export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
   if (!fuelLog) {
     throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
-  return { data: fuelLog, success: true };
+  return {
+    data: fuelLog,
+    success: true,
+  };
 };
 
 export const updateFuelLog = async (
@@ -117,47 +113,26 @@ export const updateFuelLog = async (
 };
 
 export const deleteFuelLog = async (id: string): Promise<ApiResponse> => {
-  const result = await db
-    .delete(schema.fuelLogTable)
-    .where(eq(schema.fuelLogTable.id, id))
-    .returning();
-  if (result.length === 0) {
-    throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: { id },
-    success: true,
-    message: "Fuel log deleted successfully.",
-  };
+  return await performDelete(schema.fuelLogTable, id, "Fuel log");
 };
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
   fuelLogData: any,
 ): Promise<ApiResponse> => {
+  await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return await addFuelLog(vehicle.id, fuelLogData);
+  return await addFuelLog(vehicle!.id, fuelLogData);
 };
 
 export const getFuelLogsByLicensePlate = async (
   licensePlate: string,
 ): Promise<ApiResponse> => {
+  await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
-  if (!vehicle) {
-    throw new AppError(
-      `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return await getFuelLogs(vehicle.id);
+  return await getFuelLogs(vehicle!.id);
 };
