@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { authStore } from '$lib/stores/auth.svelte';
 
 	if (browser) {
-		const pin = localStorage.getItem('userPin');
-		if (pin) {
+		if (authStore.pin) {
 			goto('/dashboard', { replaceState: true });
 		} else {
 			goto('/login', { replaceState: true });

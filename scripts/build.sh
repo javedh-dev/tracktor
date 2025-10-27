@@ -2,19 +2,19 @@
 # set -e
 
 log_info() {
-    echo "[ℹ] $1"
+    echo "[i] $1"
 }
 
 log_success() {
-    echo "[✓] $1"
+    echo "[v] $1"
 }
 
 log_warning() {
-    echo "[⚠] $1"
+    echo "[!] $1"
 }
 
 log_error() {
-    echo "[✗] $1"
+    echo "[x] $1"
 }
 
 log_info "Starting build process..."

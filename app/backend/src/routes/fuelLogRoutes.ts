@@ -5,16 +5,65 @@ import {
   getFuelLogById,
   updateFuelLog,
   deleteFuelLog,
-} from "@controllers/fuelLogController.js";
-import { authenticatePin } from "@middleware/auth.js";
-import { asyncHandler } from "@middleware/async-handler.js";
+} from "@controllers/fuelLogController";
+import { asyncHandler, validationHandler } from "../middlewares/index";
+import {
+  dateValidator,
+  floatValidator,
+  idValidator,
+} from "../middlewares/validationHandler";
+
+// TODO: Enable by licence plate number
+
+// import {
+//   addFuelLogByLicensePlate,
+//   getFuelLogsByLicensePlate,
+// } from "@services/fuelLogService";
 
 const router = Router({ mergeParams: true });
 
-router.post("/", authenticatePin, asyncHandler(addFuelLog));
-router.get("/", authenticatePin, asyncHandler(getFuelLogs));
-router.get("/:id", authenticatePin, asyncHandler(getFuelLogById));
-router.put("/:id", authenticatePin, asyncHandler(updateFuelLog));
-router.delete("/:id", authenticatePin, asyncHandler(deleteFuelLog));
+router.post(
+  "/",
+  validationHandler([
+    idValidator("vehicleId"),
+    dateValidator("date"),
+    floatValidator("odometer"),
+    floatValidator("fuelAmount"),
+    floatValidator("cost"),
+  ]),
+  asyncHandler(addFuelLog),
+);
+
+router.get(
+  "/",
+  validationHandler([idValidator("vehicleId")]),
+  asyncHandler(getFuelLogs),
+);
+
+router.get(
+  "/:id",
+  validationHandler([idValidator("vehicleId"), idValidator("id")]),
+  asyncHandler(getFuelLogById),
+);
+
+router.put(
+  "/:id",
+  validationHandler([
+    idValidator("vehicleId"),
+    idValidator("id"),
+    dateValidator("date"),
+    floatValidator("odometer"),
+    floatValidator("fuelAmount"),
+    floatValidator("cost"),
+  ]),
+  asyncHandler(updateFuelLog),
+);
+router.delete(
+  "/:id",
+  validationHandler([idValidator("id")]),
+  asyncHandler(deleteFuelLog),
+);
+// router.post("/:lpn", asyncHandler(addFuelLogByLicensePlate));
+// router.get("/:lpn", asyncHandler(getFuelLogsByLicensePlate));
 
 export default router;

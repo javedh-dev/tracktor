@@ -1,12 +1,14 @@
 import { config } from "dotenv";
 import { resolve } from "path";
+import logger from "./logger";
+import { accessSync, mkdirSync } from "fs";
+import { constants } from "fs/promises";
 
-// Load environment variables from root directory
-config({
-  path: resolve(process.cwd(), "../../.env"),
-  override: true,
-  quiet: true,
-});
+// Load environment variables based on NODE_ENV
+const nodeEnv = process.env.NODE_ENV || "dev";
+const envPath = resolve(process.cwd(), "../../env", `.env.${nodeEnv}`);
+
+config({ path: envPath, quiet: true, override: true });
 
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;
@@ -21,60 +23,80 @@ const getOrigins = (): string[] => {
 };
 
 export const env = {
-  // Application Environment
-  NODE_ENV: process.env.NODE_ENV || "development",
-
-  // Server Configuration
+  NODE_ENV: process.env.NODE_ENV || "dev",
   SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
-  SERVER_PORT: Number(process.env.SERVER_PORT) || 3000,
-
-  // Database Configuration
+  SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
   DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
-
-  // Application Features
-  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
-  FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA === "true",
-
-  // CORS Configuration
+  UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
+  AUTH_PIN: process.env.AUTH_PIN || "123456",
   CORS_ORIGINS: getOrigins(),
-
-  // Logging Configuration
-  LOG_LEVEL: process.env.LOG_LEVEL || "info",
+  FORCE_DATA_SEED: process.env.FORCE_DATA_SEED === "true",
+  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
-
-  // Helper methods
-  isDevelopment: () =>
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development",
-  isProduction: () => process.env.NODE_ENV === "production",
-  isTest: () => process.env.NODE_ENV === "test",
+  LOG_LEVEL: process.env.LOG_LEVEL || "info",
+  LOG_DIR: process.env.LOG_DIR || "./logs",
 } as const;
 
-export default env;
+export const isDevelopment = env.NODE_ENV === "dev";
+export const isProduction = env.NODE_ENV === "production";
+export const isTest = env.NODE_ENV === "test";
 
 /**
  * Validate required environment variables
  */
 export function validateEnvironment(): void {
+  logger.info("Validating environment...");
   const required: string[] = [];
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
-    console.error(
-      "❌ Missing required environment variables:",
-      missing.join(", "),
+    logger.error(
+      `Missing required environment variables: ${missing.join(", ")}`,
     );
     process.exit(1);
   }
 
-  // Validate port numbers
   if (
     isNaN(env.SERVER_PORT) ||
     env.SERVER_PORT < 1 ||
     env.SERVER_PORT > 65535
   ) {
-    console.error("❌ Invalid SERVER_PORT:", process.env.SERVER_PORT);
+    logger.error(`Invalid SERVER_PORT: ${process.env.SERVER_PORT}`);
     process.exit(1);
   }
 
-  console.log("✅ Environment validation passed");
+  if (env.CORS_ORIGINS.length === 0) {
+    logger.error("CORS_ORIGINS cannot be an empty list");
+    process.exit(1);
+  }
+
+  if (env.DEMO_MODE && env.FORCE_DATA_SEED) {
+    logger.warn("Running in FORCE_SEED mode. All data will be reset.");
+  }
+
+  if (env.DATABASE_PATH) {
+    try {
+      accessSync(env.DATABASE_PATH, constants.F_OK | constants.W_OK);
+    } catch (err) {
+      logger.error(
+        `DATABASE_PATH "${env.DATABASE_PATH}" does not exist or is not writable`,
+        err,
+      );
+      process.exit(1);
+    }
+  }
+
+  if (env.UPLOADS_DIR) {
+    try {
+      accessSync(env.UPLOADS_DIR, constants.F_OK | constants.W_OK);
+    } catch (err) {
+      logger.warn(
+        `UPLOADS_DIR "${env.UPLOADS_DIR}" does not exist. Creating...`,
+        err,
+      );
+      mkdirSync(env.UPLOADS_DIR, { recursive: true });
+    }
+  }
+
+  logger.info("Environment validation passed...!!!");
 }

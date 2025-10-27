@@ -1,13 +1,18 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
-	import { type FuelLog } from '$lib/types/fuel';
+	import { type FuelLog } from '$lib/domain/fuel';
 	import { createRawSnippet } from 'svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { formatCurrency, formatDate, formatDistance, formatVolume } from '$lib/helper/formatting';
+	import {
+		formatCurrency,
+		formatDate,
+		formatDistance,
+		formatMileage,
+		formatVolume
+	} from '$lib/helper/format.helper';
 	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
 	import Banknote from '@lucide/svelte/icons/banknote';
+	import Rabbit from '@lucide/svelte/icons/rabbit';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 	import Fuel from '@lucide/svelte/icons/fuel';
@@ -18,13 +23,9 @@
 	import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import AppTable from '$lib/components/layout/AppTable.svelte';
-	import { compareDesc } from 'date-fns';
 
-	const { vehicleId } = $props();
-
-	let fuelLogs: FuelLog[] = $state([]);
-	let loading = $state(true);
-	let error = $state('');
+	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -127,6 +128,28 @@
 			}
 		},
 		{
+			accessorKey: 'mileage',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Rabbit,
+					iconClass: 'h-4 w-4 ',
+					label: 'Mileage',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">
+							${!mileage() ? '-' : formatMileage(mileage())}
+							</div>`
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('mileage'));
+			}
+		},
+		{
 			accessorKey: 'notes',
 			header: () =>
 				renderComponent(LabelWithIcon, {
@@ -150,59 +173,27 @@
 				renderComponent(FuelLogContextMenu, {
 					fuelLog: row.original,
 					onaction: () => {
-						fetchFuelLogs();
+						fuelLogStore.refreshFuelLogs();
 					}
 				})
 		}
 	];
 
 	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchFuelLogs();
-		}
-	});
-
-	async function fetchFuelLogs() {
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/fuel-logs`), {
-				headers: {
-					'X-User-PIN': localStorage.getItem('userPin') || ''
-				}
-			});
-			if (response.ok) {
-				fuelLogs = await response.json();
-			} else {
-				const data = await response.json();
-				error = data.message || 'Failed to fetch fuel logs.';
-			}
-		} catch (e) {
-			console.error('Failed to connect to the server.', e);
-			error = 'Failed to connect to the server.';
-		}
-		fuelLogs.sort((a, b) => compareDesc(a.date, b.date));
-		loading = false;
-	}
-
-	onMount(() => {
-		fetchFuelLogs();
+		if (vehicleStore.selectedId) fuelLogStore.refreshFuelLogs();
 	});
 </script>
 
-{#if loading}
+{#if fuelLogStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if fuelLogs.length === 0}
+{:else if fuelLogStore.error}
+	<p class="text-red-500">Error: {fuelLogStore.error}</p>
+{:else if fuelLogStore.fuelLogs?.length === 0}
 	<p>No fuel refill logs found for this vehicle.</p>
 {:else}
-	<AppTable data={fuelLogs} {columns} />
+	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}
 
 {#snippet badge(status: boolean)}

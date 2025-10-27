@@ -4,32 +4,22 @@
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
-	import { configModelStore } from '$lib/stores/setting';
-	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { authStore } from '$stores/auth.svelte';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import SettingsForm from '../features/settings/SettingsForm.svelte';
 
 	let isAuthenticated = $state(false);
 
 	$effect(() => {
-		const pin = localStorage.getItem('userPin');
-		isAuthenticated = !!pin;
+		isAuthenticated = !!authStore.pin;
 
-		if (!isAuthenticated && $page.url.pathname !== '/login') {
+		if (!isAuthenticated && page.url.pathname !== '/login') {
 			goto('/login', { replaceState: true });
 		}
 	});
-
-	const logout = () => {
-		localStorage.removeItem('userPin');
-		isAuthenticated = false;
-	};
-
-	const fetchVehicles = () => {
-		const pin = localStorage.getItem('userPin') || undefined;
-		if (pin) vehiclesStore.fetchVehicles(pin);
-	};
 </script>
 
 <header
@@ -49,14 +39,12 @@
 					<Button
 						variant="ghost"
 						onclick={() => {
-							configModelStore.show((status: boolean) => {
-								status && fetchVehicles();
-							});
+							sheetStore.openSheet(SettingsForm, 'Settings');
 						}}
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					<Button variant="ghost" onclick={logout}>
+					<Button variant="ghost" onclick={authStore.logout}>
 						<LogOut class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
 				{/if}

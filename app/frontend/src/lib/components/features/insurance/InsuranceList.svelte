@@ -1,80 +1,44 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import Shield from '@lucide/svelte/icons/shield';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Hash from '@lucide/svelte/icons/hash';
 	import Notebook from '@lucide/svelte/icons/notebook';
 	import Banknote from '@lucide/svelte/icons/banknote';
-	import { formatCurrency, formatDate } from '$helper/formatting';
+	import { formatCurrency, formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
-	import type { Insurance } from '$lib/types';
+	import { insuranceStore } from '$lib/stores/insurance.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
-	let { vehicleId } = $props();
-
-	let insurances: Insurance[] = $state([]);
-	let loading = $state(false);
-	let error = $state('');
+	let vehicleId = $derived(vehicleStore.selectedId);
 
 	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchInsuranceDetails();
-		}
-	});
-
-	async function fetchInsuranceDetails() {
-		if (!vehicleId) {
-			insurances = [];
-			return;
-		}
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/insurance`), {
-				headers: {
-					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-				}
-			});
-			if (response.ok) {
-				insurances = await response.json();
-			} else {
-				error = 'Failed to fetch insurance data.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		fetchInsuranceDetails();
+		if (vehicleId) insuranceStore.refreshInsurances();
 	});
 </script>
 
-{#if loading}
+{#if insuranceStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if insurances.length === 0}
+{:else if insuranceStore.error}
+	<p class="text-red-500">Error: {insuranceStore.error}</p>
+{:else if insuranceStore.insurances?.length === 0}
 	<div>No Insurance found for this vehicle.</div>
 {:else}
-	{#each insurances as ins (ins.id)}
+	{#each insuranceStore.insurances as ins (ins.id)}
 		<div class="bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="dark: flex items-center gap-2 text-blue-400">
 					<Shield class="h-6 w-6" />
 					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{ins.provider}</span>
 				</div>
-				<InsuranceContextMenu insurance={ins} onaction={fetchInsuranceDetails} />
+				<InsuranceContextMenu
+					insurance={ins}
+					onaction={() => {
+						insuranceStore.refreshInsurances();
+					}}
+				/>
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2">
