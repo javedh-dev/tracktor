@@ -39,7 +39,7 @@ Docker Compose provides the easiest way to deploy Tracktor with all services con
 
 ```bash
 # Downlaod Docker compose file
-curl -o docker-compose.yml https://raw.githubusercontent.com/javedh-dev/tracktor/main/docker/docker-compose.yml
+curl -o docker-compose.yml https://raw.githubusercontent.com/javedh-dev/tracktor/refs/heads/dev/scripts/docker/docker-compose.yml
 ```
 
 ```yaml
@@ -61,9 +61,10 @@ volumes:
 **Step 2:** Download the example `.env` file from github
 
 ```bash
-curl -o .env https://raw.githubusercontent.com/javedh-dev/tracktor/main/.env.example
+curl -o .env https://raw.githubusercontent.com/javedh-dev/tracktor/refs/heads/dev/env/.env.prod
 ```
 
+<!--
 OR create the `.env` file and add environement variables as per your requirement.
 
 ```bash
@@ -72,6 +73,7 @@ touch .env
 
 You can check the available environment variables at [ENVIRONMENT](ENVIRONMENT.md).
 **Step 3:** Start the application using Docker Compose:
+--->
 
 ```bash
 docker-compose up -d
@@ -104,6 +106,7 @@ docker pull ghcr.io/javedh-dev/tracktor:latest
 docker volume create tracktor-app-data
 ```
 
+<!-- maybe re-added in the future?
 **Step 3:** (Optional) Create a `.env` file for environment variables or download as shown [here](#method-1-docker-compose-recommended) -
 
 ```bash
@@ -111,6 +114,7 @@ touch .env
 ```
 
 Add any necessary environment variables as per your requirement.
+--->
 
 **Step 3:** Run the container -
 
@@ -148,6 +152,7 @@ cd tracktor
 npm install
 ```
 
+<!-- maybe re-added in the future?
 **Step 3:** (Optional) Create a `.env` file for environment variables -
 
 ```bash
@@ -157,20 +162,21 @@ touch .env
 Add any necessary environment variables as per your requirement. You can check the available environment variables in the [Configuration Reference](../configuration/environment-variables.md).
 
 > **Note:** Set the `NODE_ENV` variable to `production` in the `.env` file for production deployments.
+--->
 
-**Step 4:** Build the application -
+**Step 3:** Build the application -
 
 ```bash
 npm run build
 ```
 
-5. **Start the application:**
+4. **Start the application:**
 
    ```bash
    npm run start
    ```
 
-6. **Access the application:**
+5. **Access the application:**
    Open `http://localhost:3000` in your browser
 
 ### Method 4: Proxmox LXC Installation
@@ -187,10 +193,10 @@ For installing Tracktor in a lightweight LXC container on a Proxmox host.
 
 **Step 1:** Create a new LXC container using the ProxmoxVE Helper Scripts by running the following command on your Proxmox host.
 
-> Reference : [ProxmoxVE Helper Scripts - Tracktor LXC](https://community-scripts.github.io/ProxmoxVE/ct/tracktor/)
+> Reference : [ProxmoxVE Helper Scripts - Tracktor LXC](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracktor)
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVED/main/ct/tracktor.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/tracktor.sh)"
 ```
 
 ### Method 5: Development Setup
