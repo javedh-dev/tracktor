@@ -64,17 +64,6 @@ volumes:
 curl -o .env https://raw.githubusercontent.com/javedh-dev/tracktor/refs/heads/dev/env/.env.prod
 ```
 
-<!--
-OR create the `.env` file and add environement variables as per your requirement.
-
-```bash
-touch .env
-```
-
-You can check the available environment variables at [ENVIRONMENT](ENVIRONMENT.md).
-**Step 3:** Start the application using Docker Compose:
---->
-
 ```bash
 docker-compose up -d
 ```
@@ -105,16 +94,6 @@ docker pull ghcr.io/javedh-dev/tracktor:latest
 ```bash
 docker volume create tracktor-app-data
 ```
-
-<!-- maybe re-added in the future?
-**Step 3:** (Optional) Create a `.env` file for environment variables or download as shown [here](#method-1-docker-compose-recommended) -
-
-```bash
-touch .env
-```
-
-Add any necessary environment variables as per your requirement.
---->
 
 **Step 3:** Run the container -
 
@@ -151,18 +130,6 @@ cd tracktor
 ```bash
 npm install
 ```
-
-<!-- maybe re-added in the future?
-**Step 3:** (Optional) Create a `.env` file for environment variables -
-
-```bash
-touch .env
-```
-
-Add any necessary environment variables as per your requirement. You can check the available environment variables in the [Configuration Reference](../configuration/environment-variables.md).
-
-> **Note:** Set the `NODE_ENV` variable to `production` in the `.env` file for production deployments.
---->
 
 **Step 3:** Build the application -
 
