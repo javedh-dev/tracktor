@@ -18,7 +18,7 @@ Before installing Tracktor, ensure your system meets these minimum requirements 
 | **Docker**            | **-**                                                                        | - docker<br>- git              |
 | **Bare Metal**        | **- Memory:** 512MB RAM<br>**- Storage:** 1GB free space                     | - node.js<br>- git             |
 | **Proxmox LXC**       | **- Memory:** 512MB RAM<br>**- Storage:** 1GB free space<br>**- CPU:** 1vCPU | - proxmox<br>- lxc             |
-| **Development Setup** | [Setup Guide](/developer-guide/development/setup.html)                       | -                              |
+| **Development Setup** | [Setup Guide](CONTRIBUTING.md)                       | -                              |
 
 > **Note:** For production deployments, it is recommended to have at least 1GB of RAM and 2GB of free disk space.
 
