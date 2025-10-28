@@ -50,8 +50,8 @@
 <p align="center">
   <h3>⛽ Fuel Log</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/fuel-log-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/images/fuel-log-light.png" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/fuel-logs-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/fuel-logs-light.png" />
     <img alt="Fuel Log" src="./docs/images/fuel-log-light.png" style="border-radius: 10px" />
   </picture>
 </p>
