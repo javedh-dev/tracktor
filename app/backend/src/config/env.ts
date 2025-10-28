@@ -31,7 +31,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || "dev",
   SERVER_HOST: process.env.SERVER_HOST || "localhost",
   SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
-  DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
+  DB_PATH: process.env.DB_PATH || "./tracktor.db",
   UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
   AUTH_PIN: process.env.AUTH_PIN || "123456",
   CORS_ORIGINS: getOrigins(),
@@ -80,12 +80,12 @@ export function validateEnvironment(): void {
     logger.warn("Running in FORCE_SEED mode. All data will be reset.");
   }
 
-  if (env.DATABASE_PATH) {
+  if (env.DB_PATH) {
     try {
-      accessSync(env.DATABASE_PATH, constants.F_OK | constants.W_OK);
+      accessSync(env.DB_PATH, constants.F_OK | constants.W_OK);
     } catch (err) {
       logger.error(
-        `DATABASE_PATH "${env.DATABASE_PATH}" does not exist or is not writable`,
+        `DB_PATH "${env.DB_PATH}" does not exist or is not writable`,
         err,
       );
       process.exit(1);

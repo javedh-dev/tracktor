@@ -40,7 +40,7 @@ const startupCallback = () => {
   logger.info("─".repeat(75));
   logger.info(`Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`);
   logger.info(`Environment: ${env.NODE_ENV}`);
-  logger.info(`Database: ${env.DATABASE_PATH}`);
+  logger.info(`Database: ${env.DB_PATH}`);
   logger.info(`Log Level: ${env.LOG_LEVEL}`);
   if (env.APP_VERSION) logger.info(`App Version: ${env.APP_VERSION}`);
   logger.info(`Demo Mode: ${env.DEMO_MODE ? "Enabled" : "Disabled"}`);

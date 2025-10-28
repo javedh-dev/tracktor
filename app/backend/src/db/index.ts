@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import { env } from "@config/env";
 
 const db = drizzle({
-  connection: { url: `file:${env.DATABASE_PATH! || "./tracktor.db"}` },
+  connection: { url: `file:${env.DB_PATH! || "./tracktor.db"}` },
   casing: "snake_case",
   schema: {
     ...schema,

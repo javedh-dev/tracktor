@@ -12,7 +12,7 @@ Tracktor app uses environment variables to configure its settings. Here are some
     - Possible values are any valid port number (e.g., `3000`, `8080`). That port must be free.
     - Default : `3000`.
 
-4. **DATABASE_PATH** - Specifies the file path to the database used by Tracktor. This is typically a SQLite database file.
+4. **DB_PATH** - Specifies the file path to the database used by Tracktor. This is typically a SQLite database file.
     - Possible values are any valid file path (e.g., `/path/to/tracktor.db`).
     - Default : `./tracktor.db`.
     - For docker setup this environment variable is set to `/data/tracktor.db`.
