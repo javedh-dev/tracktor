@@ -89,11 +89,11 @@
 
 ## 🚀 Getting Started
 
-Please check the [installation guide](./docs/INSTALL.md) for detailed instructions on setting up the project.
+Please check the [installation guide](./docs/installation.md) for detailed instructions on setting up the project.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the [contributing guidelines](./docs/CONTRIBUTING.md) before submitting a pull request.
+Contributions are welcome! Please read the [contributing guidelines](./docs/contributing.md) before submitting a pull request.
 
 Please consider supporting this project by giving it a star! ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
 
