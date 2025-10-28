@@ -38,6 +38,6 @@ ENV DB_PATH=/data/tracktor.db
 ENV UPLOADS_DIR=/data/uploads
 ENV LOGS_DIR=/data/logs
 # This should be updated with each release
-ENV APP_VERSION=0.4.1
+ENV APP_VERSION=0.4.2
 
 ENTRYPOINT ["/app/start.sh"]
