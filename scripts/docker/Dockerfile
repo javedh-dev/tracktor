@@ -36,5 +36,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV DATABASE_PATH=/data/tracktor.db
 ENV UPLOADS_DIR=/data/uploads
+ENV LOGS_DIR=/data/logs
+ENV APP_VERSION=0.4.1
 
 ENTRYPOINT ["/app/start.sh"]
