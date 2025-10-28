@@ -17,8 +17,14 @@ export const seedData = async () => {
     PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
   });
 
-  if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6)
+  if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6) {
     await seedAuthPin(env.AUTH_PIN.trim());
+  } else {
+    logger.warn(
+      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH_PIN is invalid.",
+    );
+  }
+
   if (env.DEMO_MODE && env.NODE_ENV !== "test")
     await seedDemoData(env.FORCE_DATA_SEED);
 };
