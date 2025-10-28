@@ -42,7 +42,7 @@ const startupCallback = () => {
   logger.info(`Environment: ${env.NODE_ENV}`);
   logger.info(`Database: ${env.DATABASE_PATH}`);
   logger.info(`Log Level: ${env.LOG_LEVEL}`);
-  // logger.info(`App Version: ${env.APP_VERSION}`);
+  if (env.APP_VERSION) logger.info(`App Version: ${env.APP_VERSION}`);
   logger.info(`Demo Mode: ${env.DEMO_MODE ? "Enabled" : "Disabled"}`);
   logger.info(`CORS: Explicit origins only`);
   logger.info(`Allowed origins: [ ${env.CORS_ORIGINS.join(", ")} ]`);
