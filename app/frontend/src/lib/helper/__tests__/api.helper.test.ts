@@ -377,6 +377,7 @@ ssrApiClient.addRequestInterceptor((req) => {
 					...req.headers,
 					'x-user-pin': '' // Simulate no browser access
 				};
+				return true;
 			});
 
 			await ssrApiClient.get('/test');
@@ -419,6 +420,7 @@ ssrApiClient.addRequestInterceptor((req) => {
 					...req.headers,
 					'x-user-pin': mockLocalStorage.getItem('userPin') || ''
 				};
+				return true;
 			});
 
 			await defaultApiClient.get('/test');
