@@ -12,10 +12,13 @@ export const apiClient = new HttpClient({
 });
 
 apiClient.addRequestInterceptor((req) => {
+	const userPin = browser ? localStorage.getItem('userPin') || '' : '';
+	if (userPin === '') return false;
 	req.headers = {
 		...req.headers,
 		...{
-			'x-user-pin': browser ? localStorage.getItem('userPin') || '' : ''
+			'x-user-pin': userPin
 		}
 	};
+	return true;
 });

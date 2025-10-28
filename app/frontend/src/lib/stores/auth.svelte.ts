@@ -16,14 +16,14 @@ class AuthStore {
 
 	isPinConfigured = async () => {
 		return apiClient
-			.get<ApiResponse>('/auth/status')
+			.get<ApiResponse>('/auth/status', { skipInterceptors: true })
 			.then(({ data: res }) => res.data.exists as boolean)
 			.catch(() => false);
 	};
 
 	login = async (pin: string) => {
 		return apiClient
-			.post<ApiResponse>('/auth/verify', { pin })
+			.post<ApiResponse>('/auth/verify', { pin }, { skipInterceptors: true })
 			.then(({ data: res }) => {
 				if (res.success) {
 					this.pin = pin;

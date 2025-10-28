@@ -5,6 +5,7 @@ interface RequestConfig {
 	data?: any;
 	timeout?: number;
 	baseURL?: string;
+	skipInterceptors?: boolean;
 }
 
 interface Response<T = any> {
@@ -35,7 +36,7 @@ class HttpClient {
 		'Content-Type': 'application/json'
 	};
 	private timeout: number = 10000;
-	private requestInterceptors: ((req: RequestConfig) => void)[] = [];
+	private requestInterceptors: ((req: RequestConfig) => boolean)[] = [];
 
 	constructor(config?: { baseURL?: string; headers?: Record<string, string>; timeout?: number }) {
 		if (config?.baseURL) this.baseURL = config.baseURL;
@@ -63,7 +64,15 @@ class HttpClient {
 		url: string,
 		config: RequestConfig = {}
 	): Promise<Response<T>> {
-		this.requestInterceptors.forEach((intercept) => intercept(config));
+		if (!config.skipInterceptors) {
+			this.requestInterceptors.forEach((intercept) => {
+				const isSuccessful = intercept(config);
+				if (!isSuccessful) {
+					console.warn('Request cancelled by interceptor:', config);
+					throw new HttpError('Request cancelled by interceptor', config);
+				}
+			});
+		}
 
 		const {
 			method = 'GET',
@@ -215,7 +224,7 @@ class HttpClient {
 		return client.delete<T>(url, config);
 	}
 
-	addRequestInterceptor = (interceptor: (req: RequestConfig) => void) => {
+	addRequestInterceptor = (interceptor: (req: RequestConfig) => boolean) => {
 		this.requestInterceptors.push(interceptor);
 	};
 

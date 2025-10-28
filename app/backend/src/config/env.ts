@@ -9,7 +9,11 @@ const nodeEnv = process.env.NODE_ENV || "dev";
 const envPath = resolve(process.cwd(), "../../env", `${nodeEnv}.env`);
 
 config({ path: envPath, quiet: true, override: true });
-config({ path: resolve(process.cwd(), ".env"), quiet: true, override: true });
+config({
+  path: resolve(process.cwd(), "../../.env"),
+  quiet: true,
+  override: true,
+});
 
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;
