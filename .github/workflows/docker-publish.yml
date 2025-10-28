@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
     tags: ["*.*.*"]
 
 env:
