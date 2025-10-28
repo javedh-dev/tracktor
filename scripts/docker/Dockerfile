@@ -34,7 +34,7 @@ RUN chmod +x /app/start.sh
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV DATABASE_PATH=/data/tracktor.db
+ENV DB_PATH=/data/tracktor.db
 ENV UPLOADS_DIR=/data/uploads
 ENV LOGS_DIR=/data/logs
 # This should be updated with each release
