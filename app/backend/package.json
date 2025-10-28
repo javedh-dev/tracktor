@@ -8,8 +8,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV='dev' tsx --watch index.ts",
-    "build": "NODE_ENV='prod' tsc && tsc-alias && tsc-esm-fix ./build/",
-    "start": "NODE_ENV='prod' node build/index.js",
+    "build": "NODE_ENV='production' tsc && tsc-alias && tsc-esm-fix ./build/",
+    "start": "NODE_ENV='production' node build/index.js",
     "db:generate": "NODE_OPTIONS='--import tsx' drizzle-kit generate --custom --name",
     "db:migrate": "NODE_OPTIONS='--import tsx' NODE_ENV='prod' drizzle-kit migrate --config=drizzle.config.js",
     "db:migrate:dev": "NODE_OPTIONS='--import tsx' NODE_ENV='dev' drizzle-kit migrate --config=drizzle.config.js",

@@ -29,7 +29,7 @@ const getOrigins = (): string[] => {
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || "dev",
-  SERVER_HOST: process.env.SERVER_HOST || "localhost",
+  SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
   SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
   DB_PATH: process.env.DB_PATH || "./tracktor.db",
   UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
