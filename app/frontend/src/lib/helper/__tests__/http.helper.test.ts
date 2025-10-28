@@ -310,6 +310,7 @@ describe('HttpClient', () => {
 	describe('Request interceptors', () => {
 		it('should add and execute request interceptors', async () => {
 			const interceptor = vi.fn();
+			interceptor.mockResolvedValue(true);
 			client.addRequestInterceptor(interceptor);
 
 			const mockResponse = {

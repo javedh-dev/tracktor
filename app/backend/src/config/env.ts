@@ -6,9 +6,14 @@ import { constants } from "fs/promises";
 
 // Load environment variables based on NODE_ENV
 const nodeEnv = process.env.NODE_ENV || "dev";
-const envPath = resolve(process.cwd(), "../../env", `.env.${nodeEnv}`);
+const envPath = resolve(process.cwd(), "../../env", `${nodeEnv}.env`);
 
 config({ path: envPath, quiet: true, override: true });
+config({
+  path: resolve(process.cwd(), "../../.env"),
+  quiet: true,
+  override: true,
+});
 
 const getOrigins = (): string[] => {
   const origins = process.env.CORS_ORIGINS;
@@ -24,7 +29,7 @@ const getOrigins = (): string[] => {
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || "dev",
-  SERVER_HOST: process.env.SERVER_HOST || "0.0.0.0",
+  SERVER_HOST: process.env.SERVER_HOST || "localhost",
   SERVER_PORT: parseInt(process.env.SERVER_PORT || "3000"),
   DATABASE_PATH: process.env.DATABASE_PATH || "./tracktor.db",
   UPLOADS_DIR: process.env.UPLOADS_DIR || "./uploads",
@@ -35,6 +40,7 @@ export const env = {
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_DIR: process.env.LOG_DIR || "./logs",
+  APP_VERSION: process.env.APP_VERSION,
 } as const;
 
 export const isDevelopment = env.NODE_ENV === "dev";

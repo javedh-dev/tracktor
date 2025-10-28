@@ -3,7 +3,7 @@
 > _Please keep regular backups of your data!_
 
 <div align="center" style="margin-bottom: 20px;">
-  <img src="./docs/screenshots/logo.svg" style="height:60px; margin-right: 10px; vertical-align: middle;"/>
+  <img src="./docs/images/logo.svg" style="height:60px; margin-right: 10px; vertical-align: middle;"/>
   <h1 style="display:inline; font-size: 2.5rem; vertical-align: middle;">Tracktor</h1>
 </div>
 
@@ -14,9 +14,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/dashboard-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/dashboard-light.png" />
-    <img alt="Dashboard" src="./docs/screenshots/dashboard-light.png" width="90%" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/dashboard-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/dashboard-light.png" />
+    <img alt="Dashboard" src="./docs/images/dashboard-light.png" width="90%" style="border-radius: 10px" />
   </picture>
 </p>
 
@@ -29,54 +29,54 @@
 - 📊 **Dashboard:** Visualize key metrics and upcoming renewals.
 - 🔒 **User Authentication:** Secure access to your data.
 
-## 🖼️ Screenshots
+## 🖼️ images
 
 <p align="center">
   <h3>🔐 Login Page</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/login-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/login-light.png" />
-    <img alt="Login Page" src="./docs/screenshots/login-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/login-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/login-light.png" />
+    <img alt="Login Page" src="./docs/images/login-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 <p align="center">
   <h3>📈 Charts</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/charts-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/charts-light.png" />
-    <img alt="Login Page" src="./docs/screenshots/charts-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/charts-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/charts-light.png" />
+    <img alt="Login Page" src="./docs/images/charts-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 <p align="center">
   <h3>⛽ Fuel Log</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/fuel-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/fuel-light.png" />
-    <img alt="Fuel Log" src="./docs/screenshots/fuel-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/fuel-logs-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/fuel-logs-light.png" />
+    <img alt="Fuel Log" src="./docs/images/fuel-log-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 <p align="center">
   <h3>🛠️ Maintenance Log</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/maintenance-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/maintenance-light.png" />
-    <img alt="Maintenance Log" src="./docs/screenshots/maintenance-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/maintenance-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/maintenance-light.png" />
+    <img alt="Maintenance Log" src="./docs/images/maintenance-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 <p align="center">
   <h3>🛡️ Insurance Details</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/insurance-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/insurance-light.png" />
-    <img alt="Insurance Details" src="./docs/screenshots/insurance-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/insurance-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/insurance-light.png" />
+    <img alt="Insurance Details" src="./docs/images/insurance-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 <p align="center">
   <h3>📄 PUCC Details</h3><br>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/pucc-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/pucc-light.png" />
-    <img alt="PUCC Details" src="./docs/screenshots/pucc-light.png" style="border-radius: 10px" />
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/images/pucc-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/images/pucc-light.png" />
+    <img alt="PUCC Details" src="./docs/images/pucc-light.png" style="border-radius: 10px" />
   </picture>
 </p>
 
@@ -89,11 +89,11 @@
 
 ## 🚀 Getting Started
 
-Please check the [installation guide](./docs/INSTALL.md) for detailed instructions on setting up the project.
+Please check the [installation guide](./docs/installation.md) for detailed instructions on setting up the project.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the [contributing guidelines](./docs/CONTRIBUTING.md) before submitting a pull request.
+Contributions are welcome! Please read the [contributing guidelines](./docs/contributing.md) before submitting a pull request.
 
 Please consider supporting this project by giving it a star! ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
 
