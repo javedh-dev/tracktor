@@ -7,7 +7,7 @@ COPY . .
 
 # Set build environment
 ENV API_BASE_URL=/
-ENV PUBLIC_DEMO_MODE=false
+ENV TRACKTOR_DEMO_MODE=false
 ENV NODE_ENV=production
 
 RUN npm run build

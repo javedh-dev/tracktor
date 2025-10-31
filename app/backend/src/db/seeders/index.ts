@@ -13,8 +13,8 @@ import { env, logger } from "@config/index";
 
 export const seedData = async () => {
   logger.info("Seeding data ", {
-    FORCE_DATA_SEED: process.env.FORCE_DATA_SEED,
-    PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
+    FORCE_DATA_SEED: env.FORCE_DATA_SEED,
+    DEMO_MODE: env.DEMO_MODE,
   });
 
   if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6) {

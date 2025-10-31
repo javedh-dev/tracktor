@@ -26,7 +26,7 @@ vi.mock('$lib/stores/setting', () => ({
 
 vi.mock('$env/dynamic/public', () => ({
 	env: {
-		PUBLIC_API_BASE_URL: 'https://api.test.com'
+		TRACKTOR_API_BASE_URL: 'https://api.test.com'
 	}
 }));
 

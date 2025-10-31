@@ -4,11 +4,6 @@ import logger from "./logger";
 import { accessSync, mkdirSync } from "fs";
 import { constants } from "fs/promises";
 
-// Load environment variables based on NODE_ENV
-const nodeEnv = process.env.NODE_ENV || "dev";
-const envPath = resolve(process.cwd(), "../../env", `${nodeEnv}.env`);
-
-config({ path: envPath, quiet: true, override: true });
 config({
   path: resolve(process.cwd(), "../../.env"),
   quiet: true,
@@ -36,11 +31,12 @@ export const env = {
   AUTH_PIN: process.env.AUTH_PIN || "123456",
   CORS_ORIGINS: getOrigins(),
   FORCE_DATA_SEED: process.env.FORCE_DATA_SEED === "true",
-  DEMO_MODE: process.env.PUBLIC_DEMO_MODE === "true",
+  DEMO_MODE: process.env.TRACKTOR_DEMO_MODE === "true",
   LOG_REQUESTS: process.env.LOG_REQUESTS === "true",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_DIR: process.env.LOG_DIR || "./logs",
   APP_VERSION: process.env.APP_VERSION,
+  DISABLE_AUTH: process.env.TRACKTOR_DISABLE_AUTH === "true",
 } as const;
 
 export const isDevelopment = env.NODE_ENV === "dev";

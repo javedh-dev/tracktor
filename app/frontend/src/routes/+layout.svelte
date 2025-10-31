@@ -2,20 +2,25 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$lib/components/layout/Header.svelte';
+	import { configStore } from '$lib/stores/config.svelte';
+	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import { goto } from '$app/navigation';
 
 	let { children } = $props();
-	let demoMode = env.PUBLIC_DEMO_MODE === 'true';
+	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
 
 	$effect(() => {
-		if (authStore.pin) goto('/dashboard', { replaceState: true });
+		if (authStore.isLoggedIn) goto('/dashboard', { replaceState: true });
+	});
+	onMount(() => {
+		configStore.refreshConfigs();
 	});
 </script>
 

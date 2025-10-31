@@ -39,13 +39,13 @@ const frontendHandler = async () => {
 const startupCallback = () => {
   logger.info("─".repeat(75));
   logger.info(`Server running at http://${env.SERVER_HOST}:${env.SERVER_PORT}`);
-  logger.info(`Environment: ${env.NODE_ENV}`);
-  logger.info(`Database: ${env.DB_PATH}`);
-  logger.info(`Log Level: ${env.LOG_LEVEL}`);
   if (env.APP_VERSION) logger.info(`App Version: ${env.APP_VERSION}`);
+  logger.info(`Environment: ${env.NODE_ENV}`);
+  logger.info(`Authentication: ${env.DISABLE_AUTH ? "Disabled" : "Enabled"}`);
+  logger.info(`Database: ${env.DB_PATH}`);
   logger.info(`Demo Mode: ${env.DEMO_MODE ? "Enabled" : "Disabled"}`);
-  logger.info(`CORS: Explicit origins only`);
   logger.info(`Allowed origins: [ ${env.CORS_ORIGINS.join(", ")} ]`);
+  logger.info(`Log Level: ${env.LOG_LEVEL}`);
   logger.info("─".repeat(75));
 };
 
@@ -70,7 +70,7 @@ app.use(jsonHandler);
 app.use(requestLogger);
 
 if (!isTest) {
-  app.use(authHandler);
+  if (!env.DISABLE_AUTH) app.use(authHandler);
   app.use(corsHandler);
   app.use(rateLimiter);
 }

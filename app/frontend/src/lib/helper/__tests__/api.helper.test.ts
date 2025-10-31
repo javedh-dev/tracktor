@@ -24,7 +24,7 @@ vi.mock('$app/environment', () => ({
 
 vi.mock('$env/dynamic/public', () => ({
 	env: {
-		PUBLIC_API_BASE_URL: 'https://api.test.com'
+		TRACKTOR_API_BASE_URL: 'https://api.test.com'
 	}
 }));
 
@@ -355,7 +355,7 @@ describe('API Helper', () => {
 			};
 			mockFetch.mockResolvedValue(mockResponse);
 
-			// Create a new HttpClient to simulate what happens when PUBLIC_API_BASE_URL is not set
+			// Create a new HttpClient to simulate what happens when TRACKTOR_API_BASE_URL is not set
 			const { HttpClient } = await import('../http.helper');
 			const defaultApiClient = new HttpClient({
 				baseURL: '/api', // Simulate the default fallback

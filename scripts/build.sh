@@ -17,6 +17,9 @@ log_error() {
     echo "[x] $1"
 }
 
+log_info "Setting Environment Variables"
+npx dotenvx run -f environment/prod.env
+
 log_info "Starting build process..."
 
 # Clean previous build
