@@ -8,7 +8,7 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		env: {
-			publicPrefix: 'TRACKTOR_',
+			publicPrefix: 'TRACKTOR_'
 		},
 		alias: {
 			$lib: './src/lib',
