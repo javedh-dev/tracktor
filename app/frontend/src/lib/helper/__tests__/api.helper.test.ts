@@ -1,5 +1,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Polyfill File and Blob for test environments
+if (typeof File === 'undefined') {
+	global.File = class File extends Blob {
+		constructor(fileBits, fileName, options = {}) {
+			super(fileBits, options);
+			this.name = fileName;
+			this.lastModified = Date.now();
+		}
+	};
+}
+
+if (typeof Blob === 'undefined') {
+	global.Blob = class Blob {
+		constructor(parts = [], options = {}) {
+			this.size = parts.reduce((size, part) => size + (part.length || 0), 0);
+			this.type = options.type || '';
+		}
+	};
+}
+
 // Mock localStorage
 const mockLocalStorage = {
 	getItem: vi.fn(),
@@ -394,7 +414,9 @@ describe('API Helper', () => {
 			mockFetch.mockResolvedValue(mockResponse);
 
 			const formData = new FormData();
-			formData.append('file', new Blob(['test file content'], { type: 'image/jpeg' }), 'test.jpg');
+			// Create a File object instead of Blob for better compatibility
+			const file = new File(['test file content'], 'test.jpg', { type: 'image/jpeg' });
+			formData.append('file', file);
 			formData.append('category', 'profile');
 
 			const response = await apiClient.post('/upload', formData);
