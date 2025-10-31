@@ -3,7 +3,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig(({ mode = 'dev' }) => {
+export default defineConfig(({ mode = 'development' }) => {
 	console.log('Building in mode : ', mode);
 	const getApiUrl = () => {
 		switch (mode) {

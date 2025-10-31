@@ -17,11 +17,11 @@ export const seedData = async () => {
     DEMO_MODE: env.DEMO_MODE,
   });
 
-  if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6) {
+  if (!env.DEMO_MODE && !env.DISABLE_AUTH && env.AUTH_PIN.trim().length == 6) {
     await seedAuthPin(env.AUTH_PIN.trim());
   } else {
     logger.warn(
-      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH_PIN is invalid.",
+      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH is disabled or AUTH_PIN is invalid.",
     );
   }
 
@@ -48,7 +48,7 @@ export const clearDb = async () => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-  seedAuthPin("123456");
+  if (!env.DISABLE_AUTH) seedAuthPin("123456");
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {
