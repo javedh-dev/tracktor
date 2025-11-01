@@ -3,10 +3,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { deleteFuelLog } from '$lib/services/fuel.service';
-	import { fuelLogModelStore } from '$lib/stores/fuel-log';
-	import type { FuelLog } from '$lib/types/fuel';
+	import type { FuelLog } from '$lib/domain/fuel';
 	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 	import { toast } from 'svelte-sonner';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import FuelLogForm from './FuelLogForm.svelte';
 
 	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -37,7 +38,7 @@
 		<DropdownMenu.Content align="end" class="w-32">
 			<DropdownMenu.Item
 				onclick={() => {
-					fuelLogModelStore.show(fuelLog.vehicleId, fuelLog, true, onaction);
+					sheetStore.openSheet(FuelLogForm, 'Update Fuel Log', '', fuelLog);
 				}}
 			>
 				Edit

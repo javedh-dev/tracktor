@@ -1,0 +1,16 @@
+{
+  "name": "@tracktor/common",
+  "version": "0.0.1",
+  "description": "Common types and logic for both backend and frontend",
+  "author": "Javed Hussain",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "NODE_ENV='prod' tsc"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

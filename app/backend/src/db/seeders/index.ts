@@ -6,26 +6,27 @@ import {
   maintenanceLogTable,
   pollutionCertificateTable,
   vehicleTable,
-} from "@db/schema/index.js";
-import { db } from "@db/index.js";
+} from "@db/schema/index";
+import { db } from "@db/index";
 import { faker } from "@faker-js/faker";
-import { configDotenv } from "dotenv";
-
-configDotenv();
+import { env, logger } from "@config/index";
 
 export const seedData = async () => {
-  const pinEnv = process.env.AUTH_PIN || "";
-  const enforceEnv = process.env.FORCE_DEMO_SEED_DATA || "false";
-  const demoMode = process.env.PUBLIC_DEMO_MODE || "false";
-
-  console.log("Seeding data...", {
-    FORCE_DEMO_SEED_DATA: process.env.FORCE_DEMO_SEED_DATA,
-    PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
+  logger.debug("Seeding data ", {
+    FORCE_DATA_SEED: env.FORCE_DATA_SEED,
+    DEMO_MODE: env.DEMO_MODE,
   });
 
-  if (demoMode === "false" && pinEnv.trim().length == 6)
-    await seedAuthPin(pinEnv);
-  if (demoMode === "true") await seedDemoData(enforceEnv === "true");
+  if (!env.DEMO_MODE && !env.DISABLE_AUTH && env.AUTH_PIN.trim().length == 6) {
+    await seedAuthPin(env.AUTH_PIN.trim());
+  } else {
+    logger.warn(
+      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH is disabled or AUTH_PIN is invalid.",
+    );
+  }
+
+  if (env.DEMO_MODE && env.NODE_ENV !== "test")
+    await seedDemoData(env.FORCE_DATA_SEED);
 };
 
 const seedAuthPin = async (pin: string) => {
@@ -35,24 +36,28 @@ const seedAuthPin = async (pin: string) => {
     .values({ id: 1, hash })
     .onConflictDoUpdate({ set: { hash: hash }, target: authTable.id })
     .run();
-  console.log("Authentication PIN configured");
+  logger.info("Authentication PIN configured");
+};
+
+export const clearDb = async () => {
+  await db.delete(pollutionCertificateTable);
+  await db.delete(maintenanceLogTable);
+  await db.delete(fuelLogTable);
+  await db.delete(insuranceTable);
+  await db.delete(vehicleTable);
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-  seedAuthPin("123456");
+  if (!env.DISABLE_AUTH) seedAuthPin("123456");
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {
-      console.log("Demo data already exists, skipping");
+      logger.info("Demo data already exists, skipping");
       return;
     }
   } else {
-    console.log("Forcing demo data seed");
-    await db.delete(pollutionCertificateTable);
-    await db.delete(maintenanceLogTable);
-    await db.delete(fuelLogTable);
-    await db.delete(insuranceTable);
-    await db.delete(vehicleTable);
+    logger.warn("Forcing demo data seed. Deleting existing data...");
+    await clearDb();
   }
 
   const vehicles = await db
@@ -141,5 +146,5 @@ const seedDemoData = async (enforce: boolean = false) => {
     await db.insert(fuelLogTable).values(fuelLogs);
   });
 
-  console.log("Demo data seeded successfully");
+  logger.info("Demo data seeded successfully");
 };

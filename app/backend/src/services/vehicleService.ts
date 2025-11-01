@@ -1,22 +1,28 @@
-import { Status } from "@exceptions/ServiceError.js";
-import { VehicleError } from "@exceptions/VehicleError.js";
-import * as schema from "@db/schema/index.js";
-import { db } from "@db/index.js";
+import { Status } from "@exceptions/AppError";
+import { AppError } from "@exceptions/AppError";
+import * as schema from "@db/schema/index";
+import { db } from "@db/index";
 import { eq } from "drizzle-orm";
+import { ApiResponse } from "@tracktor/common";
+import { performDelete } from "@utils/serviceUtils";
 
-export const addVehicle = async (vehicleData: any) => {
-  const vehicle = await db
+export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
+  const vehicles = await db
     .insert(schema.vehicleTable)
     .values({ ...vehicleData, id: undefined })
     .returning();
-  return { id: vehicle[0]?.id, message: "Vehicle added successfully." };
+  return {
+    data: vehicles[0],
+    success: true,
+    message: "Vehicle added successfully.",
+  };
 };
 
 // Helper function to calculate overall mileage for a vehicle
 const calculateOverallMileage = async (vehicleId: string) => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
-    orderBy: (log, { asc }) => asc(log.date),
+    orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)],
   });
 
   if (fuelLogs.length < 2) return null;
@@ -58,7 +64,7 @@ const calculateOverallMileage = async (vehicleId: string) => {
   return parseFloat(avgMileage.toFixed(2));
 };
 
-export const getAllVehicles = async () => {
+export const getAllVehicles = async (): Promise<ApiResponse> => {
   const vehicles = await db.query.vehicleTable.findMany({
     columns: {
       id: true,
@@ -69,7 +75,7 @@ export const getAllVehicles = async () => {
       color: true,
       odometer: true,
       vin: true,
-      image: true
+      image: true,
     },
   });
 
@@ -96,13 +102,13 @@ export const getAllVehicles = async () => {
     vehicles.map(async (vehicle) => {
       const latestLog = await db.query.fuelLogTable.findFirst({
         where: (log, { eq }) => eq(log.vehicleId, vehicle.id),
-        orderBy: (log, { desc }) => desc(log.date),
+        orderBy: (log, { desc }) => [desc(log.date), desc(log.odometer)],
         columns: {
           odometer: true,
         },
       });
       return { vehicleId: vehicle.id, latestOdometer: latestLog?.odometer };
-    })
+    }),
   );
 
   // Calculate overall mileage for each vehicle
@@ -110,18 +116,18 @@ export const getAllVehicles = async () => {
     vehicles.map(async (vehicle) => ({
       vehicleId: vehicle.id,
       overallMileage: await calculateOverallMileage(vehicle.id),
-    }))
+    })),
   );
 
-  return vehicles.map((vehicle) => {
+  const enrichedVehicles = vehicles.map((vehicle) => {
     // Find insurance status
     const vehicleInsurances = activeInsurances.filter(
-      (insurance) => insurance.vehicleId === vehicle.id
+      (insurance) => insurance.vehicleId === vehicle.id,
     );
     let insuranceStatus = "Not Available";
     if (vehicleInsurances.length > 0) {
       insuranceStatus = vehicleInsurances.some(
-        (insurance) => new Date(insurance.endDate) > today
+        (insurance) => new Date(insurance.endDate) > today,
       )
         ? "Active"
         : "Expired";
@@ -129,12 +135,12 @@ export const getAllVehicles = async () => {
 
     // Find PUCC status
     const vehiclePollutionCerts = activePollutionCertificates.filter(
-      (pucc) => pucc.vehicleId === vehicle.id
+      (pucc) => pucc.vehicleId === vehicle.id,
     );
     let puccStatus = "Not Available";
     if (vehiclePollutionCerts.length > 0) {
       puccStatus = vehiclePollutionCerts.some(
-        (pucc) => new Date(pucc.expiryDate) > today
+        (pucc) => new Date(pucc.expiryDate) > today,
       )
         ? "Active"
         : "Expired";
@@ -142,7 +148,7 @@ export const getAllVehicles = async () => {
 
     // Get current odometer and overall mileage
     const latestFuelLog = latestFuelLogs.find(
-      (log) => log.vehicleId === vehicle.id
+      (log) => log.vehicleId === vehicle.id,
     );
     const mileageData = vehicleMileages.find((m) => m.vehicleId === vehicle.id);
 
@@ -164,20 +170,24 @@ export const getAllVehicles = async () => {
       puccStatus,
     };
   });
+  return {
+    data: enrichedVehicles,
+    success: true,
+  };
 };
 
-export const getVehicleById = async (id: string) => {
+export const getVehicleById = async (id: string): Promise<ApiResponse> => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, id),
   });
   if (!vehicle) {
-    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
+    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
 
   // Get current odometer from latest fuel log
   const latestFuelLog = await db.query.fuelLogTable.findFirst({
     where: (log, { eq }) => eq(log.vehicleId, id),
-    orderBy: (log, { desc }) => desc(log.date),
+    orderBy: (log, { desc }) => [desc(log.date), desc(log.odometer)],
     columns: {
       odometer: true,
     },
@@ -189,37 +199,41 @@ export const getVehicleById = async (id: string) => {
   const currentOdometer = latestFuelLog?.odometer || vehicle.odometer || 0;
 
   return {
-    ...vehicle,
-    currentOdometer,
-    overallMileage,
+    data: {
+      ...vehicle,
+      currentOdometer,
+      overallMileage,
+    },
+    success: true,
   };
 };
 
-export const updateVehicle = async (id: string, vehicleData: any) => {
+export const updateVehicle = async (
+  id: string,
+  vehicleData: any,
+): Promise<ApiResponse> => {
   await getVehicleById(id);
-  await db
+  const updatedVehicle = await db
     .update(schema.vehicleTable)
     .set({
       ...vehicleData,
     })
-    .where(eq(schema.vehicleTable.id, id));
-  return { message: "Vehicle updated successfully." };
-};
-
-export const deleteVehicle = async (id: string) => {
-  const result = await db
-    .delete(schema.vehicleTable)
     .where(eq(schema.vehicleTable.id, id))
     .returning();
-  if (result.length === 0) {
-    throw new VehicleError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
-  }
-  return { message: "Vehicle deleted successfully." };
+  return {
+    data: updatedVehicle[0],
+    success: true,
+    message: "Vehicle updated successfully.",
+  };
+};
+
+export const deleteVehicle = async (id: string): Promise<ApiResponse> => {
+  return await performDelete(schema.vehicleTable, id, "Vehicle");
 };
 
 // Get vehicles with minimal data for dropdown/selection purposes
-export const getVehiclesMinimal = async () => {
-  return await db.query.vehicleTable.findMany({
+export const getVehiclesMinimal = async (): Promise<ApiResponse> => {
+  const vehicles = await db.query.vehicleTable.findMany({
     columns: {
       id: true,
       make: true,
@@ -228,10 +242,14 @@ export const getVehiclesMinimal = async () => {
       licensePlate: true,
     },
   });
+  return {
+    data: vehicles,
+    success: true,
+  };
 };
 
 // Get vehicle summary with key metrics
-export const getVehicleSummary = async (id: string) => {
+export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
   const vehicle = await getVehicleById(id);
 
   // Get total fuel logs count
@@ -247,8 +265,11 @@ export const getVehicleSummary = async (id: string) => {
   });
 
   return {
-    ...vehicle,
-    totalFuelLogs: fuelLogsCount.length,
-    totalMaintenanceLogs: maintenanceLogsCount.length,
+    data: {
+      ...vehicle,
+      totalFuelLogs: fuelLogsCount.length,
+      totalMaintenanceLogs: maintenanceLogsCount.length,
+    },
+    success: true,
   };
 };

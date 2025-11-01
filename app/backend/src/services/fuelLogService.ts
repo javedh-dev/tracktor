@@ -1,20 +1,19 @@
-import { FuelLogError } from "@exceptions/FuelLogError.js";
-import { Status } from "@exceptions/ServiceError.js";
-import { VehicleError } from "@exceptions/VehicleError.js";
-import * as schema from "@db/schema/index.js";
-import { db } from "@db/index.js";
+import { AppError, Status } from "@exceptions/AppError";
+import * as schema from "@db/schema/index";
+import { db } from "@db/index";
 import { eq } from "drizzle-orm";
+import { ApiResponse } from "@tracktor/common";
+import {
+  validateVehicleExists,
+  validateVehicleExistsByLicensePlate,
+  performDelete,
+} from "@utils/serviceUtils";
 
-export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
-  });
-  if (!vehicle) {
-    throw new VehicleError(
-      `No vehicle found for id : ${vehicleId}`,
-      Status.NOT_FOUND,
-    );
-  }
+export const addFuelLog = async (
+  vehicleId: string,
+  fuelLogData: any,
+): Promise<ApiResponse> => {
+  await validateVehicleExists(vehicleId);
   const fuelLog = await db
     .insert(schema.fuelLogTable)
     .values({
@@ -23,17 +22,21 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any) => {
       vehicleId: vehicleId,
     })
     .returning();
-  return { id: fuelLog[0]?.id, message: "Fuel log added successfully." };
+  return {
+    data: fuelLog[0],
+    success: true,
+    message: "Fuel log added successfully.",
+  };
 };
 
-export const getFuelLogs = async (vehicleId: string) => {
+export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
-    orderBy: (log, { asc }) => asc(log.date),
+    orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)],
   });
 
   // Calculate mileage
-  return fuelLogs.map((log, index, arr) => {
+  const mileageData = fuelLogs.map((log, index, arr) => {
     // mileage can only be calculated for a full tank and a previous log is needed
     if (index === 0 || !log.filled || log.missedLast) {
       return { ...log, mileage: null };
@@ -74,72 +77,75 @@ export const getFuelLogs = async (vehicleId: string) => {
     const mileage = distance / totalFuel;
     return { ...log, mileage: parseFloat(mileage.toFixed(2)) };
   });
+  return {
+    data: mileageData,
+    success: true,
+  };
 };
 
-export const getFuelLogById = async (id: string) => {
+export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
   const fuelLog = await db.query.fuelLogTable.findFirst({
     where: (log, { eq }) => eq(log.id, id),
   });
 
   if (!fuelLog) {
-    throw new FuelLogError(
-      `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND,
-    );
+    throw new AppError(`No Fuel Logs found for id : ${id}`, Status.NOT_FOUND);
   }
-  return fuelLog;
+  return {
+    data: fuelLog,
+    success: true,
+  };
 };
 
-export const updateFuelLog = async (id: string, fuelLogData: any) => {
-  getFuelLogById(id);
-  await db
+export const updateFuelLog = async (
+  vehicleId: string,
+  id: string,
+  fuelLogData: any,
+): Promise<ApiResponse> => {
+  // Validate that the fuel log exists and belongs to the specified vehicle
+  const fuelLog = await db.query.fuelLogTable.findFirst({
+    where: (log, { eq, and }) =>
+      and(eq(log.vehicleId, vehicleId), eq(log.id, id)),
+  });
+  if (!fuelLog) {
+    throw new AppError(`No Fuel Log found for id: ${id}`, Status.NOT_FOUND);
+  }
+
+  const updatedLog = await db
     .update(schema.fuelLogTable)
     .set({
       ...fuelLogData,
     })
-    .where(eq(schema.fuelLogTable.id, id));
-  return { message: "Fuel log updated successfully." };
-};
-
-export const deleteFuelLog = async (id: string) => {
-  const result = await db
-    .delete(schema.fuelLogTable)
     .where(eq(schema.fuelLogTable.id, id))
     .returning();
-  if (result.length === 0) {
-    throw new FuelLogError(
-      `No Fuel Logs found for id : ${id}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return { message: "Fuel log deleted successfully." };
+  return {
+    data: updatedLog[0],
+    success: true,
+    message: "Fuel log updated successfully.",
+  };
+};
+
+export const deleteFuelLog = async (id: string): Promise<ApiResponse> => {
+  return await performDelete(schema.fuelLogTable, id, "Fuel log");
 };
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
   fuelLogData: any,
-) => {
+): Promise<ApiResponse> => {
+  await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
-  if (!vehicle) {
-    throw new VehicleError(
-      `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return await addFuelLog(vehicle.id, fuelLogData);
+  return await addFuelLog(vehicle!.id, fuelLogData);
 };
 
-export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
+export const getFuelLogsByLicensePlate = async (
+  licensePlate: string,
+): Promise<ApiResponse> => {
+  await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate),
   });
-  if (!vehicle) {
-    throw new VehicleError(
-      `No vehicle found for license plate : ${licensePlate}`,
-      Status.NOT_FOUND,
-    );
-  }
-  return await getFuelLogs(vehicle.id);
+  return await getFuelLogs(vehicle!.id);
 };

@@ -1,79 +1,41 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
-	import { formatDate } from '$helper/formatting';
+	import { formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { getApiUrl } from '$helper/api';
 	import PuccContextMenu from './PuccContextMenu.svelte';
-	import type { PollutionCertificate } from '$lib/types';
-
-	let { vehicleId } = $props();
-
-	let pollutionCertificates: PollutionCertificate[] = $state([]);
-	let loading = $state(false);
-	let error = $state('');
+	import { puccStore } from '$lib/stores/pucc.svelte';
+	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	$effect(() => {
-		if (!vehicleId) {
-			error = 'Vehicle ID is required.';
-			loading = false;
-		} else {
-			fetchPollutionCertificateDetails();
-		}
-	});
-
-	async function fetchPollutionCertificateDetails() {
-		if (!vehicleId) {
-			pollutionCertificates = [];
-			return;
-		}
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(getApiUrl(`/api/vehicles/${vehicleId}/pucc`), {
-				headers: {
-					'X-User-PIN': browser ? localStorage.getItem('userPin') || '' : ''
-				}
-			});
-			if (response.ok) {
-				pollutionCertificates = await response.json();
-			} else {
-				error = 'Failed to fetch Pollution Certificates.';
-			}
-		} catch (e) {
-			console.error(e);
-			error = 'Network error. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		fetchPollutionCertificateDetails();
+		if (vehicleStore.selectedId) puccStore.refreshPuccs();
 	});
 </script>
 
-{#if loading}
+{#if puccStore.processing}
 	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
 		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
 	</p>
-{:else if error}
-	<p class="text-red-500">Error: {error}</p>
-{:else if pollutionCertificates.length === 0}
+{:else if puccStore.error}
+	<p class="text-red-500">Error: {puccStore.error}</p>
+{:else if puccStore.pollutionCerts?.length === 0}
 	<div>No Pollution Certificates for this vehicle.</div>
 {:else}
-	{#each pollutionCertificates as pucc (pucc.id)}
+	{#each puccStore.pollutionCerts as pucc (pucc.id)}
 		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
 					<BadgeCheck class="h-6 w-6 " />
 					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
 				</div>
-				<PuccContextMenu {pucc} onaction={fetchPollutionCertificateDetails} />
+				<PuccContextMenu
+					{pucc}
+					onaction={() => {
+						puccStore.refreshPuccs();
+					}}
+				/>
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">

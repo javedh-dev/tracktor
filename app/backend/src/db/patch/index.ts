@@ -1,4 +1,5 @@
-import { db } from "../index.js";
+import { logger } from "@config/index";
+import { db } from "@db/index";
 import { sql } from "drizzle-orm";
 
 /**
@@ -7,13 +8,13 @@ import { sql } from "drizzle-orm";
  */
 export async function applyPatches(): Promise<void> {
   try {
-    console.log("Starting database patches...");
+    logger.info("Starting database patches...");
 
     await addFuelLogColumns();
 
-    console.log("Database patches completed successfully");
+    logger.info("Database patches completed successfully");
   } catch (error) {
-    console.error("Error applying database patches:", error);
+    logger.error("Error applying database patches:", error);
     throw error;
   }
 }
@@ -25,12 +26,12 @@ async function addFuelLogColumns(): Promise<void> {
   try {
     // First check if the fuel_logs table exists
     const tableExists = await db.all(sql`
-      SELECT name FROM sqlite_master 
+      SELECT name FROM sqlite_master
       WHERE type='table' AND name='fuel_logs'
     `);
 
     if (tableExists.length === 0) {
-      console.log("fuel_logs table does not exist, skipping column patches");
+      logger.info("fuel_logs table does not exist, skipping column patches");
       return;
     }
 
@@ -41,59 +42,59 @@ async function addFuelLogColumns(): Promise<void> {
     const hasFilledColumn = existingColumns.includes("filled");
     const hasMissedLastColumn = existingColumns.includes("missed_last");
 
-    console.log(`Found columns in fuel_logs: ${existingColumns.join(", ")}`);
+    logger.info(`Found columns in fuel_logs: ${existingColumns.join(", ")}`);
 
     if (!hasFilledColumn) {
-      console.log("Adding 'filled' column to fuel_logs table...");
+      logger.info("Adding 'filled' column to fuel_logs table...");
       try {
         await db.run(sql`
-          ALTER TABLE fuel_logs 
+          ALTER TABLE fuel_logs
           ADD COLUMN filled INTEGER DEFAULT 1 NOT NULL
         `);
-        console.log("Successfully added 'filled' column");
+        logger.info("Successfully added 'filled' column");
       } catch (columnError) {
         if (
           columnError instanceof Error &&
           (columnError.message.includes("duplicate column name") ||
             columnError.message.includes("already exists"))
         ) {
-          console.log("Column 'filled' already exists, skipping...");
+          logger.info("Column 'filled' already exists, skipping...");
         } else {
           throw columnError;
         }
       }
     } else {
-      console.log("Column 'filled' already exists in fuel_logs table");
+      logger.info("Column 'filled' already exists in fuel_logs table");
     }
 
     if (!hasMissedLastColumn) {
-      console.log("Adding 'missed_last' column to fuel_logs table...");
+      logger.info("Adding 'missed_last' column to fuel_logs table...");
       try {
         await db.run(sql`
-          ALTER TABLE fuel_logs 
+          ALTER TABLE fuel_logs
           ADD COLUMN missed_last INTEGER DEFAULT 0 NOT NULL
         `);
-        console.log("Successfully added 'missed_last' column");
+        logger.info("Successfully added 'missed_last' column");
       } catch (columnError) {
         if (
           columnError instanceof Error &&
           (columnError.message.includes("duplicate column name") ||
             columnError.message.includes("already exists"))
         ) {
-          console.log("Column 'missed_last' already exists, skipping...");
+          logger.info("Column 'missed_last' already exists, skipping...");
         } else {
           throw columnError;
         }
       }
     } else {
-      console.log("Column 'missed_last' already exists in fuel_logs table");
+      logger.info("Column 'missed_last' already exists in fuel_logs table");
     }
   } catch (error) {
-    console.error("Error in addFuelLogColumns:", error);
+    logger.info("Error in addFuelLogColumns:", error);
 
     // Don't throw for non-critical errors to prevent app startup failure
     if (error instanceof Error) {
-      console.error(`Patch error details: ${error.message}`);
+      logger.error(`Patch error details: ${error.message}`);
     }
   }
 }
@@ -107,7 +108,5 @@ export async function initializePatches(): Promise<void> {
     await applyPatches();
   } catch (error) {
     console.error("Failed to initialize database patches:", error);
-    // Don't throw here to prevent app startup failure
-    // Log the error and continue
   }
 }

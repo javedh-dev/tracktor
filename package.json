@@ -3,23 +3,28 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "./app/common",
     "./app/frontend",
     "./app/backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=@tracktor/backend\" \"npm run dev --workspace=@tracktor/frontend\"",
+    "dev": "./scripts/run.sh dev",
+    "dev:test": "./scripts/run.sh test",
     "build": "./scripts/build.sh",
-    "start": "./build/start.sh",
+    "db:migrate": "dotenvx run -f environment/prod.env -- npm run db:migrate --workspace=@tracktor/backend",
+    "db:migrate:dev": "dotenvx run -f environment/dev.env -- npm run db:migrate:dev --workspace=@tracktor/backend",
+    "start": "dotenvx run -f environment/prod.env -- ./build/start.sh",
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "clean": "./scripts/clean.sh",
-    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present"
+    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
+    "test": "dotenvx run -f environment/test.env -- npm run test --workspaces --if-present"
   },
   "devDependencies": {
-    "concurrently": "^9.2.0"
+    "concurrently": "^9.2.1"
   },
   "dependencies": {
-    "dotenv": "^17.2.2"
+    "@dotenvx/dotenvx": "^1.51.0"
   }
 }

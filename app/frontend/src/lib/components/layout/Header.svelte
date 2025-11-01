@@ -1,35 +1,14 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
-	import { configModelStore } from '$lib/stores/setting';
-	import { vehiclesStore } from '$stores/vehicle';
 	import { Button } from '$lib/components/ui/button';
 	import LabelWithIcon from '../app/LabelWithIcon.svelte';
-	import { page } from '$app/stores';
-
-	let isAuthenticated = $state(false);
-
-	$effect(() => {
-		const pin = localStorage.getItem('userPin');
-		isAuthenticated = !!pin;
-
-		if (!isAuthenticated && $page.url.pathname !== '/login') {
-			goto('/login', { replaceState: true });
-		}
-	});
-
-	const logout = () => {
-		localStorage.removeItem('userPin');
-		isAuthenticated = false;
-	};
-
-	const fetchVehicles = () => {
-		const pin = localStorage.getItem('userPin') || undefined;
-		if (pin) vehiclesStore.fetchVehicles(pin);
-	};
+	import { authStore } from '$stores/auth.svelte';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import SettingsForm from '../features/settings/SettingsForm.svelte';
+	import { env } from '$env/dynamic/public';
 </script>
 
 <header
@@ -45,20 +24,20 @@
 		<div class="ml-auto flex items-center gap-2">
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
-				{#if isAuthenticated}
+				{#if authStore.isLoggedIn}
 					<Button
 						variant="ghost"
 						onclick={() => {
-							configModelStore.show((status: boolean) => {
-								status && fetchVehicles();
-							});
+							sheetStore.openSheet(SettingsForm, 'Settings');
 						}}
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					<Button variant="ghost" onclick={logout}>
-						<LogOut class="h-[1.2rem] w-[1.2rem]" />
-					</Button>
+					{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
+						<Button variant="ghost" onclick={authStore.logout}>
+							<LogOut class="h-[1.2rem] w-[1.2rem]" />
+						</Button>
+					{/if}
 				{/if}
 			</div>
 		</div>

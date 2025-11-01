@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "esnext",
     "rootDir": ".",
     "outDir": "./build",
     "esModuleInterop": true,
@@ -12,29 +12,21 @@
     "allowJs": true,
     // "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "nodenext",
-    "module": "nodenext",
+    "moduleResolution": "node10",
+    "module": "esnext",
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "paths": {
-      "@config": ["./src/config"],
       "@config/*": ["./src/config/*"],
-      "@controllers": ["./src/controllers"],
       "@controllers/*": ["./src/controllers/*"],
-      "@db": ["./src/db"],
       "@db/*": ["./src/db/*"],
-      "@exceptions": ["./src/exceptions"],
       "@exceptions/*": ["./src/exceptions/*"],
-      "@routes": ["./src/routes"],
+      "@middlewares/*": ["./src/middlewares/*"],
       "@routes/*": ["./src/routes/*"],
-      "@services": ["./src/services"],
       "@services/*": ["./src/services/*"],
-      "@middleware": ["./src/middleware"],
-      "@middleware/*": ["./src/middleware/*"],
-      "@frontend": ["./frontend"],
-      "@frontend/*": ["./frontend/*"]
+      "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "drizzle.config.js"],
   "exclude": ["node_modules", "./build"]
 }

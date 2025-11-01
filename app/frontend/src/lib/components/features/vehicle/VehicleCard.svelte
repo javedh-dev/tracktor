@@ -11,23 +11,25 @@
 	import BadgeAlert from '@lucide/svelte/icons/badge-alert';
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import IdCard from '@lucide/svelte/icons/id-card';
-	import { formatDistance } from '$helper/formatting';
-	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
-	import { maintenanceModelStore } from '$stores/maintenance';
-	import { fuelLogModelStore } from '$stores/fuel-log';
-	import { insuranceModelStore } from '$stores/insurance';
-	import { puccModelStore } from '$stores/pucc';
+	import { formatDistance } from '$lib/helper/format.helper';
+	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { browser } from '$app/environment';
 	import IconButton from '$lib/components/app/IconButton.svelte';
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import IconWithTooltip from '$lib/components/app/IconWithTooltip.svelte';
+	import IconWithTooltip from '$lib/components/app/IconWithPopover.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import FuelLogForm from '../fuel/FuelLogForm.svelte';
+	import MaintenanceForm from '../maintenance/MaintenanceForm.svelte';
+	import InsuranceForm from '../insurance/InsuranceForm.svelte';
+	import PollutionCertificateForm from '../pollution/PollutionCertificateForm.svelte';
+	import VehicleForm from './VehicleForm.svelte';
 
-	const { vehicle, updateCallback, onclick, onkeydown, isSelected = false } = $props();
+	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
 
 	const performDelete = async (vehicleId: string) => {
@@ -44,12 +46,12 @@
 	const fetchVehicles = () => {
 		if (browser) {
 			const pin = localStorage.getItem('userPin') || undefined;
-			if (pin) vehiclesStore.fetchVehicles(pin);
+			if (pin) vehicleStore.refreshVehicles();
 		}
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = vehicle.image ? `/api/upload/${vehicle.image}` : undefined;
+	const imageUrl = vehicle.image ? `/api/files/${vehicle.image}` : undefined;
 </script>
 
 <div tabindex="0" role="button" {onclick} {onkeydown}>
@@ -123,28 +125,29 @@
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
-						onclick={() => fuelLogModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log')}
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 						iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 						icon={Wrench}
-						onclick={() => maintenanceModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log')}
 						ariaLabel="Maintenence"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 						iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 						icon={Shield}
-						onclick={() => insuranceModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance')}
 						ariaLabel="Insurance"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
 						iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 						icon={BadgeCheck}
-						onclick={() => puccModelStore.show(vehicle.id, null, false, updateCallback)}
+						onclick={() =>
+							sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate')}
 						ariaLabel="Pollution Certificate"
 					/>
 				</div>
@@ -154,7 +157,7 @@
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
 						icon={Pencil}
 						onclick={() => {
-							vehicleModelStore.show(vehicle, true);
+							sheetStore.openSheet(VehicleForm, 'Update Vehicle', '', vehicle);
 						}}
 						ariaLabel="Edit"
 					/>

@@ -1,28 +1,26 @@
 <script lang="ts">
 	import VehicleList from '$feature/vehicle/VehicleList.svelte';
-	import { vehicleModelStore, vehiclesStore } from '$stores/vehicle';
+	import { vehicleStore } from '$stores/vehicle.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { Jumper } from 'svelte-loading-spinners';
+	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
+	import { authStore } from '$lib/stores/auth.svelte';
+	import { goto } from '$app/navigation';
 
-	let selectedVehicleId = $state<string | undefined>();
-	let loading = $state(false);
-
-	const updateCallback = (success: boolean) => success && fetchVehicles();
-
-	const fetchVehicles = async () => {
-		loading = true;
-		const pin = localStorage.getItem('userPin') || undefined;
-		if (pin) vehiclesStore.fetchVehicles(pin).finally(() => (loading = false));
-	};
-
-	onMount(() => fetchVehicles());
+	onMount(() => {
+		if (!authStore.isLoggedIn) {
+			goto('/login', { replaceState: true });
+		}
+		vehicleStore.refreshVehicles();
+	});
 </script>
 
-{#if loading}
+{#if vehicleStore.processing}
 	<div class="flex min-h-screen items-center justify-center">
 		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
@@ -34,16 +32,16 @@
 				variant="outline"
 				size="default"
 				class="cursor-pointer"
-				onclick={() => vehicleModelStore.show()}
+				onclick={() => sheetStore.openSheet(VehicleForm, 'Add Vehicle')}
 			>
 				<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />
 			</Button>
 		</div>
 
-		<VehicleList bind:selectedVehicleId {updateCallback} />
+		<VehicleList />
 
-		{#if selectedVehicleId}
-			<DashboardTabs vehicleId={selectedVehicleId} />
+		{#if vehicleStore.selectedId}
+			<DashboardTabs />
 		{/if}
 	</div>
 {/if}

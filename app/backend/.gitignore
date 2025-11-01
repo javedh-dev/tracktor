@@ -3,4 +3,5 @@ node_modules
 tracktor.db
 build/
 uploads/
+logs/
 coverage/

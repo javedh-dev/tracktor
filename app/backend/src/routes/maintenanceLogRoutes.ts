@@ -5,16 +5,58 @@ import {
   getMaintenanceLogById,
   updateMaintenanceLog,
   deleteMaintenanceLog,
-} from "@controllers/maintenanceLogController.js";
-import { authenticatePin } from "@middleware/auth.js";
-import { asyncHandler } from "@middleware/async-handler.js";
+} from "@controllers/maintenanceLogController";
+import { asyncHandler, validationHandler } from "../middlewares/index";
+import {
+  dateValidator,
+  floatValidator,
+  idValidator,
+  stringValidator,
+} from "../middlewares/validationHandler";
 
 const router = Router({ mergeParams: true });
 
-router.post("/", authenticatePin, asyncHandler(addMaintenanceLog));
-router.get("/", authenticatePin, asyncHandler(getMaintenanceLogs));
-router.get("/:id", authenticatePin, asyncHandler(getMaintenanceLogById));
-router.put("/:id", authenticatePin, asyncHandler(updateMaintenanceLog));
-router.delete("/:id", authenticatePin, asyncHandler(deleteMaintenanceLog));
+router.post(
+  "/",
+  validationHandler([
+    idValidator("vehicleId"),
+    dateValidator("date"),
+    floatValidator("odometer"),
+    stringValidator("serviceCenter"),
+    floatValidator("cost"),
+  ]),
+  asyncHandler(addMaintenanceLog),
+);
+
+router.get(
+  "/",
+  validationHandler([idValidator("vehicleId")]),
+  asyncHandler(getMaintenanceLogs),
+);
+
+router.get(
+  "/:id",
+  validationHandler([idValidator("vehicleId"), idValidator("id")]),
+  asyncHandler(getMaintenanceLogById),
+);
+
+router.put(
+  "/:id",
+  validationHandler([
+    idValidator("vehicleId"),
+    idValidator("id"),
+    dateValidator("date"),
+    floatValidator("odometer"),
+    stringValidator("serviceCenter"),
+    floatValidator("cost"),
+  ]),
+  asyncHandler(updateMaintenanceLog),
+);
+
+router.delete(
+  "/:id",
+  validationHandler([idValidator("vehicleId"), idValidator("id")]),
+  asyncHandler(deleteMaintenanceLog),
+);
 
 export default router;
