@@ -12,7 +12,7 @@ import { faker } from "@faker-js/faker";
 import { env, logger } from "@config/index";
 
 export const seedData = async () => {
-  logger.info("Seeding data ", {
+  logger.debug("Seeding data ", {
     FORCE_DATA_SEED: env.FORCE_DATA_SEED,
     DEMO_MODE: env.DEMO_MODE,
   });

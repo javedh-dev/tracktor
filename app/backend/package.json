@@ -29,6 +29,7 @@
     "@libsql/client": "^0.15.15",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.7",
     "express": "^5.1.0",

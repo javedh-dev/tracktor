@@ -9,8 +9,15 @@
 	import { Jumper } from 'svelte-loading-spinners';
 	import { sheetStore } from '$lib/stores/sheet.svelte';
 	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
+	import { authStore } from '$lib/stores/auth.svelte';
+	import { goto } from '$app/navigation';
 
-	onMount(() => vehicleStore.refreshVehicles());
+	onMount(() => {
+		if (!authStore.isLoggedIn) {
+			goto('/login', { replaceState: true });
+		}
+		vehicleStore.refreshVehicles();
+	});
 </script>
 
 {#if vehicleStore.processing}

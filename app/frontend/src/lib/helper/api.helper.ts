@@ -11,7 +11,7 @@ export const apiClient = new HttpClient({
 	timeout: 5000
 });
 
-if (!env.TRACKTOR_DISABLE_AUTH) {
+if (env.TRACKTOR_DISABLE_AUTH !== 'true') {
 	apiClient.addRequestInterceptor((req) => {
 		const userPin = browser ? localStorage.getItem('userPin') || '' : '';
 		if (userPin === '') return false;

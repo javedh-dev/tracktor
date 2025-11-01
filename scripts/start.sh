@@ -40,6 +40,7 @@ fi
 # Run database migrations
 log_info "Running database migrations..."
 if npx drizzle-kit migrate --config drizzle.config.js; then
+    echo ""
     log_success "Database migrations completed successfully"
 else
     log_error "Database migrations failed"
@@ -49,4 +50,6 @@ fi
 # Start the server
 log_info "Starting server..."
 log_info "Server will be available shortly..."
+
+# Use exec to replace shell with node process
 exec node index.js

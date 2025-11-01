@@ -10,15 +10,10 @@
 	import { configStore } from '$lib/stores/config.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
-	import { authStore } from '$lib/stores/auth.svelte';
-	import { goto } from '$app/navigation';
 
 	let { children } = $props();
 	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
 
-	$effect(() => {
-		if (authStore.isLoggedIn) goto('/dashboard', { replaceState: true });
-	});
 	onMount(() => {
 		configStore.refreshConfigs();
 	});

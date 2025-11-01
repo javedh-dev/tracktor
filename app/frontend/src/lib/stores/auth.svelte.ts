@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
 import { env } from '$env/dynamic/public';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
@@ -40,11 +41,10 @@ class AuthStore {
 	};
 
 	logout = () => {
-		if (browser) {
-			localStorage.removeItem('userPin');
-		}
+		localStorage.removeItem('userPin');
 		this.pin = undefined;
 		this.isLoggedIn = false;
+		goto('/');
 	};
 }
 

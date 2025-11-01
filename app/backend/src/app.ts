@@ -29,10 +29,12 @@ const frontendHandler = async () => {
     // @ts-ignore
     const { handler } = await import("../../frontend/handler.js");
     app.use(handler);
+    logger.info("Using frontend build as Frontend handler");
   } else {
     app.get("/", (_, res) => {
       res.redirect("http://localhost:5173");
     });
+    logger.info("Using Frontend redirection as Frontend Handler");
   }
 };
 

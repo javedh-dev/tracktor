@@ -10,10 +10,10 @@
   "scripts": {
     "dev": "./scripts/run.sh dev",
     "dev:test": "./scripts/run.sh test",
-    "build": "dotenvx run -f environment/prod.env -- ./scripts/build.sh",
+    "build": "./scripts/build.sh",
     "db:migrate": "dotenvx run -f environment/prod.env -- npm run db:migrate --workspace=@tracktor/backend",
     "db:migrate:dev": "dotenvx run -f environment/dev.env -- npm run db:migrate:dev --workspace=@tracktor/backend",
-    "start": "./build/start.sh",
+    "start": "dotenvx run -f environment/prod.env -- ./build/start.sh",
     "format": "npm run format --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",

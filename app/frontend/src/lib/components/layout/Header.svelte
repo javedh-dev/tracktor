@@ -33,7 +33,7 @@
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					{#if !env.TRACKTOR_DISABLE_AUTH}
+					{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
 						<Button variant="ghost" onclick={authStore.logout}>
 							<LogOut class="h-[1.2rem] w-[1.2rem]" />
 						</Button>
