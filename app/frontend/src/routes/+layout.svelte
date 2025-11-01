@@ -2,20 +2,20 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import { env } from '$env/dynamic/public';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$lib/components/layout/Header.svelte';
-	import { authStore } from '$lib/stores/auth.svelte';
-	import { goto } from '$app/navigation';
+	import { configStore } from '$lib/stores/config.svelte';
+	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 
 	let { children } = $props();
-	let demoMode = env.PUBLIC_DEMO_MODE === 'true';
+	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
 
-	$effect(() => {
-		if (authStore.pin) goto('/dashboard', { replaceState: true });
+	onMount(() => {
+		configStore.refreshConfigs();
 	});
 </script>
 
@@ -30,7 +30,10 @@
 			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center"
 		>
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
-			avoid adding any persoanl info. <strong>Default PIN : 123456</strong>
+			avoid adding any persoanl info.
+			{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
+				<strong>Default PIN : 123456</strong>
+			{/if}
 		</LabelWithIcon>
 	</div>
 {/if}

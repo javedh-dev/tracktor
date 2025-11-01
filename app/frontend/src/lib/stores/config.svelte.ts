@@ -15,10 +15,6 @@ class ConfigStore {
 	processing = $state(false);
 	error = $state<string>();
 
-	constructor() {
-		this.refreshConfigs();
-	}
-
 	refreshConfigs = async () => {
 		this.processing = true;
 		apiClient

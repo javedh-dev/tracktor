@@ -19,7 +19,7 @@ services:
     volumes:
       - tracktor-data:/data # Database and uploads are placed in this location
     environment:
-      - PUBLIC_DEMO_MODE=false
+      - TRACKTOR_DEMO_MODE=false
       - FORCE_DATA_SEED=false
       - CORS_ORIGINS="http://localhost:3000" # Adjust as needed for your setup
     # OR you can use an env file to manage environment variables
@@ -90,7 +90,7 @@ docker run -d \
     --name tracktor-app \
     -p 3333:3000 \
     -v tracktor-data:/data \ # Database and uploads are placed in this location
-    -e PUBLIC_DEMO_MODE=false \
+    -e TRACKTOR_DEMO_MODE=false \
     -e FORCE_DATA_SEED=false \
     -e CORS_ORIGINS="http://localhost:3000" \ # Adjust as needed for your setup
     ghcr.io/javedh-dev/tracktor:latest
@@ -119,7 +119,7 @@ docker run -d \
     --name tracktor-app \
     -p 3333:3000 \
     -v tracktor-data:/data \ # Database and uploads are placed in this location
-    -e PUBLIC_DEMO_MODE=false \
+    -e TRACKTOR_DEMO_MODE=false \
     -e FORCE_DATA_SEED=false \
     -e CORS_ORIGINS="http://localhost:3000" \ # Adjust as needed for your setup
     ghcr.io/javedh-dev/tracktor:latest
