@@ -10,5 +10,5 @@
 	<div class="bg-secondary flex h-8 w-10 items-center justify-center rounded">
 		<CircleDotDashed class="h-5 w-5" />
 	</div>
-	<p class="mono justify-start rounded-md pe-2 font-bold">{registrationNumber}</p>
+	<p class="mono justify-start rounded-md pe-2 font-bold">{registrationNumber || '-'}</p>
 </div>

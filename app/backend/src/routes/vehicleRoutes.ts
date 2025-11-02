@@ -15,6 +15,7 @@ import {
   idValidator,
   numberValidator,
   stringValidator,
+  optionalStringValidator,
 } from "../middlewares/validationHandler";
 
 const router = Router();
@@ -25,7 +26,8 @@ router.post(
     stringValidator("make"),
     stringValidator("model"),
     numberValidator("year"),
-    stringValidator("licensePlate"),
+    optionalStringValidator("licensePlate"),
+    optionalStringValidator("vin"),
   ]),
   asyncHandler(addVehicle),
 );
@@ -42,7 +44,8 @@ router.put(
     stringValidator("make"),
     stringValidator("model"),
     numberValidator("year"),
-    stringValidator("licensePlate"),
+    optionalStringValidator("licensePlate"),
+    optionalStringValidator("vin"),
   ]),
   asyncHandler(updateVehicle),
 );

@@ -10,7 +10,7 @@ export const vehicleTable = table("vehicles", {
   make: t.text().notNull(),
   model: t.text().notNull(),
   year: t.integer().notNull(),
-  licensePlate: t.text().notNull(),
+  licensePlate: t.text(),
   vin: t.text(),
   color: t.text(),
   odometer: t.integer(),
