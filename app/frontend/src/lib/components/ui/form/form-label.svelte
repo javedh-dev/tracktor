@@ -24,6 +24,9 @@
 				class={cn('data-[fs-error]:text-destructive', className)}
 			>
 				{@render children?.()}
+				{#if props.required}
+					<span class="text-destructive">*</span>
+				{/if}
 			</Label>
 			{#if description}
 				<IconWithPopover

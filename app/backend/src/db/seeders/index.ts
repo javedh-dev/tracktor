@@ -12,16 +12,16 @@ import { faker } from "@faker-js/faker";
 import { env, logger } from "@config/index";
 
 export const seedData = async () => {
-  logger.info("Seeding data ", {
-    FORCE_DATA_SEED: process.env.FORCE_DATA_SEED,
-    PUBLIC_DEMO_MODE: process.env.PUBLIC_DEMO_MODE,
+  logger.debug("Seeding data ", {
+    FORCE_DATA_SEED: env.FORCE_DATA_SEED,
+    DEMO_MODE: env.DEMO_MODE,
   });
 
-  if (!env.DEMO_MODE && env.AUTH_PIN.trim().length == 6) {
+  if (!env.DEMO_MODE && !env.DISABLE_AUTH && env.AUTH_PIN.trim().length == 6) {
     await seedAuthPin(env.AUTH_PIN.trim());
   } else {
     logger.warn(
-      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH_PIN is invalid.",
+      "Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH is disabled or AUTH_PIN is invalid.",
     );
   }
 
@@ -48,7 +48,7 @@ export const clearDb = async () => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-  seedAuthPin("123456");
+  if (!env.DISABLE_AUTH) seedAuthPin("123456");
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {

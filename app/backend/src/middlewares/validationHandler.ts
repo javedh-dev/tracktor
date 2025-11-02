@@ -42,10 +42,22 @@ export const stringValidator = (key: string) =>
     .notEmpty()
     .withMessage(`${key} must be an non-empty string`);
 
+export const optionalStringValidator = (key: string) =>
+  buildCheckFunction(["body", "params"])(key)
+    .optional({ nullable: true })
+    .isString()
+    .trim()
+    .withMessage(`${key} must be a string if provided`);
+
 export const fileNameValidator = (key: string) =>
   param(key)
     .isString()
     .matches("^[0-9a-fA-F-]+\\.[a-z]+$")
     .withMessage(`${key} must have UUID based name`);
+
+export const fuelTypeValidator = (key: string) =>
+  body(key)
+    .isIn(["petrol", "diesel", "ev", "hybrid"])
+    .withMessage(`${key} must be one of: petrol, diesel, ev, hybrid`);
 
 export default validationHandler;

@@ -12,7 +12,8 @@ const logFormatter = winston.format.combine(
 
 const transports: winston.transport[] = [
   new winston.transports.File({
-    filename: `${process.env.LOG_DIR || "./logs"}/tracktor.log`,
+    dirname: process.env.LOG_DIR || "./logs",
+    filename: `tracktor.log`,
   }),
 ];
 
@@ -25,10 +26,12 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  // level: process.env.LOG_LEVEL || "info",
   exitOnError: false,
   format: logFormatter,
   transports,
 });
+
+logger.info(`Winston logger configured with ${transports.length} transports`);
 
 export default logger;

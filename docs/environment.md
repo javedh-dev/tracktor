@@ -32,11 +32,11 @@ Tracktor app uses environment variables to configure its settings. Here are some
     - Default : `*` (allows all origins).
     **NOTE:** When using Tracktor with a frontend application hosted on a different domain or port or behind reverse proxy, it's recommended to set this variable to the specific origin of the frontend application for security reasons.
 
-8. **PUBLIC_DEMO_MODE** - A boolean flag that, when set to `true`, enables demo mode features in the application by seeding some demo data to try out application features.
+8. **TRACKTOR_DEMO_MODE** - A boolean flag that, when set to `true`, enables demo mode features in the application by seeding some demo data to try out application features.
     - Possible values are `true` or `false`.
     - Default : `false`.
 
-9. **FORCE_DATA_SEED** - A boolean flag that, when set to `true`, forces the application to seed the database with demo data on startup if `PUBLIC_DEMO_MODE` is set to true.
+9. **FORCE_DATA_SEED** - A boolean flag that, when set to `true`, forces the application to seed the database with demo data on startup if `TRACKTOR_DEMO_MODE` is set to true.
     - Possible values are `true` or `false`.
     - Default : `false`.
 
@@ -52,8 +52,13 @@ Tracktor app uses environment variables to configure its settings. Here are some
     - Possible values are any valid directory path (e.g., `/path/to/logs`).
     - Default : `./logs`.
 
-13. **PUBLIC_API_BASE_URL** - Defines the base URL for the public API endpoints. This is useful when the application is behind a reverse proxy or load balancer.
+13. **TRACKTOR_API_BASE_URL** - Defines the base URL for the public API endpoints. This is useful when the application is behind a reverse proxy or load balancer.
     - Possible values are any valid URL (e.g., `http://example.com`).
     - Default : `http://localhost:3000`.
+
+14. **TRACKTOR_DISABLE_AUTH** - A boolean flag that, when set to `true`, disables authentication for the public API endpoints.
+    - Possible values are `true` or `false`.
+    - Default : `false`.
+
 
 **NOTE:** These environment variables can be set in your system or in a `.env` file in the root directory of the Tracktor application. Make sure to restart the application after changing any environment variables for the changes to take effect.

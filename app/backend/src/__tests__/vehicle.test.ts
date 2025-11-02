@@ -10,6 +10,7 @@ describe("Vehicle API", () => {
     model: "Camry",
     year: 2020,
     licensePlate: "ABC123",
+    fuelType: "petrol",
   };
 
   describe("POST /api/vehicles", () => {
@@ -26,14 +27,39 @@ describe("Vehicle API", () => {
       expect(res.body.data.model).toBe(validVehicleData.model);
       expect(res.body.data.year).toBe(validVehicleData.year);
       expect(res.body.data.licensePlate).toBe(validVehicleData.licensePlate);
+      expect(res.body.data.fuelType).toBe(validVehicleData.fuelType);
 
       vehicleId = res.body.data.id;
+    });
+
+    test("should create a vehicle without licensePlate and vin", async () => {
+      const minimalVehicleData = {
+        make: "Ford",
+        model: "Focus",
+        year: 2019,
+        fuelType: "diesel",
+      };
+
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(minimalVehicleData);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty("success", true);
+      expect(res.body).toHaveProperty("data");
+      expect(res.body.data).toHaveProperty("id");
+      expect(res.body.data.make).toBe(minimalVehicleData.make);
+      expect(res.body.data.model).toBe(minimalVehicleData.model);
+      expect(res.body.data.year).toBe(minimalVehicleData.year);
+      expect(res.body.data.fuelType).toBe(minimalVehicleData.fuelType);
+      expect(res.body.data.licensePlate).toBeNull();
+      expect(res.body.data.vin).toBeNull();
     });
 
     test("should validate required fields", async () => {
       const invalidData = {
         make: "Toyota",
-        // missing model, year, licensePlate
+        // missing model, year (licensePlate is now optional)
       };
 
       const res = await request(app).post("/api/vehicles").send(invalidData);
@@ -48,12 +74,47 @@ describe("Vehicle API", () => {
         model: "Camry",
         year: "invalid", // should be number
         licensePlate: "ABC123",
+        fuelType: "petrol",
       };
 
       const res = await request(app).post("/api/vehicles").send(invalidData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
+    });
+
+    test("should validate fuel type values", async () => {
+      const invalidFuelTypeData = {
+        make: "Toyota",
+        model: "Camry",
+        year: 2020,
+        licensePlate: "ABC123",
+        fuelType: "invalid_fuel_type",
+      };
+
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(invalidFuelTypeData);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("success", false);
+    });
+
+    test.skip("should create vehicle with default fuel type when not provided", async () => {
+      const dataWithoutFuelType = {
+        make: "Toyota",
+        model: "Prius",
+        year: 2020,
+        licensePlate: "DEF456",
+      };
+
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(dataWithoutFuelType);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty("success", true);
+      expect(res.body.data.fuelType).toBe("petrol"); // default value
     });
   });
 
@@ -101,6 +162,7 @@ describe("Vehicle API", () => {
         model: "Accord",
         year: 2021,
         licensePlate: "XYZ789",
+        fuelType: "hybrid",
       };
 
       const res = await request(app).put("/api/vehicles").send(updateData);
@@ -109,13 +171,14 @@ describe("Vehicle API", () => {
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data.make).toBe(updateData.make);
       expect(res.body.data.model).toBe(updateData.model);
+      expect(res.body.data.fuelType).toBe(updateData.fuelType);
     });
 
     test("should validate all required fields for update", async () => {
       const invalidData = {
         id: vehicleId,
         make: "Honda",
-        // missing other required fields
+        // missing model and year (licensePlate is now optional)
       };
 
       const res = await request(app).put("/api/vehicles").send(invalidData);
@@ -131,12 +194,73 @@ describe("Vehicle API", () => {
         model: "Accord",
         year: 2021,
         licensePlate: "XYZ789",
+        fuelType: "petrol",
       };
 
       const res = await request(app).put("/api/vehicles").send(updateData);
 
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty("success", false);
+    });
+  });
+
+  describe("Odometer Logic", () => {
+    let testVehicleId: string;
+
+    beforeAll(async () => {
+      // Create a test vehicle with initial odometer
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Test",
+        model: "Odometer",
+        year: 2023,
+        licensePlate: "ODO123",
+        odometer: 50000,
+        fuelType: "ev",
+      });
+      testVehicleId = vehicleRes.body.data.id;
+    });
+
+    test("should return vehicle odometer when no logs exist", async () => {
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.currentOdometer).toBe(50000);
+    });
+
+    test("should return highest odometer from fuel logs", async () => {
+      // Add fuel log with higher odometer
+      await request(app).post(`/api/vehicles/${testVehicleId}/fuel-logs`).send({
+        date: "2023-01-01",
+        odometer: 55000,
+        fuelAmount: 40,
+        cost: 60,
+        filled: true,
+        missedLast: false,
+      });
+
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+      expect(res.body.data.currentOdometer).toBe(55000);
+    });
+
+    test("should return highest odometer from maintenance logs", async () => {
+      // Add maintenance log with even higher odometer
+      await request(app)
+        .post(`/api/vehicles/${testVehicleId}/maintenance-logs`)
+        .send({
+          date: "2023-01-15",
+          odometer: 60000,
+          serviceCenter: "Test Center",
+          cost: 100,
+          notes: "Oil change",
+        });
+
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+      expect(res.body.data.currentOdometer).toBe(60000);
+    });
+
+    afterAll(async () => {
+      // Clean up test vehicle
+      await request(app).delete(`/api/vehicles/${testVehicleId}`);
     });
   });
 

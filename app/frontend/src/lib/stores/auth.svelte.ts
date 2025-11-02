@@ -1,12 +1,16 @@
 import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
+import { env } from '$env/dynamic/public';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
 
 class AuthStore {
 	pin = $state<string>();
+	isLoggedIn = $state<boolean>(false);
 
 	constructor() {
-		if (browser) {
+		this.isLoggedIn = env.TRACKTOR_DISABLE_AUTH === 'true';
+		if (browser && !this.isLoggedIn) {
 			const pin = localStorage.getItem('userPin');
 			if (pin) {
 				this.login(pin);
@@ -30,16 +34,17 @@ class AuthStore {
 					if (browser) {
 						localStorage.setItem('userPin', pin);
 					}
+					this.isLoggedIn = true;
 				}
 			})
 			.catch((err) => (this.pin = undefined));
 	};
 
 	logout = () => {
-		if (browser) {
-			localStorage.removeItem('userPin');
-		}
+		localStorage.removeItem('userPin');
 		this.pin = undefined;
+		this.isLoggedIn = false;
+		goto('/');
 	};
 }
 

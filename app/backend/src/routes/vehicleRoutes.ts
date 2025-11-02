@@ -15,6 +15,8 @@ import {
   idValidator,
   numberValidator,
   stringValidator,
+  optionalStringValidator,
+  fuelTypeValidator,
 } from "../middlewares/validationHandler";
 
 const router = Router();
@@ -24,25 +26,32 @@ router.post(
   validationHandler([
     stringValidator("make"),
     stringValidator("model"),
+    fuelTypeValidator("fuelType"),
     numberValidator("year"),
-    stringValidator("licensePlate"),
+    optionalStringValidator("licensePlate"),
+    optionalStringValidator("vin"),
   ]),
   asyncHandler(addVehicle),
 );
+
 router.get("/", asyncHandler(getAllVehicles));
+
 router.get(
   "/:id",
   validationHandler([idValidator("id")]),
   asyncHandler(getVehicleById),
 );
+
 router.put(
   "/",
   validationHandler([
     idValidator("id"),
     stringValidator("make"),
     stringValidator("model"),
+    fuelTypeValidator("fuelType"),
     numberValidator("year"),
-    stringValidator("licensePlate"),
+    optionalStringValidator("licensePlate"),
+    optionalStringValidator("vin"),
   ]),
   asyncHandler(updateVehicle),
 );

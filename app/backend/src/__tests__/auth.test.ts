@@ -37,8 +37,6 @@ describe("Auth API", () => {
         .post("/api/auth/verify")
         .send({ pin: "123456" });
 
-      console.info(res.body);
-
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success", true);
     });
@@ -77,8 +75,6 @@ describe("Auth API", () => {
         .post("/api/auth/verify")
         .set("Content-Type", "application/json")
         .send("invalid json");
-
-      console.error(res);
 
       expect(res.statusCode).toBe(400);
     });
