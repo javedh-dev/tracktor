@@ -100,7 +100,7 @@ const formatDistance = (distance: number): string => {
 
 const getFuelUnit = (vehicleType: string): string => {
 	if (vehicleType === 'ev') {
-		return 'kWh'
+		return 'kWh';
 	}
 	return (
 		new Intl.NumberFormat(configs.locale, {
@@ -114,7 +114,7 @@ const getFuelUnit = (vehicleType: string): string => {
 
 const formatFuel = (amount: number, vehicleType: string): string => {
 	if (vehicleType === 'ev') {
-		return `${amount.toFixed(3)} kWh`
+		return `${amount.toFixed(3)} kWh`;
 	}
 	return new Intl.NumberFormat(configs.locale, {
 		style: 'unit',
@@ -124,7 +124,7 @@ const formatFuel = (amount: number, vehicleType: string): string => {
 
 const getMileageUnit = (vehicleType: string): string => {
 	if (vehicleType === 'ev') {
-		return 'km/kWh'
+		return 'km/kWh';
 	}
 	return (
 		new Intl.NumberFormat(configs.locale, {
@@ -138,7 +138,7 @@ const getMileageUnit = (vehicleType: string): string => {
 
 const formatMileage = (mileage: number, vehicleType: string): string => {
 	if (vehicleType === 'ev') {
-		return `${mileage.toFixed(3)} km/kWh`
+		return `${mileage.toFixed(3)} km/kWh`;
 	}
 	return new Intl.NumberFormat(configs.locale, {
 		style: 'unit',

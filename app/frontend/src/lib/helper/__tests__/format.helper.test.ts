@@ -226,38 +226,38 @@ describe('Format Helper', () => {
 
 	describe('getFuelUnit', () => {
 		it('should return fuel unit', () => {
-			const unit = getFuelUnit("petrol");
+			const unit = getFuelUnit('petrol');
 			expect(typeof unit).toBe('string');
 		});
 	});
 
 	describe('formatFuel', () => {
 		it('should format fuel correctly', () => {
-			const result = formatFuel(50, "petrol");
+			const result = formatFuel(50, 'petrol');
 			expect(result).toMatch(/50/);
 		});
 
 		it('should format decimal volume correctly', () => {
-			const result = formatFuel(50.75, "ev");
+			const result = formatFuel(50.75, 'ev');
 			expect(result).toMatch(/50\.75/);
 		});
 	});
 
 	describe('getMileageUnit', () => {
 		it('should return mileage unit', () => {
-			const unit = getMileageUnit("petrol");
+			const unit = getMileageUnit('petrol');
 			expect(typeof unit).toBe('string');
 		});
 	});
 
 	describe('formatMileage', () => {
 		it('should format mileage correctly', () => {
-			const result = formatMileage(25, "petrol");
+			const result = formatMileage(25, 'petrol');
 			expect(result).toMatch(/25/);
 		});
 
 		it('should format decimal mileage correctly', () => {
-			const result = formatMileage(25.5, "petrol");
+			const result = formatMileage(25.5, 'petrol');
 			expect(result).toMatch(/25\.5/);
 		});
 	});

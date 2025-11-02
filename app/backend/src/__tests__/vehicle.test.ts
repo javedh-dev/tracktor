@@ -92,7 +92,9 @@ describe("Vehicle API", () => {
         fuelType: "invalid_fuel_type",
       };
 
-      const res = await request(app).post("/api/vehicles").send(invalidFuelTypeData);
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(invalidFuelTypeData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
@@ -106,7 +108,9 @@ describe("Vehicle API", () => {
         licensePlate: "DEF456",
       };
 
-      const res = await request(app).post("/api/vehicles").send(dataWithoutFuelType);
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(dataWithoutFuelType);
 
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty("success", true);

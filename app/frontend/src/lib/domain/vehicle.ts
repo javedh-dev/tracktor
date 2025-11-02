@@ -18,7 +18,7 @@ export interface Vehicle {
 export const FUEL_TYPES = {
 	diesel: 'Diesel',
 	petrol: 'Petrol',
-	ev: 'Electric (EV)',
+	ev: 'Electric (EV)'
 } as const;
 
 export const vehicleSchema = z.object({

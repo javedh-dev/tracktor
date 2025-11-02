@@ -118,7 +118,7 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
         odometer: true,
         vin: true,
         image: true,
-        fuelType: true
+        fuelType: true,
       },
     }),
     db.query.insuranceTable.findMany({

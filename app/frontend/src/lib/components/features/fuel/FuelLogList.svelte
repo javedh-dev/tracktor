@@ -7,7 +7,6 @@
 		formatCurrency,
 		formatDate,
 		formatDistance,
-		formatMileage,
 		formatFuel,
 		getMileageUnit
 	} from '$lib/helper/format.helper';
