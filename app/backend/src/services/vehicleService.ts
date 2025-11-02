@@ -33,14 +33,14 @@ const getLatestOdometer = async (vehicleId: string) => {
     vehicle?.odometer || 0,
     latestFuelLog?.odometer || 0,
     latestMaintenanceLog?.odometer || 0,
-  ].filter(value => value > 0);
+  ].filter((value) => value > 0);
 
   return odometerValues.length > 0 ? Math.max(...odometerValues) : 0;
 };
 
 const getStatusFromDates = (dates: Date[], today: Date) => {
   if (dates.length === 0) return "Not Available";
-  return dates.some(date => date > today) ? "Active" : "Expired";
+  return dates.some((date) => date > today) ? "Active" : "Expired";
 };
 
 const calculateOverallMileage = async (vehicleId: string) => {
@@ -57,11 +57,14 @@ const calculateOverallMileage = async (vehicleId: string) => {
     if (index === 0 || !log.filled || log.missedLast) return;
 
     // Find the last filled log before current
-    const startIndex = arr.slice(0, index).reverse().findIndex((prevLog) => {
-      if (prevLog?.filled) return true;
-      if (prevLog?.missedLast) return false;
-      return false;
-    });
+    const startIndex = arr
+      .slice(0, index)
+      .reverse()
+      .findIndex((prevLog) => {
+        if (prevLog?.filled) return true;
+        if (prevLog?.missedLast) return false;
+        return false;
+      });
 
     if (startIndex === -1) return;
 
@@ -83,7 +86,9 @@ const calculateOverallMileage = async (vehicleId: string) => {
 
   if (validMileages.length === 0) return null;
 
-  const avgMileage = validMileages.reduce((sum, mileage) => sum + mileage, 0) / validMileages.length;
+  const avgMileage =
+    validMileages.reduce((sum, mileage) => sum + mileage, 0) /
+    validMileages.length;
   return parseFloat(avgMileage.toFixed(2));
 };
 
@@ -104,9 +109,15 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
   const [vehicles, insurances, pollutionCerts] = await Promise.all([
     db.query.vehicleTable.findMany({
       columns: {
-        id: true, make: true, model: true, year: true,
-        licensePlate: true, color: true, odometer: true,
-        vin: true, image: true,
+        id: true,
+        make: true,
+        model: true,
+        year: true,
+        licensePlate: true,
+        color: true,
+        odometer: true,
+        vin: true,
+        image: true,
       },
     }),
     db.query.insuranceTable.findMany({
@@ -129,12 +140,12 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
 
       // Calculate statuses
       const vehicleInsuranceDates = insurances
-        .filter(ins => ins.vehicleId === vehicle.id)
-        .map(ins => new Date(ins.endDate));
+        .filter((ins) => ins.vehicleId === vehicle.id)
+        .map((ins) => new Date(ins.endDate));
 
       const vehiclePuccDates = pollutionCerts
-        .filter(pucc => pucc.vehicleId === vehicle.id)
-        .map(pucc => new Date(pucc.expiryDate));
+        .filter((pucc) => pucc.vehicleId === vehicle.id)
+        .map((pucc) => new Date(pucc.expiryDate));
 
       return {
         ...vehicle,
@@ -143,7 +154,7 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
         insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
         puccStatus: getStatusFromDates(vehiclePuccDates, today),
       };
-    })
+    }),
   );
 
   return {

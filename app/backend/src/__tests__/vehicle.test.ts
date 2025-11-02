@@ -167,15 +167,13 @@ describe("Vehicle API", () => {
 
     beforeAll(async () => {
       // Create a test vehicle with initial odometer
-      const vehicleRes = await request(app)
-        .post("/api/vehicles")
-        .send({
-          make: "Test",
-          model: "Odometer",
-          year: 2023,
-          licensePlate: "ODO123",
-          odometer: 50000,
-        });
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Test",
+        model: "Odometer",
+        year: 2023,
+        licensePlate: "ODO123",
+        odometer: 50000,
+      });
       testVehicleId = vehicleRes.body.data.id;
     });
 
@@ -188,16 +186,14 @@ describe("Vehicle API", () => {
 
     test("should return highest odometer from fuel logs", async () => {
       // Add fuel log with higher odometer
-      await request(app)
-        .post(`/api/vehicles/${testVehicleId}/fuel-logs`)
-        .send({
-          date: "2023-01-01",
-          odometer: 55000,
-          fuelAmount: 40,
-          cost: 60,
-          filled: true,
-          missedLast: false,
-        });
+      await request(app).post(`/api/vehicles/${testVehicleId}/fuel-logs`).send({
+        date: "2023-01-01",
+        odometer: 55000,
+        fuelAmount: 40,
+        cost: 60,
+        filled: true,
+        missedLast: false,
+      });
 
       const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
       expect(res.body.data.currentOdometer).toBe(55000);
