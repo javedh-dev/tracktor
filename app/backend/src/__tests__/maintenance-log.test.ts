@@ -10,6 +10,7 @@ describe("Maintenance Log API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
+    fuelType: "petrol",
     licensePlate: "MAINT123",
   };
 
@@ -133,6 +134,7 @@ describe("Maintenance Log API", () => {
         make: "Honda",
         model: "Civic",
         year: 2019,
+        fuelType: "petrol",
         licensePlate: "NOMAINT123",
       });
 

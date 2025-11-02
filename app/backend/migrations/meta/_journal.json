@@ -36,6 +36,13 @@
       "when": 1762077262288,
       "tag": "20251102095422_make_lpn_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1762094213825,
+      "tag": "20251102143653_add_fuel_type_to_vehicles",
+      "breakpoints": true
     }
   ]
 }

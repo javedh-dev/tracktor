@@ -4,7 +4,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { saveVehicleWithImage } from '$lib/services/vehicle.service';
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
-	import { vehicleSchema } from '$lib/domain/vehicle';
+	import { vehicleSchema, FUEL_TYPES } from '$lib/domain/vehicle';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import CarFront from '@lucide/svelte/icons/car-front';
@@ -12,6 +12,8 @@
 	import Fingerprint from '@lucide/svelte/icons/fingerprint';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import Paintbrush from '@lucide/svelte/icons/paintbrush';
+	import Fuel from '@lucide/svelte/icons/fuel';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -104,6 +106,45 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		</div>
+		<div class="flex w-full flex-row gap-4">
+			<Form.Field {form} name="fuelType" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Type of fuel used by the vehicle" required>
+							Fuel Type
+						</Form.Label>
+						<Select.Root bind:value={$formData.fuelType} type="single">
+							<Select.Trigger {...props} class="w-full">
+								<div class="flex items-center justify-start">
+									<Fuel class="mr-2 h-4 w-4" />
+									<span>
+										{$formData.fuelType
+											? FUEL_TYPES[$formData.fuelType as keyof typeof FUEL_TYPES]
+											: 'Select fuel type'}
+									</span>
+								</div>
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(FUEL_TYPES) as [value, label]}
+									<Select.Item {value}>{label}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="odometer" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
+						<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
+					{/snippet}
+				</Form.Control>
+				<!-- <Form.Description>Model of the vehicle</Form.Description> -->
+				<Form.FieldErrors />
+			</Form.Field>
+		</div>
 
 		<Form.Field {form} name="licensePlate" class="w-full">
 			<Form.Control>
@@ -125,16 +166,7 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="odometer" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
-					<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
-				{/snippet}
-			</Form.Control>
-			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
-			<Form.FieldErrors />
-		</Form.Field>
+
 		{#if !processing}
 			<Form.Button>Submit</Form.Button>
 		{:else}

@@ -9,6 +9,7 @@ describe("Integration Tests", () => {
     make: "Toyota",
     model: "Prius",
     year: 2022,
+    fuelType: "petrol",
     licensePlate: "INT123",
   };
 
@@ -120,6 +121,7 @@ describe("Integration Tests", () => {
         make: "Honda",
         model: "Civic",
         year: 2021,
+        fuelType: "petrol",
         licensePlate: "CONSIST123",
       });
 
@@ -153,6 +155,7 @@ describe("Integration Tests", () => {
               make: "Test",
               model: `Model${i}`,
               year: 2020 + i,
+              fuelType: "petrol",
               licensePlate: `CONC${i}`,
             }),
         );

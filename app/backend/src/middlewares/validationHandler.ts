@@ -55,4 +55,9 @@ export const fileNameValidator = (key: string) =>
     .matches("^[0-9a-fA-F-]+\\.[a-z]+$")
     .withMessage(`${key} must have UUID based name`);
 
+export const fuelTypeValidator = (key: string) =>
+  body(key)
+    .isIn(["petrol", "diesel", "ev", "hybrid"])
+    .withMessage(`${key} must be one of: petrol, diesel, ev, hybrid`);
+
 export default validationHandler;

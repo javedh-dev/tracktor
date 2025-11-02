@@ -7,8 +7,8 @@
 		formatCurrency,
 		formatDate,
 		formatDistance,
-		formatMileage,
-		formatVolume
+		formatFuel,
+		getMileageUnit
 	} from '$lib/helper/format.helper';
 	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
 	import Banknote from '@lucide/svelte/icons/banknote';
@@ -26,6 +26,13 @@
 
 	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
+
+	// Get the selected vehicle to determine fuel type and units
+	const selectedVehicle = $derived(
+		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
+	);
+	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
+	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Fuel Amount');
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -95,14 +102,14 @@
 				renderComponent(LabelWithIcon, {
 					icon: PaintBucket,
 					iconClass: 'h-4 w-4 ',
-					label: 'Fuel Amount',
+					label: volumeLabel,
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => {
 				const fuelAmountCellSnippet = createRawSnippet<[number]>((fuelAmount) => {
 					return {
 						render: () =>
-							`<div class="flex flex-row justify-center">${formatVolume(fuelAmount())}</div>`
+							`<div class="flex flex-row justify-center">${formatFuel(fuelAmount(), selectedVehicle?.fuelType as string)}</div>`
 					};
 				});
 				return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
@@ -133,15 +140,16 @@
 				renderComponent(LabelWithIcon, {
 					icon: Rabbit,
 					iconClass: 'h-4 w-4 ',
-					label: 'Mileage',
+					label: selectedVehicle?.fuelType === 'ev' ? 'Efficiency' : 'Mileage',
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => {
 				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
+					const unit = getMileageUnit(selectedVehicle?.fuelType as string);
 					return {
 						render: () =>
 							`<div class="flex flex-row justify-center">
-							${!mileage() ? '-' : formatMileage(mileage())}
+							${!mileage() ? '-' : `${mileage().toFixed(2)} ${unit}`}
 							</div>`
 					};
 				});

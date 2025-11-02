@@ -10,6 +10,7 @@ describe("Insurance API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
+    fuelType: "petrol",
     licensePlate: "INS123",
   };
 
@@ -131,6 +132,7 @@ describe("Insurance API", () => {
         make: "Honda",
         model: "Civic",
         year: 2019,
+        fuelType: "petrol",
         licensePlate: "NOINS123",
       });
 

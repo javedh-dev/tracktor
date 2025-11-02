@@ -37,9 +37,6 @@
 				textAnchor: 'end'
 			}
 		},
-		// yAxis: {
-		// 	format: yFormatter
-		// },
 		grid: {
 			style: 'stroke-dasharray: 2',
 			class: 'stroke-1'
