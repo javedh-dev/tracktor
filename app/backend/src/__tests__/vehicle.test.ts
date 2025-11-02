@@ -162,6 +162,65 @@ describe("Vehicle API", () => {
     });
   });
 
+  describe("Odometer Logic", () => {
+    let testVehicleId: string;
+
+    beforeAll(async () => {
+      // Create a test vehicle with initial odometer
+      const vehicleRes = await request(app).post("/api/vehicles").send({
+        make: "Test",
+        model: "Odometer",
+        year: 2023,
+        licensePlate: "ODO123",
+        odometer: 50000,
+      });
+      testVehicleId = vehicleRes.body.data.id;
+    });
+
+    test("should return vehicle odometer when no logs exist", async () => {
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.currentOdometer).toBe(50000);
+    });
+
+    test("should return highest odometer from fuel logs", async () => {
+      // Add fuel log with higher odometer
+      await request(app).post(`/api/vehicles/${testVehicleId}/fuel-logs`).send({
+        date: "2023-01-01",
+        odometer: 55000,
+        fuelAmount: 40,
+        cost: 60,
+        filled: true,
+        missedLast: false,
+      });
+
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+      expect(res.body.data.currentOdometer).toBe(55000);
+    });
+
+    test("should return highest odometer from maintenance logs", async () => {
+      // Add maintenance log with even higher odometer
+      await request(app)
+        .post(`/api/vehicles/${testVehicleId}/maintenance-logs`)
+        .send({
+          date: "2023-01-15",
+          odometer: 60000,
+          serviceCenter: "Test Center",
+          cost: 100,
+          notes: "Oil change",
+        });
+
+      const res = await request(app).get(`/api/vehicles/${testVehicleId}`);
+      expect(res.body.data.currentOdometer).toBe(60000);
+    });
+
+    afterAll(async () => {
+      // Clean up test vehicle
+      await request(app).delete(`/api/vehicles/${testVehicleId}`);
+    });
+  });
+
   describe("DELETE /api/vehicles/:id", () => {
     test("should delete vehicle", async () => {
       const res = await request(app).delete(`/api/vehicles/${vehicleId}`);

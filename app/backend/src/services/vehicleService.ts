@@ -6,19 +6,43 @@ import { eq } from "drizzle-orm";
 import { ApiResponse } from "@tracktor/common";
 import { performDelete } from "@utils/serviceUtils";
 
-export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
-  const vehicles = await db
-    .insert(schema.vehicleTable)
-    .values({ ...vehicleData, id: undefined })
-    .returning();
-  return {
-    data: vehicles[0],
-    success: true,
-    message: "Vehicle added successfully.",
-  };
+// Helper functions
+const getLatestOdometer = async (vehicleId: string) => {
+  // Get the vehicle's base odometer
+  const vehicle = await db.query.vehicleTable.findFirst({
+    where: (vehicles, { eq }) => eq(vehicles.id, vehicleId),
+    columns: { odometer: true },
+  });
+
+  // Get highest odometer from fuel logs
+  const latestFuelLog = await db.query.fuelLogTable.findFirst({
+    where: (log, { eq }) => eq(log.vehicleId, vehicleId),
+    orderBy: (log, { desc }) => [desc(log.odometer)],
+    columns: { odometer: true },
+  });
+
+  // Get highest odometer from maintenance logs
+  const latestMaintenanceLog = await db.query.maintenanceLogTable.findFirst({
+    where: (log, { eq }) => eq(log.vehicleId, vehicleId),
+    orderBy: (log, { desc }) => [desc(log.odometer)],
+    columns: { odometer: true },
+  });
+
+  // Find the highest value among all sources
+  const odometerValues = [
+    vehicle?.odometer || 0,
+    latestFuelLog?.odometer || 0,
+    latestMaintenanceLog?.odometer || 0,
+  ].filter((value) => value > 0);
+
+  return odometerValues.length > 0 ? Math.max(...odometerValues) : 0;
 };
 
-// Helper function to calculate overall mileage for a vehicle
+const getStatusFromDates = (dates: Date[], today: Date) => {
+  if (dates.length === 0) return "Not Available";
+  return dates.some((date) => date > today) ? "Active" : "Expired";
+};
+
 const calculateOverallMileage = async (vehicleId: string) => {
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
@@ -32,24 +56,28 @@ const calculateOverallMileage = async (vehicleId: string) => {
   fuelLogs.forEach((log, index, arr) => {
     if (index === 0 || !log.filled || log.missedLast) return;
 
-    let startIndex = -1;
-    for (let i = index - 1; i >= 0; i--) {
-      if (arr[i]?.filled) {
-        startIndex = i;
-        break;
-      }
-      if (arr[i]?.missedLast) break;
-    }
+    // Find the last filled log before current
+    const startIndex = arr
+      .slice(0, index)
+      .reverse()
+      .findIndex((prevLog) => {
+        if (prevLog?.filled) return true;
+        if (prevLog?.missedLast) return false;
+        return false;
+      });
 
     if (startIndex === -1) return;
 
-    const startLog = arr[startIndex]!;
+    const actualStartIndex = index - 1 - startIndex;
+    const startLog = arr[actualStartIndex];
+    if (!startLog) return;
+
     const distance = log.odometer - startLog.odometer;
 
-    let totalFuel = 0;
-    for (let i = startIndex + 1; i <= index; i++) {
-      totalFuel += arr[i]!.fuelAmount;
-    }
+    // Sum fuel from start to current log
+    const totalFuel = arr
+      .slice(actualStartIndex + 1, index + 1)
+      .reduce((sum, fuelLog) => sum + fuelLog.fuelAmount, 0);
 
     if (totalFuel > 0 && distance > 0) {
       validMileages.push(distance / totalFuel);
@@ -64,112 +92,71 @@ const calculateOverallMileage = async (vehicleId: string) => {
   return parseFloat(avgMileage.toFixed(2));
 };
 
+export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
+  const [vehicle] = await db
+    .insert(schema.vehicleTable)
+    .values({ ...vehicleData, id: undefined })
+    .returning();
+
+  return {
+    data: vehicle,
+    success: true,
+    message: "Vehicle added successfully.",
+  };
+};
+
 export const getAllVehicles = async (): Promise<ApiResponse> => {
-  const vehicles = await db.query.vehicleTable.findMany({
-    columns: {
-      id: true,
-      make: true,
-      model: true,
-      year: true,
-      licensePlate: true,
-      color: true,
-      odometer: true,
-      vin: true,
-      image: true,
-    },
-  });
+  const [vehicles, insurances, pollutionCerts] = await Promise.all([
+    db.query.vehicleTable.findMany({
+      columns: {
+        id: true,
+        make: true,
+        model: true,
+        year: true,
+        licensePlate: true,
+        color: true,
+        odometer: true,
+        vin: true,
+        image: true,
+      },
+    }),
+    db.query.insuranceTable.findMany({
+      columns: { vehicleId: true, endDate: true },
+    }),
+    db.query.pollutionCertificateTable.findMany({
+      columns: { vehicleId: true, expiryDate: true },
+    }),
+  ]);
 
   const today = new Date();
 
-  // Get active insurances and pollution certificates efficiently
-  const activeInsurances = await db.query.insuranceTable.findMany({
-    columns: {
-      vehicleId: true,
-      endDate: true,
-    },
-  });
-
-  const activePollutionCertificates =
-    await db.query.pollutionCertificateTable.findMany({
-      columns: {
-        vehicleId: true,
-        expiryDate: true,
-      },
-    });
-
-  // Get latest fuel logs for current odometer readings
-  const latestFuelLogs = await Promise.all(
+  // Get enriched data for all vehicles in parallel
+  const enrichedVehicles = await Promise.all(
     vehicles.map(async (vehicle) => {
-      const latestLog = await db.query.fuelLogTable.findFirst({
-        where: (log, { eq }) => eq(log.vehicleId, vehicle.id),
-        orderBy: (log, { desc }) => [desc(log.date), desc(log.odometer)],
-        columns: {
-          odometer: true,
-        },
-      });
-      return { vehicleId: vehicle.id, latestOdometer: latestLog?.odometer };
+      const [latestOdometer, overallMileage] = await Promise.all([
+        getLatestOdometer(vehicle.id),
+        calculateOverallMileage(vehicle.id),
+      ]);
+
+      // Calculate statuses
+      const vehicleInsuranceDates = insurances
+        .filter((ins) => ins.vehicleId === vehicle.id)
+        .map((ins) => new Date(ins.endDate));
+
+      const vehiclePuccDates = pollutionCerts
+        .filter((pucc) => pucc.vehicleId === vehicle.id)
+        .map((pucc) => new Date(pucc.expiryDate));
+
+      return {
+        ...vehicle,
+        odometer: latestOdometer || vehicle.odometer || 0,
+        overallMileage,
+        insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
+        puccStatus: getStatusFromDates(vehiclePuccDates, today),
+      };
     }),
   );
 
-  // Calculate overall mileage for each vehicle
-  const vehicleMileages = await Promise.all(
-    vehicles.map(async (vehicle) => ({
-      vehicleId: vehicle.id,
-      overallMileage: await calculateOverallMileage(vehicle.id),
-    })),
-  );
-
-  const enrichedVehicles = vehicles.map((vehicle) => {
-    // Find insurance status
-    const vehicleInsurances = activeInsurances.filter(
-      (insurance) => insurance.vehicleId === vehicle.id,
-    );
-    let insuranceStatus = "Not Available";
-    if (vehicleInsurances.length > 0) {
-      insuranceStatus = vehicleInsurances.some(
-        (insurance) => new Date(insurance.endDate) > today,
-      )
-        ? "Active"
-        : "Expired";
-    }
-
-    // Find PUCC status
-    const vehiclePollutionCerts = activePollutionCertificates.filter(
-      (pucc) => pucc.vehicleId === vehicle.id,
-    );
-    let puccStatus = "Not Available";
-    if (vehiclePollutionCerts.length > 0) {
-      puccStatus = vehiclePollutionCerts.some(
-        (pucc) => new Date(pucc.expiryDate) > today,
-      )
-        ? "Active"
-        : "Expired";
-    }
-
-    // Get current odometer and overall mileage
-    const latestFuelLog = latestFuelLogs.find(
-      (log) => log.vehicleId === vehicle.id,
-    );
-    const mileageData = vehicleMileages.find((m) => m.vehicleId === vehicle.id);
-
-    const currentOdometer =
-      latestFuelLog?.latestOdometer || vehicle.odometer || 0;
-
-    return {
-      id: vehicle.id,
-      make: vehicle.make,
-      model: vehicle.model,
-      year: vehicle.year,
-      licensePlate: vehicle.licensePlate,
-      vin: vehicle.vin,
-      color: vehicle.color,
-      odometer: currentOdometer,
-      image: vehicle.image,
-      overallMileage: mileageData?.overallMileage,
-      insuranceStatus,
-      puccStatus,
-    };
-  });
   return {
     data: enrichedVehicles,
     success: true,
@@ -180,28 +167,20 @@ export const getVehicleById = async (id: string): Promise<ApiResponse> => {
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicles, { eq }) => eq(vehicles.id, id),
   });
+
   if (!vehicle) {
     throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
   }
 
-  // Get current odometer from latest fuel log
-  const latestFuelLog = await db.query.fuelLogTable.findFirst({
-    where: (log, { eq }) => eq(log.vehicleId, id),
-    orderBy: (log, { desc }) => [desc(log.date), desc(log.odometer)],
-    columns: {
-      odometer: true,
-    },
-  });
-
-  // Calculate overall mileage
-  const overallMileage = await calculateOverallMileage(id);
-
-  const currentOdometer = latestFuelLog?.odometer || vehicle.odometer || 0;
+  const [currentOdometer, overallMileage] = await Promise.all([
+    getLatestOdometer(id),
+    calculateOverallMileage(id),
+  ]);
 
   return {
     data: {
       ...vehicle,
-      currentOdometer,
+      currentOdometer: currentOdometer || vehicle.odometer || 0,
       overallMileage,
     },
     success: true,
@@ -212,16 +191,16 @@ export const updateVehicle = async (
   id: string,
   vehicleData: any,
 ): Promise<ApiResponse> => {
-  await getVehicleById(id);
-  const updatedVehicle = await db
+  await getVehicleById(id); // Validates vehicle exists
+
+  const [updatedVehicle] = await db
     .update(schema.vehicleTable)
-    .set({
-      ...vehicleData,
-    })
+    .set(vehicleData)
     .where(eq(schema.vehicleTable.id, id))
     .returning();
+
   return {
-    data: updatedVehicle[0],
+    data: updatedVehicle,
     success: true,
     message: "Vehicle updated successfully.",
   };
@@ -248,25 +227,22 @@ export const getVehiclesMinimal = async (): Promise<ApiResponse> => {
   };
 };
 
-// Get vehicle summary with key metrics
 export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
-  const vehicle = await getVehicleById(id);
-
-  // Get total fuel logs count
-  const fuelLogsCount = await db.query.fuelLogTable.findMany({
-    where: (log, { eq }) => eq(log.vehicleId, id),
-    columns: { id: true },
-  });
-
-  // Get maintenance logs count
-  const maintenanceLogsCount = await db.query.maintenanceLogTable.findMany({
-    where: (log, { eq }) => eq(log.vehicleId, id),
-    columns: { id: true },
-  });
+  const [vehicle, fuelLogsCount, maintenanceLogsCount] = await Promise.all([
+    getVehicleById(id),
+    db.query.fuelLogTable.findMany({
+      where: (log, { eq }) => eq(log.vehicleId, id),
+      columns: { id: true },
+    }),
+    db.query.maintenanceLogTable.findMany({
+      where: (log, { eq }) => eq(log.vehicleId, id),
+      columns: { id: true },
+    }),
+  ]);
 
   return {
     data: {
-      ...vehicle,
+      ...vehicle.data,
       totalFuelLogs: fuelLogsCount.length,
       totalMaintenanceLogs: maintenanceLogsCount.length,
     },
