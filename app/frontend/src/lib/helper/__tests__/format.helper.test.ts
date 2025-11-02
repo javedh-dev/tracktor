@@ -11,8 +11,8 @@ import {
 	formatCurrency,
 	getDistanceUnit,
 	formatDistance,
-	getVolumeUnit,
-	formatVolume,
+	getFuelUnit,
+	formatFuel,
 	getMileageUnit,
 	formatMileage,
 	cleanup
@@ -224,40 +224,40 @@ describe('Format Helper', () => {
 		});
 	});
 
-	describe('getVolumeUnit', () => {
-		it('should return volume unit', () => {
-			const unit = getVolumeUnit();
+	describe('getFuelUnit', () => {
+		it('should return fuel unit', () => {
+			const unit = getFuelUnit("petrol");
 			expect(typeof unit).toBe('string');
 		});
 	});
 
-	describe('formatVolume', () => {
-		it('should format volume correctly', () => {
-			const result = formatVolume(50);
+	describe('formatFuel', () => {
+		it('should format fuel correctly', () => {
+			const result = formatFuel(50, "petrol");
 			expect(result).toMatch(/50/);
 		});
 
 		it('should format decimal volume correctly', () => {
-			const result = formatVolume(50.75);
+			const result = formatFuel(50.75, "ev");
 			expect(result).toMatch(/50\.75/);
 		});
 	});
 
 	describe('getMileageUnit', () => {
 		it('should return mileage unit', () => {
-			const unit = getMileageUnit();
+			const unit = getMileageUnit("petrol");
 			expect(typeof unit).toBe('string');
 		});
 	});
 
 	describe('formatMileage', () => {
 		it('should format mileage correctly', () => {
-			const result = formatMileage(25);
+			const result = formatMileage(25, "petrol");
 			expect(result).toMatch(/25/);
 		});
 
 		it('should format decimal mileage correctly', () => {
-			const result = formatMileage(25.5);
+			const result = formatMileage(25.5, "petrol");
 			expect(result).toMatch(/25\.5/);
 		});
 	});

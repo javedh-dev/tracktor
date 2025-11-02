@@ -76,8 +76,6 @@ describe("Auth API", () => {
         .set("Content-Type", "application/json")
         .send("invalid json");
 
-      console.error(res);
-
       expect(res.statusCode).toBe(400);
     });
 

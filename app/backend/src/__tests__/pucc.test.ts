@@ -10,6 +10,7 @@ describe("Pollution Certificate (PUCC) API", () => {
     make: "Toyota",
     model: "Camry",
     year: 2020,
+    fuelType: "petrol",
     licensePlate: "PUCC123",
   };
 
@@ -114,6 +115,7 @@ describe("Pollution Certificate (PUCC) API", () => {
         make: "Honda",
         model: "Civic",
         year: 2019,
+        fuelType: "petrol",
         licensePlate: "NOPUCC123",
       });
 

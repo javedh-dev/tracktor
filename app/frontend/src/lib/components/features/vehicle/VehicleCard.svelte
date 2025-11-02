@@ -14,6 +14,7 @@
 	import { formatDistance } from '$lib/helper/format.helper';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { browser } from '$app/environment';
+	import { FUEL_TYPES } from '$lib/domain/vehicle';
 	import IconButton from '$lib/components/app/IconButton.svelte';
 	import DeleteConfirmation from '$lib/components/app/DeleteConfirmation.svelte';
 	import * as Card from '$lib/components/ui/card';
@@ -115,7 +116,14 @@
 		<Card.Content class="px-4">
 			<div class="flex items-center justify-between">
 				<LicensePlate registrationNumber={vehicle.licensePlate} />
-				<Badge variant="outline" class="text-sm">{vehicle.year}</Badge>
+				<div class="flex gap-2">
+					<Badge variant="secondary" class="text-xs"
+						>{vehicle.fuelType
+							? FUEL_TYPES[vehicle.fuelType as keyof typeof FUEL_TYPES]
+							: 'Petrol'}</Badge
+					>
+					<Badge variant="outline" class="text-sm">{vehicle.year}</Badge>
+				</div>
 			</div>
 		</Card.Content>
 		<Card.Footer class="px-3">

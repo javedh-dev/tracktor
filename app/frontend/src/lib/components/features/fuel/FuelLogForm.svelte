@@ -3,7 +3,7 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { formatDate, parseDate, roundNumber } from '$lib/helper/format.helper';
+	import { formatDate, getFuelUnit, parseDate, roundNumber } from '$lib/helper/format.helper';
 	import { saveFuelLog } from '$lib/services/fuel.service';
 	import { fuelLogStore } from '$lib/stores/fuel-log.svelte';
 	import { fuelSchema } from '$lib/domain/fuel';
@@ -19,6 +19,13 @@
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
 	let { data } = $props();
+
+	// Get the selected vehicle to determine fuel type and units
+	const selectedVehicle = $derived(
+		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
+	);
+	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
+	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Volume');
 
 	const form = superForm(defaults(zod4(fuelSchema)), {
 		validators: zod4(fuelSchema),
@@ -84,13 +91,17 @@
 		<Form.Field {form} name="fuelAmount" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Volume of fuel">Volume</Form.Label>
+					<Form.Label
+						description={selectedVehicle?.fuelType === 'ev' ? 'Energy consumed' : 'Volume of fuel'}
+						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</Form.Label
+					>
 					<Input
 						{...props}
 						bind:value={$formData.fuelAmount}
 						icon={Fuel}
 						type="number"
 						step=".01"
+						placeholder={`Enter ${volumeLabel.toLowerCase()} in ${getFuelUnit(selectedVehicle?.fuelType as string)}`}
 					/>
 				{/snippet}
 			</Form.Control>
@@ -100,7 +111,10 @@
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Cost of refill">Cost</Form.Label>
+					<Form.Label
+						description={selectedVehicle?.fuelType === 'ev' ? 'Cost of charging' : 'Cost of refill'}
+						>Cost</Form.Label
+					>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
 			</Form.Control>
@@ -114,8 +128,13 @@
 					{#snippet children({ props })}
 						<div class="flex flex-row items-center gap-2">
 							<Checkbox {...props} bind:checked={$formData.filled} />
-							<Form.Label class="font-normal" description="Is tank filled to top?">
-								Full Tank
+							<Form.Label
+								class="font-normal"
+								description={selectedVehicle?.fuelType === 'ev'
+									? 'Is battery fully charged?'
+									: 'Is tank filled to top?'}
+							>
+								{selectedVehicle?.fuelType === 'ev' ? 'Full Charge' : 'Full Tank'}
 							</Form.Label>
 						</div>
 					{/snippet}

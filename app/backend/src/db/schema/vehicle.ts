@@ -15,5 +15,8 @@ export const vehicleTable = table("vehicles", {
   color: t.text(),
   odometer: t.integer(),
   image: t.text(),
+  fuelType: t.text({
+    enum: ["petrol", "diesel", "ev", "hybrid"]
+  }).notNull().default("petrol"),
   ...timestamps,
 });

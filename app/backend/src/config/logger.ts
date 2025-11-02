@@ -4,9 +4,8 @@ const logFormatter = winston.format.combine(
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
   winston.format.errors({ stack: true }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    return `${timestamp} [${level}]: ${message} ${
-      Object.keys(meta).length ? JSON.stringify(meta) : ""
-    }`;
+    return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ""
+      }`;
   }),
 );
 
@@ -32,7 +31,6 @@ const logger = winston.createLogger({
   transports,
 });
 
-console.log("Winston logger configured with", transports.length, "transports");
 logger.info(`Winston logger configured with ${transports.length} transports`);
 
 export default logger;

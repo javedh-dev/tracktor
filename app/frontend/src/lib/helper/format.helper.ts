@@ -98,7 +98,10 @@ const formatDistance = (distance: number): string => {
 	}).format(distance);
 };
 
-const getVolumeUnit = (): string => {
+const getFuelUnit = (vehicleType: string): string => {
+	if (vehicleType === 'ev') {
+		return 'kWh'
+	}
 	return (
 		new Intl.NumberFormat(configs.locale, {
 			style: 'unit',
@@ -109,14 +112,20 @@ const getVolumeUnit = (): string => {
 	);
 };
 
-const formatVolume = (volume: number): string => {
+const formatFuel = (amount: number, vehicleType: string): string => {
+	if (vehicleType === 'ev') {
+		return `${amount.toFixed(3)} kWh`
+	}
 	return new Intl.NumberFormat(configs.locale, {
 		style: 'unit',
 		unit: configs.unitOfVolume
-	}).format(volume);
+	}).format(amount);
 };
 
-const getMileageUnit = (): string => {
+const getMileageUnit = (vehicleType: string): string => {
+	if (vehicleType === 'ev') {
+		return 'km/kWh'
+	}
 	return (
 		new Intl.NumberFormat(configs.locale, {
 			style: 'unit',
@@ -127,7 +136,10 @@ const getMileageUnit = (): string => {
 	);
 };
 
-const formatMileage = (mileage: number): string => {
+const formatMileage = (mileage: number, vehicleType: string): string => {
+	if (vehicleType === 'ev') {
+		return `${mileage.toFixed(3)} km/kWh`
+	}
 	return new Intl.NumberFormat(configs.locale, {
 		style: 'unit',
 		unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
@@ -149,8 +161,8 @@ export {
 	formatCurrency,
 	getDistanceUnit,
 	formatDistance,
-	getVolumeUnit,
-	formatVolume,
+	getFuelUnit,
+	formatFuel,
 	getMileageUnit,
 	formatMileage,
 	roundNumber

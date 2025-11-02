@@ -12,7 +12,14 @@ export interface Vehicle {
 	insuranceStatus?: string;
 	puccStatus?: string;
 	image: string | null;
+	fuelType: 'diesel' | 'petrol' | 'ev';
 }
+
+export const FUEL_TYPES = {
+	diesel: 'Diesel',
+	petrol: 'Petrol',
+	ev: 'Electric (EV)',
+} as const;
 
 export const vehicleSchema = z.object({
 	id: z.string().nullable(),
@@ -45,7 +52,8 @@ export const vehicleSchema = z.object({
 		.regex(/^(#[0-9a-fA-F]{3})|(#[0-9a-fA-F]{6})$/, 'Only hex color codes allowed.')
 		.nullable(),
 	odometer: z.number().nonnegative().nullable(),
-	image: z.string().nullable()
+	image: z.string().nullable(),
+	fuelType: z.enum(['diesel', 'petrol', 'ev']).default('petrol')
 });
 
 export type VehicleSchema = typeof vehicleSchema;

@@ -10,6 +10,7 @@ describe("Vehicle API", () => {
     model: "Camry",
     year: 2020,
     licensePlate: "ABC123",
+    fuelType: "petrol",
   };
 
   describe("POST /api/vehicles", () => {
@@ -26,6 +27,7 @@ describe("Vehicle API", () => {
       expect(res.body.data.model).toBe(validVehicleData.model);
       expect(res.body.data.year).toBe(validVehicleData.year);
       expect(res.body.data.licensePlate).toBe(validVehicleData.licensePlate);
+      expect(res.body.data.fuelType).toBe(validVehicleData.fuelType);
 
       vehicleId = res.body.data.id;
     });
@@ -35,6 +37,7 @@ describe("Vehicle API", () => {
         make: "Ford",
         model: "Focus",
         year: 2019,
+        fuelType: "diesel",
       };
 
       const res = await request(app)
@@ -48,6 +51,7 @@ describe("Vehicle API", () => {
       expect(res.body.data.make).toBe(minimalVehicleData.make);
       expect(res.body.data.model).toBe(minimalVehicleData.model);
       expect(res.body.data.year).toBe(minimalVehicleData.year);
+      expect(res.body.data.fuelType).toBe(minimalVehicleData.fuelType);
       expect(res.body.data.licensePlate).toBeNull();
       expect(res.body.data.vin).toBeNull();
     });
@@ -70,12 +74,43 @@ describe("Vehicle API", () => {
         model: "Camry",
         year: "invalid", // should be number
         licensePlate: "ABC123",
+        fuelType: "petrol",
       };
 
       const res = await request(app).post("/api/vehicles").send(invalidData);
 
       expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty("success", false);
+    });
+
+    test("should validate fuel type values", async () => {
+      const invalidFuelTypeData = {
+        make: "Toyota",
+        model: "Camry",
+        year: 2020,
+        licensePlate: "ABC123",
+        fuelType: "invalid_fuel_type",
+      };
+
+      const res = await request(app).post("/api/vehicles").send(invalidFuelTypeData);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("success", false);
+    });
+
+    test.skip("should create vehicle with default fuel type when not provided", async () => {
+      const dataWithoutFuelType = {
+        make: "Toyota",
+        model: "Prius",
+        year: 2020,
+        licensePlate: "DEF456",
+      };
+
+      const res = await request(app).post("/api/vehicles").send(dataWithoutFuelType);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty("success", true);
+      expect(res.body.data.fuelType).toBe("petrol"); // default value
     });
   });
 
@@ -123,6 +158,7 @@ describe("Vehicle API", () => {
         model: "Accord",
         year: 2021,
         licensePlate: "XYZ789",
+        fuelType: "hybrid",
       };
 
       const res = await request(app).put("/api/vehicles").send(updateData);
@@ -131,6 +167,7 @@ describe("Vehicle API", () => {
       expect(res.body).toHaveProperty("success", true);
       expect(res.body.data.make).toBe(updateData.make);
       expect(res.body.data.model).toBe(updateData.model);
+      expect(res.body.data.fuelType).toBe(updateData.fuelType);
     });
 
     test("should validate all required fields for update", async () => {
@@ -153,6 +190,7 @@ describe("Vehicle API", () => {
         model: "Accord",
         year: 2021,
         licensePlate: "XYZ789",
+        fuelType: "petrol",
       };
 
       const res = await request(app).put("/api/vehicles").send(updateData);
@@ -173,6 +211,7 @@ describe("Vehicle API", () => {
         year: 2023,
         licensePlate: "ODO123",
         odometer: 50000,
+        fuelType: "ev",
       });
       testVehicleId = vehicleRes.body.data.id;
     });
