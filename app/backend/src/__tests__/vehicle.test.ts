@@ -30,10 +30,32 @@ describe("Vehicle API", () => {
       vehicleId = res.body.data.id;
     });
 
+    test("should create a vehicle without licensePlate and vin", async () => {
+      const minimalVehicleData = {
+        make: "Ford",
+        model: "Focus",
+        year: 2019,
+      };
+
+      const res = await request(app)
+        .post("/api/vehicles")
+        .send(minimalVehicleData);
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty("success", true);
+      expect(res.body).toHaveProperty("data");
+      expect(res.body.data).toHaveProperty("id");
+      expect(res.body.data.make).toBe(minimalVehicleData.make);
+      expect(res.body.data.model).toBe(minimalVehicleData.model);
+      expect(res.body.data.year).toBe(minimalVehicleData.year);
+      expect(res.body.data.licensePlate).toBeNull();
+      expect(res.body.data.vin).toBeNull();
+    });
+
     test("should validate required fields", async () => {
       const invalidData = {
         make: "Toyota",
-        // missing model, year, licensePlate
+        // missing model, year (licensePlate is now optional)
       };
 
       const res = await request(app).post("/api/vehicles").send(invalidData);
@@ -115,7 +137,7 @@ describe("Vehicle API", () => {
       const invalidData = {
         id: vehicleId,
         make: "Honda",
-        // missing other required fields
+        // missing model and year (licensePlate is now optional)
       };
 
       const res = await request(app).put("/api/vehicles").send(invalidData);

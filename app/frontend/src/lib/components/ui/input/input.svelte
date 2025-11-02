@@ -66,7 +66,7 @@
 			<ColorPicker
 				position="responsive"
 				bind:hex={value}
-				label={value.toUpperCase()}
+				label={value?.toUpperCase()}
 				isAlpha={false}
 				--slider-width="18px"
 				--input-size="18px"

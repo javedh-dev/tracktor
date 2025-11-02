@@ -42,6 +42,13 @@ export const stringValidator = (key: string) =>
     .notEmpty()
     .withMessage(`${key} must be an non-empty string`);
 
+export const optionalStringValidator = (key: string) =>
+  buildCheckFunction(["body", "params"])(key)
+    .optional({ nullable: true })
+    .isString()
+    .trim()
+    .withMessage(`${key} must be a string if provided`);
+
 export const fileNameValidator = (key: string) =>
   param(key)
     .isString()

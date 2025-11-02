@@ -16,9 +16,8 @@
 	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
 
 	async function detectSWUpdate() {
-		const registrations = await navigator.serviceWorker.ready;
-
-		registrations.addEventListener('updatefound', () => {
+		const registrations = await navigator?.serviceWorker?.ready;
+		registrations?.addEventListener('updatefound', () => {
 			const newSW = registrations.installing;
 			newSW?.addEventListener('statechange', () => {
 				if (newSW.state === 'installed') {

@@ -65,7 +65,7 @@
 			<Form.Field {form} name="make" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Manufacturer of the vehicle">Make</Form.Label>
+						<Form.Label description="Manufacturer of the vehicle" required>Make</Form.Label>
 						<Input {...props} bind:value={$formData.make} icon={Building2} />
 					{/snippet}
 				</Form.Control>
@@ -74,7 +74,7 @@
 			<Form.Field {form} name="model" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Model of the vehicle">Model</Form.Label>
+						<Form.Label description="Model of the vehicle" required>Model</Form.Label>
 						<Input {...props} bind:value={$formData.model} icon={CarFront} />
 					{/snippet}
 				</Form.Control>
@@ -86,7 +86,7 @@
 			<Form.Field {form} name="year" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Year of Manufacturing">Year</Form.Label>
+						<Form.Label description="Year of Manufacturing" required>Year</Form.Label>
 						<Input {...props} bind:value={$formData.year} icon={Calendar} type="number" />
 					{/snippet}
 				</Form.Control>
@@ -96,7 +96,7 @@
 			<Form.Field {form} name="color" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Color of the vehicle">Color</Form.Label>
+						<Form.Label description="Color of the vehicle" required>Color</Form.Label>
 						<Input {...props} bind:value={$formData.color} icon={Paintbrush} type="color" />
 					{/snippet}
 				</Form.Control>
