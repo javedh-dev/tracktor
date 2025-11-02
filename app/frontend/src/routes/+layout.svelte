@@ -10,12 +10,31 @@
 	import { configStore } from '$lib/stores/config.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
+	import { toast } from 'svelte-sonner';
 
 	let { children } = $props();
 	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
 
+	async function detectSWUpdate() {
+		const registrations = await navigator.serviceWorker.ready;
+
+		registrations.addEventListener('updatefound', () => {
+			const newSW = registrations.installing;
+			newSW?.addEventListener('statechange', () => {
+				if (newSW.state === 'installed') {
+					toast.info('New Update is available. Reloading..!');
+					setTimeout(() => {
+						newSW.postMessage({ type: 'SKIP_WAITING' });
+						window.location.reload();
+					}, 2000);
+				}
+			});
+		});
+	}
+
 	onMount(() => {
 		configStore.refreshConfigs();
+		detectSWUpdate();
 	});
 </script>
 
