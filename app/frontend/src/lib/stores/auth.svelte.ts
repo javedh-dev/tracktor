@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
+import { toast } from 'svelte-sonner';
 
 class AuthStore {
 	pin = $state<string>();
@@ -32,7 +33,11 @@ class AuthStore {
 					}
 				}
 			})
-			.catch((err) => (this.pin = undefined));
+			.catch((err) => {
+				this.pin = undefined;
+				console.log(err);
+				toast.error(`Error while logging in. ${err.message}.`);
+			});
 	};
 
 	logout = () => {
