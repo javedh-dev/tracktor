@@ -3,6 +3,7 @@ import { goto } from '$app/navigation';
 import { env } from '$env/dynamic/public';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '@tracktor/common';
+import { toast } from 'svelte-sonner';
 
 class AuthStore {
 	pin = $state<string>();
@@ -37,7 +38,11 @@ class AuthStore {
 					this.isLoggedIn = true;
 				}
 			})
-			.catch((err) => (this.pin = undefined));
+			.catch((err) => {
+				this.pin = undefined;
+				console.log(err);
+				toast.error(`Error while logging in. ${err.message}.`);
+			});
 	};
 
 	logout = () => {
