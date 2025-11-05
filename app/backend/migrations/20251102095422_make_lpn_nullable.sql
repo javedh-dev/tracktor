@@ -8,7 +8,6 @@ CREATE TABLE `vehicles_new` (
 	`vin` varchar(255),
 	`color` varchar(255),
 	`odometer` integer,
-	`image` varchar(255),
 	`created_at` datetime NOT NULL,
 	`updated_at` datetime NOT NULL,
 	`image` varchar(255));
