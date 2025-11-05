@@ -10,7 +10,8 @@ CREATE TABLE `vehicles_new` (
 	`odometer` integer,
 	`image` varchar(255),
 	`created_at` datetime NOT NULL,
-	`updated_at` datetime NOT NULL);
+	`updated_at` datetime NOT NULL,
+	`image` varchar(255));
 --> statement-breakpoint
 INSERT INTO `vehicles_new` select * from vehicles;
 --> statement-breakpoint
