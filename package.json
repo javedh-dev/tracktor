@@ -2,24 +2,19 @@
   "name": "tracktor",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "./app/common",
-    "./app/frontend",
-    "./app/backend"
-  ],
   "scripts": {
     "dev": "./scripts/run.sh dev",
     "dev:test": "./scripts/run.sh test",
     "build": "./scripts/build.sh",
-    "db:migrate": "dotenvx run -f environment/prod.env -- npm run db:migrate --workspace=@tracktor/backend",
-    "db:migrate:dev": "dotenvx run -f environment/dev.env -- npm run db:migrate:dev --workspace=@tracktor/backend",
+    "db:migrate": "dotenvx run -f environment/prod.env -- pnpm --filter @tracktor/backend db:migrate",
+    "db:migrate:dev": "dotenvx run -f environment/dev.env -- pnpm --filter @tracktor/backend db:migrate:dev",
     "start": "dotenvx run -f environment/prod.env -- ./build/start.sh",
-    "format": "npm run format --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "check": "npm run check --workspaces --if-present",
+    "format": "pnpm -r format",
+    "lint": "pnpm -r lint",
+    "check": "pnpm -r check",
     "clean": "./scripts/clean.sh",
-    "reset": "rm -rf node_modules && npm run reset --workspaces --if-present",
-    "test": "dotenvx run -f environment/test.env -- npm run test --workspaces --if-present"
+    "reset": "rm -rf node_modules && pnpm -r reset",
+    "test": "dotenvx run -f environment/test.env -- pnpm -r test"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

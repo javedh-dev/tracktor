@@ -2,6 +2,9 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Copy source code
 COPY . .
 
@@ -9,7 +12,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV TRACKTOR_DEMO_MODE=false
 
-RUN npm run build
+RUN pnpm run build
 
 
 # Stage 2: Final production image

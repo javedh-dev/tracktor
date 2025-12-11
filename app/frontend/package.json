@@ -18,7 +18,7 @@
 		"format": "(eslint --fix . || true) && prettier --write .",
 		"lint": "eslint . && prettier --check .",
 		"clean": "rm -rf build .svelte-kit",
-		"reset": "npm run clean && rm -rf node_modules && npm install"
+		"reset": "pnpm run clean && rm -rf node_modules && pnpm install"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.38.0",
@@ -74,6 +74,7 @@
 		"@types/d3-scale": "^4.0.9",
 		"@types/d3-shape": "^3.1.7",
 		"mode-watcher": "^1.1.0",
-		"svelte-loading-spinners": "^0.3.6"
+		"svelte-loading-spinners": "^0.3.6",
+		"zod": "^4.1.13"
 	}
 }

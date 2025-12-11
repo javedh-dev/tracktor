@@ -18,14 +18,14 @@ cleanup() {
 trap cleanup SIGINT SIGTERM EXIT
 
 # Run database migration
-dotenvx run -f environment/$1.env -- npm run db:migrate:dev
+dotenvx run -f environment/$1.env -- pnpm --filter @tracktor/backend db:migrate:dev
 
 # Start backend in background and store PID
-dotenvx run -f environment/$1.env -- npm run dev --workspace=@tracktor/backend &
+dotenvx run -f environment/$1.env -- pnpm --filter @tracktor/backend dev &
 BACKEND_PID=$!
 
 # Start frontend in background and store PID
-dotenvx run -f environment/$1.env -- npm run dev --workspace=@tracktor/frontend &
+dotenvx run -f environment/$1.env -- pnpm --filter @tracktor/frontend dev &
 FRONTEND_PID=$!
 
 echo "Backend PID: $BACKEND_PID"

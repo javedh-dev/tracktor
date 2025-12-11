@@ -29,15 +29,15 @@ fi
 
 # Install dependencies
 log_info "Cleaning Up..."
-if npm run clean; then
+if pnpm run clean; then
     log_success "Clean Up successfully..."
 else
-    log_error "Failed to install dependencies"
+    log_error "Failed to clean up"
     exit 1
 fi
 log_info "Installing Dependencies..."
 NODE_ENV=development
-if npm install; then
+if pnpm install; then
     log_success "Dependencies installed successfully"
 else
     log_error "Failed to install dependencies"
@@ -47,7 +47,7 @@ fi
 # Build workspaces
 log_info "Building workspaces..."
 NODE_ENV=production
-if npm run build --workspaces; then
+if pnpm -r build; then
     log_success "Workspaces built successfully"
 else
     log_error "Failed to build workspaces"
@@ -127,7 +127,7 @@ fi
 # Install production dependencies
 log_info "Installing production dependencies in build directory..."
 cd build/backend
-if npm install --omit=dev --ignore-scripts; then
+if pnpm install --prod --ignore-scripts; then
     log_success "Production dependencies installed successfully"
 else
     log_error "Failed to install production dependencies"

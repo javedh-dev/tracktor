@@ -17,12 +17,12 @@
     "format": "(eslint --fix . || true) && prettier --write .",
     "lint": "eslint . && prettier --check .",
     "clean": "rm -rf build *.db uploads logs coverage",
-    "reset": "npm run clean && rm -rf tracktor.db tracktor-test.db node_modules && npm install",
-    "test": "npm run db:migrate:test && jest",
-    "test:watch": "npm run db:migrate:test && jest --watch",
-    "test:coverage": "npm run db:migrate:test && jest --coverage",
-    "test:coverage:watch": "npm run db:migrate:test && jest --coverage --watch",
-    "test:ci": "npm run db:migrate:test && jest --coverage --ci --watchAll=false --passWithNoTests"
+    "reset": "pnpm run clean && rm -rf tracktor.db tracktor-test.db node_modules && pnpm install",
+    "test": "pnpm run db:migrate:test && jest",
+    "test:watch": "pnpm run db:migrate:test && jest --watch",
+    "test:coverage": "pnpm run db:migrate:test && jest --coverage",
+    "test:coverage:watch": "pnpm run db:migrate:test && jest --coverage --watch",
+    "test:ci": "pnpm run db:migrate:test && jest --coverage --ci --watchAll=false --passWithNoTests"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",
@@ -48,7 +48,6 @@
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.9.1",
-    "@types/sqlite3": "^5.1.0",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",

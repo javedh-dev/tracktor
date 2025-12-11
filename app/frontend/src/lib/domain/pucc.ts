@@ -1,5 +1,5 @@
 import { parseDate } from '$lib/helper/format.helper';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export interface PollutionCertificate {
 	id: string | null;

@@ -1,0 +1,10 @@
+packages:
+  - app/common
+  - app/frontend
+  - app/backend
+
+onlyBuiltDependencies:
+  - bcrypt
+  - esbuild
+  - sqlite3
+  - unrs-resolver

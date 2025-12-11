@@ -147,7 +147,7 @@ To set up Tracktor in a Proxmox LXC container, Please use [Community-Scripts](ht
 ## Local Development Setup
 To set up Tracktor for local development, follow these steps:
 
-1. Ensure you have Node.js and npm installed on your system.
+1. Ensure you have Node.js and pnpm installed on your system.
 2. Clone the Tracktor repository from GitHub:
 
 ```bash
@@ -157,18 +157,18 @@ cd tracktor
 3. Install the required dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 4. Update the environment variables as needed in the `.env` file in root directory.
 
 5. Migrate the database:
 ```bash
-npm run db:migrate:dev
+pnpm run db:migrate:dev
 ```
 
 6. Start the development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 7. Access the application by navigating to `http://localhost:5173` in your web browser.
