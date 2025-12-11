@@ -103,7 +103,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📊 Repository activity
 
-![Activities](https://repobeats.axiom.co/api/embed/d41931a72a5373ee0d2073e72279862171468023.svg "Repobeats analytics image")
+![Activities](https://repobeats.axiom.co/api/embed/d41931a72a5373ee0d2073e72279862171468023.svg 'Repobeats analytics image')
 
 ## ⭐ Star History
 

@@ -5,7 +5,7 @@ services:
     restart: always
     env_file: .env
     ports:
-      - "3333:3000"
+      - '3333:3000'
     volumes:
       - tracktor-app-data:/data/
 

@@ -1,3 +1,0 @@
-# Tracktor Frontend App
-
----
