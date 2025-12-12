@@ -6,15 +6,7 @@ import { resolve } from 'path';
 export default defineConfig(({ mode = 'development' }) => {
 	console.log('Building in mode : ', mode);
 
-	// Load environment variables
-	const envFile =
-		mode === 'production'
-			? 'environment/prod.env'
-			: mode === 'test'
-				? 'environment/test.env'
-				: 'environment/dev.env';
-
-	// Load env vars from the appropriate file
+	// Load environment variables using Vite's built-in env loading
 	const env = loadEnv(mode, process.cwd(), '');
 
 	return {
@@ -36,7 +28,7 @@ export default defineConfig(({ mode = 'development' }) => {
 			host: '0.0.0.0'
 		},
 
-		envDir: resolve(process.cwd(), './environment'),
+		envDir: process.cwd(),
 
 		define: {
 			// Make environment variables available at build time

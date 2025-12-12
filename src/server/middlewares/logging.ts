@@ -5,18 +5,10 @@ import { BaseMiddleware, type MiddlewareResult } from './base';
 export class LoggingMiddleware extends BaseMiddleware {
     protected async process(event: RequestEvent): Promise<MiddlewareResult> {
         if (env.LOG_REQUESTS) {
-            let message = `${event.request.method} ${event.url.pathname} - IP: ${event.getClientAddress()}`;
+            let message = `${event.getClientAddress()} - ${event.request.method} - ${event.url.pathname}`;
             logger.info(message);
         }
 
         return { continue: true };
-    }
-
-
-    private shouldLogRequestBody(request: Request): boolean {
-        return (
-            request.method !== 'GET' &&
-            request.headers.get('content-type')?.includes('application/json') === true
-        );
     }
 }

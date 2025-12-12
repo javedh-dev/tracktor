@@ -4,19 +4,6 @@ import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';
 
 // Load environment variables at build time
-const envFile =
-	process.env.NODE_ENV === 'production'
-		? 'environment/prod.env'
-		: process.env.NODE_ENV === 'test'
-			? 'environment/test.env'
-			: 'environment/dev.env';
-
-dotenvConfig({
-	path: resolve(process.cwd(), envFile),
-	override: false
-});
-
-// Also try to load from a root .env file if it exists
 dotenvConfig({
 	path: resolve(process.cwd(), '.env'),
 	override: false

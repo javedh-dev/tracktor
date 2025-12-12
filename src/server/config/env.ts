@@ -4,20 +4,7 @@ import logger from './logger';
 import { accessSync, mkdirSync } from 'fs';
 import { constants } from 'fs/promises';
 
-// Load environment variables from the appropriate .env file
-const envFile =
-	process.env.NODE_ENV === 'production'
-		? 'environment/prod.env'
-		: process.env.NODE_ENV === 'test'
-			? 'environment/test.env'
-			: 'environment/dev.env';
-
-config({
-	path: resolve(process.cwd(), envFile),
-	override: false // Don't override existing environment variables
-});
-
-// Also try to load from a root .env file if it exists
+// Load environment variables from .env file
 config({
 	path: resolve(process.cwd(), '.env'),
 	override: false
@@ -52,7 +39,7 @@ export const env = {
 	DISABLE_AUTH: process.env.TRACKTOR_DISABLE_AUTH === 'true'
 } as const;
 
-export const isDevelopment = env.NODE_ENV === 'dev';
+export const isDevelopment = env.NODE_ENV === 'development' || env.NODE_ENV === 'dev';
 export const isProduction = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';
 
