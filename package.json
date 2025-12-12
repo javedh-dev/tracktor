@@ -23,6 +23,8 @@
 		"db:migrate": "dotenvx run -f environment/prod.env -- drizzle-kit migrate",
 		"db:migrate:dev": "dotenvx run -f environment/dev.env -- drizzle-kit migrate",
 		"db:migrate:test": "dotenvx run -f environment/test.env -- drizzle-kit migrate",
+		"db:seed": "dotenvx run -f environment/dev.env -- tsx scripts/seed.ts",
+		"db:init": "pnpm run db:migrate:dev && pnpm run db:seed",
 		"start": "dotenvx run -f environment/prod.env -- node build"
 	},
 	"devDependencies": {
