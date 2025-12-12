@@ -1,22 +1,27 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
-import * as configController from '$server/controllers/configController';
+import { getAppConfigs, updateAppConfig } from '$server/services/configService';
+import { AppError } from '$server/exceptions/AppError';
 
 export const GET: RequestHandler = async (event) => {
 	try {
-		const response = await configController.getConfig(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await getAppConfigs();
+		return json(result);
 	} catch (err) {
 		console.error('Config GET error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		throw error(500, 'Internal server error');
 	}
 };
 
 export const PUT: RequestHandler = async (event) => {
 	try {
-		const body = await event.request.json();
+		// Use body from locals if available (from middleware), otherwise parse it
+		const body = event.locals.requestBody || await event.request.json();
 
 		// Validate that body is an array of config objects
 		if (!Array.isArray(body)) {
@@ -33,15 +38,19 @@ export const PUT: RequestHandler = async (event) => {
 			}
 		}
 
-		const response = await configController.updateConfig(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await updateAppConfig(body);
+		return json(result);
 	} catch (err) {
 		console.error('Config PUT error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

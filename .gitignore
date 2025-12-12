@@ -34,3 +34,5 @@ Thumbs.db
 .vscode/
 temp/
 **/*.db-journal
+
+uploads/

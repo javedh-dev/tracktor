@@ -6,7 +6,9 @@ declare global {
 		interface Error {
 			message: string;
 		}
-		// interface Locals {}
+		interface Locals {
+			requestBody?: any;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
@@ -34,4 +36,4 @@ declare namespace NodeJS {
 	}
 }
 
-export {};
+export { };

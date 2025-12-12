@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { BaseMiddleware, type MiddlewareResult } from '.';
+import { BaseMiddleware, type MiddlewareResult } from './base';
 import type { ApiResponse } from '$lib';
 import { CorsMiddleware } from './cors';
 

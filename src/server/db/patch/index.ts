@@ -1,5 +1,5 @@
-import { logger } from '@config/index';
-import { db } from '@db/index';
+import { logger } from '$server/config/index';
+import { db } from '$server/db/index';
 import { sql } from 'drizzle-orm';
 
 /**

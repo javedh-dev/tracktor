@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
-import * as insuranceController from '$server/controllers/insuranceController';
+import * as insuranceService from '$server/services/insuranceService';
+import { AppError } from '$server/exceptions/AppError';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -10,17 +11,19 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'Vehicle ID is required');
 		}
 
-		// Controllers now handle both parameter names
-
-		const response = await insuranceController.getInsurances(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await insuranceService.getInsurances(id);
+		return json(result);
 	} catch (err) {
 		console.error('Insurance GET error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -33,7 +36,8 @@ export const POST: RequestHandler = async (event) => {
 			throw error(400, 'Vehicle ID is required');
 		}
 
-		const body = await event.request.json();
+		// Use body from locals if available (from middleware), otherwise parse it
+		const body = event.locals.requestBody || await event.request.json();
 
 		// Basic validation for insurance data
 		if (!body.provider || !body.policyNumber || !body.startDate || !body.endDate) {
@@ -52,17 +56,19 @@ export const POST: RequestHandler = async (event) => {
 			throw error(400, 'End date must be after start date');
 		}
 
-		// Controllers now handle parameter mapping
-
-		const response = await insuranceController.addInsurance(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await insuranceService.addInsurance(id, body);
+		return json(result, { status: 201 });
 	} catch (err) {
 		console.error('Insurance POST error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

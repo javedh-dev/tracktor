@@ -1,6 +1,7 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { createErrorResponseBody, logError } from './server/utils/errorHandler';
-import { CorsMiddleware, RateLimitMiddleware, AuthMiddleware, LoggingMiddleware, BaseMiddleware, MiddlewareChain } from '$server/middlewares'
+import { CorsMiddleware, RateLimitMiddleware, AuthMiddleware, LoggingMiddleware } from '$server/middlewares'
+import { MiddlewareChain } from '$server/middlewares/base';
 
 const middlewareChain = new MiddlewareChain();
 

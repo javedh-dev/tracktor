@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
-import * as puccController from '$server/controllers/puccController';
+import * as pollutionCertificateService from '$server/services/pollutionCertificateService';
+import { AppError } from '$server/exceptions/AppError';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -10,18 +11,19 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'PUCC ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = puccId;
-
-		const response = await puccController.getPuccById(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await pollutionCertificateService.getPollutionCertificateById(puccId);
+		return json(result);
 	} catch (err) {
 		console.error('PUCC GET error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -34,7 +36,8 @@ export const PUT: RequestHandler = async (event) => {
 			throw error(400, 'Vehicle ID and PUCC ID are required');
 		}
 
-		const body = await event.request.json();
+		// Use body from locals if available (from middleware), otherwise parse it
+		const body = event.locals.requestBody || await event.request.json();
 
 		// Validation for PUCC updates
 		if (body.issueDate && body.expiryDate) {
@@ -50,19 +53,19 @@ export const PUT: RequestHandler = async (event) => {
 			}
 		}
 
-		// Update event params to match controller expectations
-		(event.params as any).vehicleId = id;
-		(event.params as any).puccId = puccId;
-
-		const response = await puccController.updatePucc(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await pollutionCertificateService.updatePollutionCertificate(id, puccId, body);
+		return json(result);
 	} catch (err) {
 		console.error('PUCC PUT error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -75,18 +78,19 @@ export const DELETE: RequestHandler = async (event) => {
 			throw error(400, 'PUCC ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = puccId;
-
-		const response = await puccController.deletePucc(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await pollutionCertificateService.deletePollutionCertificate(puccId);
+		return json(result);
 	} catch (err) {
 		console.error('PUCC DELETE error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

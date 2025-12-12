@@ -1,6 +1,8 @@
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import * as fileController from '$server/controllers/fileController';
+import { env } from '$server/config/env';
+import path from 'path';
+import { readFile } from 'fs/promises';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -15,23 +17,27 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'Invalid filename');
 		}
 
-		const response = await fileController.downloadFile(event);
+		const filePath = path.join(env.UPLOADS_DIR, filename);
 
-		// If the controller returns a JSON error response, parse and handle it
-		if (response.headers.get('content-type')?.includes('application/json')) {
-			const result = await response.json();
-			if (!result.success) {
-				throw error(404, result.message || 'File not found');
-			}
+		try {
+			const fileBuffer = await readFile(filePath);
+			return new Response(fileBuffer, {
+				status: 200,
+				headers: {
+					'Content-Type': 'application/octet-stream',
+					'Content-Disposition': `attachment; filename="${filename}"`
+				}
+			});
+		} catch (fileErr) {
+			throw error(404, 'File not found');
 		}
-
-		// Return the file response directly
-		return response;
 	} catch (err) {
 		console.error('File download error:', err);
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

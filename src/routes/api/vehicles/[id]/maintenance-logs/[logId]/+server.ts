@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
-import * as maintenanceLogController from '$server/controllers/maintenanceLogController';
+import * as maintenanceLogService from '$server/services/maintenanceLogService';
+import { AppError } from '$server/exceptions/AppError';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -10,18 +11,19 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'Maintenance log ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = logId;
-
-		const response = await maintenanceLogController.getMaintenanceLogById(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await maintenanceLogService.getMaintenanceLogById(logId);
+		return json(result);
 	} catch (err) {
 		console.error('Maintenance log GET error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -34,7 +36,8 @@ export const PUT: RequestHandler = async (event) => {
 			throw error(400, 'Maintenance log ID is required');
 		}
 
-		const body = await event.request.json();
+		// Use body from locals if available (from middleware), otherwise parse it
+		const body = event.locals.requestBody || await event.request.json();
 
 		// Validation for maintenance log updates
 		if (body.date) {
@@ -48,18 +51,19 @@ export const PUT: RequestHandler = async (event) => {
 			throw error(400, 'Cost must be a non-negative number');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = logId;
-
-		const response = await maintenanceLogController.updateMaintenanceLog(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await maintenanceLogService.updateMaintenanceLog(logId, body);
+		return json(result);
 	} catch (err) {
 		console.error('Maintenance log PUT error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -72,18 +76,19 @@ export const DELETE: RequestHandler = async (event) => {
 			throw error(400, 'Maintenance log ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = logId;
-
-		const response = await maintenanceLogController.deleteMaintenanceLog(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await maintenanceLogService.deleteMaintenanceLog(logId);
+		return json(result);
 	} catch (err) {
 		console.error('Maintenance log DELETE error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

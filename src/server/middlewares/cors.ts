@@ -1,6 +1,6 @@
 import { env } from '$server/config';
 import type { RequestEvent } from '@sveltejs/kit';
-import { BaseMiddleware, type MiddlewareResult } from '.';
+import { BaseMiddleware, type MiddlewareResult } from './base';
 
 export class CorsMiddleware extends BaseMiddleware {
     protected async process(event: RequestEvent): Promise<MiddlewareResult> {

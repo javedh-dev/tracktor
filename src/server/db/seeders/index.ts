@@ -6,10 +6,10 @@ import {
 	maintenanceLogTable,
 	pollutionCertificateTable,
 	vehicleTable
-} from '@db/schema/index';
-import { db } from '@db/index';
+} from '$server/db/schema/index';
+import { db } from '$server/db/index';
 import { faker } from '@faker-js/faker';
-import { env, logger } from '@config/index';
+import { env, logger } from '$server/config/index';
 
 export const seedData = async () => {
 	logger.debug('Seeding data ', {

@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
-import * as insuranceController from '$server/controllers/insuranceController';
+import * as insuranceService from '$server/services/insuranceService';
+import { AppError } from '$server/exceptions/AppError';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -10,18 +11,19 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'Insurance ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = insuranceId;
-
-		const response = await insuranceController.getInsuranceById(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await insuranceService.getInsuranceById(insuranceId);
+		return json(result);
 	} catch (err) {
 		console.error('Insurance GET error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -34,7 +36,8 @@ export const PUT: RequestHandler = async (event) => {
 			throw error(400, 'Vehicle ID and insurance ID are required');
 		}
 
-		const body = await event.request.json();
+		// Use body from locals if available (from middleware), otherwise parse it
+		const body = event.locals.requestBody || await event.request.json();
 
 		// Validation for insurance updates
 		if (body.startDate && body.endDate) {
@@ -50,19 +53,19 @@ export const PUT: RequestHandler = async (event) => {
 			}
 		}
 
-		// Update event params to match controller expectations
-		(event.params as any).vehicleId = id;
-		(event.params as any).insuranceId = insuranceId;
-
-		const response = await insuranceController.updateInsurance(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await insuranceService.updateInsurance(id, insuranceId, body);
+		return json(result);
 	} catch (err) {
 		console.error('Insurance PUT error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };
@@ -75,18 +78,19 @@ export const DELETE: RequestHandler = async (event) => {
 			throw error(400, 'Insurance ID is required');
 		}
 
-		// Update event params to match controller expectations
-		event.params.id = insuranceId;
-
-		const response = await insuranceController.deleteInsurance(event);
-		const result = await response.json();
-
-		return json(result, { status: response.status });
+		const result = await insuranceService.deleteInsurance(insuranceId);
+		return json(result);
 	} catch (err) {
 		console.error('Insurance DELETE error:', err);
+
+		if (err instanceof AppError) {
+			throw error(err.status, err.message);
+		}
+
 		if (err instanceof Error && 'status' in err) {
 			throw err;
 		}
+
 		throw error(500, 'Internal server error');
 	}
 };

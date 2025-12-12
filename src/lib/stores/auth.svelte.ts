@@ -1,8 +1,8 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { env } from '$env/dynamic/public';
-import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '@tracktor/common';
+import { apiClient } from '../helper/api.helper';
+import type { ApiResponse } from '../response';
 import { toast } from 'svelte-sonner';
 
 class AuthStore {
@@ -21,7 +21,7 @@ class AuthStore {
 
 	isPinConfigured = async () => {
 		return apiClient
-			.get<ApiResponse>('/auth/status', { skipInterceptors: true })
+			.get<ApiResponse>('/auth', { skipInterceptors: true })
 			.then(({ data: res }) => res.data.exists as boolean)
 			.catch(() => false);
 	};

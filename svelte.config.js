@@ -45,12 +45,7 @@ const config = {
 			$services: './src/lib/services',
 			$helper: './src/lib/helper',
 			$feature: './src/lib/components/features',
-			$server: './src/server',
-			'@config': './src/server/config',
-			'@db': './src/server/db',
-			'@exceptions': './src/server/exceptions',
-			'@utils': './src/server/utils',
-			'@tracktor/common': './src/lib'
+			$server: './src/server'
 		}
 	}
 };
