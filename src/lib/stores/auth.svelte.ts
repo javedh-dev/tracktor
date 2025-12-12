@@ -28,7 +28,7 @@ class AuthStore {
 
 	login = async (pin: string) => {
 		return apiClient
-			.post<ApiResponse>('/auth/verify', { pin }, { skipInterceptors: true })
+			.post<ApiResponse>('/auth', { pin }, { skipInterceptors: true })
 			.then(({ data: res }) => {
 				if (res.success) {
 					this.pin = pin;
