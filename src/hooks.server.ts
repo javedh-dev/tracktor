@@ -1,29 +1,27 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
-import { MiddlewareChain, addCorsHeaders } from './server/middlewares';
 import { createErrorResponseBody, logError } from './server/utils/errorHandler';
+import { CorsMiddleware, RateLimitMiddleware, AuthMiddleware, LoggingMiddleware, BaseMiddleware, MiddlewareChain } from '$server/middlewares'
 
-// Create the middleware chain instance
 const middlewareChain = new MiddlewareChain();
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const clientIP = event.getClientAddress();
 
-	// Execute the middleware chain
-	const middlewareResponse = await middlewareChain.execute({
-		event,
-		clientIP
-	});
+	middlewareChain.init([
+		new CorsMiddleware(),
+		new AuthMiddleware(),
+		new RateLimitMiddleware(),
+		new LoggingMiddleware()
+	])
 
-	// If any middleware returned a response, return it immediately
-	if (middlewareResponse) {
-		return middlewareResponse;
+	const result = await middlewareChain.handle(event);
+	if (result.response) {
+		return result.response;
 	}
 
-	// Continue with the normal request processing
 	const response = await resolve(event);
 
 	// Add CORS headers to all responses
-	addCorsHeaders(response, event.request);
+	CorsMiddleware.addCorsHeaders(response, event.request);
 
 	return response;
 };
