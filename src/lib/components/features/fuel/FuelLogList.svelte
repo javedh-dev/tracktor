@@ -147,10 +147,14 @@
 				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
 					const unit = getMileageUnit(selectedVehicle?.fuelType as string);
 					return {
-						render: () =>
-							`<div class="flex flex-row justify-center">
-							${!mileage() ? '-' : `${mileage().toFixed(2)} ${unit}`}
-							</div>`
+						render: () => {
+							const mileageValue = mileage();
+							const isValidNumber =
+								mileageValue != null && typeof mileageValue === 'number' && !isNaN(mileageValue);
+							return `<div class="flex flex-row justify-center">
+								${!isValidNumber ? '-' : `${mileageValue.toFixed(2)} ${unit}`}
+							</div>`;
+						}
 					};
 				});
 
