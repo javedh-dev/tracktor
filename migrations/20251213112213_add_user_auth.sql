@@ -6,9 +6,11 @@ CREATE TABLE `users` (
 	`created_at` text NOT NULL DEFAULT (datetime('now')),
 	`updated_at` text NOT NULL DEFAULT (datetime('now'))
 );
+--> statement-breakpoint
 
 -- Add unique index on username
 CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
+--> statement-breakpoint
 
 -- Add sessions table for session management
 CREATE TABLE `sessions` (

@@ -43,6 +43,13 @@
       "when": 1762094213825,
       "tag": "20251102143653_add_fuel_type_to_vehicles",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1765624933032,
+      "tag": "20251213112213_add_user_auth",
+      "breakpoints": true
     }
   ]
 }
