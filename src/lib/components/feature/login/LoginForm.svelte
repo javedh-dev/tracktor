@@ -1,61 +1,121 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import * as Card from '$ui/card';
+	import * as Button from '$ui/button';
+	import * as Form from '$ui/form';
+	import { Input } from '$ui/input';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import * as InputOTP from '$ui/input-otp/index.js';
-	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { authStore } from '$stores/auth.svelte';
+	import { goto } from '$app/navigation';
 
-	let { class: className = '', oncomplete, ...restProps } = $props();
+	let { class: className = '', ...restProps } = $props();
 
-	let pin = $state('');
-	let disabled = $state(!authStore.isPinConfigured());
+	let username = $state('');
+	let password = $state('');
 	let processing = $state(false);
+	let isRegistering = $state(false);
 
-	const handleChange = () => {
-		if (pin.length == 6 && !processing) {
-			processing = true;
-			oncomplete(pin).finally(() => {
-				processing = false;
-			});
+	$effect(() => {
+		// Check if users exist when component mounts
+		authStore.checkAuthStatus();
+	});
+
+	const handleLogin = async () => {
+		if (!username || !password || processing) return;
+
+		processing = true;
+		try {
+			const success = await authStore.login(username, password);
+			if (success) {
+				goto('/dashboard');
+			}
+		} finally {
+			processing = false;
+		}
+	};
+
+	const handleRegister = async () => {
+		if (!username || !password || processing) return;
+
+		processing = true;
+		try {
+			const success = await authStore.register(username, password);
+			if (success) {
+				isRegistering = false;
+				username = '';
+				password = '';
+			}
+		} finally {
+			processing = false;
+		}
+	};
+
+	const handleSubmit = (event: Event) => {
+		event.preventDefault();
+		if (isRegistering) {
+			handleRegister();
+		} else {
+			handleLogin();
 		}
 	};
 </script>
 
 <Card.Root class={cn('flex flex-col items-center gap-6 py-12', className)} {...restProps}>
 	<LabelWithIcon
-		icon={ShieldEllipsis}
+		icon={isRegistering ? UserPlus : ShieldEllipsis}
 		iconClass="lg:h-6 lg:w-6"
-		label="Enter your 6-digit PIN to access the app"
+		label={isRegistering ? 'Create your account' : 'Sign in to your account'}
 		style="gap-4"
 	/>
 
-	<InputOTP.Root
-		maxlength={6}
-		bind:value={pin}
-		pattern={REGEXP_ONLY_DIGITS}
-		pushPasswordManagerStrategy={'increase-width'}
-		onValueChange={handleChange}
-		disabled={disabled || processing}
-	>
-		{#snippet children({ cells })}
-			{#each cells as cell (cell)}
-				<InputOTP.Group>
-					<InputOTP.Slot
-						cell={{
-							char: cell.char && '◉',
-							hasFakeCaret: cell.hasFakeCaret,
-							isActive: cell.isActive
-						}}
-						class="text-base lg:text-lg"
-					/>
-				</InputOTP.Group>
-			{/each}
-		{/snippet}
-	</InputOTP.Root>
-	{#if processing}
-		<Jumper size="32" color="var(--primary)" duration="2s" />
+	<form onsubmit={handleSubmit} class="w-full max-w-sm space-y-4">
+		<div class="space-y-2">
+			<label for="username" class="text-sm font-medium">Username</label>
+			<Input
+				id="username"
+				type="text"
+				bind:value={username}
+				placeholder="Enter your username"
+				disabled={processing}
+				required
+			/>
+		</div>
+
+		<div class="space-y-2">
+			<label for="password" class="text-sm font-medium">Password</label>
+			<Input
+				id="password"
+				type="password"
+				bind:value={password}
+				placeholder="Enter your password"
+				disabled={processing}
+				required
+			/>
+		</div>
+
+		<Button.Root type="submit" class="w-full" disabled={processing || !username || !password}>
+			{#if processing}
+				<Jumper size="16" color="currentColor" duration="1s" />
+			{:else}
+				{isRegistering ? 'Create Account' : 'Sign In'}
+			{/if}
+		</Button.Root>
+	</form>
+
+	{#if !authStore.hasUsers}
+		<p class="text-muted-foreground text-center text-sm">
+			No users found. Create the first account to get started.
+		</p>
+	{:else if !isRegistering}
+		<Button.Root variant="ghost" onclick={() => (isRegistering = true)} disabled={processing}>
+			Need an account? Register here
+		</Button.Root>
+	{:else}
+		<Button.Root variant="ghost" onclick={() => (isRegistering = false)} disabled={processing}>
+			Already have an account? Sign in
+		</Button.Root>
 	{/if}
 </Card.Root>

@@ -12,7 +12,7 @@
 </script>
 
 <div class="bg-background flex w-full grow items-center justify-center gap-6 p-4 md:p-10">
-	<div class=" w-full max-w-lg justify-center">
-		<LoginForm oncomplete={(pin: string) => authStore.login(pin)} />
+	<div class="w-full max-w-lg justify-center">
+		<LoginForm />
 	</div>
 </div>

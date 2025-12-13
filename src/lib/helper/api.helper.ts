@@ -6,21 +6,17 @@ const baseURL = env.TRACKTOR_API_BASE_URL || '';
 export const apiClient = new HttpClient({
 	baseURL: `${baseURL}/api`,
 	headers: {
-		'x-user-pin': browser ? localStorage.getItem('userPin') || '' : ''
+		'Content-Type': 'application/json'
 	},
 	timeout: 5000
 });
 
+// Session-based authentication is handled via cookies automatically
+// No need for manual headers since cookies are sent automatically
 if (env.TRACKTOR_DISABLE_AUTH !== 'true') {
 	apiClient.addRequestInterceptor((req) => {
-		const userPin = browser ? localStorage.getItem('userPin') || '' : '';
-		if (userPin === '') return false;
-		req.headers = {
-			...req.headers,
-			...{
-				'x-user-pin': userPin
-			}
-		};
+		// Session authentication is handled via cookies
+		// The browser will automatically include the session cookie
 		return true;
 	});
 }

@@ -5,51 +5,107 @@ import { apiClient } from '../helper/api.helper';
 import type { ApiResponse } from '../response';
 import { toast } from 'svelte-sonner';
 
+interface User {
+	id: string;
+	username: string;
+}
+
 class AuthStore {
-	pin = $state<string>();
+	user = $state<User | null>(null);
 	isLoggedIn = $state<boolean>(false);
+	hasUsers = $state<boolean>(false);
 
 	constructor() {
 		this.isLoggedIn = env.TRACKTOR_DISABLE_AUTH === 'true';
 		if (browser && !this.isLoggedIn) {
-			const pin = localStorage.getItem('userPin');
-			if (pin) {
-				this.login(pin);
-			}
+			// Check if user is already logged in via session cookie
+			this.checkAuthStatus();
 		}
 	}
 
-	isPinConfigured = async () => {
-		return apiClient
-			.get<ApiResponse>('/auth', { skipInterceptors: true })
-			.then(({ data: res }) => res.data.exists as boolean)
-			.catch(() => false);
-	};
+	checkAuthStatus = async () => {
+		try {
+			const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
+			this.hasUsers = res.data.hasUsers;
 
-	login = async (pin: string) => {
-		return apiClient
-			.post<ApiResponse>('/auth', { pin }, { skipInterceptors: true })
-			.then(({ data: res }) => {
-				if (res.success) {
-					this.pin = pin;
-					if (browser) {
-						localStorage.setItem('userPin', pin);
-					}
+			// If we have a session cookie, we might be logged in
+			if (this.hasUsers && document.cookie.includes('session=')) {
+				// Try to make an authenticated request to verify session
+				try {
+					await apiClient.get('/vehicles');
 					this.isLoggedIn = true;
+				} catch {
+					// Session is invalid, user needs to login
+					this.isLoggedIn = false;
 				}
-			})
-			.catch((err) => {
-				this.pin = undefined;
-				console.log(err);
-				toast.error(`Error while logging in. ${err.message}.`);
-			});
+			}
+		} catch (error) {
+			console.error('Error checking auth status:', error);
+			this.hasUsers = false;
+		}
 	};
 
-	logout = () => {
-		localStorage.removeItem('userPin');
-		this.pin = undefined;
-		this.isLoggedIn = false;
-		goto('/');
+	login = async (username: string, password: string) => {
+		try {
+			const { data: res } = await apiClient.post<ApiResponse>(
+				'/auth',
+				{ username, password },
+				{ skipInterceptors: true }
+			);
+
+			if (res.success && res.data) {
+				this.user = res.data.user;
+				this.isLoggedIn = true;
+				toast.success('Login successful');
+				return true;
+			}
+			return false;
+		} catch (err: any) {
+			this.user = null;
+			this.isLoggedIn = false;
+			console.error('Login error:', err);
+			toast.error(`Login failed: ${err.response?.data?.message || err.message}`);
+			return false;
+		}
+	};
+
+	register = async (username: string, password: string) => {
+		try {
+			const { data: res } = await apiClient.post<ApiResponse>(
+				'/auth/register',
+				{ username, password },
+				{ skipInterceptors: true }
+			);
+
+			if (res.success) {
+				toast.success('User created successfully. Please login.');
+				this.hasUsers = true;
+				return true;
+			}
+			return false;
+		} catch (err: any) {
+			console.error('Registration error:', err);
+			toast.error(`Registration failed: ${err.response?.data?.message || err.message}`);
+			return false;
+		}
+	};
+
+	logout = async () => {
+		try {
+			await apiClient.delete('/auth');
+		} catch (error) {
+			console.error('Logout error:', error);
+		} finally {
+			this.user = null;
+			this.isLoggedIn = false;
+			goto('/login');
+		}
+	};
+
+	// Legacy method for backward compatibility
+	isPinConfigured = async () => {
+		const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
+		return res.data.hasUsers;
 	};
 }
 

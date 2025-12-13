@@ -4,9 +4,9 @@ import { BaseMiddleware, type MiddlewareResult } from './base';
 import type { RequestEvent } from '@sveltejs/kit';
 import { CorsMiddleware } from './cors';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { getPinStatus, verifyPin } from '$server/services/authService';
+import { validateSession, getUsersCount } from '$server/services/authService';
 
-const BYPASS_PATHS = ['/api/auth', '/api/files/'];
+const BYPASS_PATHS = ['/api/auth', '/api/files/', '/api/health'];
 
 export class AuthMiddleware extends BaseMiddleware {
 
@@ -19,32 +19,51 @@ export class AuthMiddleware extends BaseMiddleware {
     }
 
     private async handleAuthentication(event: RequestEvent): Promise<MiddlewareResult> {
-        const pin = event.request.headers.get('x-user-pin');
-        if (!pin) {
+        // Check if any users exist in the system
+        const usersStatus = await getUsersCount();
+        if (!usersStatus.data.hasUsers) {
             return {
                 response: this.createAuthErrorResponse(
-                    'PIN is required in X-User-PIN header.',
+                    'No users found. Please create a user account first.',
                     Status.BAD_REQUEST,
                     event.request
                 ),
                 continue: false
-            }
+            };
+        }
+
+        // Check for session token in Authorization header or cookie
+        const authHeader = event.request.headers.get('Authorization');
+        const sessionToken = authHeader?.replace('Bearer ', '') ||
+            event.cookies.get('session');
+
+        if (!sessionToken) {
+            return {
+                response: this.createAuthErrorResponse(
+                    'Session token is required. Please login first.',
+                    Status.UNAUTHORIZED,
+                    event.request
+                ),
+                continue: false
+            };
         }
 
         try {
-            const user = await getPinStatus();
-            if (!user.data.exists) {
+            const { user } = await validateSession(sessionToken);
+
+            if (!user) {
                 return {
                     response: this.createAuthErrorResponse(
-                        'PIN is not set. Please set the PIN first.',
-                        Status.BAD_REQUEST,
+                        'Invalid or expired session. Please login again.',
+                        Status.UNAUTHORIZED,
                         event.request
                     ),
                     continue: false
-                }
+                };
             }
 
-            await verifyPin(pin);
+            // Add user to locals for use in route handlers
+            event.locals.user = user;
             return { continue: true };
         } catch (error) {
             let statusCode = Status.INTERNAL_SERVER_ERROR;
@@ -62,14 +81,19 @@ export class AuthMiddleware extends BaseMiddleware {
         }
     }
 
-
     private requiresAuth(pathname: string): boolean {
-        // Only apply auth for APPI endpoints
-        return pathname.startsWith('/api')
-            // Check if auth is enabled in config    
-            || !env.DISABLE_AUTH
-            // Chcek if pathname to be bypassed
-            || BYPASS_PATHS.some(path => pathname.startsWith(path));
+        // Skip auth if disabled in config
+        if (env.DISABLE_AUTH) {
+            return false;
+        }
+
+        // Only apply auth for API endpoints
+        if (!pathname.startsWith('/api')) {
+            return false;
+        }
+
+        // Check if pathname should be bypassed
+        return !BYPASS_PATHS.some(path => pathname.startsWith(path));
     }
 
     private createAuthErrorResponse(

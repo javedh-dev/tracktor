@@ -1,4 +1,4 @@
-import { authTable } from './auth';
+import { authTable, usersTable, sessionsTable } from './auth';
 import { configTable } from './config';
 import { fuelLogTable } from './fuel-log';
 import { insuranceTable } from './insurance';
@@ -8,6 +8,8 @@ import { pollutionCertificateTable } from './pucc';
 
 export {
 	authTable,
+	usersTable,
+	sessionsTable,
 	configTable,
 	fuelLogTable,
 	insuranceTable,

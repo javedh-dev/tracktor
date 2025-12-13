@@ -34,13 +34,14 @@ export class MiddlewareChain {
     private firstMiddleware?: BaseMiddleware;
 
     public init(middlewares: BaseMiddleware[]) {
-        middlewares.forEach((middleware, index) => {
-            if (index > 0) {
-                this.firstMiddleware!.setNext(middleware);
-            } else {
-                this.firstMiddleware = middleware;
-            }
-        });
+        if (middlewares.length === 0) return;
+
+        this.firstMiddleware = middlewares[0];
+        let current = this.firstMiddleware;
+
+        for (let i = 1; i < middlewares.length; i++) {
+            current = current.setNext(middlewares[i]);
+        }
     }
 
     async handle(event: RequestEvent): Promise<MiddlewareResult> {

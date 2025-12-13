@@ -27,7 +27,7 @@
 - 🛠️ **Maintenance Log:** Record and view maintenance history for each vehicle.
 - 📄 **Document Tracking:** Track insurance, pollution certificates, and other important documents.
 - 📊 **Dashboard:** Visualize key metrics and upcoming renewals.
-- 🔒 **User Authentication:** Secure access to your data.
+- 🔒 **User Authentication:** Secure username/password authentication with session management.
 
 ## 🖼️ images
 

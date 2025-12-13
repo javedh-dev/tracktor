@@ -48,9 +48,9 @@
 			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center"
 		>
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
-			avoid adding any persoanl info.
+			avoid adding any personal info.
 			{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
-				<strong>Default PIN : 123456</strong>
+				<strong>Default Login: admin / password123</strong>
 			{/if}
 		</LabelWithIcon>
 	</div>
