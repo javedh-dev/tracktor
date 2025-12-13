@@ -1,6 +1,6 @@
 import type { PollutionCertificate } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '@tracktor/common';
+import type { ApiResponse } from '$lib/response';
 import { vehicleStore } from './vehicle.svelte';
 import { onMount } from 'svelte';
 

@@ -1,6 +1,6 @@
 import type { Vehicle } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '@tracktor/common';
+import type { ApiResponse } from '$lib/response';
 import { toast } from 'svelte-sonner';
 
 class VehicleStore {

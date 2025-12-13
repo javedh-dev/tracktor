@@ -1,6 +1,6 @@
 import type { Config, Configs } from '$lib/domain/config';
 import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '@tracktor/common';
+import type { ApiResponse } from '$lib/response';
 
 class ConfigStore {
 	configs = $state<Configs>({

@@ -1,6 +1,6 @@
 import type { Insurance } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '@tracktor/common';
+import type { ApiResponse } from '$lib/response';
 import { vehicleStore } from './vehicle.svelte';
 
 class InsuranceStore {

@@ -1,6 +1,6 @@
 import { apiClient } from '$lib/helper/api.helper';
 import type { Response } from '$lib/domain';
-import type { ApiResponse } from '@tracktor/common';
+import type { ApiResponse } from '$lib/response';
 
 export const uploadFile = async (file: File): Promise<Response<any>> => {
 	const res: Response<string> = { status: 'OK' };
