@@ -1,6 +1,9 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
+import { env } from '$server/config/env';
+import path from 'path';
+import { writeFile } from 'fs/promises';
 
 export const POST: RequestHandler = async (event) => {
 	try {
@@ -17,13 +20,18 @@ export const POST: RequestHandler = async (event) => {
 			throw new AppError('File is missing to be uploaded', Status.BAD_REQUEST);
 		}
 
-		// In SvelteKit, we need to handle file upload differently
-		// This is a simplified version - in practice, you'd want to save the file to disk
+		// Generate unique filename
 		const buffer = await file.arrayBuffer();
-		const filename = `${Date.now()}-${file.name}`;
+		const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+		const filePath = path.join(env.UPLOADS_DIR, filename);
 
-		// TODO: Save file to uploads directory
-		// For now, just return the file info
+		// Save file to uploads directory
+		try {
+			await writeFile(filePath, Buffer.from(buffer));
+		} catch (writeErr) {
+			console.error('Failed to save file:', writeErr);
+			throw new AppError('Failed to save file', Status.INTERNAL_SERVER_ERROR);
+		}
 
 		const result = {
 			success: true,

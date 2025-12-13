@@ -29,12 +29,14 @@ export const GET: RequestHandler = async (event) => {
 				}
 			});
 		} catch (fileErr) {
+			console.warn(`File not found: ${filePath}`, fileErr);
 			throw error(404, 'File not found');
 		}
 	} catch (err) {
 		console.error('File download error:', err);
 
-		if (err instanceof Error && 'status' in err) {
+		// Check if this is already a SvelteKit error
+		if (err && typeof err === 'object' && 'status' in err) {
 			throw err;
 		}
 
