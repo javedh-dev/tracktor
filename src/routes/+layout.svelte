@@ -55,7 +55,7 @@
 		</LabelWithIcon>
 	</div>
 {/if}
-{#if navigating.to}
+{#if navigating.to && !navigating.to.route.id?.includes('(auth)')}
 	<div class="flex min-h-screen items-center justify-center">
 		<Jumper size="64" color="var(--primary)" duration="2s" />
 	</div>
