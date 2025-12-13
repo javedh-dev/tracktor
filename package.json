@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite dev --host",
 		"build": "vite build",
-		"preview": "vite preview",
+		"preview": "vite preview --host",
 		"test": "vitest --run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest --coverage",
