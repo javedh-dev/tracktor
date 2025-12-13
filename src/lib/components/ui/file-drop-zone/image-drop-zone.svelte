@@ -18,9 +18,11 @@
 		disabled = false,
 		class: className,
 		file = $bindable(),
+		existingImageUrl,
 		...rest
 	}: Omit<FileDropZoneProps, 'onUpload'> & {
 		file: File | undefined;
+		existingImageUrl?: string;
 		// onSelect: (file: File) => Promise<void>;
 	} = $props();
 
@@ -34,6 +36,9 @@
 				imageSrc = e.target?.result as string;
 			};
 			reader.readAsDataURL(file);
+		} else if (existingImageUrl && !imageSrc) {
+			// Show existing image if no new file is selected
+			imageSrc = existingImageUrl;
 		}
 	});
 
@@ -119,7 +124,7 @@
 		uploading = false;
 	};
 
-	const canUploadFiles = $derived(!disabled && !uploading && !imageSrc);
+	const canUploadFiles = $derived(!disabled && !uploading);
 </script>
 
 <label
@@ -141,7 +146,10 @@
 			/>
 			<SquarePen
 				class="bg-accent absolute top-2 right-2 h-8 w-8 cursor-pointer rounded-full p-2 shadow-md"
-				onclick={() => (imageSrc = undefined)}
+				onclick={() => {
+					imageSrc = undefined;
+					file = undefined;
+				}}
 			/>
 		</div>
 	{:else}

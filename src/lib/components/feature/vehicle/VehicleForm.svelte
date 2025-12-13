@@ -26,6 +26,9 @@
 	let image = $state<File>();
 	let processing = $state(false);
 
+	// For showing existing image when editing
+	const existingImageUrl = $derived(data?.image ? `/api/files/${data.image}` : undefined);
+
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),
 		SPA: true,
@@ -59,7 +62,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<!-- <FormLabel description="Manufacturer of the vehicle">Image</FormLabel> -->
-					<ImageDropZone {...props} bind:file={image} disabled={processing} />
+					<ImageDropZone {...props} bind:file={image} disabled={processing} {existingImageUrl} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
