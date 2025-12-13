@@ -1,7 +1,8 @@
 <script lang="ts">
 	import ImageDropZone from '$ui/file-drop-zone/image-drop-zone.svelte';
 	import * as Form from '$ui/form/index.js';
-	import { Input } from '$ui/input/index.js';
+	import FormLabel from '$appui/FormLabel.svelte';
+	import Input from '$appui/input.svelte';
 	import { saveVehicleWithImage } from '$lib/services/vehicle.service';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { vehicleSchema, FUEL_TYPES } from '$lib/domain/vehicle';
@@ -57,7 +58,7 @@
 		<Form.Field {form} name="image" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<!-- <Form.Label description="Manufacturer of the vehicle">Image</Form.Label> -->
+					<!-- <FormLabel description="Manufacturer of the vehicle">Image</FormLabel> -->
 					<ImageDropZone {...props} bind:file={image} disabled={processing} />
 				{/snippet}
 			</Form.Control>
@@ -67,7 +68,7 @@
 			<Form.Field {form} name="make" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Manufacturer of the vehicle" required>Make</Form.Label>
+						<FormLabel description="Manufacturer of the vehicle" required>Make</FormLabel>
 						<Input {...props} bind:value={$formData.make} icon={Building2} />
 					{/snippet}
 				</Form.Control>
@@ -76,7 +77,7 @@
 			<Form.Field {form} name="model" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Model of the vehicle" required>Model</Form.Label>
+						<FormLabel description="Model of the vehicle" required>Model</FormLabel>
 						<Input {...props} bind:value={$formData.model} icon={CarFront} />
 					{/snippet}
 				</Form.Control>
@@ -88,7 +89,7 @@
 			<Form.Field {form} name="year" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Year of Manufacturing" required>Year</Form.Label>
+						<FormLabel description="Year of Manufacturing" required>Year</FormLabel>
 						<Input {...props} bind:value={$formData.year} icon={Calendar} type="number" />
 					{/snippet}
 				</Form.Control>
@@ -98,7 +99,7 @@
 			<Form.Field {form} name="color" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Color of the vehicle" required>Color</Form.Label>
+						<FormLabel description="Color of the vehicle" required>Color</FormLabel>
 						<Input {...props} bind:value={$formData.color} icon={Paintbrush} type="color" />
 					{/snippet}
 				</Form.Control>
@@ -110,9 +111,7 @@
 			<Form.Field {form} name="fuelType" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Type of fuel used by the vehicle" required>
-							Fuel Type
-						</Form.Label>
+						<FormLabel description="Type of fuel used by the vehicle" required>Fuel Type</FormLabel>
 						<Select.Root bind:value={$formData.fuelType} type="single">
 							<Select.Trigger {...props} class="w-full">
 								<div class="flex items-center justify-start">
@@ -137,7 +136,7 @@
 			<Form.Field {form} name="odometer" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
+						<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
 						<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 					{/snippet}
 				</Form.Control>
@@ -149,7 +148,7 @@
 		<Form.Field {form} name="licensePlate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Registration Number of vehicle">License Plate</Form.Label>
+					<FormLabel description="Registration Number of vehicle">License Plate</FormLabel>
 					<Input {...props} bind:value={$formData.licensePlate} icon={IdCard} />
 				{/snippet}
 			</Form.Control>
@@ -159,7 +158,7 @@
 		<Form.Field {form} name="vin" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Vehicle Idenification Number">VIN</Form.Label>
+					<FormLabel description="Vehicle Idenification Number">VIN</FormLabel>
 					<Input {...props} bind:value={$formData.vin} icon={Fingerprint} />
 				{/snippet}
 			</Form.Control>

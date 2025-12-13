@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Form from '$ui/form/index.js';
-	import { Input } from '$ui/input/index.js';
+	import FormLabel from '$appui/FormLabel.svelte';
+	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { maintenanceSchema } from '$lib/domain/maintenance';
@@ -53,7 +54,7 @@
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Maintenance Date">Date</Form.Label>
+					<FormLabel description="Maintenance Date">Date</FormLabel>
 					<Input {...props} bind:value={$formData.date} icon={Calendar1} type="calendar" disabled />
 				{/snippet}
 			</Form.Control>
@@ -62,7 +63,7 @@
 		<Form.Field {form} name="odometer" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
+					<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
 					<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 				{/snippet}
 			</Form.Control>
@@ -73,7 +74,7 @@
 		<Form.Field {form} name="serviceCenter" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Name of Service center">Service Center</Form.Label>
+					<FormLabel description="Name of Service center">Service Center</FormLabel>
 					<Input {...props} bind:value={$formData.serviceCenter} icon={Hammer} />
 				{/snippet}
 			</Form.Control>
@@ -84,7 +85,7 @@
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Cost of Maintenance">Cost</Form.Label>
+					<FormLabel description="Cost of Maintenance">Cost</FormLabel>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
 			</Form.Control>
@@ -95,7 +96,7 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="More details">Notes</Form.Label>
+					<FormLabel description="More details">Notes</FormLabel>
 					<Textarea
 						{...props}
 						placeholder="Add more details. If any..."

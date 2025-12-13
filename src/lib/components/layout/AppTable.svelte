@@ -24,7 +24,7 @@
 	import * as DropdownMenu from '$ui/dropdown-menu';
 	import * as Select from '$ui/select';
 	import Badge from '$ui/badge/badge.svelte';
-	import Input from '$ui/input/input.svelte';
+	import Input from '$appui/input.svelte';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];

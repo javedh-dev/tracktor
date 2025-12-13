@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Form from '$ui/form/index.js';
-	import { Input } from '$ui/input/index.js';
+	import FormLabel from '$appui/FormLabel.svelte';
+	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveInsurance } from '$lib/services/insurance.service';
@@ -63,7 +64,7 @@
 		<Form.Field {form} name="provider" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Insurance provider name">Provider</Form.Label>
+					<FormLabel description="Insurance provider name">Provider</FormLabel>
 					<Input {...props} bind:value={$formData.provider} icon={Building2} />
 				{/snippet}
 			</Form.Control>
@@ -73,7 +74,7 @@
 		<Form.Field {form} name="policyNumber" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Insurance policy number">Policy Number</Form.Label>
+					<FormLabel description="Insurance policy number">Policy Number</FormLabel>
 					<Input {...props} bind:value={$formData.policyNumber} icon={IdCard} />
 				{/snippet}
 			</Form.Control>
@@ -83,7 +84,7 @@
 		<Form.Field {form} name="startDate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Insurance start date">Start Date</Form.Label>
+					<FormLabel description="Insurance start date">Start Date</FormLabel>
 					<Input {...props} bind:value={$formData.startDate} icon={Calendar1} type="calendar" />
 				{/snippet}
 			</Form.Control>
@@ -93,7 +94,7 @@
 		<Form.Field {form} name="endDate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Insurance end date">End Date</Form.Label>
+					<FormLabel description="Insurance end date">End Date</FormLabel>
 					<Input {...props} bind:value={$formData.endDate} icon={Calendar1} type="calendar" />
 				{/snippet}
 			</Form.Control>
@@ -103,7 +104,7 @@
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Insurance cost">Cost</Form.Label>
+					<FormLabel description="Insurance cost">Cost</FormLabel>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
 			</Form.Control>
@@ -113,7 +114,7 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Additional notes">Notes</Form.Label>
+					<FormLabel description="Additional notes">Notes</FormLabel>
 					<Textarea
 						{...props}
 						placeholder="Add more details. If any..."

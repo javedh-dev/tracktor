@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Checkbox from '$ui/checkbox/checkbox.svelte';
 	import * as Form from '$ui/form/index.js';
-	import { Input } from '$ui/input/index.js';
+	import FormLabel from '$appui/FormLabel.svelte';
+	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, getFuelUnit, parseDate, roundNumber } from '$lib/helper/format.helper';
 	import { saveFuelLog } from '$lib/services/fuel.service';
@@ -70,7 +71,7 @@
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Date of fuel refill">Date</Form.Label>
+					<FormLabel description="Date of fuel refill">Date</FormLabel>
 					<Input {...props} bind:value={$formData.date} icon={Calendar1} type="calendar" disabled />
 				{/snippet}
 			</Form.Control>
@@ -79,7 +80,7 @@
 		<Form.Field {form} name="odometer" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Current vehicle odometer reading">Odometer</Form.Label>
+					<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
 					<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 				{/snippet}
 			</Form.Control>
@@ -91,9 +92,9 @@
 		<Form.Field {form} name="fuelAmount" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label
+					<FormLabel
 						description={selectedVehicle?.fuelType === 'ev' ? 'Energy consumed' : 'Volume of fuel'}
-						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</Form.Label
+						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</FormLabel
 					>
 					<Input
 						{...props}
@@ -111,9 +112,9 @@
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label
+					<FormLabel
 						description={selectedVehicle?.fuelType === 'ev' ? 'Cost of charging' : 'Cost of refill'}
-						>Cost</Form.Label
+						>Cost</FormLabel
 					>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
@@ -128,14 +129,14 @@
 					{#snippet children({ props })}
 						<div class="flex flex-row items-center gap-2">
 							<Checkbox {...props} bind:checked={$formData.filled} />
-							<Form.Label
+							<FormLabel
 								class="font-normal"
 								description={selectedVehicle?.fuelType === 'ev'
 									? 'Is battery fully charged?'
 									: 'Is tank filled to top?'}
 							>
 								{selectedVehicle?.fuelType === 'ev' ? 'Full Charge' : 'Full Tank'}
-							</Form.Label>
+							</FormLabel>
 						</div>
 					{/snippet}
 				</Form.Control>
@@ -146,9 +147,9 @@
 					{#snippet children({ props })}
 						<div class="flex flex-row items-center gap-2">
 							<Checkbox {...props} bind:checked={$formData.missedLast} />
-							<Form.Label class="font-normal" description="Were any of last entries missed?">
+							<FormLabel class="font-normal" description="Were any of last entries missed?">
 								Missed Last
-							</Form.Label>
+							</FormLabel>
 						</div>
 					{/snippet}
 				</Form.Control>
@@ -158,7 +159,7 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="More details">Notes</Form.Label>
+					<FormLabel description="More details">Notes</FormLabel>
 					<Textarea
 						{...props}
 						placeholder="Add more details. If any..."

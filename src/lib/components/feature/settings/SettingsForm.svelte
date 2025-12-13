@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Form from '$ui/form/index.js';
+	import FormLabel from '$appui/FormLabel.svelte';
 	import * as Select from '$ui/select/index.js';
 	import { configStore } from '$stores/config.svelte';
 	import Calendar from '@lucide/svelte/icons/calendar';
@@ -12,7 +13,7 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod/v4';
-	import Input from '$ui/input/input.svelte';
+	import Input from '$appui/input.svelte';
 	import { data as currencies } from 'currency-codes';
 	import SearchableSelect from '$appui/SearchableSelect.svelte';
 	import {
@@ -99,7 +100,7 @@
 		<Form.Field {form} name="dateFormat" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Choose your preferred date format">Date Format</Form.Label>
+					<FormLabel description="Choose your preferred date format">Date Format</FormLabel>
 					<Input
 						{...props}
 						bind:value={$formData.dateFormat}
@@ -119,7 +120,7 @@
 		<Form.Field {form} name="locale" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Locale for formatting">Locale</Form.Label>
+					<FormLabel description="Locale for formatting">Locale</FormLabel>
 					<Input
 						{...props}
 						bind:value={$formData.locale}
@@ -138,7 +139,7 @@
 		<Form.Field {form} name="timezone" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Choose your timezone for date display">Timezone</Form.Label>
+					<FormLabel description="Choose your timezone for date display">Timezone</FormLabel>
 					<SearchableSelect
 						bind:value={$formData.timezone}
 						options={getTimezoneOptions()}
@@ -154,7 +155,7 @@
 		<Form.Field {form} name="currency" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Choose your preferred currency">Currency</Form.Label>
+					<FormLabel description="Choose your preferred currency">Currency</FormLabel>
 					<!-- <Select.Root bind:value={$formData.currency} type="single">
 							<Select.Trigger {...props} class="w-full">
 								<div class="flex items-center justify-start">
@@ -186,7 +187,7 @@
 		<Form.Field {form} name="unitOfDistance" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Measurement of distance uint">Unit of Distance</Form.Label>
+					<FormLabel description="Measurement of distance uint">Unit of Distance</FormLabel>
 					<Select.Root bind:value={$formData.unitOfDistance} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center justify-start">
@@ -212,7 +213,7 @@
 		<Form.Field {form} name="unitOfVolume" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label description="Measurement of volume unit">Unit of Volume</Form.Label>
+					<FormLabel description="Measurement of volume unit">Unit of Volume</FormLabel>
 					<Select.Root bind:value={$formData.unitOfVolume} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center justify-start">
