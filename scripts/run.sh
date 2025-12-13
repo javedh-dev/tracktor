@@ -2,12 +2,10 @@
 
 # Function to cleanup background processes
 cleanup() {
-    echo "Stopping all processes..."
-
-    if [ ! -z "$FRONTEND_PID" ]; then
-        kill $FRONTEND_PID 2>/dev/null
+    echo "Stopping development server..."
+    if [ ! -z "$DEV_PID" ]; then
+        kill $DEV_PID 2>/dev/null
     fi
-    # Kill any remaining child processes
     pkill -P $$
     exit 0
 }
@@ -16,14 +14,14 @@ cleanup() {
 trap cleanup SIGINT SIGTERM EXIT
 
 # Run database migration
-pnpm db:migrate:dev
+pnpm db:migrate
 
-# Start backend and frontend
+# Start development server
 pnpm dev &
-FRONTEND_PID=$!
+DEV_PID=$!
 
-echo "Frontend PID: $FRONTEND_PID"
-echo "Press Ctrl+C to stop all processes"
+echo "Development server PID: $DEV_PID"
+echo "Press Ctrl+C to stop the server"
 
 # Wait for background processes
 wait

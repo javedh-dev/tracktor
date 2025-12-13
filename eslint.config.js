@@ -29,10 +29,9 @@ export default [
 		rules: {
 			...ts.configs.recommended.rules,
 			'unused-imports/no-unused-imports': 'error',
-			'unused-imports/no-unused-vars': ['off'],
 			'@typescript-eslint/no-explicit-any': 'off',
 			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': ['off'],
+			'@typescript-eslint/no-unused-vars': 'off',
 			'no-prototype-builtins': 'off'
 		}
 	},
@@ -61,7 +60,7 @@ export default [
 			'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-explicit-any': 'off',
 			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': ['error'],
+			'@typescript-eslint/no-unused-vars': 'error',
 			'no-prototype-builtins': 'off'
 		}
 	},
