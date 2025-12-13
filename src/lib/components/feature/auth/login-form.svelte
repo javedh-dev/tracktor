@@ -7,7 +7,6 @@
 	import UserIcon from '@lucide/svelte/icons/circle-user-round';
 	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
 
-	const id = crypto.randomUUID();
 	let username = $state('');
 	let password = $state('');
 	let processing = $state(false);
@@ -36,9 +35,9 @@
 <form onsubmit={handleLogin}>
 	<FieldGroup class="w-full">
 		<Field>
-			<FieldLabel for="email-{id}">Username</FieldLabel>
+			<FieldLabel for="email">Username</FieldLabel>
 			<Input
-				id="email-{id}"
+				id="email"
 				icon={UserIcon}
 				type="text"
 				required
@@ -47,9 +46,9 @@
 			/>
 		</Field>
 		<Field>
-			<FieldLabel for="password-{id}">Password</FieldLabel>
+			<FieldLabel for="password">Password</FieldLabel>
 			<Input
-				id="password-{id}"
+				id="password"
 				type="password"
 				required
 				placeholder="********"
