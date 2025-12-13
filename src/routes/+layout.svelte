@@ -3,11 +3,11 @@
 	import '../styles/app.css';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { Toaster } from '$lib/components/ui/sonner';
-	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import { Toaster } from '$ui/sonner';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
-	import Header from '$lib/components/layout/Header.svelte';
-	import { configStore } from '$lib/stores/config.svelte';
+	import Header from '$layout/Header.svelte';
+	import { configStore } from '$stores/config.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import { toast } from 'svelte-sonner';

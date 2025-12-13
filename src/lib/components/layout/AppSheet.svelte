@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as Sheet from '$lib/components/ui/sheet/index.js';
+	import * as Sheet from '$ui/sheet/index.js';
 	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
-	import { sheetStore } from '$lib/stores/sheet.svelte';
+	import { sheetStore } from '$stores/sheet.svelte';
 
 	let FormComponent = $derived(sheetStore.formComponent);
 	let formData = $derived(sheetStore.formData);

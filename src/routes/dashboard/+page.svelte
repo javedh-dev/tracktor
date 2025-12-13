@@ -1,15 +1,15 @@
 <script lang="ts">
-	import VehicleList from '$lib/components/features/vehicle/VehicleList.svelte';
-	import { vehicleStore } from '$lib/stores/vehicle.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import DashboardTabs from '$lib/components/layout/DashboardTabs.svelte';
+	import VehicleList from '$feature/vehicle/VehicleList.svelte';
+	import { vehicleStore } from '$stores/vehicle.svelte';
+	import Button from '$ui/button/button.svelte';
+	import DashboardTabs from '$layout/DashboardTabs.svelte';
 	import { onMount } from 'svelte';
-	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { sheetStore } from '$lib/stores/sheet.svelte';
-	import VehicleForm from '$lib/components/features/vehicle/VehicleForm.svelte';
-	import { authStore } from '$lib/stores/auth.svelte';
+	import { sheetStore } from '$stores/sheet.svelte';
+	import VehicleForm from '$feature/vehicle/VehicleForm.svelte';
+	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
 
 	onMount(() => {

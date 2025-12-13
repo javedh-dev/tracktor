@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AppSheet from '$lib/components/layout/AppSheet.svelte';
+	import AppSheet from '$layout/AppSheet.svelte';
 
 	let { children } = $props();
 </script>

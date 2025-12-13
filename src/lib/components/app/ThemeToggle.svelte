@@ -3,7 +3,7 @@
 	import MoonIcon from '@lucide/svelte/icons/moon';
 
 	import { toggleMode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$ui/button';
 </script>
 
 <Button onclick={toggleMode} variant="ghost" size="icon">

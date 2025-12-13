@@ -1,0 +1,215 @@
+<script lang="ts">
+	import { Jumper } from 'svelte-loading-spinners';
+	import { type FuelLog } from '$lib/domain/fuel';
+	import { createRawSnippet } from 'svelte';
+	import Badge from '$ui/badge/badge.svelte';
+	import {
+		formatCurrency,
+		formatDate,
+		formatDistance,
+		formatFuel,
+		getMileageUnit
+	} from '$lib/helper/format.helper';
+	import FuelLogContextMenu from './FuelLogContextMenu.svelte';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import Rabbit from '@lucide/svelte/icons/rabbit';
+	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+	import Fuel from '@lucide/svelte/icons/fuel';
+	import Notebook from '@lucide/svelte/icons/notebook';
+	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
+	import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
+	import type { ColumnDef } from '@tanstack/table-core';
+	import { renderComponent, renderSnippet } from '$ui/data-table';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import AppTable from '$layout/AppTable.svelte';
+
+	import { fuelLogStore } from '$stores/fuel-log.svelte';
+	import { vehicleStore } from '$stores/vehicle.svelte';
+
+	// Get the selected vehicle to determine fuel type and units
+	const selectedVehicle = $derived(
+		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
+	);
+	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
+	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Fuel Amount');
+
+	const columns: ColumnDef<FuelLog>[] = [
+		{
+			accessorKey: 'date',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Calendar1,
+					iconClass: 'h-4 w-4',
+					label: 'Date',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const dateCellSnippet = createRawSnippet<[string]>((date) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
+					};
+				});
+				return renderSnippet(dateCellSnippet, row.getValue('date'));
+			}
+		},
+		{
+			accessorKey: 'odometer',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: CircleGauge,
+					iconClass: 'h-4 w-4 ',
+					label: 'Odometer',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
+					const odometer = getOdometer();
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
+					};
+				});
+
+				return renderSnippet(odometerCellSnippet, row.getValue('odometer'));
+			}
+		},
+		{
+			accessorKey: 'filled',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Fuel,
+					iconClass: 'h-4 w-4',
+					label: 'Filled',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => renderSnippet(badge, row.getValue('filled'))
+		},
+		{
+			accessorKey: 'missedLast',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: SquircleDashed,
+					iconClass: 'h-4 w-4',
+					label: 'Missed Last',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => renderSnippet(badge, row.getValue('missedLast'))
+		},
+		{
+			accessorKey: 'fuelAmount',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: PaintBucket,
+					iconClass: 'h-4 w-4 ',
+					label: volumeLabel,
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const fuelAmountCellSnippet = createRawSnippet<[number]>((fuelAmount) => {
+					return {
+						render: () =>
+							`<div class="flex flex-row justify-center">${formatFuel(fuelAmount(), selectedVehicle?.fuelType as string)}</div>`
+					};
+				});
+				return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
+			}
+		},
+		{
+			accessorKey: 'cost',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Banknote,
+					iconClass: 'h-4 w-4 ',
+					label: 'Cost',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((cost) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('cost'));
+			}
+		},
+		{
+			accessorKey: 'mileage',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Rabbit,
+					iconClass: 'h-4 w-4 ',
+					label: selectedVehicle?.fuelType === 'ev' ? 'Efficiency' : 'Mileage',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => {
+				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
+					const unit = getMileageUnit(selectedVehicle?.fuelType as string);
+					return {
+						render: () => {
+							const mileageValue = mileage();
+							const isValidNumber =
+								mileageValue != null && typeof mileageValue === 'number' && !isNaN(mileageValue);
+							return `<div class="flex flex-row justify-center">
+								${!isValidNumber ? '-' : `${mileageValue.toFixed(2)} ${unit}`}
+							</div>`;
+						}
+					};
+				});
+
+				return renderSnippet(costCellSnippet, row.getValue('mileage'));
+			}
+		},
+		{
+			accessorKey: 'notes',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Notebook,
+					iconClass: 'h-4 w-4',
+					label: 'Notes',
+					style: 'justify-start'
+				}),
+			cell: ({ row }) => {
+				const noteSnippet = createRawSnippet<[string]>((note) => {
+					return {
+						render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
+					};
+				});
+				return renderSnippet(noteSnippet, row.getValue('notes'));
+			}
+		},
+		{
+			id: 'actions',
+			cell: ({ row }) =>
+				renderComponent(FuelLogContextMenu, {
+					fuelLog: row.original,
+					onaction: () => {
+						fuelLogStore.refreshFuelLogs();
+					}
+				})
+		}
+	];
+
+	$effect(() => {
+		if (vehicleStore.selectedId) fuelLogStore.refreshFuelLogs();
+	});
+</script>
+
+{#if fuelLogStore.processing}
+	<p class="flex items-center justify-center gap-5 text-lg">
+		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
+	</p>
+{:else if fuelLogStore.error}
+	<p class="text-red-500">Error: {fuelLogStore.error}</p>
+{:else if fuelLogStore.fuelLogs?.length === 0}
+	<p>No fuel refill logs found for this vehicle.</p>
+{:else}
+	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
+{/if}
+
+{#snippet badge(status: boolean)}
+	<div class="flex flex-row justify-center">
+		<Badge variant="outline"><span>{status ? 'Yes' : 'No'}</span></Badge>
+	</div>
+{/snippet}

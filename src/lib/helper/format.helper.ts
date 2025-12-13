@@ -1,4 +1,4 @@
-import configs from '$lib/stores/config.svelte';
+import configs from '$stores/config.svelte';
 import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';

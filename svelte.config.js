@@ -26,12 +26,13 @@ const config = {
 		},
 		alias: {
 			$lib: './src/lib',
-			$appui: './src/lib/components/ui/app',
-			$models: './src/lib/types',
+			$ui: './src/lib/components/ui',
+			$appui: './src/lib/components/app',
+			$layout: './src/lib/components/layout',
+			$feature: './src/lib/components/feature',
 			$stores: './src/lib/stores',
 			$services: './src/lib/services',
 			$helper: './src/lib/helper',
-			$feature: './src/lib/components/features',
 			$server: './src/server'
 		}
 	}

@@ -11,20 +11,20 @@
 		type SortingState,
 		type VisibilityState
 	} from '@tanstack/table-core';
-	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
-	import * as Table from '$lib/components/ui/table/index.js';
-	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import { createSvelteTable, FlexRender } from '$ui/data-table/index.js';
+	import * as Table from '$ui/table/index.js';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import Columns3 from '@lucide/svelte/icons/columns-3';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Search from '@lucide/svelte/icons/search';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import * as Select from '$lib/components/ui/select';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import Button from '$ui/button/button.svelte';
+	import * as DropdownMenu from '$ui/dropdown-menu';
+	import * as Select from '$ui/select';
+	import Badge from '$ui/badge/badge.svelte';
+	import Input from '$ui/input/input.svelte';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];

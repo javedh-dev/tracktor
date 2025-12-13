@@ -20,7 +20,7 @@ import {
 import { CalendarDate } from '@internationalized/date';
 
 // Mock the config store
-vi.mock('$lib/stores/setting', () => ({
+vi.mock('$stores/setting', () => ({
 	config: writable([])
 }));
 

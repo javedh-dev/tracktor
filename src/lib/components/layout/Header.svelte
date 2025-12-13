@@ -2,12 +2,12 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
-	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
-	import { authStore } from '$lib/stores/auth.svelte';
-	import { sheetStore } from '$lib/stores/sheet.svelte';
-	import SettingsForm from '../features/settings/SettingsForm.svelte';
+	import ThemeToggle from '$appui/ThemeToggle.svelte';
+	import { Button } from '$ui/button';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import { authStore } from '$stores/auth.svelte';
+	import { sheetStore } from '$stores/sheet.svelte';
+	import SettingsForm from '../feature/settings/SettingsForm.svelte';
 	import { env } from '$env/dynamic/public';
 </script>
 

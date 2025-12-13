@@ -2,9 +2,9 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import { tick, type Component } from 'svelte';
-	import * as Command from '$lib/components/ui/command/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Command from '$ui/command/index.js';
+	import * as Popover from '$ui/popover/index.js';
+	import { Button } from '$ui/button/index.js';
 	import { cn } from '$lib/utils.js';
 
 	let {

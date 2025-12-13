@@ -1,17 +1,17 @@
 <script lang="ts">
-	import * as Tabs from '$lib/components/ui/tabs';
-	import OverviewTab from '../features/overview/OverviewTab.svelte';
-	import FuelLogTab from '../features/fuel/FuelLogTab.svelte';
-	import MaintenenceLogTab from '../features/maintenance/MaintenenceLogTab.svelte';
-	import InsuranceTab from '../features/insurance/InsuranceTab.svelte';
-	import PollutionTab from '../features/pollution/PollutionTab.svelte';
+	import * as Tabs from '$ui/tabs';
+	import OverviewTab from '../feature/overview/OverviewTab.svelte';
+	import FuelLogTab from '../feature/fuel/FuelLogTab.svelte';
+	import MaintenenceLogTab from '../feature/maintenance/MaintenenceLogTab.svelte';
+	import InsuranceTab from '../feature/insurance/InsuranceTab.svelte';
+	import PollutionTab from '../feature/pollution/PollutionTab.svelte';
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import BadgeInfo from '@lucide/svelte/icons/badge-info';
 	import Fuel from '@lucide/svelte/icons/fuel';
 	import Shield from '@lucide/svelte/icons/shield';
 	import SquareKanban from '@lucide/svelte/icons/square-kanban';
 
-	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 
 	const tabs: {
 		name: string;

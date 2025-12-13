@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
-	import LoginForm from '$lib/components/features/login/LoginForm.svelte';
-	import { authStore } from '$lib/stores/auth.svelte';
+	import LoginForm from '$feature/login/LoginForm.svelte';
+	import { authStore } from '$stores/auth.svelte';
 
 	$effect(() => {
 		if (env.TRACKTOR_DISABLE_AUTH === 'true' || authStore.isLoggedIn) {
