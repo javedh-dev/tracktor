@@ -52,7 +52,7 @@
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = vehicle.image ? `/api/files/${vehicle.image}` : undefined;
+	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : undefined);
 </script>
 
 <div tabindex="0" role="button" {onclick} {onkeydown}>
@@ -133,21 +133,22 @@
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
-						onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log')}
+						onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '', vehicle)}
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 						iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 						icon={Wrench}
-						onclick={() => sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log')}
+						onclick={() =>
+							sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log', '', vehicle)}
 						ariaLabel="Maintenence"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 						iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 						icon={Shield}
-						onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance')}
+						onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance', '', vehicle)}
 						ariaLabel="Insurance"
 					/>
 					<IconButton
@@ -155,7 +156,12 @@
 						iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 						icon={BadgeCheck}
 						onclick={() =>
-							sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate')}
+							sheetStore.openSheet(
+								PollutionCertificateForm,
+								'Add Pollution Certificate',
+								'',
+								vehicle
+							)}
 						ariaLabel="Pollution Certificate"
 					/>
 				</div>

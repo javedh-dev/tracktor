@@ -43,12 +43,12 @@
 		}
 	} satisfies AreaChartPropsObjProp;
 
-	const chartConfig = {
+	const chartConfig = $derived({
 		data: {
 			color,
 			label
 		}
-	} satisfies Chart.ChartConfig;
+	} satisfies Chart.ChartConfig);
 </script>
 
 <div class="bg-background/50 rounded-lg px-4 pt-2 pb-6 lg:p-6">

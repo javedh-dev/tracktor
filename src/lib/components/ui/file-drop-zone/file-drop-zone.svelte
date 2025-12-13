@@ -19,11 +19,15 @@
 		...rest
 	}: FileDropZoneProps = $props();
 
-	if (maxFiles !== undefined && fileCount === undefined) {
-		console.warn(
-			'Make sure to provide FileDropZone with `fileCount` when using the `maxFiles` prompt'
-		);
-	}
+	$effect(() => {
+		const currentMaxFiles = maxFiles;
+		const currentFileCount = fileCount;
+		if (currentMaxFiles !== undefined && currentFileCount === undefined) {
+			console.warn(
+				'Make sure to provide FileDropZone with `fileCount` when using the `maxFiles` prompt'
+			);
+		}
+	});
 
 	let uploading = $state(false);
 
@@ -98,7 +102,8 @@
 		for (let i = 0; i < uploadFiles.length; i++) {
 			const file = uploadFiles[i];
 
-			const rejectedReason = shouldAcceptFile(file, (fileCount ?? 0) + i + 1);
+			const currentFileCount = fileCount ?? 0;
+			const rejectedReason = shouldAcceptFile(file, currentFileCount + i + 1);
 
 			if (rejectedReason) {
 				onFileRejected?.({ file, reason: rejectedReason });
@@ -113,11 +118,19 @@
 		uploading = false;
 	};
 
-	const canUploadFiles = $derived(
-		!disabled &&
+	const canUploadFiles = $derived(() => {
+		const currentMaxFiles = maxFiles;
+		const currentFileCount = fileCount;
+		return (
+			!disabled &&
 			!uploading &&
-			!(maxFiles !== undefined && fileCount !== undefined && fileCount >= maxFiles)
-	);
+			!(
+				currentMaxFiles !== undefined &&
+				currentFileCount !== undefined &&
+				currentFileCount >= currentMaxFiles
+			)
+		);
+	});
 </script>
 
 <label
@@ -144,15 +157,17 @@
 					Drag 'n' drop files here, or click to select files
 				</span>
 				{#if maxFiles || maxFileSize}
+					{@const currentMaxFiles = maxFiles}
+					{@const currentMaxFileSize = maxFileSize}
 					<span class="text-muted-foreground/75 text-sm">
-						{#if maxFiles}
-							<span>You can upload {maxFiles} files</span>
+						{#if currentMaxFiles}
+							<span>You can upload {currentMaxFiles} files</span>
 						{/if}
-						{#if maxFiles && maxFileSize}
-							<span>(up to {displaySize(maxFileSize)} each)</span>
+						{#if currentMaxFiles && currentMaxFileSize}
+							<span>(up to {displaySize(currentMaxFileSize)} each)</span>
 						{/if}
-						{#if maxFileSize && !maxFiles}
-							<span>Maximum size {displaySize(maxFileSize)}</span>
+						{#if currentMaxFileSize && !currentMaxFiles}
+							<span>Maximum size {displaySize(currentMaxFileSize)}</span>
 						{/if}
 					</span>
 				{/if}
@@ -164,7 +179,11 @@
 		disabled={!canUploadFiles}
 		{id}
 		{accept}
-		multiple={maxFiles === undefined || maxFiles - (fileCount ?? 0) > 1}
+		multiple={(() => {
+			const currentMaxFiles = maxFiles;
+			const currentFileCount = fileCount ?? 0;
+			return currentMaxFiles === undefined || currentMaxFiles - currentFileCount > 1;
+		})()}
 		type="file"
 		onchange={change}
 		class="hidden"
