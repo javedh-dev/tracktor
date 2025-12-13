@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" fill="none">
-<rect width="1200" height="1200" fill="#EAEAEA" rx="3"/>
+<!-- <rect width="1200" height="1200" fill="#EAEAEA" rx="3"/> -->
 <g opacity=".5">
 <g opacity=".5">
 <path fill="#FAFAFA" d="M600.709 736.5c-75.454 0-136.621-61.167-136.621-136.62 0-75.454 61.167-136.621 136.621-136.621 75.453 0 136.62 61.167 136.62 136.621 0 75.453-61.167 136.62-136.62 136.62Z"/>
@@ -32,7 +32,8 @@
 </linearGradient><linearGradient id="d" x1="404.85" x2="796.972" y1="403.903" y2="796.02" gradientUnits="userSpaceOnUse">
 <stop stop-color="#C9C9C9" stop-opacity="0"/><stop offset=".208" stop-color="#C9C9C9"/>
 <stop offset=".792" stop-color="#C9C9C9"/><stop offset="1" stop-color="#C9C9C9" stop-opacity="0"/>
-</linearGradient><clipPath id="e"><path fill="#fff" d="M581.364 580.535h38.689v38.689h-38.689z"/>
+</linearGradient>
+<clipPath id="e"><path fill="#fff" d="M581.364 580.535h38.689v38.689h-38.689z"/>
 </clipPath>
 </defs>
 </svg>

@@ -61,11 +61,11 @@
 				{processing ? 'Signing in...' : 'Login'}
 			</Button>
 		</Field>
-		<FieldDescription class="text-center">
+		<!-- <FieldDescription class="text-center">
 			Don't have an account? <a
 				href={'/register'}
 				class="transition-all duration-300 hover:underline">Sign up</a
 			>
-		</FieldDescription>
+		</FieldDescription> -->
 	</FieldGroup>
 </form>

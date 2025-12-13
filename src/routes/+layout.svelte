@@ -32,7 +32,6 @@
 	}
 
 	onMount(() => {
-		configStore.refreshConfigs();
 		detectSWUpdate();
 	});
 </script>

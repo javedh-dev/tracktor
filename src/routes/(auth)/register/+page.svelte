@@ -20,9 +20,8 @@
 		authCheckComplete = true;
 
 		// If already logged in, redirect to dashboard
-		if (authStore.isLoggedIn) {
-			goto('/dashboard', { replaceState: true });
-		}
+		if (authStore.isLoggedIn) goto('/dashboard', { replaceState: true });
+		if (authStore.hasUsers) goto('/login', { replaceState: true });
 	});
 </script>
 
