@@ -50,7 +50,7 @@
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
 			avoid adding any personal info.
 			{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
-				<strong>Default Login: admin / password123</strong>
+				<strong>Default Login: demo / demo</strong>
 			{/if}
 		</LabelWithIcon>
 	</div>

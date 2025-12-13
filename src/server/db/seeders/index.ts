@@ -1,12 +1,11 @@
-import bcrypt from 'bcrypt';
 import {
-	authTable,
 	fuelLogTable,
 	insuranceTable,
 	maintenanceLogTable,
 	pollutionCertificateTable,
 	vehicleTable
 } from '$server/db/schema/index';
+import { createOrUpdateUser } from '$server/services/authService';
 import { db } from '$server/db/index';
 import { faker } from '@faker-js/faker';
 import { env, logger } from '$server/config/index';
@@ -17,25 +16,12 @@ export const seedData = async () => {
 		DEMO_MODE: env.DEMO_MODE
 	});
 
-	if (!env.DEMO_MODE && !env.DISABLE_AUTH && env.AUTH_PIN.trim().length == 6) {
-		await seedAuthPin(env.AUTH_PIN.trim());
-	} else {
-		logger.warn(
-			'Skipping auth PIN setup. Either DEMO_MODE is enabled or AUTH is disabled or AUTH_PIN is invalid.'
-		);
-	}
-
 	if (env.DEMO_MODE && env.NODE_ENV !== 'test') await seedDemoData(env.FORCE_DATA_SEED);
 };
 
-const seedAuthPin = async (pin: string) => {
-	const hash = await bcrypt.hash(pin, 10);
-	await db
-		.insert(authTable)
-		.values({ id: 1, hash })
-		.onConflictDoUpdate({ set: { hash: hash }, target: authTable.id })
-		.run();
-	logger.info('Authentication PIN configured');
+const seedDefaultUser = async () => {
+	await createOrUpdateUser('demo', 'demo');
+	logger.info('Default demo user created!!!');
 };
 
 export const clearDb = async () => {
@@ -47,7 +33,7 @@ export const clearDb = async () => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-	if (!env.DISABLE_AUTH) seedAuthPin('123456');
+	if (!env.DISABLE_AUTH) seedDefaultUser();
 	if (!enforce) {
 		const existingVehicles = await db.$count(vehicleTable);
 		if (existingVehicles > 0) {

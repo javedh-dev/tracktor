@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { env } from '$env/dynamic/public';
 import { apiClient } from '../helper/api.helper';

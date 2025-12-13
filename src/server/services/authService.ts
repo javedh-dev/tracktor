@@ -6,14 +6,7 @@ import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import { type ApiResponse } from '$lib/response';
 import { generateSessionToken, createSession, validateSessionToken, invalidateSession, type User } from '../utils/session';
-import { encodeBase32LowerCaseNoPadding } from '@oslojs/encoding';
 
-// Generate a unique user ID
-function generateUserId(): string {
-	const bytes = new Uint8Array(15);
-	crypto.getRandomValues(bytes);
-	return encodeBase32LowerCaseNoPadding(bytes);
-}
 
 export const createUser = async (username: string, password: string): Promise<ApiResponse> => {
 	// Check if user already exists
@@ -26,7 +19,7 @@ export const createUser = async (username: string, password: string): Promise<Ap
 	}
 
 	const passwordHash = await bcrypt.hash(password, 10);
-	const userId = generateUserId();
+	const userId = crypto.randomUUID();
 
 	await db.insert(schema.usersTable).values({
 		id: userId,
@@ -39,6 +32,26 @@ export const createUser = async (username: string, password: string): Promise<Ap
 		message: 'User created successfully',
 		data: { userId, username }
 	};
+};
+
+export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
+	const existingUser = await db.query.usersTable.findFirst({
+		where: (users, { eq }) => eq(users.username, username)
+	});
+
+	if (!existingUser) {
+		const passwordHash = await bcrypt.hash(password, 10);
+		const userId = crypto.randomUUID();
+
+		await db.insert(schema.usersTable).values({
+			id: userId,
+			username: username,
+			passwordHash
+		});
+	} else {
+		const passwordHash = await bcrypt.hash(password, 10);
+		await db.update(schema.usersTable).set({ passwordHash }).where(eq(schema.usersTable.username, username));
+	}
 };
 
 export const loginUser = async (username: string, password: string): Promise<ApiResponse> => {
@@ -92,61 +105,5 @@ export const getUsersCount = async (): Promise<ApiResponse> => {
 			count: users.length,
 			hasUsers: users.length > 0
 		}
-	};
-};
-
-// Legacy PIN functions (keep for backward compatibility during migration)
-export const setPin = async (pin: string): Promise<ApiResponse> => {
-	const hash = await bcrypt.hash(pin, 10);
-
-	const existingAuth = await db.query.authTable.findFirst({
-		where: (auth, { eq }) => eq(auth.id, 1)
-	});
-
-	if (existingAuth) {
-		await db.update(schema.authTable).set({ hash: hash }).where(eq(schema.authTable.id, 1));
-		return {
-			success: true,
-			message: 'PIN updated successfully.'
-		};
-	} else {
-		await db.insert(schema.authTable).values({ id: 1, hash: hash });
-		return {
-			success: true,
-			message: 'PIN set successfully.'
-		};
-	}
-};
-
-export const verifyPin = async (pin: string): Promise<ApiResponse> => {
-	const auth = await db.query.authTable.findFirst({
-		where: (auth, { eq }) => eq(auth.id, 1)
-	});
-	if (!auth) {
-		throw new AppError('PIN is not set yet. Please set PIN first.', Status.BAD_REQUEST);
-	}
-	const match = await bcrypt.compare(pin, auth.hash);
-	if (match) {
-		return {
-			data: { message: 'PIN verified successfully.' },
-			success: true
-		};
-	} else {
-		throw new AppError(
-			'Incorrect PIN provided. Please try again with correct PIN',
-			Status.UNAUTHORIZED
-		);
-	}
-};
-
-export const getPinStatus = async (): Promise<ApiResponse> => {
-	const auth = await db.query.authTable.findFirst({
-		where: (auth, { eq }) => eq(auth.id, 1)
-	});
-	return {
-		data: {
-			exists: !!auth
-		},
-		success: true
 	};
 };
