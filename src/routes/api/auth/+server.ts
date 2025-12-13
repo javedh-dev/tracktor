@@ -42,11 +42,33 @@ export const POST: RequestHandler = async (event) => {
 	}
 };
 
-// GET /api/auth - Get authentication status
+// GET /api/auth - Get authentication status and validate session
 export const GET: RequestHandler = async (event) => {
 	try {
 		const result = await authService.getUsersCount();
-		return json(result);
+
+		// Check if user has a valid session
+		const sessionToken = event.cookies.get('session');
+		let user = null;
+
+		if (sessionToken) {
+			try {
+				const sessionResult = await authService.validateSession(sessionToken);
+				user = sessionResult.user;
+			} catch (err) {
+				// Session is invalid, but don't throw error - just return null user
+				console.log('Invalid session during auth check:', err);
+			}
+		}
+
+		return json({
+			...result,
+			data: {
+				...result.data,
+				user,
+				isAuthenticated: !!user
+			}
+		});
 	} catch (err) {
 		console.error('Auth GET error:', err);
 

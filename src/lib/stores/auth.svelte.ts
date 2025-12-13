@@ -17,10 +17,8 @@ class AuthStore {
 
 	constructor() {
 		this.isLoggedIn = env.TRACKTOR_DISABLE_AUTH === 'true';
-		if (browser && !this.isLoggedIn) {
-			// Check if user is already logged in via session cookie
-			this.checkAuthStatus();
-		}
+		// Don't automatically check auth status in constructor
+		// Let pages call checkAuthStatus explicitly when needed
 	}
 
 	checkAuthStatus = async () => {
@@ -28,20 +26,19 @@ class AuthStore {
 			const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
 			this.hasUsers = res.data.hasUsers;
 
-			// If we have a session cookie, we might be logged in
-			if (this.hasUsers && document.cookie.includes('session=')) {
-				// Try to make an authenticated request to verify session
-				try {
-					await apiClient.get('/vehicles');
-					this.isLoggedIn = true;
-				} catch {
-					// Session is invalid, user needs to login
-					this.isLoggedIn = false;
-				}
+			// Check if user is authenticated based on server response
+			if (res.data.isAuthenticated && res.data.user) {
+				this.user = res.data.user;
+				this.isLoggedIn = true;
+			} else {
+				this.user = null;
+				this.isLoggedIn = false;
 			}
 		} catch (error) {
 			console.error('Error checking auth status:', error);
 			this.hasUsers = false;
+			this.user = null;
+			this.isLoggedIn = false;
 		}
 	};
 

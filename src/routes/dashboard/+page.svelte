@@ -12,10 +12,15 @@
 	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
 
-	onMount(() => {
+	onMount(async () => {
+		// Wait for auth status check to complete
+		await authStore.checkAuthStatus();
+
 		if (!authStore.isLoggedIn) {
 			goto('/login', { replaceState: true });
+			return;
 		}
+
 		vehicleStore.refreshVehicles();
 	});
 </script>
