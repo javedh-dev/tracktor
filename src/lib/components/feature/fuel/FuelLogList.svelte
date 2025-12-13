@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Jumper } from 'svelte-loading-spinners';
 	import { type FuelLog } from '$lib/domain/fuel';
-	import { createRawSnippet } from 'svelte';
+
 	import Badge from '$ui/badge/badge.svelte';
 	import {
 		formatCurrency,
@@ -44,14 +44,7 @@
 					label: 'Date',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const dateCellSnippet = createRawSnippet<[string]>((date) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
-					};
-				});
-				return renderSnippet(dateCellSnippet, row.getValue('date'));
-			}
+			cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
 		},
 		{
 			accessorKey: 'odometer',
@@ -62,17 +55,7 @@
 					label: 'Odometer',
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => {
-				const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
-					const odometer = getOdometer();
-					return {
-						render: () =>
-							`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
-					};
-				});
-
-				return renderSnippet(odometerCellSnippet, row.getValue('odometer'));
-			}
+			cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
 		},
 		{
 			accessorKey: 'filled',
@@ -83,7 +66,7 @@
 					label: 'Filled',
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => renderSnippet(badge, row.getValue('filled'))
+			cell: ({ row }) => renderSnippet(badge, { value: row.getValue('filled') })
 		},
 		{
 			accessorKey: 'missedLast',
@@ -94,7 +77,7 @@
 					label: 'Missed Last',
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => renderSnippet(badge, row.getValue('missedLast'))
+			cell: ({ row }) => renderSnippet(badge, { value: row.getValue('missedLast') })
 		},
 		{
 			accessorKey: 'fuelAmount',
@@ -105,15 +88,11 @@
 					label: volumeLabel,
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => {
-				const fuelAmountCellSnippet = createRawSnippet<[number]>((fuelAmount) => {
-					return {
-						render: () =>
-							`<div class="flex flex-row justify-center">${formatFuel(fuelAmount(), selectedVehicle?.fuelType as string)}</div>`
-					};
-				});
-				return renderSnippet(fuelAmountCellSnippet, row.getValue('fuelAmount'));
-			}
+			cell: ({ row }) =>
+				renderSnippet(fuelAmountCell, {
+					amount: row.getValue('fuelAmount'),
+					fuelType: selectedVehicle?.fuelType
+				})
 		},
 		{
 			accessorKey: 'cost',
@@ -124,15 +103,7 @@
 					label: 'Cost',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const costCellSnippet = createRawSnippet<[number]>((cost) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
-					};
-				});
-
-				return renderSnippet(costCellSnippet, row.getValue('cost'));
-			}
+			cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
 		},
 		{
 			accessorKey: 'mileage',
@@ -143,23 +114,11 @@
 					label: selectedVehicle?.fuelType === 'ev' ? 'Efficiency' : 'Mileage',
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => {
-				const costCellSnippet = createRawSnippet<[number]>((mileage) => {
-					const unit = getMileageUnit(selectedVehicle?.fuelType as string);
-					return {
-						render: () => {
-							const mileageValue = mileage();
-							const isValidNumber =
-								mileageValue != null && typeof mileageValue === 'number' && !isNaN(mileageValue);
-							return `<div class="flex flex-row justify-center">
-								${!isValidNumber ? '-' : `${mileageValue.toFixed(2)} ${unit}`}
-							</div>`;
-						}
-					};
-				});
-
-				return renderSnippet(costCellSnippet, row.getValue('mileage'));
-			}
+			cell: ({ row }) =>
+				renderSnippet(mileageCell, {
+					mileage: row.getValue('mileage'),
+					fuelType: selectedVehicle?.fuelType
+				})
 		},
 		{
 			accessorKey: 'notes',
@@ -170,14 +129,7 @@
 					label: 'Notes',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const noteSnippet = createRawSnippet<[string]>((note) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
-					};
-				});
-				return renderSnippet(noteSnippet, row.getValue('notes'));
-			}
+			cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
 		},
 		{
 			id: 'actions',
@@ -208,8 +160,39 @@
 	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}
 
-{#snippet badge(status: boolean)}
+{#snippet badge(params: any)}
 	<div class="flex flex-row justify-center">
-		<Badge variant="outline"><span>{status ? 'Yes' : 'No'}</span></Badge>
+		<Badge variant="outline"><span>{params.value ? 'Yes' : 'No'}</span></Badge>
 	</div>
+{/snippet}
+
+{#snippet dateCell(params: any)}
+	<div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+{/snippet}
+
+{#snippet odometerCell(params: any)}
+	<div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+{/snippet}
+
+{#snippet fuelAmountCell(params: any)}
+	<div class="flex flex-row justify-center">
+		{formatFuel(params.amount, params.fuelType as string)}
+	</div>
+{/snippet}
+
+{#snippet costCell(params: any)}
+	<div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+{/snippet}
+
+{#snippet mileageCell(params: any)}
+	{@const unit = getMileageUnit(params.fuelType as string)}
+	{@const isValidNumber =
+		params.mileage != null && typeof params.mileage === 'number' && !isNaN(params.mileage)}
+	<div class="flex flex-row justify-center">
+		{!isValidNumber ? '-' : `${params.mileage.toFixed(2)} ${unit}`}
+	</div>
+{/snippet}
+
+{#snippet notesCell(params: any)}
+	<div class="flex flex-row justify-start">{params.value || '-'}</div>
 {/snippet}

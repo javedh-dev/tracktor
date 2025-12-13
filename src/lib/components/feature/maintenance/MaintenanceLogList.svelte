@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createRawSnippet } from 'svelte';
 	import { formatCurrency, formatDate, formatDistance } from '$lib/helper/format.helper';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
@@ -26,14 +25,7 @@
 					label: 'Date',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const dateCellSnippet = createRawSnippet<[string]>((date) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${formatDate(date())}</div>`
-					};
-				});
-				return renderSnippet(dateCellSnippet, row.getValue('date'));
-			}
+			cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
 		},
 		{
 			accessorKey: 'odometer',
@@ -44,17 +36,7 @@
 					label: 'Odometer',
 					style: 'justify-center'
 				}),
-			cell: ({ row }) => {
-				const odometerCellSnippet = createRawSnippet<[number]>((getOdometer) => {
-					const odometer = getOdometer();
-					return {
-						render: () =>
-							`<div class="flex flex-row justify-center">${formatDistance(odometer)}</div>`
-					};
-				});
-
-				return renderSnippet(odometerCellSnippet, row.getValue('odometer'));
-			}
+			cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
 		},
 		{
 			accessorKey: 'serviceCenter',
@@ -65,15 +47,7 @@
 					label: 'Service Center',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const odometerCellSnippet = createRawSnippet<[number]>((serviceCenter) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${serviceCenter()}</div>`
-					};
-				});
-
-				return renderSnippet(odometerCellSnippet, row.getValue('serviceCenter'));
-			}
+			cell: ({ row }) => renderSnippet(serviceCenterCell, { value: row.getValue('serviceCenter') })
 		},
 		{
 			accessorKey: 'cost',
@@ -84,15 +58,7 @@
 					label: 'Cost',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const costCellSnippet = createRawSnippet<[number]>((cost) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${formatCurrency(cost())}</div>`
-					};
-				});
-
-				return renderSnippet(costCellSnippet, row.getValue('cost'));
-			}
+			cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
 		},
 		{
 			accessorKey: 'notes',
@@ -103,14 +69,7 @@
 					label: 'Notes',
 					style: 'justify-start'
 				}),
-			cell: ({ row }) => {
-				const noteSnippet = createRawSnippet<[string]>((note) => {
-					return {
-						render: () => `<div class="flex flex-row justify-start">${note() || '-'}</div>`
-					};
-				});
-				return renderSnippet(noteSnippet, row.getValue('notes'));
-			}
+			cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
 		},
 		{
 			id: 'actions',
@@ -140,3 +99,23 @@
 {:else}
 	<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
 {/if}
+
+{#snippet dateCell(params: any)}
+	<div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+{/snippet}
+
+{#snippet odometerCell(params: any)}
+	<div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+{/snippet}
+
+{#snippet serviceCenterCell(params: any)}
+	<div class="flex flex-row justify-start">{params.value}</div>
+{/snippet}
+
+{#snippet costCell(params: any)}
+	<div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+{/snippet}
+
+{#snippet notesCell(params: any)}
+	<div class="flex flex-row justify-start">{params.value || '-'}</div>
+{/snippet}
