@@ -50,6 +50,7 @@ ENV DB_PATH=/data/tracktor.db
 ENV LOG_LEVEL=info
 ENV LOG_DIR=/data/logs
 ENV UPLOADS_DIR=/data/uploads
+ENV BODY_SIZE_LIMIT=Infinity
 
 # Start the application
 CMD ["node", "build"]
