@@ -17,5 +17,6 @@ export const pollutionCertificateTable = table('pollution_certificates', {
 	expiryDate: t.text().notNull(),
 	testingCenter: t.text().notNull(),
 	notes: t.text(),
+	attachment: t.text(),
 	...timestamps
 });

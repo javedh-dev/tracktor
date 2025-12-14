@@ -10,6 +10,7 @@ export interface Insurance {
 	endDate: Date;
 	cost: number;
 	notes: string | null;
+	attachment: string | null;
 }
 
 export const insuranceSchema = z.object({
@@ -40,7 +41,8 @@ export const insuranceSchema = z.object({
 		}
 	}, 'Invalid date format'),
 	cost: z.float32().positive(),
-	notes: z.string().nullable()
+	notes: z.string().nullable(),
+	attachment: z.string().nullable()
 });
 
 export type InsuranceSchema = typeof insuranceSchema;

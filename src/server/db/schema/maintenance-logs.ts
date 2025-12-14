@@ -17,5 +17,6 @@ export const maintenanceLogTable = table('maintenance_logs', {
 	serviceCenter: t.text().notNull(),
 	cost: t.real().notNull(),
 	notes: t.text(),
+	attachment: t.text(),
 	...timestamps
 });

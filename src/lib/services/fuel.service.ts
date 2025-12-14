@@ -1,5 +1,24 @@
 import type { FuelLog, Response } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
+import { uploadFile } from './file.service';
+
+export const saveFuelLogWithAttachment = async (
+	fuelLog: FuelLog,
+	attachment: File | undefined
+): Promise<Response<FuelLog>> => {
+	if (attachment) {
+		try {
+			const res = await uploadFile(attachment);
+			fuelLog.attachment = res.data.filename || null;
+		} catch (e: any) {
+			return {
+				status: 'ERROR',
+				error: e.response?.data?.message || 'Failed to upload attachment'
+			};
+		}
+	}
+	return saveFuelLog(fuelLog);
+};
 
 export const saveFuelLog = async (fuelLog: FuelLog): Promise<Response<FuelLog>> => {
 	const res: Response<FuelLog> = { status: 'OK' };

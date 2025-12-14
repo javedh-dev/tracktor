@@ -18,5 +18,6 @@ export const insuranceTable = table('insurances', {
 	endDate: t.text().notNull(),
 	cost: t.real().notNull(),
 	notes: t.text(),
+	attachment: t.text(),
 	...timestamps
 });

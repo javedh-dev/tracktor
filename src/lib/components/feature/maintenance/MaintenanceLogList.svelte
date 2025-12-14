@@ -5,6 +5,10 @@
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 	import Notebook from '@lucide/svelte/icons/notebook';
 	import Wrench from '@lucide/svelte/icons/wrench';
+	import Paperclip from '@lucide/svelte/icons/paperclip';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Image from '@lucide/svelte/icons/image';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import { Jumper } from 'svelte-loading-spinners';
 	import AppTable from '$layout/AppTable.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
@@ -72,6 +76,17 @@
 			cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
 		},
 		{
+			accessorKey: 'attachment',
+			header: () =>
+				renderComponent(LabelWithIcon, {
+					icon: Paperclip,
+					iconClass: 'h-4 w-4',
+					label: 'Attachment',
+					style: 'justify-center'
+				}),
+			cell: ({ row }) => renderSnippet(attachmentCell, { value: row.getValue('attachment') })
+		},
+		{
 			id: 'actions',
 			cell: ({ row }) =>
 				renderComponent(MaintenanceContextMenu, {
@@ -118,4 +133,26 @@
 
 {#snippet notesCell(params: any)}
 	<div class="flex flex-row justify-start">{params.value || '-'}</div>
+{/snippet}
+
+{#snippet attachmentCell(params: any)}
+	<div class="flex flex-row justify-center">
+		{#if params.value}
+			{@const fileName = params.value}
+			{@const isPdf = fileName.toLowerCase().endsWith('.pdf')}
+			{@const Icon = isPdf ? FileText : Image}
+			<a
+				href="/api/files/{fileName}"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+				title="View attachment"
+			>
+				<Icon class="h-4 w-4" />
+				<ExternalLink class="h-3 w-3" />
+			</a>
+		{:else}
+			<span class="text-muted-foreground">-</span>
+		{/if}
+	</div>
 {/snippet}

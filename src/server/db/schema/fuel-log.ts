@@ -19,5 +19,6 @@ export const fuelLogTable = table('fuel_logs', {
 	filled: t.integer({ mode: 'boolean' }).notNull(),
 	missedLast: t.integer({ mode: 'boolean' }).notNull(),
 	notes: t.text(),
+	attachment: t.text(),
 	...timestamps
 });

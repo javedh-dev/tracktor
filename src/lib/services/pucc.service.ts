@@ -1,5 +1,24 @@
 import type { Response, PollutionCertificate } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
+import { uploadFile } from './file.service';
+
+export const savePuccWithAttachment = async (
+	certificate: PollutionCertificate,
+	attachment: File | undefined
+): Promise<Response<PollutionCertificate>> => {
+	if (attachment) {
+		try {
+			const res = await uploadFile(attachment);
+			certificate.attachment = res.data.filename || null;
+		} catch (e: any) {
+			return {
+				status: 'ERROR',
+				error: e.response?.data?.message || 'Failed to upload attachment'
+			};
+		}
+	}
+	return savePucc(certificate);
+};
 
 export const savePucc = async (
 	certificate: PollutionCertificate
@@ -31,4 +50,5 @@ export const deletePucc = async (pucc: PollutionCertificate): Promise<Response<s
 };
 // Backward compatibility aliases
 export const savePollutionCertificate = savePucc;
+export const savePollutionCertificateWithAttachment = savePuccWithAttachment;
 export const deletePollutionCertificate = deletePucc;

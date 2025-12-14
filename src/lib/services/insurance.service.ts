@@ -1,5 +1,24 @@
 import type { Response, Insurance } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
+import { uploadFile } from './file.service';
+
+export const saveInsuranceWithAttachment = async (
+	insurance: Insurance,
+	attachment: File | undefined
+): Promise<Response<Insurance>> => {
+	if (attachment) {
+		try {
+			const res = await uploadFile(attachment);
+			insurance.attachment = res.data.filename || null;
+		} catch (e: any) {
+			return {
+				status: 'ERROR',
+				error: e.response?.data?.message || 'Failed to upload attachment'
+			};
+		}
+	}
+	return saveInsurance(insurance);
+};
 
 export const saveInsurance = async (insurance: Insurance): Promise<Response<Insurance>> => {
 	const res: Response<Insurance> = { status: 'OK' };

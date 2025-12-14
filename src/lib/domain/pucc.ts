@@ -9,6 +9,7 @@ export interface PollutionCertificate {
 	expiryDate: Date;
 	testingCenter: string;
 	notes: string | null;
+	attachment: string | null;
 }
 
 export const pollutionCertificateSchema = z.object({
@@ -38,7 +39,8 @@ export const pollutionCertificateSchema = z.object({
 		.string()
 		.min(2, 'It must be more than 1 character.')
 		.max(100, 'It must be less than 100 characters.'),
-	notes: z.string().nullable()
+	notes: z.string().nullable(),
+	attachment: z.string().nullable()
 });
 
 export type PollutionCertificateSchema = typeof pollutionCertificateSchema;

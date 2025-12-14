@@ -1,5 +1,24 @@
 import type { Response, MaintenanceLog } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
+import { uploadFile } from './file.service';
+
+export const saveMaintenanceLogWithAttachment = async (
+	maintenanceLog: MaintenanceLog,
+	attachment: File | undefined
+): Promise<Response<MaintenanceLog>> => {
+	if (attachment) {
+		try {
+			const res = await uploadFile(attachment);
+			maintenanceLog.attachment = res.data.filename || null;
+		} catch (e: any) {
+			return {
+				status: 'ERROR',
+				error: e.response?.data?.message || 'Failed to upload attachment'
+			};
+		}
+	}
+	return saveMaintenanceLog(maintenanceLog);
+};
 
 export const saveMaintenanceLog = async (
 	maintenanceLog: MaintenanceLog

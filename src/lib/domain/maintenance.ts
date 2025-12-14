@@ -9,6 +9,7 @@ export interface MaintenanceLog {
 	serviceCenter: string;
 	cost: number;
 	notes: string | null;
+	attachment: string | null;
 }
 
 export const maintenanceSchema = z.object({
@@ -28,7 +29,8 @@ export const maintenanceSchema = z.object({
 		.min(2, 'It must be more than 1 character.')
 		.max(50, 'It must be less than 50 characters.'),
 	cost: z.float32().positive(),
-	notes: z.string().nullable()
+	notes: z.string().nullable(),
+	attachment: z.string().nullable()
 });
 
 export type MaintenanceSchema = typeof maintenanceSchema;

@@ -13,20 +13,32 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { maintenanceStore } from '$stores/maintenance.svelte';
-	import { saveMaintenanceLog } from '$lib/services/maintenance.service';
+	import { saveMaintenanceLogWithAttachment } from '$lib/services/maintenance.service';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
 
 	let { data } = $props();
+
+	let attachment = $state<File>();
+
+	// For showing existing attachment when editing
+	const existingAttachmentUrl = $derived(
+		data?.attachment ? `/api/files/${data.attachment}` : undefined
+	);
 
 	const form = superForm(defaults(zod4(maintenanceSchema)), {
 		validators: zod4(maintenanceSchema),
 		SPA: true,
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
-				saveMaintenanceLog({ ...f.data, date: parseDate(f.data.date) }).then((res) => {
+				saveMaintenanceLogWithAttachment(
+					{ ...f.data, date: parseDate(f.data.date) },
+					attachment
+				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(`Maintenance Log ${data ? 'updated' : 'saved'} successfully...!!!`);
+						attachment = undefined;
 						sheetStore.closeSheet(maintenanceStore.refreshMaintenanceLogs);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
@@ -38,7 +50,7 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data) formData.set({ ...data, date: formatDate(data.date) });
+		if (data) formData.set({ ...data, date: formatDate(data.date), attachment: null });
 		formData.update((fd) => {
 			return {
 				...fd,
@@ -51,6 +63,12 @@
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="flex flex-col gap-4">
 		<!-- <div class="flex w-full flex-row gap-4"> -->
+		<Form.Field {form} name="attachment" class="w-full">
+			<Form.Control>
+				<FormLabel description="Upload receipt or maintenance document">Attachment</FormLabel>
+				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+			</Form.Control>
+		</Form.Field>
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}

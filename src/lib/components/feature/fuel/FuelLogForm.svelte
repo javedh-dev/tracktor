@@ -5,8 +5,9 @@
 	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, getFuelUnit, parseDate, roundNumber } from '$lib/helper/format.helper';
-	import { saveFuelLog } from '$lib/services/fuel.service';
+	import { saveFuelLogWithAttachment } from '$lib/services/fuel.service';
 	import { fuelLogStore } from '$stores/fuel-log.svelte';
+	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
 	import { fuelSchema } from '$lib/domain/fuel';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
@@ -21,6 +22,8 @@
 
 	let { data } = $props();
 
+	let attachment = $state<File>();
+
 	// Get the selected vehicle to determine fuel type and units
 	const selectedVehicle = $derived(
 		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
@@ -28,20 +31,28 @@
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
 	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Volume');
 
+	// For showing existing attachment when editing
+	const existingAttachmentUrl = $derived(
+		data?.attachment ? `/api/files/${data.attachment}` : undefined
+	);
+
 	const form = superForm(defaults(zod4(fuelSchema)), {
 		validators: zod4(fuelSchema),
 		SPA: true,
 		validationMethod: 'onsubmit',
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
-				saveFuelLog({ ...f.data, date: parseDate(f.data.date) }).then((res) => {
-					if (res.status == 'OK') {
-						toast.success(`FuelLog ${data ? 'updated' : 'saved'} successfully...!!!`);
-						sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
-					} else {
-						toast.error(`Error while saving : ${res.error}`);
+				saveFuelLogWithAttachment({ ...f.data, date: parseDate(f.data.date) }, attachment).then(
+					(res) => {
+						if (res.status == 'OK') {
+							toast.success(`FuelLog ${data ? 'updated' : 'saved'} successfully...!!!`);
+							attachment = undefined;
+							sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
+						} else {
+							toast.error(`Error while saving : ${res.error}`);
+						}
 					}
-				});
+				);
 			}
 		}
 	});
@@ -54,7 +65,8 @@
 				...data,
 				date: formatDate(data.date),
 				fuelAmount: roundNumber(data.fuelAmount),
-				cost: roundNumber(data.cost)
+				cost: roundNumber(data.cost),
+				attachment: null // Don't include attachment in form data, handle separately
 			});
 		formData.update((fd) => {
 			return {
@@ -68,6 +80,12 @@
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="flex flex-col gap-4">
 		<!-- <div class="flex w-full flex-row gap-4"> -->
+		<Form.Field {form} name="attachment" class="w-full">
+			<Form.Control>
+				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
+				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+			</Form.Control>
+		</Form.Field>
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}

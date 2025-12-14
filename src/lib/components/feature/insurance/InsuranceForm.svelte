@@ -4,9 +4,10 @@
 	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
-	import { saveInsurance } from '$lib/services/insurance.service';
+	import { saveInsuranceWithAttachment } from '$lib/services/insurance.service';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import { insuranceSchema } from '$lib/domain/insurance';
+	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -19,18 +20,29 @@
 
 	let { data } = $props();
 
+	let attachment = $state<File>();
+
+	// For showing existing attachment when editing
+	const existingAttachmentUrl = $derived(
+		data?.attachment ? `/api/files/${data.attachment}` : undefined
+	);
+
 	const form = superForm(defaults(zod4(insuranceSchema)), {
 		validators: zod4(insuranceSchema),
 		SPA: true,
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
-				saveInsurance({
-					...f.data,
-					startDate: parseDate(f.data.startDate),
-					endDate: parseDate(f.data.endDate)
-				}).then((res) => {
+				saveInsuranceWithAttachment(
+					{
+						...f.data,
+						startDate: parseDate(f.data.startDate),
+						endDate: parseDate(f.data.endDate)
+					},
+					attachment
+				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(`Insurance ${data ? 'updated' : 'saved'} successfully...!!!`);
+						attachment = undefined;
 						sheetStore.closeSheet(() => insuranceStore.refreshInsurances());
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
@@ -48,7 +60,8 @@
 			formData.set({
 				...data,
 				startDate: formatDate(data.startDate),
-				endDate: formatDate(data.endDate)
+				endDate: formatDate(data.endDate),
+				attachment: null
 			});
 		formData.update((fd) => {
 			return {
@@ -61,6 +74,12 @@
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="flex flex-col gap-4">
+		<Form.Field {form} name="attachment" class="w-full">
+			<Form.Control>
+				<FormLabel description="Upload policy document">Attachment</FormLabel>
+				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+			</Form.Control>
+		</Form.Field>
 		<Form.Field {form} name="provider" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -125,7 +144,6 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-
 		<Form.Button>Submit</Form.Button>
 	</div>
 </form>

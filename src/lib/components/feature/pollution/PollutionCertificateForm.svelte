@@ -4,9 +4,10 @@
 	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
-	import { savePollutionCertificate } from '$lib/services/pucc.service';
+	import { savePollutionCertificateWithAttachment } from '$lib/services/pucc.service';
 	import { puccStore } from '$stores/pucc.svelte';
 	import { pollutionCertificateSchema } from '$lib/domain/pucc';
+	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
@@ -19,20 +20,31 @@
 
 	let { data } = $props();
 
+	let attachment = $state<File>();
+
+	// For showing existing attachment when editing
+	const existingAttachmentUrl = $derived(
+		data?.attachment ? `/api/files/${data.attachment}` : undefined
+	);
+
 	const form = superForm(defaults(zod4(pollutionCertificateSchema)), {
 		validators: zod4(pollutionCertificateSchema),
 		SPA: true,
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
-				savePollutionCertificate({
-					...f.data,
-					issueDate: parseDate(f.data.issueDate),
-					expiryDate: parseDate(f.data.expiryDate)
-				}).then((res) => {
+				savePollutionCertificateWithAttachment(
+					{
+						...f.data,
+						issueDate: parseDate(f.data.issueDate),
+						expiryDate: parseDate(f.data.expiryDate)
+					},
+					attachment
+				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(
 							`Pollution Certificate ${puccStore.editMode ? 'updated' : 'saved'} successfully...!!!`
 						);
+						attachment = undefined;
 						sheetStore.closeSheet(puccStore.refreshPuccs);
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
@@ -48,7 +60,8 @@
 			formData.set({
 				...data,
 				issueDate: formatDate(data.issueDate),
-				expiryDate: formatDate(data.expiryDate)
+				expiryDate: formatDate(data.expiryDate),
+				attachment: null
 			});
 		formData.update((fd) => {
 			return {
@@ -61,6 +74,13 @@
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="flex flex-col gap-4">
+		<Form.Field {form} name="attachment" class="w-full">
+			<Form.Control>
+				<FormLabel description="Upload certificate document">Attachment</FormLabel>
+				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+			</Form.Control>
+		</Form.Field>
+
 		<Form.Field {form} name="certificateNumber" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -115,7 +135,6 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-
 		<Form.Button>Submit</Form.Button>
 	</div>
 </form>

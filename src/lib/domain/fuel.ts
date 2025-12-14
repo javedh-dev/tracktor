@@ -11,6 +11,7 @@ export interface FuelLog {
 	fuelAmount: number;
 	cost: number;
 	notes: string | null;
+	attachment: string | null;
 	mileage?: number;
 }
 
@@ -30,7 +31,8 @@ export const fuelSchema = z.object({
 	missedLast: z.boolean(),
 	fuelAmount: z.float32().positive(),
 	cost: z.float32().positive(),
-	notes: z.string().nullable()
+	notes: z.string().nullable(),
+	attachment: z.string().nullable()
 });
 
 export type FuelSchema = typeof fuelSchema;
