@@ -1,7 +1,0 @@
-node_modules
-.env
-tracktor.db
-build/
-uploads/
-logs/
-coverage/
