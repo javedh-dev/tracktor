@@ -5,6 +5,4 @@ export const appAsciiArt = `
                      / /_/ /  / /_/ / /__/ ,< / /_/ /_/ / /        
                      \\__/_/   \\__,_/\\___/_/|_|\\__/\\____/_/         
 `;
-
-export { env, validateEnvironment } from './env';
 export { default as logger } from './logger';

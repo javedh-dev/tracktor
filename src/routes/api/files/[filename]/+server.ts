@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { env } from '$server/config/env';
+import { serverEnv } from '$lib/config/env';
 import path from 'path';
 import { readFile } from 'fs/promises';
 
@@ -17,7 +17,7 @@ export const GET: RequestHandler = async (event) => {
 			throw error(400, 'Invalid filename');
 		}
 
-		const filePath = path.join(env.UPLOADS_DIR, filename);
+		const filePath = path.join(serverEnv?.UPLOADS_DIR || './uploads', filename);
 
 		try {
 			const fileBuffer = await readFile(filePath);

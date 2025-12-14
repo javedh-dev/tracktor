@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { env } from '$server/config/env';
+import { serverEnv } from '$lib/config/env';
 import path from 'path';
 import { writeFile } from 'fs/promises';
 
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async (event) => {
 		// Generate unique filename
 		const buffer = await file.arrayBuffer();
 		const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-		const filePath = path.join(env.UPLOADS_DIR, filename);
+		const filePath = path.join(serverEnv?.UPLOADS_DIR || './uploads', filename);
 
 		// Save file to uploads directory
 		try {

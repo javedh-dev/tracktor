@@ -1,4 +1,4 @@
-import { env } from '$server/config';
+import { env, serverEnv } from '$lib/config/env';
 import type { RequestEvent } from '@sveltejs/kit';
 import { BaseMiddleware, type MiddlewareResult } from './base';
 
@@ -24,17 +24,17 @@ export class CorsMiddleware extends BaseMiddleware {
         }
 
         // If wildcard is configured, allow any origin
-        if (env.CORS_ORIGINS.includes('*')) {
+        if (serverEnv?.CORS_ORIGINS.includes('*')) {
             return '*';
         }
 
         // Check if request origin is in allowed origins
-        if (env.CORS_ORIGINS.includes(requestOrigin)) {
+        if (serverEnv?.CORS_ORIGINS.includes(requestOrigin)) {
             return requestOrigin;
         }
 
         // Default to first configured origin if request origin is not allowed
-        return env.CORS_ORIGINS[0] || '*';
+        return serverEnv?.CORS_ORIGINS[0] || '*';
     }
 
     private handleCorsOptions(request: Request): Response {

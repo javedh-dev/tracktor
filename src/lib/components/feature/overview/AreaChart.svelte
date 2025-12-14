@@ -74,7 +74,7 @@
 				props={chartProps}
 			>
 				{#snippet tooltip()}
-					<Chart.Tooltip labelFormatter={xFormatter} indicator="line" valueFormatter={yFormatter} />
+					<Chart.Tooltip labelFormatter={xFormatter} indicator="line" />
 				{/snippet}
 				{#snippet marks({ series, getAreaProps })}
 					{#each series as s, i (s.key)}

@@ -7,13 +7,12 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
 	import Header from '$layout/Header.svelte';
-	import { configStore } from '$stores/config.svelte';
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
+	import { env } from '$lib/config/env';
 	import { toast } from 'svelte-sonner';
 
 	let { children } = $props();
-	let demoMode = env.TRACKTOR_DEMO_MODE === 'true';
+	let demoMode = env.DEMO_MODE;
 
 	async function detectSWUpdate() {
 		const registrations = await navigator?.serviceWorker?.ready;
@@ -48,7 +47,7 @@
 		>
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
 			avoid adding any personal info.
-			{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
+			{#if !env.DISABLE_AUTH}
 				<strong>Default Login: demo / demo</strong>
 			{/if}
 		</LabelWithIcon>

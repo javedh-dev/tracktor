@@ -8,7 +8,7 @@
 	import { authStore } from '$stores/auth.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import SettingsForm from '../feature/settings/SettingsForm.svelte';
-	import { env } from '$env/dynamic/public';
+	import { env } from '$lib/config/env';
 </script>
 
 <header
@@ -33,7 +33,7 @@
 					>
 						<Settings class="h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					{#if env.TRACKTOR_DISABLE_AUTH !== 'true'}
+					{#if !env.DISABLE_AUTH}
 						<Button variant="ghost" onclick={authStore.logout}>
 							<LogOut class="h-[1.2rem] w-[1.2rem]" />
 						</Button>

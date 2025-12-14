@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { env } from '$env/dynamic/public';
+import { env } from '$lib/config/env';
 import { apiClient } from '../helper/api.helper';
 import type { ApiResponse } from '../response';
 import { toast } from 'svelte-sonner';
@@ -15,9 +15,7 @@ class AuthStore {
 	hasUsers = $state<boolean>(false);
 
 	constructor() {
-		this.isLoggedIn = env.TRACKTOR_DISABLE_AUTH === 'true';
-		// Don't automatically check auth status in constructor
-		// Let pages call checkAuthStatus explicitly when needed
+		this.isLoggedIn = env.DISABLE_AUTH;
 	}
 
 	checkAuthStatus = async () => {
@@ -25,7 +23,6 @@ class AuthStore {
 			const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
 			this.hasUsers = res.data.hasUsers;
 
-			// Check if user is authenticated based on server response
 			if (res.data.isAuthenticated && res.data.user) {
 				this.user = res.data.user;
 				this.isLoggedIn = true;
@@ -98,11 +95,6 @@ class AuthStore {
 		}
 	};
 
-	// Legacy method for backward compatibility
-	isPinConfigured = async () => {
-		const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
-		return res.data.hasUsers;
-	};
 }
 
 export const authStore = new AuthStore();

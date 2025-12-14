@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { AppError } from '$server/exceptions/AppError';
+import { env } from '$lib/config/env';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
@@ -20,7 +21,7 @@ export const POST: RequestHandler = async (event) => {
 			event.cookies.set('session', result.data.sessionToken, {
 				path: '/',
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
+				secure: env.NODE_ENV === 'production',
 				sameSite: 'lax',
 				maxAge: 60 * 60 * 24 * 30 // 30 days
 			});
