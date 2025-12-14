@@ -20,7 +20,9 @@ export async function applyPatches(): Promise<void> {
  */
 async function addFuelLogColumns(): Promise<void> {
 	// First check if the fuel_logs table exists
-	const tableExists = await db.all(sql`SELECT name FROM sqlite_master WHERE type='table' AND name='fuel_logs'`);
+	const tableExists = await db.all(
+		sql`SELECT name FROM sqlite_master WHERE type='table' AND name='fuel_logs'`
+	);
 
 	if (tableExists.length === 0) {
 		return;

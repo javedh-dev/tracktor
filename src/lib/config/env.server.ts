@@ -46,7 +46,7 @@ export const serverEnv = {
 	LOG_REQUESTS: privateEnv.LOG_REQUESTS === 'true',
 	LOG_LEVEL: privateEnv.LOG_LEVEL || 'info',
 	LOG_DIR: privateEnv.LOG_DIR || './logs',
-	APP_VERSION: privateEnv.APP_VERSION,
+	APP_VERSION: privateEnv.APP_VERSION
 } as const;
 
 /**

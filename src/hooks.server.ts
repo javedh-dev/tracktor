@@ -20,14 +20,21 @@ const initPromise = (async () => {
 		try {
 			logger.info(appAsciiArt);
 			// Log environment variables without secrets in prettty print
-			logger.info('Environment variables: \n' + JSON.stringify({
-				LOG_LEVEL: env.LOG_LEVEL,
-				LOG_DIR: env.LOG_DIR,
-				NODE_ENV: env.NODE_ENV,
-				DB_PATH: env.DB_PATH,
-				DEMO_MODE: env.DEMO_MODE,
-				FORCE_DATA_SEED: env.FORCE_DATA_SEED
-			}, null, 2));
+			logger.info(
+				'Environment variables: \n' +
+					JSON.stringify(
+						{
+							LOG_LEVEL: env.LOG_LEVEL,
+							LOG_DIR: env.LOG_DIR,
+							NODE_ENV: env.NODE_ENV,
+							DB_PATH: env.DB_PATH,
+							DEMO_MODE: env.DEMO_MODE,
+							FORCE_DATA_SEED: env.FORCE_DATA_SEED
+						},
+						null,
+						2
+					)
+			);
 			await initializeDatabase();
 			dbInitialized = true;
 			logger.info('Database initialization completed');
