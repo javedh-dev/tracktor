@@ -21,3 +21,7 @@ CREATE TABLE `sessions` (
 	`updated_at` text NOT NULL DEFAULT (datetime('now')),
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
+--> statement-breakpoint
+
+-- Drop legacy auth table
+DROP TABLE IF EXISTS `auth`;
