@@ -43,12 +43,10 @@ export const serverEnv = {
 	UPLOADS_DIR: privateEnv.UPLOADS_DIR || './uploads',
 	CORS_ORIGINS: getCorsOrigins(privateEnv.CORS_ORIGINS),
 	FORCE_DATA_SEED: privateEnv.FORCE_DATA_SEED === 'true',
-	DEMO_MODE: privateEnv.TRACKTOR_DEMO_MODE === 'true',
 	LOG_REQUESTS: privateEnv.LOG_REQUESTS === 'true',
 	LOG_LEVEL: privateEnv.LOG_LEVEL || 'info',
 	LOG_DIR: privateEnv.LOG_DIR || './logs',
 	APP_VERSION: privateEnv.APP_VERSION,
-	DISABLE_AUTH: privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
 } as const;
 
 /**

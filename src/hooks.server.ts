@@ -8,7 +8,8 @@ import {
 } from '$server/middlewares';
 import { MiddlewareChain } from '$server/middlewares/base';
 import { initializeDatabase } from '$server/db/init';
-import { logger } from '$server/config';
+import { appAsciiArt, logger } from '$server/config';
+import { env } from '$lib/config/env.server';
 
 const middlewareChain = new MiddlewareChain();
 
@@ -17,6 +18,16 @@ let dbInitialized = false;
 const initPromise = (async () => {
 	if (!dbInitialized) {
 		try {
+			logger.info(appAsciiArt);
+			// Log environment variables without secrets in prettty print
+			logger.info('Environment variables: \n' + JSON.stringify({
+				LOG_LEVEL: env.LOG_LEVEL,
+				LOG_DIR: env.LOG_DIR,
+				NODE_ENV: env.NODE_ENV,
+				DB_PATH: env.DB_PATH,
+				DEMO_MODE: env.DEMO_MODE,
+				FORCE_DATA_SEED: env.FORCE_DATA_SEED
+			}, null, 2));
 			await initializeDatabase();
 			dbInitialized = true;
 			logger.info('Database initialization completed');

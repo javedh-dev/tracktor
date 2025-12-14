@@ -37,10 +37,19 @@ COPY --from=builder /app/migrations ./migrations
 # Expose the port the app runs on
 EXPOSE 3000
 
+# Create data directories
+RUN mkdir -p /data
+RUN mkdir -p /data/logs
+RUN mkdir -p /data/uploads
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV DB_PATH=/data/tracktor.db
+ENV LOG_LEVEL=info
+ENV LOG_DIR=/data/logs
+ENV UPLOADS_DIR=/data/uploads
 
 # Start the application
 CMD ["node", "build"]
