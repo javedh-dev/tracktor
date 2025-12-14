@@ -1,13 +1,5 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { config as dotenvConfig } from 'dotenv';
-import { resolve } from 'path';
-
-// Load environment variables at build time
-dotenvConfig({
-	path: resolve(process.cwd(), '.env'),
-	override: false
-});
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

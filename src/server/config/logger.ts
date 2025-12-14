@@ -44,6 +44,6 @@ const logger = winston.createLogger({
 	transports
 });
 
-logger.info(`Winston logger configured with ${transports.length} transports`);
+// logger.info(`Winston logger configured with ${transports.length} transports`);
 
 export default logger;
