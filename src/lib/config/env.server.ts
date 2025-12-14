@@ -43,9 +43,10 @@ export const serverEnv = {
 	UPLOADS_DIR: privateEnv.UPLOADS_DIR || './uploads',
 	CORS_ORIGINS: getCorsOrigins(privateEnv.CORS_ORIGINS),
 	FORCE_DATA_SEED: privateEnv.FORCE_DATA_SEED === 'true',
-	LOG_REQUESTS: privateEnv.LOG_REQUESTS === 'true',
+	LOG_REQUESTS: !privateEnv.LOG_REQUESTS || privateEnv.LOG_REQUESTS === 'true',
 	LOG_LEVEL: privateEnv.LOG_LEVEL || 'info',
 	LOG_DIR: privateEnv.LOG_DIR || './logs',
+	HTTP_MODE: privateEnv.HTTP_MODE || 'http',
 	APP_VERSION: privateEnv.APP_VERSION
 } as const;
 
