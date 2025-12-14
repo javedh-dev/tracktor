@@ -2,13 +2,18 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
+	import Database from '@lucide/svelte/icons/database';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { Button } from '$ui/button';
+	import * as DropdownMenu from '$ui/dropdown-menu';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import SettingsForm from '../feature/settings/SettingsForm.svelte';
+	import DataExportImport from '../feature/data-export-import/DataExportImport.svelte';
 	import { env } from '$lib/config/env';
+	import ToolCase from '@lucide/svelte/icons/tool-case';
 </script>
 
 <header
@@ -25,6 +30,28 @@
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger
+							class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center justify-center gap-1 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+						>
+							<ToolCase class="h-[1.2rem] w-[1.2rem]" />
+							<ChevronDown class="h-3 w-3" />
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content align="end">
+							<DropdownMenu.Item
+								onclick={() => {
+									sheetStore.openSheet(
+										DataExportImport,
+										'Data Export/Import',
+										'Export or import your database with optional encryption'
+									);
+								}}
+							>
+								<Database class="h-[1.2rem] w-[1.2rem]" />
+								Export/Import Data
+							</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 					<Button
 						variant="ghost"
 						onclick={() => {
