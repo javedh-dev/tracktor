@@ -10,7 +10,17 @@ export class RateLimitMiddleware extends BaseMiddleware {
 	private rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 	protected async process(event: RequestEvent): Promise<MiddlewareResult> {
-		const isAllowed = this.checkRateLimit(event.getClientAddress());
+		let clientAddress: string;
+
+		try {
+			clientAddress = event.getClientAddress();
+		} catch (error) {
+			// Fallback to a default identifier when client address cannot be determined
+			// This commonly happens in development or behind proxies
+			clientAddress = 'unknown-client';
+		}
+
+		const isAllowed = this.checkRateLimit(clientAddress);
 
 		if (!isAllowed) {
 			return {

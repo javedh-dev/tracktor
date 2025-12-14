@@ -3,6 +3,7 @@ import { db } from './index';
 import { seedData } from './seeders';
 import { logger } from '$server/config';
 import { resolve } from 'path';
+import { applyPatches } from './patch';
 
 /**
  * Initialize the database by running migrations and seeding data
@@ -20,8 +21,14 @@ export async function initializeDatabase(): Promise<void> {
 		logger.info('Database migrations completed successfully');
 
 		// Seed data if needed
-		logger.info('Checking if data seeding is required...');
+		logger.info('Running data seeding if applicable...');
 		await seedData();
+		logger.info('Data seeding completed successfully');
+
+		// Apply Patches if needed.
+		logger.info('Running database patches if applicable..');
+		await applyPatches();
+		logger.info('Database patches applied successfully');
 		logger.info('Database initialization completed successfully');
 	} catch (error) {
 		logger.error('Failed to initialize database:', error);

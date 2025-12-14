@@ -4,9 +4,21 @@ import winston from 'winston';
 const logFormatter = winston.format.combine(
 	winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
 	winston.format.errors({ stack: true }),
-	winston.format.printf(({ timestamp, level, message, ...meta }) => {
-		return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''
-			}`;
+	winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
+		let logMessage = `${timestamp} [${level}]: ${message}`;
+
+		// Add stack trace on new lines if present
+		if (stack) {
+			logMessage += '\n' + stack;
+		}
+
+		// Add any remaining metadata
+		const metaKeys = Object.keys(meta);
+		if (metaKeys.length > 0) {
+			logMessage += '\n' + JSON.stringify(meta, null, 2);
+		}
+
+		return logMessage;
 	})
 );
 
