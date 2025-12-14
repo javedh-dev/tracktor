@@ -1,4 +1,4 @@
-import { serverEnv } from '$lib/config/env';
+import { serverEnv } from '$lib/config/env.server';
 import type { RequestEvent } from '@sveltejs/kit';
 import { BaseMiddleware, type MiddlewareResult } from './base';
 

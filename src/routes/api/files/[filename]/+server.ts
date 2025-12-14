@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { serverEnv } from '$lib/config/env';
+import { serverEnv } from '$lib/config/env.server';
 import path from 'path';
 import { readFile } from 'fs/promises';
 

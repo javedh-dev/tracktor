@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { serverEnv } from '$lib/config/env';
+import { serverEnv } from '$lib/config/env.server';
 import path from 'path';
 import { writeFile } from 'fs/promises';
 

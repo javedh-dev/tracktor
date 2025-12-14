@@ -1,5 +1,5 @@
 import type { ApiResponse } from '$lib';
-import { env } from '$lib/config/env';
+import { env } from '$lib/config/env.server';
 import { BaseMiddleware, type MiddlewareResult } from './base';
 import type { RequestEvent } from '@sveltejs/kit';
 import { CorsMiddleware } from './cors';

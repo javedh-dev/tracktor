@@ -1,7 +1,7 @@
 import { logger } from '$server/config';
 import type { RequestEvent } from '@sveltejs/kit';
 import { BaseMiddleware, type MiddlewareResult } from './base';
-import { env } from '$lib/config/env';
+import { env } from '$lib/config/env.server';
 
 export class LoggingMiddleware extends BaseMiddleware {
 	protected async process(event: RequestEvent): Promise<MiddlewareResult> {

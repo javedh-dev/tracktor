@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { AppError } from '$server/exceptions/AppError';
-import { env } from '$lib/config/env';
+import { env } from '$lib/config/env.server';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {

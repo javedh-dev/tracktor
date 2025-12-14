@@ -8,7 +8,7 @@ import {
 import { createOrUpdateUser } from '$server/services/authService';
 import { db } from '$server/db/index';
 import { faker } from '@faker-js/faker';
-import { env } from '$lib/config/env';
+import { env } from '$lib/config/env.server';
 import { logger } from '$server/config';
 
 export const seedData = async () => {
