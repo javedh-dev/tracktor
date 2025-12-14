@@ -12,15 +12,13 @@
 		color = 'var(--primary)',
 		label,
 		title,
-		xFormatter,
-		yFormatter
+		xFormatter
 	}: {
 		chartData: DataPoint[];
 		color?: string;
 		label: string;
 		title: string;
 		xFormatter: (_: Date) => string;
-		yFormatter: (_: number) => string;
 	} = $props();
 
 	const chartProps = {

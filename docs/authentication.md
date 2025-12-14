@@ -30,6 +30,7 @@ pnpm tsx scripts/create-user.ts <username> <password>
 ```
 
 Example:
+
 ```bash
 pnpm tsx scripts/create-user.ts admin mypassword123
 ```
@@ -39,6 +40,7 @@ pnpm tsx scripts/create-user.ts admin mypassword123
 For API access, the system uses session-based authentication:
 
 ### Login
+
 ```bash
 POST /api/auth
 Content-Type: application/json
@@ -50,11 +52,13 @@ Content-Type: application/json
 ```
 
 ### Logout
+
 ```bash
 DELETE /api/auth
 ```
 
 ### Check Authentication Status
+
 ```bash
 GET /api/auth
 ```
@@ -89,15 +93,18 @@ If you're upgrading from a PIN-based system:
 ## Troubleshooting
 
 ### Can't Login
+
 - Ensure you've created a user account
 - Check that your username and password are correct
 - Clear your browser cookies if you're having session issues
 
 ### Session Expired
+
 - Sessions expire after 30 days of inactivity
 - Simply log in again to create a new session
 
 ### API Access Issues
+
 - Ensure you're including session cookies in your API requests
 - Check that your session hasn't expired
 - Verify the API endpoint URLs are correct

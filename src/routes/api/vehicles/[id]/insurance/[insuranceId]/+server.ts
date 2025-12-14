@@ -37,7 +37,7 @@ export const PUT: RequestHandler = async (event) => {
 		}
 
 		// Use body from locals if available (from middleware), otherwise parse it
-		const body = event.locals.requestBody || await event.request.json();
+		const body = event.locals.requestBody || (await event.request.json());
 
 		// Validation for insurance updates
 		if (body.startDate && body.endDate) {

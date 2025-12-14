@@ -94,7 +94,6 @@ class AuthStore {
 			goto('/login');
 		}
 	};
-
 }
 
 export const authStore = new AuthStore();

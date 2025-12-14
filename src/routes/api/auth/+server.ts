@@ -7,7 +7,7 @@ import { env } from '$lib/config/env';
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
 	try {
-		const body = event.locals.requestBody || await event.request.json();
+		const body = event.locals.requestBody || (await event.request.json());
 
 		// Validate request body
 		if (!body.username || !body.password) {

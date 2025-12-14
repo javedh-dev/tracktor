@@ -37,7 +37,7 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		// Use body from locals if available (from middleware), otherwise parse it
-		const body = event.locals.requestBody || await event.request.json();
+		const body = event.locals.requestBody || (await event.request.json());
 
 		// Basic validation for maintenance log data
 		if (!body.type || !body.description || !body.date) {

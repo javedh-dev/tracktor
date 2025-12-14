@@ -5,8 +5,13 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import { type ApiResponse } from '$lib/response';
-import { generateSessionToken, createSession, validateSessionToken, invalidateSession, type User } from '../utils/session';
-
+import {
+	generateSessionToken,
+	createSession,
+	validateSessionToken,
+	invalidateSession,
+	type User
+} from '../utils/session';
 
 export const createUser = async (username: string, password: string): Promise<ApiResponse> => {
 	// Check if user already exists
@@ -50,7 +55,10 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
 		});
 	} else {
 		const passwordHash = await bcrypt.hash(password, 10);
-		await db.update(schema.usersTable).set({ passwordHash }).where(eq(schema.usersTable.username, username));
+		await db
+			.update(schema.usersTable)
+			.set({ passwordHash })
+			.where(eq(schema.usersTable.username, username));
 	}
 };
 

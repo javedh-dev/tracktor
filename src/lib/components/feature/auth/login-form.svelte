@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FieldGroup, Field, FieldLabel, FieldDescription } from '$ui/field/index.js';
+	import { FieldGroup, Field, FieldLabel } from '$ui/field/index.js';
 	import Input from '$appui/input.svelte';
 	import { Button } from '$ui/button/index.js';
 	import { authStore } from '$stores/auth.svelte';

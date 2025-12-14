@@ -13,7 +13,10 @@ export const usersTable = table('users', {
 // Sessions table for session management
 export const sessionsTable = table('sessions', {
 	id: t.text().primaryKey(),
-	userId: t.text().notNull().references(() => usersTable.id),
+	userId: t
+		.text()
+		.notNull()
+		.references(() => usersTable.id),
 	expiresAt: t.integer().notNull(),
 	...timestamps
 });

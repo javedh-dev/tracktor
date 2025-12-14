@@ -1,6 +1,11 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { createErrorResponseBody, logError } from './server/utils/errorHandler';
-import { CorsMiddleware, RateLimitMiddleware, AuthMiddleware, LoggingMiddleware } from '$server/middlewares'
+import {
+	CorsMiddleware,
+	RateLimitMiddleware,
+	AuthMiddleware,
+	LoggingMiddleware
+} from '$server/middlewares';
 import { MiddlewareChain } from '$server/middlewares/base';
 import { initializeDatabase } from '$server/db/init';
 import { logger } from '$server/config';
@@ -31,7 +36,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		new AuthMiddleware(),
 		new RateLimitMiddleware(),
 		new LoggingMiddleware()
-	])
+	]);
 
 	const result = await middlewareChain.handle(event);
 	if (result.response) {
@@ -54,5 +59,3 @@ export const handleError: HandleServerError = async ({ error, event }) => {
 		message: body.message || 'Internal server error'
 	};
 };
-
-

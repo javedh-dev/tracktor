@@ -21,7 +21,7 @@ export const GET: RequestHandler = async (event) => {
 export const PUT: RequestHandler = async (event) => {
 	try {
 		// Use body from locals if available (from middleware), otherwise parse it
-		const body = event.locals.requestBody || await event.request.json();
+		const body = event.locals.requestBody || (await event.request.json());
 
 		// Validate that body is an array of config objects
 		if (!Array.isArray(body)) {
