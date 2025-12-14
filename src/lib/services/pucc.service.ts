@@ -4,7 +4,8 @@ import { uploadFile } from './file.service';
 
 export const savePuccWithAttachment = async (
 	certificate: PollutionCertificate,
-	attachment: File | undefined
+	attachment: File | undefined,
+	removeExisting: boolean = false
 ): Promise<Response<PollutionCertificate>> => {
 	if (attachment) {
 		try {
@@ -16,6 +17,17 @@ export const savePuccWithAttachment = async (
 				error: e.response?.data?.message || 'Failed to upload attachment'
 			};
 		}
+	}
+	// Handle existing attachment removal
+	if (removeExisting) {
+		certificate.attachment = null;
+	}
+	// If no new attachment and this is an update (has id) and not removing existing, don't modify attachment field
+	// This preserves existing attachment when editing without uploading new file
+	else if (!attachment && certificate.id) {
+		// Remove attachment from the payload to avoid overwriting existing value
+		const { attachment: _, ...certificateWithoutAttachment } = certificate;
+		return savePucc(certificateWithoutAttachment as PollutionCertificate);
 	}
 	return savePucc(certificate);
 };

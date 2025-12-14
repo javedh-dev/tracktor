@@ -21,6 +21,7 @@
 	let { data } = $props();
 
 	let attachment = $state<File>();
+	let removeExistingAttachment = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
@@ -38,7 +39,8 @@
 						startDate: parseDate(f.data.startDate),
 						endDate: parseDate(f.data.endDate)
 					},
-					attachment
+					attachment,
+					removeExistingAttachment
 				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(`Insurance ${data ? 'updated' : 'saved'} successfully...!!!`);
@@ -56,13 +58,17 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data)
+		if (data) {
 			formData.set({
 				...data,
 				startDate: formatDate(data.startDate),
 				endDate: formatDate(data.endDate),
 				attachment: null
 			});
+			// Reset attachment state when editing existing record
+			attachment = undefined;
+			removeExistingAttachment = false;
+		}
 		formData.update((fd) => {
 			return {
 				...fd,
@@ -77,7 +83,11 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload policy document">Attachment</FormLabel>
-				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+				<FuelAttachmentDropZone
+					bind:file={attachment}
+					existingFileUrl={existingAttachmentUrl}
+					bind:removeExisting={removeExistingAttachment}
+				/>
 			</Form.Control>
 		</Form.Field>
 		<Form.Field {form} name="provider" class="w-full">

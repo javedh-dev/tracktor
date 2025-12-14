@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils.js';
 	import { displaySize, MEGABYTE } from '.';
 	import { useId } from 'bits-ui';
-	import type { FileDropZoneProps, FileRejectedReason } from './types';
+	import type { FileDropZoneProps } from './types';
 	import { toast } from 'svelte-sonner';
 	import Upload from '@lucide/svelte/icons/upload';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -14,11 +14,13 @@
 		disabled = false,
 		file = $bindable(),
 		existingFileUrl,
+		removeExisting = $bindable(),
 		class: className,
 		...rest
 	}: Omit<FileDropZoneProps, 'onUpload'> & {
 		file: File | undefined;
 		existingFileUrl?: string;
+		removeExisting?: boolean;
 	} = $props();
 
 	let uploading = $state(false);
@@ -95,11 +97,17 @@
 		}
 
 		file = uploadFile;
+		// Reset remove existing flag when new file is uploaded
+		removeExisting = false;
 		uploading = false;
 	};
 
 	const removeFile = () => {
 		file = undefined;
+		// If there's an existing file, mark it for removal
+		if (existingFileUrl) {
+			removeExisting = true;
+		}
 	};
 
 	const canUploadFiles = $derived(!disabled && !uploading);
@@ -111,33 +119,32 @@
 		return Image;
 	};
 
-	const displayFileName = $derived(() => {
-		if (file) return file.name;
-		if (existingFileUrl) {
-			const parts = existingFileUrl.split('/');
-			return parts[parts.length - 1];
-		}
-		return null;
-	});
+	const displayFileName = $derived(
+		file
+			? file.name
+			: existingFileUrl && !removeExisting
+				? existingFileUrl.split('/').pop() || 'Unknown file'
+				: null
+	);
 </script>
 
 <div class="w-full">
-	{#if file || existingFileUrl}
+	{#if file || (existingFileUrl && !removeExisting)}
 		<div class="border-border bg-muted/25 flex items-center justify-between rounded-lg border p-4">
-			<div class="flex items-center gap-3">
+			<div class="flex min-w-0 flex-1 items-center gap-3">
 				{#if file}
 					{@const Icon = getFileIcon(file.name)}
-					<Icon class="text-muted-foreground h-8 w-8" />
-					<div>
-						<p class="font-medium">{file.name}</p>
-						<p class="text-muted-foreground text-sm">{displaySize(file.size)}</p>
+					<Icon class="text-muted-foreground h-8 w-8 shrink-0" />
+					<div class="min-w-0 flex-1">
+						<p class="truncate text-sm font-medium" title={file.name}>{file.name}</p>
+						<p class="text-muted-foreground text-xs">{displaySize(file.size)}</p>
 					</div>
-				{:else if existingFileUrl}
+				{:else if existingFileUrl && !removeExisting}
 					{@const Icon = getFileIcon(existingFileUrl)}
-					<Icon class="text-muted-foreground h-8 w-8" />
-					<div>
-						<p class="font-medium">{displayFileName}</p>
-						<p class="text-muted-foreground text-sm">Existing attachment</p>
+					<Icon class="text-muted-foreground h-8 w-8 shrink-0" />
+					<div class="min-w-0 flex-1">
+						<p class="truncate text-sm font-medium" title={displayFileName}>{displayFileName}</p>
+						<p class="text-muted-foreground text-xs">Existing attachment</p>
 					</div>
 				{/if}
 			</div>
@@ -145,7 +152,7 @@
 				type="button"
 				onclick={removeFile}
 				{disabled}
-				class="text-muted-foreground hover:text-destructive rounded-full p-1 transition-colors disabled:opacity-50"
+				class="text-muted-foreground hover:text-destructive shrink-0 rounded-full p-1 transition-colors disabled:opacity-50"
 			>
 				<X class="h-4 w-4" />
 			</button>

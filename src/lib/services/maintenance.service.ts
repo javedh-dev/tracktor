@@ -4,7 +4,8 @@ import { uploadFile } from './file.service';
 
 export const saveMaintenanceLogWithAttachment = async (
 	maintenanceLog: MaintenanceLog,
-	attachment: File | undefined
+	attachment: File | undefined,
+	removeExisting: boolean = false
 ): Promise<Response<MaintenanceLog>> => {
 	if (attachment) {
 		try {
@@ -16,6 +17,17 @@ export const saveMaintenanceLogWithAttachment = async (
 				error: e.response?.data?.message || 'Failed to upload attachment'
 			};
 		}
+	}
+	// Handle existing attachment removal
+	if (removeExisting) {
+		maintenanceLog.attachment = null;
+	}
+	// If no new attachment and this is an update (has id) and not removing existing, don't modify attachment field
+	// This preserves existing attachment when editing without uploading new file
+	else if (!attachment && maintenanceLog.id) {
+		// Remove attachment from the payload to avoid overwriting existing value
+		const { attachment: _, ...maintenanceLogWithoutAttachment } = maintenanceLog;
+		return saveMaintenanceLog(maintenanceLogWithoutAttachment as MaintenanceLog);
 	}
 	return saveMaintenanceLog(maintenanceLog);
 };

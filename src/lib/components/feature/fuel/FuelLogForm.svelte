@@ -23,6 +23,7 @@
 	let { data } = $props();
 
 	let attachment = $state<File>();
+	let removeExistingAttachment = $state(false);
 
 	// Get the selected vehicle to determine fuel type and units
 	const selectedVehicle = $derived(
@@ -42,17 +43,19 @@
 		validationMethod: 'onsubmit',
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
-				saveFuelLogWithAttachment({ ...f.data, date: parseDate(f.data.date) }, attachment).then(
-					(res) => {
-						if (res.status == 'OK') {
-							toast.success(`FuelLog ${data ? 'updated' : 'saved'} successfully...!!!`);
-							attachment = undefined;
-							sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
-						} else {
-							toast.error(`Error while saving : ${res.error}`);
-						}
+				saveFuelLogWithAttachment(
+					{ ...f.data, date: parseDate(f.data.date) },
+					attachment,
+					removeExistingAttachment
+				).then((res) => {
+					if (res.status == 'OK') {
+						toast.success(`FuelLog ${data ? 'updated' : 'saved'} successfully...!!!`);
+						attachment = undefined;
+						sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
+					} else {
+						toast.error(`Error while saving : ${res.error}`);
 					}
-				);
+				});
 			}
 		}
 	});
@@ -60,7 +63,7 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data)
+		if (data) {
 			formData.set({
 				...data,
 				date: formatDate(data.date),
@@ -68,6 +71,10 @@
 				cost: roundNumber(data.cost),
 				attachment: null // Don't include attachment in form data, handle separately
 			});
+			// Reset attachment state when editing existing record
+			attachment = undefined;
+			removeExistingAttachment = false;
+		}
 		formData.update((fd) => {
 			return {
 				...fd,
@@ -83,7 +90,11 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
-				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+				<FuelAttachmentDropZone
+					bind:file={attachment}
+					existingFileUrl={existingAttachmentUrl}
+					bind:removeExisting={removeExistingAttachment}
+				/>
 			</Form.Control>
 		</Form.Field>
 		<Form.Field {form} name="date" class="w-full">

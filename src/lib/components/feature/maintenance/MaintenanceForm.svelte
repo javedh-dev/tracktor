@@ -21,6 +21,7 @@
 	let { data } = $props();
 
 	let attachment = $state<File>();
+	let removeExistingAttachment = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
@@ -34,7 +35,8 @@
 			if (f.valid) {
 				saveMaintenanceLogWithAttachment(
 					{ ...f.data, date: parseDate(f.data.date) },
-					attachment
+					attachment,
+					removeExistingAttachment
 				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(`Maintenance Log ${data ? 'updated' : 'saved'} successfully...!!!`);
@@ -50,7 +52,12 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data) formData.set({ ...data, date: formatDate(data.date), attachment: null });
+		if (data) {
+			formData.set({ ...data, date: formatDate(data.date), attachment: null });
+			// Reset attachment state when editing existing record
+			attachment = undefined;
+			removeExistingAttachment = false;
+		}
 		formData.update((fd) => {
 			return {
 				...fd,
@@ -66,7 +73,11 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload receipt or maintenance document">Attachment</FormLabel>
-				<FuelAttachmentDropZone bind:file={attachment} existingFileUrl={existingAttachmentUrl} />
+				<FuelAttachmentDropZone
+					bind:file={attachment}
+					existingFileUrl={existingAttachmentUrl}
+					bind:removeExisting={removeExistingAttachment}
+				/>
 			</Form.Control>
 		</Form.Field>
 		<Form.Field {form} name="date" class="w-full">
