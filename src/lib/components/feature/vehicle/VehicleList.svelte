@@ -5,7 +5,7 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import { Jumper } from 'svelte-loading-spinners';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 
 	const selectVehicle = (vehicleId: string | null) => {
 		if (vehicleId) {
@@ -15,8 +15,10 @@
 </script>
 
 {#if vehicleStore.processing}
-	<div class="flex items-center justify-center">
-		<Jumper size="64" color="var(--primary)" duration="2s" />
+	<div class="my-4 flex gap-4 overflow-hidden">
+		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
+		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
+		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 	</div>
 {:else if vehicleStore.error}
 	<LabelWithIcon

@@ -4,7 +4,7 @@
 	import Download from '@lucide/svelte/icons/download';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import X from '@lucide/svelte/icons/x';
-	import Loading from '$lib/components/app/loading.svelte';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { cn } from '$lib/utils';
 	import { scale } from 'svelte/transition';
 
@@ -101,8 +101,8 @@
 				)}
 			>
 				{#if isLoading}
-					<div class="absolute inset-0 z-10 flex items-center justify-center">
-						<Loading size="lg" message="" />
+					<div class="absolute inset-0 z-10 h-full w-full">
+						<Skeleton class="h-full w-full rounded-none" />
 					</div>
 				{/if}
 

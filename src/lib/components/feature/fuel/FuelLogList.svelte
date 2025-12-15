@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Jumper } from 'svelte-loading-spinners';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { type FuelLog } from '$lib/domain/fuel';
 
 	import Badge from '$ui/badge/badge.svelte';
@@ -162,9 +162,13 @@
 </script>
 
 {#if fuelLogStore.processing}
-	<p class="flex items-center justify-center gap-5 text-lg">
-		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
-	</p>
+	<div class="space-y-3">
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+	</div>
 {:else if fuelLogStore.error}
 	<p class="text-red-500">Error: {fuelLogStore.error}</p>
 {:else if fuelLogStore.fuelLogs?.length === 0}

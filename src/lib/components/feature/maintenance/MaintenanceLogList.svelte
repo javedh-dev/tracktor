@@ -7,7 +7,7 @@
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
-	import { Jumper } from 'svelte-loading-spinners';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import AppTable from '$layout/AppTable.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$ui/data-table';
@@ -102,9 +102,13 @@
 </script>
 
 {#if maintenanceStore.processing}
-	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
-		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
-	</p>
+	<div class="space-y-3">
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+		<Skeleton class="h-12 w-full rounded-md" />
+	</div>
 {:else if maintenanceStore.error}
 	<p class="text-red-500">Error: {maintenanceStore.error}</p>
 {:else if maintenanceStore.maintenanceLogs?.length === 0}

@@ -7,7 +7,7 @@
 	import Paperclip from '@lucide/svelte/icons/paperclip';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatCurrency, formatDate } from '$lib/helper/format.helper';
-	import { Jumper } from 'svelte-loading-spinners';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
@@ -20,9 +20,22 @@
 </script>
 
 {#if insuranceStore.processing}
-	<p class="flex items-center justify-center gap-5 text-lg text-gray-500 dark:text-gray-400">
-		<Jumper size="100" color="#155dfc" unit="px" duration="2s" />
-	</p>
+	<div class="space-y-4 pt-4">
+		{#each [0, 1] as i (i)}
+			<div class="bg-background rounded-lg border p-4 shadow-sm lg:p-6">
+				<div class="mb-4 flex items-center justify-between">
+					<Skeleton class="h-6 w-48" />
+					<Skeleton class="h-8 w-8 rounded-full" />
+				</div>
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+					<Skeleton class="h-5 w-full max-w-[200px]" />
+					<Skeleton class="h-5 w-full max-w-[150px]" />
+					<Skeleton class="h-5 w-full max-w-[180px]" />
+					<Skeleton class="h-5 w-full max-w-[180px]" />
+				</div>
+			</div>
+		{/each}
+	</div>
 {:else if insuranceStore.error}
 	<p class="text-red-500">Error: {insuranceStore.error}</p>
 {:else if insuranceStore.insurances?.length === 0}

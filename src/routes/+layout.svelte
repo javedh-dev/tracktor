@@ -2,7 +2,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import { Jumper } from 'svelte-loading-spinners';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { Toaster } from '$ui/sonner';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { navigating } from '$app/state';
@@ -54,8 +54,29 @@
 	</div>
 {/if}
 {#if navigating.to && !navigating.to.route.id?.includes('(auth)')}
-	<div class="flex min-h-screen items-center justify-center">
-		<Jumper size="64" color="var(--primary)" duration="2s" />
+	<div class="flex min-h-svh w-full flex-col">
+		<header
+			class="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
+		>
+			<div class="container flex h-14 max-w-screen-2xl items-center">
+				<Skeleton class="h-8 w-8 rounded-full" />
+				<div class="ml-4 flex items-center space-x-2">
+					<Skeleton class="h-6 w-24" />
+				</div>
+				<div class="flex flex-1 items-center justify-end space-x-2">
+					<Skeleton class="h-8 w-8 rounded-full" />
+				</div>
+			</div>
+		</header>
+		<main class="flex-1 space-y-4 p-8 pt-6">
+			<div class="flex items-center justify-between space-y-2">
+				<Skeleton class="h-8 w-48" />
+			</div>
+			<div class="space-y-4">
+				<Skeleton class="h-32 w-full rounded-xl" />
+				<Skeleton class="h-32 w-full rounded-xl" />
+			</div>
+		</main>
 	</div>
 {:else}
 	<div class="flex min-h-svh w-full flex-col">
