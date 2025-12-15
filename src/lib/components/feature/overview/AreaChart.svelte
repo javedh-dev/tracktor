@@ -6,19 +6,22 @@
 	import type { DataPoint } from '$lib/domain';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 
 	let {
 		chartData,
 		color = 'var(--primary)',
 		label,
 		title,
-		xFormatter
+		xFormatter,
+		loading = false
 	}: {
 		chartData: DataPoint[];
 		color?: string;
 		label: string;
 		title: string;
 		xFormatter: (_: Date) => string;
+		loading?: boolean;
 	} = $props();
 
 	const chartProps = {
@@ -51,7 +54,16 @@
 
 <div class="bg-background/50 rounded-lg px-4 pt-2 pb-6 lg:p-6">
 	<div class="mb-4 flex flex-row justify-start font-bold">{title}</div>
-	{#if chartData.length != 0}
+	{#if loading}
+		<div class="flex h-[200px] flex-col justify-end space-y-2">
+			<div class="flex h-full items-end justify-between gap-2">
+				{#each [40, 65, 45, 80, 55, 70, 50, 85, 60, 75] as height, i (i)}
+					<Skeleton class="w-full rounded-t" style="height: {height}%" />
+				{/each}
+			</div>
+			<Skeleton class="h-4 w-full" />
+		</div>
+	{:else if chartData.length != 0}
 		<Chart.Container config={chartConfig}>
 			<AreaChart
 				data={chartData}

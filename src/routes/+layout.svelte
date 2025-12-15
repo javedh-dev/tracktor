@@ -56,7 +56,7 @@
 {#if navigating.to && !navigating.to.route.id?.includes('(auth)')}
 	<div class="flex min-h-svh w-full flex-col">
 		<header
-			class="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
+			class="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
 		>
 			<div class="container flex h-14 max-w-screen-2xl items-center">
 				<Skeleton class="h-8 w-8 rounded-full" />

@@ -30,9 +30,9 @@
 
 {#if vehicleStore.processing || isLoading}
 	<div class="mx-auto p-4 lg:container lg:p-6">
-		<div class="mb-2 flex items-center justify-between">
+		<div class="mb-2 flex items-center justify-between gap-4">
 			<Skeleton class="h-8 w-48" />
-			<Skeleton class="h-10 w-32" />
+			<Skeleton class="h-8 w-32" />
 		</div>
 
 		<div class="my-4 flex gap-4 overflow-hidden">

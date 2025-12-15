@@ -10,6 +10,9 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import BadgeInfo from '@lucide/svelte/icons/badge-info';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+
+	let isLoading = $derived(insuranceStore.processing || puccStore.processing);
 
 	interface Alert {
 		type: 'insurance' | 'pucc';
@@ -123,7 +126,27 @@
 <div class="bg-background/50 rounded-lg border border-gray-200 p-4 shadow-sm dark:border-gray-700">
 	<h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Vehicle Alerts</h3>
 
-	{#if alerts.length === 0}
+	{#if isLoading}
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+			{#each [0, 1] as i (i)}
+				<div class="rounded-lg border p-4">
+					<div class="flex items-start justify-between">
+						<div class="flex items-start gap-3">
+							<Skeleton class="h-6 w-6 rounded" />
+							<div class="flex-1 space-y-2">
+								<Skeleton class="h-5 w-32" />
+								<Skeleton class="h-4 w-40" />
+							</div>
+						</div>
+						<div class="space-y-1 text-right">
+							<Skeleton class="h-6 w-10" />
+							<Skeleton class="h-3 w-16" />
+						</div>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{:else if alerts.length === 0}
 		<div class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
 			<LabelWithIcon
 				icon={CheckCircle}
