@@ -11,7 +11,7 @@
 
 <Sheet.Root {open} onOpenChange={(state) => !state && sheetStore.closeSheet()}>
 	<!-- <Sheet.Trigger class={buttonVariants({ variant: 'outline' })}>Open</Sheet.Trigger> -->
-	<Sheet.Content side="right" class="flex flex-col px-2">
+	<Sheet.Content side="right" class=" flex w-full flex-col px-2">
 		<Sheet.Header class="shrink-0">
 			<Sheet.Title class="text-2xl">{title}</Sheet.Title>
 			<hr />
