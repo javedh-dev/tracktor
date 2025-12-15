@@ -20,9 +20,7 @@
 	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
 	import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Image from '@lucide/svelte/icons/image';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent, renderSnippet } from '$ui/data-table';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
@@ -216,18 +214,7 @@
 	<div class="flex flex-row justify-center">
 		{#if params.value}
 			{@const fileName = params.value}
-			{@const isPdf = fileName.toLowerCase().endsWith('.pdf')}
-			{@const Icon = isPdf ? FileText : Image}
-			<a
-				href="/api/files/{fileName}"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-				title="View attachment"
-			>
-				<Icon class="h-4 w-4" />
-				<ExternalLink class="h-3 w-3" />
-			</a>
+			<AttachmentLink {fileName} />
 		{:else}
 			<span class="text-muted-foreground">-</span>
 		{/if}

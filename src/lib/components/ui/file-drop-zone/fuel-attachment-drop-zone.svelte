@@ -8,6 +8,7 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Image from '@lucide/svelte/icons/image';
 	import X from '@lucide/svelte/icons/x';
+	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 
 	let {
 		id = useId(),
@@ -140,12 +141,16 @@
 						<p class="text-muted-foreground text-xs">{displaySize(file.size)}</p>
 					</div>
 				{:else if existingFileUrl && !removeExisting}
-					{@const Icon = getFileIcon(existingFileUrl)}
-					<Icon class="text-muted-foreground h-8 w-8 shrink-0" />
-					<div class="min-w-0 flex-1">
-						<p class="truncate text-sm font-medium" title={displayFileName}>{displayFileName}</p>
-						<p class="text-muted-foreground text-xs">Existing attachment</p>
-					</div>
+					<AttachmentLink fileName={displayFileName || ''}>
+						{@const Icon = getFileIcon(existingFileUrl)}
+						<div class="flex items-center gap-3 text-left">
+							<Icon class="text-muted-foreground h-8 w-8 shrink-0" />
+							<div class="min-w-0 flex-1">
+								<p class="truncate text-sm font-medium" title={displayFileName}>{displayFileName}</p>
+								<p class="text-muted-foreground text-xs">Existing attachment (Click to view)</p>
+							</div>
+						</div>
+					</AttachmentLink>
 				{/if}
 			</div>
 			<button

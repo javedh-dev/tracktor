@@ -1,11 +1,10 @@
 <script lang="ts">
-	import FileText from '@lucide/svelte/icons/file-text';
 	import Calendar from '@lucide/svelte/icons/calendar';
+	import FileText from '@lucide/svelte/icons/file-text';
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
-	import Image from '@lucide/svelte/icons/image';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatDate } from '$lib/helper/format.helper';
 	import { Jumper } from 'svelte-loading-spinners';
 	import PuccContextMenu from './PuccContextMenu.svelte';
@@ -65,22 +64,13 @@
 				{/if}
 				{#if pucc.attachment}
 					{@const fileName = pucc.attachment}
-					{@const isPdf = fileName.toLowerCase().endsWith('.pdf')}
-					{@const Icon = isPdf ? FileText : Image}
 					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 						<Paperclip class="h-5 w-5" />
 						<span class="font-semibold">Attachment:</span>
-						<a
-							href="/api/files/{fileName}"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-							title="View attachment"
-						>
-							<Icon class="h-4 w-4" />
-							<ExternalLink class="h-3 w-3" />
+						<AttachmentLink {fileName}>
 							<span class="text-sm">View Certificate</span>
-						</a>
+						</AttachmentLink>
+
 					</div>
 				{/if}
 			</div>
