@@ -12,6 +12,9 @@ const config = {
 			precompress: process.env.NODE_ENV === 'production',
 			envPrefix: ''
 		}),
+		csrf: {
+			trustedOrigins: ['*']
+		},
 		env: {
 			publicPrefix: 'TRACKTOR_',
 			privatePrefix: ''
