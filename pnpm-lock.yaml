@@ -68,9 +68,6 @@ importers:
       multer:
         specifier: ^2.0.2
         version: 2.0.2
-      svelte-loading-spinners:
-        specifier: ^0.3.6
-        version: 0.3.6
       winston:
         specifier: ^3.19.0
         version: 3.19.0
@@ -3275,9 +3272,6 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
-
-  svelte-loading-spinners@0.3.6:
-    resolution: {integrity: sha512-mthHQ2TwiwzTWzbFry3CBnVEfzqPOD9WkVw84OfSYzHRq6N9wgQ+yv37u81uPeuLU/ZOIPqhujpXquB1aol5ZQ==}
 
   svelte-sonner@1.0.7:
     resolution: {integrity: sha512-1EUFYmd7q/xfs2qCHwJzGPh9n5VJ3X6QjBN10fof2vxgy8fYE7kVfZ7uGnd7i6fQaWIr5KvXcwYXE/cmTEjk5A==}
@@ -6503,8 +6497,6 @@ snapshots:
       postcss-selector-parser: 7.1.1
     optionalDependencies:
       svelte: 5.46.0
-
-  svelte-loading-spinners@0.3.6: {}
 
   svelte-sonner@1.0.7(svelte@5.46.0):
     dependencies:
