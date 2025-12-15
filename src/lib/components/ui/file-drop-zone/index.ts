@@ -1,5 +1,4 @@
 import FileDropZone from './file-drop-zone.svelte';
-import FuelAttachmentDropZone from './fuel-attachment-drop-zone.svelte';
 import { type FileRejectedReason, type FileDropZoneProps } from './types';
 
 export const displaySize = (bytes: number): string => {
@@ -23,4 +22,4 @@ export const ACCEPT_IMAGE = 'image/*';
 export const ACCEPT_VIDEO = 'video/*';
 export const ACCEPT_AUDIO = 'audio/*';
 
-export { FileDropZone, FuelAttachmentDropZone, type FileRejectedReason, type FileDropZoneProps };
+export { FileDropZone, type FileRejectedReason, type FileDropZoneProps };

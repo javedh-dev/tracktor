@@ -7,7 +7,7 @@
 	import { formatDate, getFuelUnit, parseDate, roundNumber } from '$lib/helper/format.helper';
 	import { saveFuelLogWithAttachment } from '$lib/services/fuel.service';
 	import { fuelLogStore } from '$stores/fuel-log.svelte';
-	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
+	import { FileDropZone } from '$lib/components/app';
 	import { fuelSchema } from '$lib/domain/fuel';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
@@ -91,14 +91,15 @@
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
-		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
-				<FuelAttachmentDropZone
+				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
 					bind:removeExisting={removeExistingAttachment}
+					variant="attachment"
+					accept="application/pdf,image/*"
 				/>
 			</Form.Control>
 		</Form.Field>
@@ -121,8 +122,6 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<!-- </div> -->
-		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="fuelAmount" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -156,7 +155,6 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<!-- </div> -->
 		<div class="flex w-full flex-row justify-around gap-4">
 			<Form.Field {form} name="filled" class="w-full">
 				<Form.Control>

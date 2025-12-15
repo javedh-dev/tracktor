@@ -17,7 +17,7 @@
 	import { saveMaintenanceLogWithAttachment } from '$lib/services/maintenance.service';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
-	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
+	import { FileDropZone } from '$lib/components/app';
 
 	let { data } = $props();
 
@@ -78,10 +78,12 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload receipt or maintenance document">Attachment</FormLabel>
-				<FuelAttachmentDropZone
+				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
 					bind:removeExisting={removeExistingAttachment}
+					variant="attachment"
+					accept="application/pdf,image/*"
 				/>
 			</Form.Control>
 		</Form.Field>

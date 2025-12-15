@@ -13,7 +13,7 @@
 </script>
 
 <button
-	class="text-primary hover:text-primary/80 flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 transition-colors"
+	class="text-primary hover:text-primary/80 inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 overflow-hidden border-0 bg-transparent p-0 text-left transition-colors"
 	title="View attachment"
 	onclick={(e) => {
 		e.stopPropagation();
@@ -21,10 +21,10 @@
 	}}
 >
 	{#if children}
-		{@render children()}
+		<span class="min-w-0 truncate">{@render children()}</span>
 	{:else}
-		<Icon class="h-4 w-4" />
-		<ExternalLink class="h-3 w-3" />
+		<Icon class="h-4 w-4 shrink-0" />
+		<ExternalLink class="h-3 w-3 shrink-0" />
 	{/if}
 </button>
 

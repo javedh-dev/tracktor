@@ -7,7 +7,7 @@
 	import { savePollutionCertificateWithAttachment } from '$lib/services/pucc.service';
 	import { puccStore } from '$stores/pucc.svelte';
 	import { pollutionCertificateSchema } from '$lib/domain/pucc';
-	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
+	import { FileDropZone } from '$lib/components/app';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
@@ -88,10 +88,12 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload certificate document">Attachment</FormLabel>
-				<FuelAttachmentDropZone
+				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
 					bind:removeExisting={removeExistingAttachment}
+					variant="attachment"
+					accept="application/pdf,image/*"
 				/>
 			</Form.Control>
 		</Form.Field>

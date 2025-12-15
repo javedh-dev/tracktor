@@ -11,7 +11,7 @@
 
 <Sheet.Root {open} onOpenChange={(state) => !state && sheetStore.closeSheet()}>
 	<!-- <Sheet.Trigger class={buttonVariants({ variant: 'outline' })}>Open</Sheet.Trigger> -->
-	<Sheet.Content side="right" class="flex w-full flex-col px-2 lg:w-sm">
+	<Sheet.Content side="right" class="flex flex-col px-2">
 		<Sheet.Header class="shrink-0">
 			<Sheet.Title class="text-2xl">{title}</Sheet.Title>
 			<hr />
@@ -20,7 +20,7 @@
 			</Sheet.Description>
 		</Sheet.Header>
 
-		<div class="flex-1 overflow-y-auto px-6 pb-6">
+		<div class="min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-6 pb-6">
 			{#if FormComponent}
 				<FormComponent data={formData} />
 			{/if}

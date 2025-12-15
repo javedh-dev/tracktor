@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ImageDropZone from '$ui/file-drop-zone/image-drop-zone.svelte';
+	import { FileDropZone } from '$lib/components/app';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -63,7 +63,14 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<!-- <FormLabel description="Manufacturer of the vehicle">Image</FormLabel> -->
-					<ImageDropZone {...props} bind:file={image} disabled={processing} {existingImageUrl} />
+					<FileDropZone
+						{...props}
+						bind:file={image}
+						disabled={processing}
+						{existingImageUrl}
+						variant="image"
+						accept="image/*"
+					/>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />

@@ -7,7 +7,7 @@
 	import { saveInsuranceWithAttachment } from '$lib/services/insurance.service';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import { insuranceSchema } from '$lib/domain/insurance';
-	import FuelAttachmentDropZone from '$ui/file-drop-zone/fuel-attachment-drop-zone.svelte';
+	import { FileDropZone } from '$lib/components/app';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -88,10 +88,12 @@
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload policy document">Attachment</FormLabel>
-				<FuelAttachmentDropZone
+				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
 					bind:removeExisting={removeExistingAttachment}
+					variant="attachment"
+					accept="application/pdf,image/*"
 				/>
 			</Form.Control>
 		</Form.Field>
