@@ -6,6 +6,7 @@
 	import UserIcon from '@lucide/svelte/icons/circle-user-round';
 	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
 	import SubmitButton from '$appui/SubmitButton.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let username = $state('');
 	let password = $state('');
@@ -22,7 +23,8 @@
 		if (!username || !password || !confirmPassword || processing) return;
 
 		if (password !== confirmPassword) {
-			// You might want to add proper error handling here
+			toast.error('Passwords do not match!!!');
+			confirmPassword = '';
 			return;
 		}
 

@@ -4,6 +4,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import Database from '@lucide/svelte/icons/database';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import UserCog from '@lucide/svelte/icons/user-cog';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { Button } from '$ui/button';
 	import * as DropdownMenu from '$ui/dropdown-menu';
@@ -12,6 +13,7 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 	import SettingsForm from '../feature/settings/SettingsForm.svelte';
 	import DataExportImport from '../feature/data-export-import/DataExportImport.svelte';
+	import ProfileForm from '../feature/auth/profile-form.svelte';
 	import { env } from '$lib/config/env';
 	import ToolCase from '@lucide/svelte/icons/tool-case';
 </script>
@@ -38,6 +40,16 @@
 							<ChevronDown class="h-3 w-3" />
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content align="end">
+							<DropdownMenu.Item
+								onclick={() => {
+									sheetStore.openSheet(ProfileForm, 'Profile', 'Update your username and password');
+								}}
+								disabled={env.DISABLE_AUTH || env.DEMO_MODE}
+							>
+								<UserCog class="h-[1.2rem] w-[1.2rem]" />
+								Profile
+							</DropdownMenu.Item>
+							<DropdownMenu.Separator />
 							<DropdownMenu.Item
 								onclick={() => {
 									sheetStore.openSheet(

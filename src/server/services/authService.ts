@@ -115,3 +115,61 @@ export const getUsersCount = async (): Promise<ApiResponse> => {
 		}
 	};
 };
+
+export const updateUserProfile = async (
+	userId: string,
+	data: { username?: string; currentPassword?: string; newPassword?: string }
+): Promise<ApiResponse> => {
+	const user = await db.query.usersTable.findFirst({
+		where: (users, { eq }) => eq(users.id, userId)
+	});
+
+	if (!user) {
+		throw new AppError('User not found', Status.NOT_FOUND);
+	}
+
+	const updates: { username?: string; passwordHash?: string } = {};
+
+	// Handle username update
+	if (data.username && data.username !== user.username) {
+		const existingUser = await db.query.usersTable.findFirst({
+			where: (users, { eq }) => eq(users.username, data.username!)
+		});
+
+		if (existingUser) {
+			throw new AppError('Username already exists', Status.BAD_REQUEST);
+		}
+
+		updates.username = data.username;
+	}
+
+	// Handle password update
+	if (data.newPassword) {
+		if (!data.currentPassword) {
+			throw new AppError('Current password is required to change password', Status.BAD_REQUEST);
+		}
+
+		const match = await bcrypt.compare(data.currentPassword, user.passwordHash);
+		if (!match) {
+			throw new AppError('Current password is incorrect', Status.UNAUTHORIZED);
+		}
+
+		updates.passwordHash = await bcrypt.hash(data.newPassword, 10);
+	}
+
+	if (Object.keys(updates).length === 0) {
+		return {
+			success: true,
+			message: 'No changes to update',
+			data: { id: user.id, username: user.username }
+		};
+	}
+
+	await db.update(schema.usersTable).set(updates).where(eq(schema.usersTable.id, userId));
+
+	return {
+		success: true,
+		message: 'Profile updated successfully',
+		data: { id: user.id, username: updates.username || user.username }
+	};
+};

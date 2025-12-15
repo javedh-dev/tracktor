@@ -94,6 +94,27 @@ class AuthStore {
 			goto('/login');
 		}
 	};
+
+	updateProfile = async (data: {
+		username?: string;
+		currentPassword?: string;
+		newPassword?: string;
+	}) => {
+		try {
+			const { data: res } = await apiClient.put<ApiResponse>('/auth/profile', data);
+
+			if (res.success && res.data) {
+				this.user = { ...this.user!, username: res.data.username };
+				toast.success('Profile updated successfully');
+				return true;
+			}
+			return false;
+		} catch (err: any) {
+			console.error('Profile update error:', err);
+			toast.error(`Update failed: ${err.response?.data?.message || err.message}`);
+			return false;
+		}
+	};
 }
 
 export const authStore = new AuthStore();
