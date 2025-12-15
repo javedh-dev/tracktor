@@ -4,7 +4,7 @@
 	import RegisterForm from '$lib/components/feature/auth/register-form.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import { onMount } from 'svelte';
-	import Loading from '$ui/loading.svelte';
+	import Loading from '$lib/components/app/loading.svelte';
 
 	let authCheckComplete = $state(false);
 
