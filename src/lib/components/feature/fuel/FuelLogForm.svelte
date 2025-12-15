@@ -13,6 +13,7 @@
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 	import Fuel from '@lucide/svelte/icons/fuel';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -24,6 +25,7 @@
 
 	let attachment = $state<File>();
 	let removeExistingAttachment = $state(false);
+	let processing = $state(false);
 
 	// Get the selected vehicle to determine fuel type and units
 	const selectedVehicle = $derived(
@@ -40,9 +42,11 @@
 	const form = superForm(defaults(zod4(fuelSchema)), {
 		validators: zod4(fuelSchema),
 		SPA: true,
+		resetForm: false,
 		validationMethod: 'onsubmit',
-		onUpdated: ({ form: f }) => {
+		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
+				processing = true;
 				saveFuelLogWithAttachment(
 					{ ...f.data, date: parseDate(f.data.date) },
 					attachment,
@@ -55,6 +59,7 @@
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
+					processing = false;
 				});
 			}
 		}
@@ -85,7 +90,7 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
-	<div class="flex flex-col gap-4">
+	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
@@ -200,6 +205,6 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button>Submit</Form.Button>
-	</div>
+		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+	</fieldset>
 </form>

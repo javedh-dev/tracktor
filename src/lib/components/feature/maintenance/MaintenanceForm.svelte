@@ -9,6 +9,7 @@
 	import Hammer from '@lucide/svelte/icons/hammer';
 	import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
@@ -22,6 +23,7 @@
 
 	let attachment = $state<File>();
 	let removeExistingAttachment = $state(false);
+	let processing = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
@@ -31,8 +33,10 @@
 	const form = superForm(defaults(zod4(maintenanceSchema)), {
 		validators: zod4(maintenanceSchema),
 		SPA: true,
-		onUpdated: ({ form: f }) => {
+		resetForm: false,
+		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
+				processing = true;
 				saveMaintenanceLogWithAttachment(
 					{ ...f.data, date: parseDate(f.data.date) },
 					attachment,
@@ -45,6 +49,7 @@
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
+					processing = false;
 				});
 			}
 		}
@@ -68,7 +73,7 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
-	<div class="flex flex-col gap-4">
+	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
@@ -137,6 +142,6 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button>Submit</Form.Button>
-	</div>
+		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+	</fieldset>
 </form>

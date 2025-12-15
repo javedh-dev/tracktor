@@ -9,6 +9,7 @@
 	import Languages from '@lucide/svelte/icons/languages';
 	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
 	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
@@ -28,6 +29,7 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 
 	let localConfig: Config[] = $state([]);
+	let processing = $state(false);
 
 	$effect(() => {
 		localConfig = JSON.parse(JSON.stringify(configStore.rawConfig));
@@ -48,8 +50,10 @@
 	const form = superForm(defaults(zod4(configSchema)), {
 		validators: zod4(configSchema),
 		SPA: true,
-		onUpdated: ({ form: f }) => {
+		resetForm: false,
+		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
+				processing = true;
 				const updatedConfig = localConfig.map((item) => {
 					if (item.key in f.data) {
 						return { ...item, value: f.data[item.key as keyof typeof f.data] };
@@ -61,6 +65,7 @@
 				toast.success('Configuration updated successfully!');
 				configStore.refreshConfigs();
 				sheetStore.closeSheet(vehicleStore.refreshVehicles);
+				processing = false;
 			}
 		}
 	});
@@ -95,7 +100,7 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
-	<div class="flex flex-col gap-6">
+	<fieldset class="flex flex-col gap-6" disabled={processing}>
 		<!-- Date Format -->
 		<Form.Field {form} name="dateFormat" class="w-full">
 			<Form.Control>
@@ -235,6 +240,6 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Button>Update Settings</Form.Button>
-	</div>
+		<SubmitButton {processing} class="w-full">Update Settings</SubmitButton>
+	</fieldset>
 </form>

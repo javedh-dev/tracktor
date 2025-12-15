@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { FieldGroup, Field, FieldLabel } from '$ui/field/index.js';
 	import Input from '$appui/input.svelte';
-	import { Button } from '$ui/button/index.js';
 	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
 	import UserIcon from '@lucide/svelte/icons/circle-user-round';
 	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 
 	let username = $state('');
 	let password = $state('');
@@ -39,50 +39,56 @@
 </script>
 
 <form onsubmit={handleRegister}>
-	<FieldGroup class="w-full">
-		<Field>
-			<FieldLabel for="email">Username</FieldLabel>
-			<Input
-				id="email"
-				icon={UserIcon}
-				type="text"
-				required
-				bind:value={username}
-				placeholder="username"
-			/>
-		</Field>
-		<Field>
-			<FieldLabel for="password">Password</FieldLabel>
-			<Input
-				id="password"
-				type="password"
-				required
-				placeholder="********"
-				icon={RectangleEllipsis}
-				bind:value={password}
-			/>
-		</Field>
-		<Field>
-			<FieldLabel for="confirm-password">Confirm Password</FieldLabel>
-			<Input
-				id="confirm-password"
-				type="password"
-				required
-				placeholder="********"
-				icon={RectangleEllipsis}
-				bind:value={confirmPassword}
-			/>
-		</Field>
-		<Field>
-			<Button type="submit" disabled={processing} class="transition-all duration-300">
-				{processing ? 'Creating account...' : 'Sign up'}
-			</Button>
-		</Field>
-		<!-- <FieldDescription class="text-center">
+	<fieldset disabled={processing} class="w-full">
+		<FieldGroup class="w-full">
+			<Field>
+				<FieldLabel for="email">Username</FieldLabel>
+				<Input
+					id="email"
+					icon={UserIcon}
+					type="text"
+					required
+					bind:value={username}
+					placeholder="username"
+				/>
+			</Field>
+			<Field>
+				<FieldLabel for="password">Password</FieldLabel>
+				<Input
+					id="password"
+					type="password"
+					required
+					placeholder="********"
+					icon={RectangleEllipsis}
+					bind:value={password}
+				/>
+			</Field>
+			<Field>
+				<FieldLabel for="confirm-password">Confirm Password</FieldLabel>
+				<Input
+					id="confirm-password"
+					type="password"
+					required
+					placeholder="********"
+					icon={RectangleEllipsis}
+					bind:value={confirmPassword}
+				/>
+			</Field>
+			<Field>
+				<SubmitButton
+					{processing}
+					class="transition-all duration-300"
+					loadingText="Creating account..."
+				>
+					Sign up
+				</SubmitButton>
+			</Field>
+			<!-- <FieldDescription class="text-center">
 			Already have an account? <a
 				href={'/login'}
 				class="transition-all duration-300 hover:underline">Sign in</a
 			>
 		</FieldDescription> -->
-	</FieldGroup>
+		</FieldGroup>
+	</fieldset>
 </form>

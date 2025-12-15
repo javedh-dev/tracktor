@@ -14,8 +14,8 @@
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import Paintbrush from '@lucide/svelte/icons/paintbrush';
 	import Fuel from '@lucide/svelte/icons/fuel';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 	import * as Select from '$ui/select/index.js';
-	import { Jumper } from 'svelte-loading-spinners';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
@@ -32,7 +32,8 @@
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),
 		SPA: true,
-		onUpdated: ({ form: f }) => {
+		resetForm: false,
+		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
 				processing = true;
 				saveVehicleWithImage(f.data, image, data ? 'PUT' : 'POST').then((res) => {
@@ -57,7 +58,7 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()} encType="multipart/form-data" class="w-full">
-	<div class="flex flex-col gap-4">
+	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="image" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -169,10 +170,6 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		{#if !processing}
-			<Form.Button>Submit</Form.Button>
-		{:else}
-			<Jumper size="40" color="var(--primary)" />
-		{/if}
-	</div>
+		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+	</fieldset>
 </form>

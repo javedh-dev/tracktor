@@ -11,6 +11,7 @@
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
+	import SubmitButton from '$appui/SubmitButton.svelte';
 
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -22,6 +23,7 @@
 
 	let attachment = $state<File>();
 	let removeExistingAttachment = $state(false);
+	let processing = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
@@ -31,8 +33,10 @@
 	const form = superForm(defaults(zod4(pollutionCertificateSchema)), {
 		validators: zod4(pollutionCertificateSchema),
 		SPA: true,
-		onUpdated: ({ form: f }) => {
+		resetForm: false,
+		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
+				processing = true;
 				savePollutionCertificateWithAttachment(
 					{
 						...f.data,
@@ -51,6 +55,7 @@
 					} else {
 						toast.error(`Error while saving : ${res.error}`);
 					}
+					processing = false;
 				});
 			}
 		}
@@ -79,7 +84,7 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
-	<div class="flex flex-col gap-4">
+	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
 				<FormLabel description="Upload certificate document">Attachment</FormLabel>
@@ -145,6 +150,6 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button>Submit</Form.Button>
-	</div>
+		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+	</fieldset>
 </form>
