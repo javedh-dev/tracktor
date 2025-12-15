@@ -5,5 +5,5 @@ export const apiClient = new HttpClient({
 	headers: {
 		'Content-Type': 'application/json'
 	},
-	timeout: 5000
+	timeout: 15000 // 15 seconds for regular API calls
 });
