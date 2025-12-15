@@ -70,7 +70,6 @@
 						<AttachmentLink {fileName}>
 							<span class="text-sm">View Certificate</span>
 						</AttachmentLink>
-
 					</div>
 				{/if}
 			</div>

@@ -78,7 +78,6 @@
 						<AttachmentLink {fileName}>
 							<span class="text-sm">View Document</span>
 						</AttachmentLink>
-
 					</div>
 				{/if}
 			</div>

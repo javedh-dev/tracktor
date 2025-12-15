@@ -146,7 +146,9 @@
 						<div class="flex items-center gap-3 text-left">
 							<Icon class="text-muted-foreground h-8 w-8 shrink-0" />
 							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium" title={displayFileName}>{displayFileName}</p>
+								<p class="truncate text-sm font-medium" title={displayFileName}>
+									{displayFileName}
+								</p>
 								<p class="text-muted-foreground text-xs">Existing attachment (Click to view)</p>
 							</div>
 						</div>
