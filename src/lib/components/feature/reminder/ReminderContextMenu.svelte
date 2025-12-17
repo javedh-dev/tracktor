@@ -12,8 +12,6 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 	import ReminderForm from './ReminderForm.svelte';
 	import { reminderStore } from '$lib/stores/reminder.svelte';
-	import Circle from '@lucide/svelte/icons/circle';
-	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
 
 	let { reminder, onaction }: { reminder: Reminder; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);

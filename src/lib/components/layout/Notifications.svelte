@@ -110,8 +110,9 @@
 			completingReminderIds = { ...completingReminderIds, [id]: true };
 			return;
 		}
-		const { [id]: _removed, ...rest } = completingReminderIds;
-		completingReminderIds = rest;
+		completingReminderIds = Object.fromEntries(
+			Object.entries(completingReminderIds).filter(([key]) => key !== id)
+		);
 	};
 
 	const isReminderCompleting = (id?: string | null) =>

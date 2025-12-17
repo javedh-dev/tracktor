@@ -1,21 +1,11 @@
 <script lang="ts">
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import IconButton from '$appui/IconButton.svelte';
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
-	import ReminderForm from './ReminderForm.svelte';
 	import Badge from '$ui/badge/badge.svelte';
-	import { sheetStore } from '$stores/sheet.svelte';
 	import { reminderStore } from '$stores/reminder.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { REMINDER_TYPES, REMINDER_SCHEDULES } from '$lib/domain/reminder';
 	import { formatDate } from '$lib/helper/format.helper';
-	import { saveReminder, deleteReminder } from '$lib/services/reminder.service';
-	import { toast } from 'svelte-sonner';
-	import Pencil from '@lucide/svelte/icons/pencil';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
-	import Circle from '@lucide/svelte/icons/circle';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import BellRing from '@lucide/svelte/icons/bell-ring';
@@ -26,8 +16,6 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ReminderContextMenu from './ReminderContextMenu.svelte';
 
-	let deleteDialog = $state(false);
-	let reminderToDelete = $state<Reminder>();
 	let lastVehicleId: string | undefined;
 
 	const isOverdue = (reminder: Reminder) => {
@@ -50,16 +38,6 @@
 			reminderStore.refreshReminders();
 		}
 	});
-
-	const editReminder = (reminder: Reminder) => {
-		sheetStore.openSheet(ReminderForm, 'Update Reminder', '', reminder);
-	};
-
-	const requestDelete = (reminder: Reminder) => {
-		reminderToDelete = reminder;
-		deleteDialog = true;
-	};
-
 	const reminders = $derived(reminderStore.reminders || []);
 </script>
 

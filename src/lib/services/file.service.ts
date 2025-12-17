@@ -1,4 +1,3 @@
-import { apiClient } from '$lib/helper/api.helper';
 import { HttpClient } from '$lib/helper/http.helper';
 import type { Response } from '$lib/domain';
 import type { ApiResponse } from '$lib/response';
