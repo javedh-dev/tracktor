@@ -7,6 +7,7 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import SquareKanban from '@lucide/svelte/icons/square-kanban';
 	import Wrench from '@lucide/svelte/icons/wrench';
+	import Bell from '@lucide/svelte/icons/bell';
 
 	type Section = {
 		label: string;
@@ -19,7 +20,8 @@
 		{ label: 'Fuel Logs', href: '/dashboard/fuel', icon: Fuel },
 		{ label: 'Maintenance', href: '/dashboard/maintenance', icon: Wrench },
 		{ label: 'Insurance', href: '/dashboard/insurance', icon: Shield },
-		{ label: 'Pollution Certificate', href: '/dashboard/pollution', icon: BadgeInfo }
+		{ label: 'Pollution Certificate', href: '/dashboard/pollution', icon: BadgeInfo },
+		{ label: 'Reminders', href: '/dashboard/reminders', icon: Bell }
 	];
 
 	let currentPath = $derived($page.url.pathname);

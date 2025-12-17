@@ -51,7 +51,7 @@
 		<LabelWithIcon
 			icon={TriangleAlert}
 			iconClass="h-5 w-5"
-			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center"
+			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center lg:text-sm text-xs"
 		>
 			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
 			avoid adding any personal info.

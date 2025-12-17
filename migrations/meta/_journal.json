@@ -57,6 +57,13 @@
 			"when": 1765727115489,
 			"tag": "20251214154515_add_attachment_columns",
 			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "6",
+			"when": 1765980000000,
+			"tag": "20251217120000_add_reminders_table",
+			"breakpoints": true
 		}
 	]
 }

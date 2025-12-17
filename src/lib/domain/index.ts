@@ -22,3 +22,4 @@ export type { Insurance, InsuranceSchema } from './insurance';
 export type { PollutionCertificate, PollutionCertificateSchema } from './pucc';
 export type { MaintenanceLog, MaintenanceSchema } from './maintenance';
 export type { Config } from './config';
+export type { Reminder, ReminderSchema } from './reminder';

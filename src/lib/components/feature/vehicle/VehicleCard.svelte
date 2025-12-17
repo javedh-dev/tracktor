@@ -11,6 +11,7 @@
 	import BadgeAlert from '@lucide/svelte/icons/badge-alert';
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import IdCard from '@lucide/svelte/icons/id-card';
+	import BellRing from '@lucide/svelte/icons/bell-ring';
 	import { formatDistance } from '$lib/helper/format.helper';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { browser } from '$app/environment';
@@ -29,6 +30,7 @@
 	import InsuranceForm from '../insurance/InsuranceForm.svelte';
 	import PollutionCertificateForm from '../pollution/PollutionCertificateForm.svelte';
 	import VehicleForm from './VehicleForm.svelte';
+	import ReminderForm from '../reminder/ReminderForm.svelte';
 
 	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
@@ -49,6 +51,14 @@
 			const pin = localStorage.getItem('userPin') || undefined;
 			if (pin) vehicleStore.refreshVehicles();
 		}
+	};
+
+	const openReminderSheet = () => {
+		if (!vehicle.id) return;
+		vehicleStore.selectedId = vehicle.id;
+		sheetStore.openSheet(ReminderForm, 'Schedule Reminder', 'Stay ahead of renewals.', {
+			vehicleId: vehicle.id
+		});
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
@@ -163,6 +173,13 @@
 								vehicle
 							)}
 						ariaLabel="Pollution Certificate"
+					/>
+					<IconButton
+						buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
+						iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
+						icon={BellRing}
+						onclick={openReminderSheet}
+						ariaLabel="Schedule reminder"
 					/>
 				</div>
 				<div class="flex justify-end gap-2">

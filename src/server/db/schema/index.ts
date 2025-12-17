@@ -5,6 +5,7 @@ import { insuranceTable } from './insurance';
 import { maintenanceLogTable } from './maintenance-logs';
 import { vehicleTable } from './vehicle';
 import { pollutionCertificateTable } from './pucc';
+import { reminderTable } from './reminder';
 
 export {
 	authTable,
@@ -15,5 +16,6 @@ export {
 	insuranceTable,
 	maintenanceLogTable,
 	pollutionCertificateTable,
-	vehicleTable
+	vehicleTable,
+	reminderTable
 };
