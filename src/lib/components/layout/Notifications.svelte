@@ -259,7 +259,7 @@
 					<ul class="space-y-2">
 						{#each reminderNotifications as reminder (reminder.id ?? `${reminder.vehicleId}-${reminder.dueDate.getTime()}`)}
 							<li
-								class="border-border/50 bg-background/90 flex items-start gap-3 rounded-md border px-3 py-2 shadow-sm"
+								class="border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 shadow-sm"
 							>
 								<div class="rounded-full border p-1 {reminderSeverityRing[reminder.severity]}">
 									<CalendarDays class="h-4 w-4" />
@@ -315,7 +315,7 @@
 					<ul class="space-y-2">
 						{#each alertNotifications as alert (alert.type)}
 							<li
-								class="border-border/50 bg-background/90 flex items-start gap-3 rounded-md border px-3 py-2 shadow-sm"
+								class="border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 align-middle shadow-sm"
 							>
 								<div class="rounded-full border p-1 {alertStatusRing[alert.status]}">
 									{#if alert.type === 'insurance'}
