@@ -40,11 +40,11 @@ export const POST: RequestHandler = async (event) => {
 		const body = event.locals.requestBody || (await event.request.json());
 
 		// Basic validation for fuel log data
-		if (!body.date || !body.amount || !body.cost) {
+		if (!body.date || !body.fuelAmount || !body.cost) {
 			throw error(400, 'Date, amount, and cost are required');
 		}
 
-		if (typeof body.amount !== 'number' || body.amount <= 0) {
+		if (typeof body.fuelAmount !== 'number' || body.fuelAmount <= 0) {
 			throw error(400, 'Amount must be a positive number');
 		}
 
