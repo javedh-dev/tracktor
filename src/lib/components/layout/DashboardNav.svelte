@@ -20,7 +20,7 @@
 		{ label: 'Fuel Logs', href: '/dashboard/fuel', icon: Fuel },
 		{ label: 'Maintenance', href: '/dashboard/maintenance', icon: Wrench },
 		{ label: 'Insurance', href: '/dashboard/insurance', icon: Shield },
-		{ label: 'Pollution Certificate', href: '/dashboard/pollution', icon: BadgeInfo },
+		{ label: 'Emissions', href: '/dashboard/pollution', icon: BadgeInfo },
 		{ label: 'Reminders', href: '/dashboard/reminders', icon: Bell }
 	];
 

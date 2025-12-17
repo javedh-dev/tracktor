@@ -3,10 +3,9 @@
 	import Tractor from '@lucide/svelte/icons/tractor';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Database from '@lucide/svelte/icons/database';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import UserCog from '@lucide/svelte/icons/user-cog';
 	import CircleUser from '@lucide/svelte/icons/circle-user';
+	import ToolCase from '@lucide/svelte/icons/tool-case';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
 	import { Button } from '$ui/button';
 	import * as DropdownMenu from '$ui/dropdown-menu';
@@ -17,7 +16,7 @@
 	import DataExportImport from '../feature/data-export-import/DataExportImport.svelte';
 	import ProfileForm from '../feature/auth/profile-form.svelte';
 	import { env } from '$lib/config/env';
-	import ToolCase from '@lucide/svelte/icons/tool-case';
+	import Notifications from './Notifications.svelte';
 </script>
 
 <header
@@ -34,6 +33,7 @@
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}
+					<Notifications />
 					<Button
 						variant="ghost"
 						onclick={() => {
