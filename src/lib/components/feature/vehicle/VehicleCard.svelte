@@ -135,22 +135,21 @@
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
-						onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '', vehicle)}
+						onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '')}
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 						iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 						icon={Wrench}
-						onclick={() =>
-							sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log', '', vehicle)}
+						onclick={() => sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log', '')}
 						ariaLabel="Maintenence"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 						iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 						icon={Shield}
-						onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance', '', vehicle)}
+						onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance', '')}
 						ariaLabel="Insurance"
 					/>
 					<IconButton
@@ -158,19 +157,14 @@
 						iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 						icon={BadgeCheck}
 						onclick={() =>
-							sheetStore.openSheet(
-								PollutionCertificateForm,
-								'Add Pollution Certificate',
-								'',
-								vehicle
-							)}
+							sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate', '')}
 						ariaLabel="Pollution Certificate"
 					/>
 					<IconButton
 						buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
 						iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
 						icon={BellRing}
-						onclick={() => sheetStore.openSheet(ReminderForm, 'Add Reminder', '', vehicle)}
+						onclick={() => sheetStore.openSheet(ReminderForm, 'Add Reminder', '')}
 						ariaLabel="Schedule reminder"
 					/>
 				</div>

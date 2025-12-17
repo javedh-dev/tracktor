@@ -162,8 +162,6 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<SubmitButton {processing} class="w-full"
-			>{$formData.id ? 'Update' : 'Create'} Reminder</SubmitButton
-		>
+		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
 	</fieldset>
 </form>
