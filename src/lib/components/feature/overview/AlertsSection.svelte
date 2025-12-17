@@ -2,7 +2,6 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import { puccStore } from '$stores/pucc.svelte';
-	import { onMount } from 'svelte';
 	import { differenceInDays, format } from 'date-fns';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import Clock from '@lucide/svelte/icons/clock';
@@ -111,11 +110,14 @@
 		}
 	};
 
-	onMount(() => {
-		if (vehicleStore.selectedId) {
-			insuranceStore.refreshInsurances();
-			puccStore.refreshPuccs();
+	$effect(() => {
+		const selectedId = vehicleStore.selectedId;
+		if (!selectedId) {
+			alerts = [];
+			return;
 		}
+		insuranceStore.refreshInsurances();
+		puccStore.refreshPuccs();
 	});
 
 	$effect(() => {

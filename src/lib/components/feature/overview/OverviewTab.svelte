@@ -3,6 +3,13 @@
 	import CostChart from './CostChart.svelte';
 	import MileageChart from './MileageChart.svelte';
 	import AlertsSection from './AlertsSection.svelte';
+	import { fuelLogStore } from '$stores/fuel-log.svelte';
+	import { vehicleStore } from '$stores/vehicle.svelte';
+
+	$effect(() => {
+		if (!vehicleStore.selectedId) return;
+		fuelLogStore.refreshFuelLogs();
+	});
 </script>
 
 <TabContainer title="Overview">

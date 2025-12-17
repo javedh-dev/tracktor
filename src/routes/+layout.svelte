@@ -13,6 +13,14 @@
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
+	let isDashboardTransition = $derived(
+		navigating.to &&
+			navigating.to.url.pathname.startsWith('/dashboard') &&
+			navigating.from?.url.pathname.startsWith('/dashboard')
+	);
+	let showGlobalLoader = $derived(
+		navigating.to && !navigating.to.route.id?.includes('(auth)') && !isDashboardTransition
+	);
 
 	async function detectSWUpdate() {
 		const registrations = await navigator?.serviceWorker?.ready;
@@ -53,7 +61,7 @@
 		</LabelWithIcon>
 	</div>
 {/if}
-{#if navigating.to && !navigating.to.route.id?.includes('(auth)')}
+{#if showGlobalLoader}
 	<div class="flex min-h-svh w-full flex-col">
 		<header
 			class="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
