@@ -10,6 +10,8 @@
 	import PuccContextMenu from './PuccContextMenu.svelte';
 	import { puccStore } from '$stores/pucc.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	$effect(() => {
 		if (vehicleStore.selectedId) puccStore.refreshPuccs();
@@ -26,9 +28,9 @@
 				</div>
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<Skeleton class="h-5 w-full max-w-[200px]" />
-					<Skeleton class="h-5 w-full max-w-[150px]" />
-					<Skeleton class="h-5 w-full max-w-[180px]" />
-					<Skeleton class="h-5 w-full max-w-[180px]" />
+					<Skeleton class="h-5 w-full max-w-40" />
+					<Skeleton class="h-5 w-full max-w-48" />
+					<Skeleton class="h-5 w-full max-w-48" />
 				</div>
 			</div>
 		{/each}
@@ -36,12 +38,17 @@
 {:else if puccStore.error}
 	<p class="text-red-500">Error: {puccStore.error}</p>
 {:else if puccStore.pollutionCerts?.length === 0}
-	<div>No Pollution Certificates for this vehicle.</div>
+	<LabelWithIcon
+		icon={CircleSlash2}
+		iconClass="h-5 w-5"
+		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
+		label="No Pollution Certificates for this vehicle."
+	/>
 {:else}
 	{#each puccStore.pollutionCerts as pucc (pucc.id)}
 		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
 			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2 text-purple-500 dark:text-purple-400">
+				<div class="flex items-center gap-2 text-fuchsia-500 dark:text-fuchsia-400">
 					<BadgeCheck class="h-6 w-6 " />
 					<span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
 				</div>

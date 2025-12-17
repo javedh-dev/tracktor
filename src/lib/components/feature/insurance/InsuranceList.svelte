@@ -11,6 +11,8 @@
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
+	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	let vehicleId = $derived(vehicleStore.selectedId);
 
@@ -29,9 +31,9 @@
 				</div>
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<Skeleton class="h-5 w-full max-w-[200px]" />
-					<Skeleton class="h-5 w-full max-w-[150px]" />
-					<Skeleton class="h-5 w-full max-w-[180px]" />
-					<Skeleton class="h-5 w-full max-w-[180px]" />
+					<Skeleton class="h-5 w-full max-w-40" />
+					<Skeleton class="h-5 w-full max-w-48" />
+					<Skeleton class="h-5 w-full max-w-48" />
 				</div>
 			</div>
 		{/each}
@@ -39,7 +41,12 @@
 {:else if insuranceStore.error}
 	<p class="text-red-500">Error: {insuranceStore.error}</p>
 {:else if insuranceStore.insurances?.length === 0}
-	<div>No Insurance found for this vehicle.</div>
+	<LabelWithIcon
+		icon={CircleSlash2}
+		iconClass="h-5 w-5"
+		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
+		label="No Insurance found for this vehicle."
+	/>
 {:else}
 	{#each insuranceStore.insurances as ins (ins.id)}
 		<div class="bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6">

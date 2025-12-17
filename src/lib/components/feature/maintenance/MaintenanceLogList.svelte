@@ -16,6 +16,7 @@
 	import type { MaintenanceLog } from '$lib/domain/maintenance';
 	import { maintenanceStore } from '$stores/maintenance.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -112,7 +113,12 @@
 {:else if maintenanceStore.error}
 	<p class="text-red-500">Error: {maintenanceStore.error}</p>
 {:else if maintenanceStore.maintenanceLogs?.length === 0}
-	<div>No maintenance logs for this vehicle.</div>
+	<LabelWithIcon
+		icon={CircleSlash2}
+		iconClass="h-5 w-5"
+		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
+		label="No Maintenance Logs found for this vehicle."
+	/>
 {:else}
 	<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
 {/if}

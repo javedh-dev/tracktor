@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Button from '$ui/button/button.svelte';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import IconButton from '$appui/IconButton.svelte';
@@ -13,15 +12,19 @@
 	import { formatDate } from '$lib/helper/format.helper';
 	import { saveReminder, deleteReminder } from '$lib/services/reminder.service';
 	import { toast } from 'svelte-sonner';
-	import BellPlus from '@lucide/svelte/icons/bell-plus';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
 	import Circle from '@lucide/svelte/icons/circle';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import BellRing from '@lucide/svelte/icons/bell-ring';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import AlarmClock from '@lucide/svelte/icons/alarm-clock';
 	import { browser } from '$app/environment';
 	import type { Reminder } from '$lib/domain';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import ReminderContextMenu from './ReminderContextMenu.svelte';
 
 	let deleteDialog = $state(false);
 	let reminderToDelete = $state<Reminder>();
@@ -48,29 +51,8 @@
 		}
 	});
 
-	const openReminderModal = () => {
-		if (!vehicleStore.selectedId) return;
-		sheetStore.openSheet(
-			ReminderForm,
-			'Add Reminder',
-			'Set up reminders for renewals and maintenance.',
-			{ vehicleId: vehicleStore.selectedId }
-		);
-	};
-
 	const editReminder = (reminder: Reminder) => {
 		sheetStore.openSheet(ReminderForm, 'Update Reminder', '', reminder);
-	};
-
-	const toggleCompletion = async (reminder: Reminder) => {
-		const updated = { ...reminder, isCompleted: !reminder.isCompleted };
-		const res = await saveReminder(updated);
-		if (res.status === 'OK') {
-			toast.success(`Reminder marked ${updated.isCompleted ? 'complete' : 'pending'}.`);
-			reminderStore.refreshReminders();
-		} else {
-			toast.error(res.error || 'Unable to update reminder status.');
-		}
 	};
 
 	const requestDelete = (reminder: Reminder) => {
@@ -78,130 +60,82 @@
 		deleteDialog = true;
 	};
 
-	const handleDelete = async () => {
-		if (!reminderToDelete) return;
-		const res = await deleteReminder(reminderToDelete);
-		if (res.status === 'OK') {
-			toast.success('Reminder deleted.');
-			reminderStore.refreshReminders();
-			reminderToDelete = undefined;
-			deleteDialog = false;
-		} else {
-			toast.error(res.error || 'Failed to delete reminder.');
-		}
-	};
-
 	const reminders = $derived(reminderStore.reminders || []);
 </script>
 
-<section class="mt-8 space-y-4">
-	<div class="flex flex-wrap items-start justify-between gap-2">
-		<div>
-			<h2 class="text-xl font-semibold">Reminders</h2>
-			<p class="text-muted-foreground text-sm">Track important renewals and service dates.</p>
-		</div>
-		<Button
-			variant="secondary"
-			size="sm"
-			disabled={!vehicleStore.selectedId}
-			class="cursor-pointer"
-			onclick={openReminderModal}
-		>
-			<LabelWithIcon icon={BellPlus} label="New Reminder" />
-		</Button>
+{#if !vehicleStore.selectedId}
+	<div
+		class="bg-muted text-muted-foreground border-border flex flex-col items-center justify-center rounded-2xl border border-dashed p-6 text-center"
+	>
+		<p class="text-base font-semibold">Select a vehicle to view reminders.</p>
+		<p class="text-sm">Pick a vehicle above to load its upcoming reminders.</p>
 	</div>
-
-	{#if !vehicleStore.selectedId}
-		<div
-			class="bg-muted text-muted-foreground border-border flex flex-col items-center justify-center rounded-2xl border border-dashed p-6 text-center"
-		>
-			<p class="text-base font-semibold">Select a vehicle to view reminders.</p>
-			<p class="text-sm">Pick a vehicle above to load its upcoming reminders.</p>
-		</div>
-	{:else if reminderStore.processing}
-		<div class="space-y-3">
-			<Skeleton class="h-28 w-full rounded-2xl" />
-			<Skeleton class="h-28 w-full rounded-2xl" />
-		</div>
-	{:else if reminderStore.error}
-		<LabelWithIcon
-			icon={CircleAlert}
-			iconClass="h-5 w-5"
-			style="flex items-center gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-destructive"
-			label={reminderStore.error}
-		/>
-	{:else if reminders.length > 0}
-		<div class="space-y-3">
-			{#each reminders as reminder (reminderKey(reminder))}
-				<article class="bg-card border-border rounded-2xl border p-4 shadow-sm">
-					<div class="flex flex-wrap items-start justify-between gap-4">
-						<div>
-							<p class="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-								{REMINDER_TYPES[reminder.type]}
-							</p>
-							<p class={`text-2xl font-semibold ${isOverdue(reminder) ? 'text-destructive' : ''}`}>
-								{formatDate(reminder.dueDate)}
-							</p>
-							<p class="text-muted-foreground text-xs">
-								{REMINDER_SCHEDULES[reminder.remindSchedule]}
-							</p>
-						</div>
-						<div class="flex flex-wrap items-center gap-2">
-							<Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
-								{reminder.isCompleted ? 'Completed' : 'Pending'}
-							</Badge>
-							{#if isOverdue(reminder)}
-								<Badge variant="destructive">Overdue</Badge>
-							{/if}
-						</div>
+{:else if reminderStore.processing}
+	<div class="space-y-4 pt-4">
+		<Skeleton class="h-28 w-full rounded-2xl" />
+		<Skeleton class="h-28 w-full rounded-2xl" />
+	</div>
+{:else if reminderStore.error}
+	<LabelWithIcon
+		icon={CircleAlert}
+		iconClass="h-5 w-5"
+		style="flex items-center gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-destructive"
+		label={reminderStore.error}
+	/>
+{:else if reminders.length > 0}
+	{#each reminders as reminder (reminderKey(reminder))}
+		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
+			<div class="flex items-center justify-between">
+				<div class="flex flex-wrap items-center gap-4 align-middle">
+					<div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
+						<BellRing class="h-6 w-6" />
+						<span class="line-clamp-1 text-lg font-bold lg:text-xl">
+							{REMINDER_TYPES[reminder.type]}
+						</span>
 					</div>
-
-					{#if reminder.note}
-						<p class="text-muted-foreground mt-2 text-sm">{reminder.note}</p>
-					{/if}
-
-					<div class="mt-4 flex flex-wrap items-center justify-between gap-2">
-						<button
-							type="button"
-							onclick={() => toggleCompletion(reminder)}
-							class="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
-						>
-							{#if reminder.isCompleted}
-								<CheckCircle2 class="h-4 w-4 text-emerald-500" />
-								<span>Mark as pending</span>
-							{:else}
-								<Circle class="h-4 w-4" />
-								<span>Mark as done</span>
-							{/if}
-						</button>
-						<div class="flex items-center gap-2">
-							<IconButton
-								buttonStyles="hover:bg-slate-200 dark:hover:bg-slate-700"
-								iconStyles="text-slate-600 hover:text-sky-500 dark:text-slate-200"
-								icon={Pencil}
-								onclick={() => editReminder(reminder)}
-								ariaLabel="Edit reminder"
-							/>
-							<IconButton
-								buttonStyles="hover:bg-red-100 dark:hover:bg-red-700"
-								iconStyles="text-red-500 hover:text-red-600 dark:text-red-200"
-								icon={Trash2}
-								onclick={() => requestDelete(reminder)}
-								ariaLabel="Delete reminder"
-							/>
-						</div>
+					<div class="flex flex-wrap items-center gap-2">
+						<Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
+							{reminder.isCompleted ? 'Completed' : 'Pending'}
+						</Badge>
+						{#if isOverdue(reminder)}
+							<Badge variant="destructive">Overdue</Badge>
+						{/if}
 					</div>
-				</article>
-			{/each}
-		</div>
-	{:else}
-		<LabelWithIcon
-			icon={CircleSlash2}
-			iconClass="h-5 w-5"
-			style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-			label="No reminders yet. Create one to stay ahead of upcoming renewals."
-		/>
-	{/if}
-</section>
+				</div>
+				<ReminderContextMenu
+					{reminder}
+					onaction={() => {
+						reminderStore.refreshReminders();
+					}}
+				/>
+			</div>
 
-<DeleteConfirmation onConfirm={handleDelete} bind:open={deleteDialog} />
+			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<Calendar class="h-5 w-5" />
+					<span class="font-semibold">Due Date:</span>
+					<span>{formatDate(reminder.dueDate)}</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<AlarmClock class="h-5 w-5" />
+					<span class="font-semibold">Reminder schedule:</span>
+					<span>{REMINDER_SCHEDULES[reminder.remindSchedule]}</span>
+				</div>
+				{#if reminder.note}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<FileText class="h-5 w-5" />
+						<span class="font-semibold">Notes:</span>
+						<span>{reminder.note}</span>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/each}
+{:else}
+	<LabelWithIcon
+		icon={CircleSlash2}
+		iconClass="h-5 w-5"
+		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
+		label="No reminders yet. Create one to stay ahead of upcoming renewals."
+	/>
+{/if}

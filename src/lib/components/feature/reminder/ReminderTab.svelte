@@ -2,14 +2,15 @@
 	import TabContainer from '$appui/TabContainer.svelte';
 	import { sheetStore } from '$lib/stores/sheet.svelte';
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
-	import FuelLogForm from './FuelLogForm.svelte';
-	import FuelLogList from './FuelLogList.svelte';
+	import ReminderForm from './ReminderForm.svelte';
+	import ReminderList from './ReminderList.svelte';
 </script>
 
 <TabContainer
-	title="Fuel Logs"
-	addAction={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '', vehicleStore.selectedId)}
+	title="Reminders"
+	addAction={() =>
+		sheetStore.openSheet(ReminderForm, 'Add Reminder', '', { vehicleId: vehicleStore.selectedId })}
 	addActionDisabled={!vehicleStore.selectedId}
 >
-	<FuelLogList />
+	<ReminderList />
 </TabContainer>

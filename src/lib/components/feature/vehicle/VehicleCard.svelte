@@ -53,14 +53,6 @@
 		}
 	};
 
-	const openReminderSheet = () => {
-		if (!vehicle.id) return;
-		vehicleStore.selectedId = vehicle.id;
-		sheetStore.openSheet(ReminderForm, 'Schedule Reminder', 'Stay ahead of renewals.', {
-			vehicleId: vehicle.id
-		});
-	};
-
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
 	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : undefined);
 </script>
@@ -178,7 +170,7 @@
 						buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
 						iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
 						icon={BellRing}
-						onclick={openReminderSheet}
+						onclick={() => sheetStore.openSheet(ReminderForm, 'Add Reminder', '', vehicle)}
 						ariaLabel="Schedule reminder"
 					/>
 				</div>

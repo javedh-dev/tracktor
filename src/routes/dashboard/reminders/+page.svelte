@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ReminderList from '$feature/reminder/ReminderList.svelte';
+	import ReminderTab from '$feature/reminder/ReminderTab.svelte';
 </script>
 
-<ReminderList />
+<ReminderTab />

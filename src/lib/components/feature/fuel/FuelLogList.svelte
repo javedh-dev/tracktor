@@ -28,6 +28,7 @@
 
 	import { fuelLogStore } from '$stores/fuel-log.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 
 	// Get the selected vehicle to determine fuel type and units
 	const selectedVehicle = $derived(
@@ -172,7 +173,12 @@
 {:else if fuelLogStore.error}
 	<p class="text-red-500">Error: {fuelLogStore.error}</p>
 {:else if fuelLogStore.fuelLogs?.length === 0}
-	<p>No fuel refill logs found for this vehicle.</p>
+	<LabelWithIcon
+		icon={CircleSlash2}
+		iconClass="h-5 w-5"
+		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
+		label="No fuel refill logs found for this vehicle."
+	/>
 {:else}
 	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}
