@@ -1,0 +1,96 @@
+<script lang="ts">
+	import { FieldGroup, Field, FieldLabel } from '$ui/field/index.js';
+	import Input from '$appui/input.svelte';
+	import { authStore } from '$stores/auth.svelte';
+	import { goto } from '$app/navigation';
+	import UserIcon from '@lucide/svelte/icons/circle-user-round';
+	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
+	import SubmitButton from '$appui/SubmitButton.svelte';
+	import { toast } from 'svelte-sonner';
+
+	let username = $state('');
+	let password = $state('');
+	let confirmPassword = $state('');
+	let processing = $state(false);
+
+	$effect(() => {
+		// Check if users exist when component mounts
+		authStore.checkAuthStatus();
+	});
+
+	const handleRegister = async (event: Event) => {
+		event.preventDefault();
+		if (!username || !password || !confirmPassword || processing) return;
+
+		if (password !== confirmPassword) {
+			toast.error('Passwords do not match!!!');
+			confirmPassword = '';
+			return;
+		}
+
+		processing = true;
+		try {
+			const success = await authStore.register(username, password);
+			if (success) {
+				goto('/dashboard');
+			}
+		} finally {
+			processing = false;
+		}
+	};
+</script>
+
+<form onsubmit={handleRegister}>
+	<fieldset disabled={processing} class="w-full">
+		<FieldGroup class="w-full">
+			<Field>
+				<FieldLabel for="email">Username</FieldLabel>
+				<Input
+					id="email"
+					icon={UserIcon}
+					type="text"
+					required
+					bind:value={username}
+					placeholder="username"
+				/>
+			</Field>
+			<Field>
+				<FieldLabel for="password">Password</FieldLabel>
+				<Input
+					id="password"
+					type="password"
+					required
+					placeholder="********"
+					icon={RectangleEllipsis}
+					bind:value={password}
+				/>
+			</Field>
+			<Field>
+				<FieldLabel for="confirm-password">Confirm Password</FieldLabel>
+				<Input
+					id="confirm-password"
+					type="password"
+					required
+					placeholder="********"
+					icon={RectangleEllipsis}
+					bind:value={confirmPassword}
+				/>
+			</Field>
+			<Field>
+				<SubmitButton
+					{processing}
+					class="transition-all duration-300"
+					loadingText="Creating account..."
+				>
+					Sign up
+				</SubmitButton>
+			</Field>
+			<!-- <FieldDescription class="text-center">
+			Already have an account? <a
+				href={'/login'}
+				class="transition-all duration-300 hover:underline">Sign in</a
+			>
+		</FieldDescription> -->
+		</FieldGroup>
+	</fieldset>
+</form>
