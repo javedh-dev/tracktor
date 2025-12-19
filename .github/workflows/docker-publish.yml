@@ -41,7 +41,7 @@ jobs:
             type=ref,event=branch
 
       - name: Build and push Docker image (amd64 only)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -89,7 +89,7 @@ jobs:
             type=raw,value=latest
 
       - name: Build and push Docker image (multi-arch)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile

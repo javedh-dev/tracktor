@@ -9,9 +9,7 @@
 <TabContainer
 	title={'Pollution Certificate Details'}
 	addAction={() => {
-		sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate', '', {
-			vehicleId: vehicleStore.selectedId
-		});
+		sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate', '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >

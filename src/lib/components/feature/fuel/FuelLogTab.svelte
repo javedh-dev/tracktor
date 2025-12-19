@@ -8,7 +8,7 @@
 
 <TabContainer
 	title="Fuel Logs"
-	addAction={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '', vehicleStore.selectedId)}
+	addAction={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '')}
 	addActionDisabled={!vehicleStore.selectedId}
 >
 	<FuelLogList />
