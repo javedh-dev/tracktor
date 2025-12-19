@@ -15,7 +15,7 @@
 	<Sheet.Content id="app-sheet" side="right" class=" flex w-full flex-col px-2">
 		<Sheet.Header id="app-sheet-header" class="shrink-0 px-6 pt-6 pb-0">
 			<Sheet.Title id="app-sheet-title" class="text-primary text-2xl">{title}</Sheet.Title>
-			<hr class="bg-primary/20" />
+			<hr class="bg-primary/20 h-px" />
 			<Sheet.Description id="app-sheet-description">
 				{description}
 			</Sheet.Description>

@@ -39,7 +39,7 @@
 	<Dialog.Content
 		id="file-preview-modal"
 		class={cn(
-			'file-preview-content max-w-[95vw] min-w-2xl gap-0 border-none bg-transparent p-0 shadow-none transition-[max-width,height] duration-300',
+			'file-preview-content max-w-[95vw] min-w-xs gap-0 border-none bg-transparent p-0 shadow-none transition-[max-width,height] duration-300',
 			isLoading
 				? 'h-[50vh] w-full'
 				: isImage
