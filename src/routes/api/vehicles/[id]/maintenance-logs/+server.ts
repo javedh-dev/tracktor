@@ -40,8 +40,8 @@ export const POST: RequestHandler = async (event) => {
 		const body = event.locals.requestBody || (await event.request.json());
 
 		// Basic validation for maintenance log data
-		if (!body.type || !body.description || !body.date) {
-			throw error(400, 'Type, description, and date are required');
+		if (!body.odometer || !body.serviceCenter || !body.date || !body.cost) {
+			throw error(400, 'Odometer, serviceCenter, date, and cost are required');
 		}
 
 		// Validate date

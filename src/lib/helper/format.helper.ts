@@ -8,7 +8,7 @@ const formatDate = (date: Date | string): string => {
 	try {
 		return formatInTimeZone(dateObj, configs.timezone, configs.dateFormat);
 	} catch (e) {
-		return date.toString();
+		return '';
 	}
 };
 

@@ -9,9 +9,7 @@
 <TabContainer
 	title="Insurance Details"
 	addAction={() => {
-		sheetStore.openSheet(InsuranceForm, 'Add Insurance', '', {
-			vehicleId: vehicleStore.selectedId
-		});
+		sheetStore.openSheet(InsuranceForm, 'Add Insurance', '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >

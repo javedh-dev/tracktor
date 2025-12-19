@@ -51,6 +51,10 @@
 					}
 					processing = false;
 				});
+			} else {
+				toast.error(
+					'Please fix the errors in the form before submitting.' + JSON.stringify(f.errors)
+				);
 			}
 		}
 	});

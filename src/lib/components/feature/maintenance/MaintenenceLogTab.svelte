@@ -9,9 +9,7 @@
 <TabContainer
 	title="Maintenance History"
 	addAction={() => {
-		sheetStore.openSheet(MaintenanceForm, 'Add Maintenance Log', '', {
-			vehicleId: vehicleStore.selectedId
-		});
+		sheetStore.openSheet(MaintenanceForm, 'Add Maintenance Log', '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >
