@@ -20,6 +20,7 @@
 
 <Popover.Root bind:open>
 	<Popover.Trigger
+		id="icon-popover-trigger"
 		onmouseenter={() => (open = true)}
 		onmouseleave={() => (open = false)}
 		onclick={() => {
@@ -28,7 +29,7 @@
 	>
 		<Icon class={cn('h-6 w-6', className)} />
 	</Popover.Trigger>
-	<Popover.Content class="w-fit px-2 py-0.5 text-sm" {side} align="end">
+	<Popover.Content id="icon-popover-content" class="w-fit px-2 py-0.5 text-sm" {side} align="end">
 		{tooltip}
 	</Popover.Content>
 </Popover.Root>

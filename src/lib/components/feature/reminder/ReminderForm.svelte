@@ -72,7 +72,7 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="reminder-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="dueDate" class="w-full">
 			<Form.Control>

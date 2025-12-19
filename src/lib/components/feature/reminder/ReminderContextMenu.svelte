@@ -39,9 +39,12 @@
 	};
 </script>
 
-<div class=" flex flex-row justify-end">
+<div id="reminder-context-menu" class="reminder-context-menu flex flex-row justify-end">
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger class="data-[state=open]:bg-muted text-muted-foreground flex size-8">
+		<DropdownMenu.Trigger
+			id="reminder-menu-trigger"
+			class="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+		>
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
@@ -49,18 +52,23 @@
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end" class="w-32">
-			<DropdownMenu.Item onclick={() => toggleCompletion(reminder)}>
+		<DropdownMenu.Content id="reminder-menu-content" align="end" class="w-32">
+			<DropdownMenu.Item id="reminder-menu-toggle" onclick={() => toggleCompletion(reminder)}>
 				{reminder.isCompleted ? 'Mark as pending' : 'Mark as done'}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
+				id="reminder-menu-edit"
 				onclick={() => {
 					sheetStore.openSheet(ReminderForm, 'Update Reminder', '', reminder);
 				}}
 			>
 				Edit
 			</DropdownMenu.Item>
-			<DropdownMenu.Item variant="destructive" onclick={() => (showDeleteDialog = true)}>
+			<DropdownMenu.Item
+				id="reminder-menu-delete"
+				variant="destructive"
+				onclick={() => (showDeleteDialog = true)}
+			>
 				Delete
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>

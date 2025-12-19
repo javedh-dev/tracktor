@@ -57,7 +57,13 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()} encType="multipart/form-data" class="w-full">
+<form
+	id="vehicle-form"
+	use:enhance
+	onsubmit={(e) => e.preventDefault()}
+	encType="multipart/form-data"
+	class="w-full"
+>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="image" class="w-full">
 			<Form.Control>

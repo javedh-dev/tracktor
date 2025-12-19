@@ -32,22 +32,22 @@
 	});
 </script>
 
-<main>
+<main id="dashboard-layout-main">
 	{#if vehicleStore.processing || isLoading}
-		<div class="mx-auto p-4 lg:container lg:p-6">
-			<div class="mb-2 flex items-center justify-between gap-4">
+		<div id="dashboard-loading-container" class="mx-auto p-4 lg:container lg:p-6">
+			<div id="dashboard-loading-header" class="mb-2 flex items-center justify-between gap-4">
 				<Skeleton class="h-8 w-48" />
 				<Skeleton class="h-8 w-32" />
 			</div>
 
-			<div class="my-4 flex gap-4 overflow-hidden">
+			<div id="dashboard-loading-cards" class="my-4 flex gap-4 overflow-hidden">
 				<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 				<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 				<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 			</div>
 
-			<div class="mt-8">
-				<div class="mb-4 flex gap-2">
+			<div id="dashboard-loading-content" class="mt-8">
+				<div id="dashboard-loading-tabs" class="mb-4 flex gap-2">
 					<Skeleton class="h-10 w-24" />
 					<Skeleton class="h-10 w-24" />
 					<Skeleton class="h-10 w-24" />
@@ -56,10 +56,11 @@
 			</div>
 		</div>
 	{:else}
-		<div class="mx-auto p-4 lg:container lg:p-6">
-			<div class="mb-2 flex items-center justify-between">
-				<h1 class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
+		<div id="dashboard-content-container" class="mx-auto p-4 lg:container lg:p-6">
+			<div id="dashboard-header" class="mb-2 flex items-center justify-between">
+				<h1 id="dashboard-title" class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
 				<Button
+					id="dashboard-add-vehicle-btn"
 					variant="outline"
 					size="default"
 					class="cursor-pointer"
@@ -71,20 +72,25 @@
 
 			<VehicleList />
 
-			<div class="mt-8">
+			<div id="dashboard-details-section" class="mt-8">
 				{#if vehicleStore.selectedId}
-					<div class="space-y-6">
+					<div id="dashboard-vehicle-content" class="space-y-6">
 						<DashboardNav />
-						<div class="bg-secondary rounded-2xl p-4 lg:p-6">
+						<div id="dashboard-vehicle-details" class="bg-secondary rounded-2xl p-4 lg:p-6">
 							{@render children()}
 						</div>
 					</div>
 				{:else}
 					<div
+						id="dashboard-empty-state"
 						class="bg-muted text-muted-foreground border-border flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed text-center"
 					>
-						<p class="text-lg font-medium">Select a vehicle to view its details</p>
-						<p class="text-sm">Choose one from the garage above to load its dashboard.</p>
+						<p id="dashboard-empty-message" class="text-lg font-medium">
+							Select a vehicle to view its details
+						</p>
+						<p id="dashboard-empty-hint" class="text-sm">
+							Choose one from the garage above to load its dashboard.
+						</p>
 					</div>
 				{/if}
 			</div>

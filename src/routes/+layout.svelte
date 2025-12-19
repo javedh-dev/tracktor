@@ -57,7 +57,10 @@
 <Toaster position="bottom-right" richColors expand />
 
 {#if demoMode}
-	<div class="bg-secondary/95 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900">
+	<div
+		id="demo-mode-banner"
+		class="demo-mode-banner bg-secondary/95 flex flex-col justify-center p-2 lg:flex-row dark:border-b-amber-900"
+	>
 		<LabelWithIcon
 			icon={TriangleAlert}
 			iconClass="h-5 w-5"
@@ -72,32 +75,39 @@
 	</div>
 {/if}
 {#if showGlobalLoader}
-	<div class="flex min-h-svh w-full flex-col">
+	<div id="global-loading-layout" class="flex min-h-svh w-full flex-col">
 		<header
+			id="global-loading-header"
 			class="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
 		>
-			<div class="container flex h-14 max-w-screen-2xl items-center">
+			<div
+				id="global-loading-header-content"
+				class="container flex h-14 max-w-screen-2xl items-center"
+			>
 				<Skeleton class="h-8 w-8 rounded-full" />
-				<div class="ml-4 flex items-center space-x-2">
+				<div id="global-loading-header-title" class="ml-4 flex items-center space-x-2">
 					<Skeleton class="h-6 w-24" />
 				</div>
-				<div class="flex flex-1 items-center justify-end space-x-2">
+				<div
+					id="global-loading-header-actions"
+					class="flex flex-1 items-center justify-end space-x-2"
+				>
 					<Skeleton class="h-8 w-8 rounded-full" />
 				</div>
 			</div>
 		</header>
-		<main class="flex-1 space-y-4 p-8 pt-6">
-			<div class="flex items-center justify-between space-y-2">
+		<main id="global-loading-content" class="flex-1 space-y-4 p-8 pt-6">
+			<div id="global-loading-title-section" class="flex items-center justify-between space-y-2">
 				<Skeleton class="h-8 w-48" />
 			</div>
-			<div class="space-y-4">
+			<div id="global-loading-body" class="space-y-4">
 				<Skeleton class="h-32 w-full rounded-xl" />
 				<Skeleton class="h-32 w-full rounded-xl" />
 			</div>
 		</main>
 	</div>
 {:else}
-	<div class="flex min-h-svh w-full flex-col">
+	<div id="app-container" class="flex min-h-svh w-full flex-col">
 		<Header />
 		{@render children()}
 	</div>

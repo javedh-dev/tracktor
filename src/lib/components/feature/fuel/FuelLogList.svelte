@@ -163,7 +163,7 @@
 </script>
 
 {#if fuelLogStore.processing}
-	<div class="space-y-3">
+	<div id="fuel-log-list-skeleton" class="space-y-3">
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />

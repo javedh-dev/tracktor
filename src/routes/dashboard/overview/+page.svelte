@@ -2,4 +2,6 @@
 	import OverviewTab from '$feature/overview/OverviewTab.svelte';
 </script>
 
-<OverviewTab />
+<div id="overview-page-container" class="w-full">
+	<OverviewTab />
+</div>

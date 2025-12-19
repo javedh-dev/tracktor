@@ -83,7 +83,7 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="insurance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>

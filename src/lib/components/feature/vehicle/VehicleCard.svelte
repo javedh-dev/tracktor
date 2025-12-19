@@ -57,7 +57,14 @@
 	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : undefined);
 </script>
 
-<div tabindex="0" role="button" {onclick} {onkeydown}>
+<div
+	id="vehicle-card-{vehicle.id}"
+	class="vehicle-card"
+	tabindex="0"
+	role="button"
+	{onclick}
+	{onkeydown}
+>
 	<Card.Root
 		class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
 	>
@@ -128,10 +135,11 @@
 				</div>
 			</div>
 		</Card.Content>
-		<Card.Footer class="px-3">
-			<div class="flex w-full justify-between">
-				<div class="flex justify-start">
+		<Card.Footer id="vehicle-card-actions" class="px-3">
+			<div id="vehicle-card-action-row" class="flex w-full justify-between">
+				<div id="vehicle-card-primary-actions" class="flex justify-start">
 					<IconButton
+						id="vehicle-card-fuel-btn"
 						buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 						iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 						icon={Fuel}
@@ -139,6 +147,7 @@
 						ariaLabel="Log fuel refill"
 					/>
 					<IconButton
+						id="vehicle-card-maintenance-btn"
 						buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 						iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 						icon={Wrench}
@@ -146,6 +155,7 @@
 						ariaLabel="Maintenence"
 					/>
 					<IconButton
+						id="vehicle-card-insurance-btn"
 						buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 						iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 						icon={Shield}
@@ -153,6 +163,7 @@
 						ariaLabel="Insurance"
 					/>
 					<IconButton
+						id="vehicle-card-pollution-btn"
 						buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
 						iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 						icon={BadgeCheck}
@@ -161,6 +172,7 @@
 						ariaLabel="Pollution Certificate"
 					/>
 					<IconButton
+						id="vehicle-card-reminder-btn"
 						buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
 						iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
 						icon={BellRing}
@@ -168,8 +180,9 @@
 						ariaLabel="Schedule reminder"
 					/>
 				</div>
-				<div class="flex justify-end gap-2">
+				<div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
 					<IconButton
+						id="vehicle-card-edit-btn"
 						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
 						icon={Pencil}
@@ -179,6 +192,7 @@
 						ariaLabel="Edit"
 					/>
 					<IconButton
+						id="vehicle-card-delete-btn"
 						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
 						icon={Trash2}

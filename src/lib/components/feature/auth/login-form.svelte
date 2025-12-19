@@ -32,7 +32,7 @@
 	};
 </script>
 
-<form onsubmit={handleLogin}>
+<form id="auth-login-form" onsubmit={handleLogin}>
 	<fieldset disabled={processing} class="w-full">
 		<FieldGroup class="w-full">
 			<Field>

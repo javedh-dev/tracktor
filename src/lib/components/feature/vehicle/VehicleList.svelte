@@ -15,7 +15,7 @@
 </script>
 
 {#if vehicleStore.processing}
-	<div class="my-4 flex gap-4 overflow-hidden">
+	<div id="vehicle-list-skeleton" class="vehicle-list-loading my-4 flex gap-4 overflow-hidden">
 		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 		<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
@@ -28,7 +28,11 @@
 		label={vehicleStore.error}
 	/>
 {:else if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
-	<ScrollArea class="w-full whitespace-nowrap" orientation="horizontal">
+	<ScrollArea
+		id="vehicle-list-container"
+		class="vehicle-list w-full whitespace-nowrap"
+		orientation="horizontal"
+	>
 		<div class="my-4 flex gap-4">
 			{#each vehicleStore.vehicles as vehicle (vehicle.id)}
 				<VehicleCard

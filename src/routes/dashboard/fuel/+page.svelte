@@ -2,4 +2,6 @@
 	import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
 </script>
 
-<FuelLogTab />
+<div id="fuel-page-container" class="w-full">
+	<FuelLogTab />
+</div>

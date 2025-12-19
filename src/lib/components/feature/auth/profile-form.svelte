@@ -85,7 +85,7 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="auth-profile-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-6" disabled={processing}>
 		<Form.Field {form} name="username" class="w-full">
 			<Form.Control>

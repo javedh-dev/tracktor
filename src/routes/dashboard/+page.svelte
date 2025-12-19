@@ -29,20 +29,20 @@
 </script>
 
 {#if vehicleStore.processing || isLoading}
-	<div class="mx-auto p-4 lg:container lg:p-6">
-		<div class="mb-2 flex items-center justify-between gap-4">
+	<div id="dashboard-page-loading" class="mx-auto p-4 lg:container lg:p-6">
+		<div id="dashboard-loading-header" class="mb-2 flex items-center justify-between gap-4">
 			<Skeleton class="h-8 w-48" />
 			<Skeleton class="h-8 w-32" />
 		</div>
 
-		<div class="my-4 flex gap-4 overflow-hidden">
+		<div id="dashboard-loading-cards" class="my-4 flex gap-4 overflow-hidden">
 			<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 			<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 			<Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
 		</div>
 
-		<div class="mt-8">
-			<div class="mb-4 flex gap-2">
+		<div id="dashboard-loading-tabs" class="mt-8">
+			<div id="dashboard-loading-tab-list" class="mb-4 flex gap-2">
 				<Skeleton class="h-10 w-24" />
 				<Skeleton class="h-10 w-24" />
 				<Skeleton class="h-10 w-24" />
@@ -51,10 +51,11 @@
 		</div>
 	</div>
 {:else}
-	<div class="mx-auto p-4 lg:container lg:p-6">
-		<div class="mb-2 flex items-center justify-between">
-			<h1 class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
+	<div id="dashboard-page-content" class="mx-auto p-4 lg:container lg:p-6">
+		<div id="dashboard-page-header" class="mb-2 flex items-center justify-between">
+			<h1 id="dashboard-page-title" class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
 			<Button
+				id="dashboard-page-add-btn"
 				variant="outline"
 				size="default"
 				class="cursor-pointer"

@@ -103,7 +103,7 @@
 </script>
 
 {#if maintenanceStore.processing}
-	<div class="space-y-3">
+	<div id="maintenance-log-list-skeleton" class="space-y-3">
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />
@@ -120,7 +120,9 @@
 		label="No Maintenance Logs found for this vehicle."
 	/>
 {:else}
-	<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
+	<div id="maintenance-log-table" class="maintenance-log-table">
+		<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
+	</div>
 {/if}
 
 {#snippet dateCell(params: any)}

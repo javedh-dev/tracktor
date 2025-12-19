@@ -2,4 +2,6 @@
 	import InsuranceTab from '$feature/insurance/InsuranceTab.svelte';
 </script>
 
-<InsuranceTab />
+<div id="insurance-page-container" class="w-full">
+	<InsuranceTab />
+</div>

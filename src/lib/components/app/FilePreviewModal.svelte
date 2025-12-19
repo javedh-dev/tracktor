@@ -37,8 +37,9 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
+		id="file-preview-modal"
 		class={cn(
-			'max-w-[95vw] min-w-2xl gap-0 border-none bg-transparent p-0 shadow-none transition-[max-width,height] duration-300',
+			'file-preview-content max-w-[95vw] min-w-2xl gap-0 border-none bg-transparent p-0 shadow-none transition-[max-width,height] duration-300',
 			isLoading
 				? 'h-[50vh] w-full'
 				: isImage
@@ -50,28 +51,34 @@
 		showCloseButton={false}
 	>
 		<div
+			id="file-preview-wrapper"
 			class={cn(
-				'group bg-background/95 relative flex flex-col overflow-hidden rounded-lg shadow-2xl backdrop-blur-sm transition-all duration-300',
+				'group bg-background/95 file-preview-wrapper relative flex flex-col overflow-hidden rounded-lg shadow-2xl backdrop-blur-sm transition-all duration-300',
 				isViewable ? 'border-none' : 'border'
 			)}
 			style={isLoading ? 'height: 100%;' : isPdf ? 'height: 90vh;' : ''}
 		>
 			<!-- Custom Header -->
 			<div
+				id="file-preview-header"
 				class={cn(
-					'absolute top-0 right-0 left-0 z-20 flex items-center justify-between p-3 transition-opacity duration-300',
+					'file-preview-header absolute top-0 right-0 left-0 z-20 flex items-center justify-between p-3 transition-opacity duration-300',
 					isViewable
 						? 'bg-gradient-to-b from-black/60 to-transparent text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100'
 						: 'bg-background relative border-b opacity-100'
 				)}
 			>
-				<div class="mr-4 flex flex-1 items-center gap-2 overflow-hidden px-2">
+				<div
+					id="file-preview-filename"
+					class="mr-4 flex flex-1 items-center gap-2 overflow-hidden px-2"
+				>
 					<span class={cn('truncate text-sm font-medium', isViewable ? 'drop-shadow-md' : '')}
 						>{fileName}</span
 					>
 				</div>
-				<div class="flex flex-shrink-0 items-center gap-2">
+				<div id="file-preview-actions" class="flex flex-shrink-0 items-center gap-2">
 					<Button
+						id="file-preview-download"
 						variant="ghost"
 						size="icon"
 						href={fileUrl}
@@ -82,6 +89,7 @@
 						<span class="sr-only">Download</span>
 					</Button>
 					<Button
+						id="file-preview-close"
 						variant="ghost"
 						size="icon"
 						onclick={() => (open = false)}

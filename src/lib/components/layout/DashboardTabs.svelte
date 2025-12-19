@@ -59,38 +59,44 @@
 </script>
 
 {#if isLoading}
-	<div class="w-full">
+	<div id="dashboard-tabs-skeleton" class="w-full">
 		<div
+			id="dashboard-tabs-header-skeleton"
 			class="mb-4 grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center lg:gap-4"
 		>
 			{#each [0, 1, 2, 3, 4] as i (i)}
-				<Skeleton class="h-10 w-full rounded-md lg:w-28" />
+				<Skeleton class="skeleton-tab-trigger h-10 w-full rounded-md lg:w-28" />
 			{/each}
 		</div>
-		<div class="bg-secondary rounded-md p-2 lg:p-8">
-			<Skeleton class="mb-6 h-8 w-48" />
+		<div id="dashboard-tabs-content-skeleton" class="bg-secondary rounded-md p-2 lg:p-8">
+			<Skeleton class="skeleton-content-title mb-6 h-8 w-48" />
 			<div class="space-y-4">
-				<Skeleton class="h-32 w-full rounded-lg" />
+				<Skeleton class="skeleton-content-block h-32 w-full rounded-lg" />
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<Skeleton class="h-64 w-full rounded-lg" />
-					<Skeleton class="h-64 w-full rounded-lg" />
+					<Skeleton class="skeleton-content-card h-64 w-full rounded-lg" />
+					<Skeleton class="skeleton-content-card h-64 w-full rounded-lg" />
 				</div>
 			</div>
 		</div>
 	</div>
 {:else}
-	<Tabs.Root bind:value={currentTab} class="w-full">
+	<Tabs.Root id="dashboard-tabs" bind:value={currentTab} class="w-full">
 		<Tabs.List
+			id="dashboard-tabs-list"
 			class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 		>
 			{#each tabs as tab}
-				<Tabs.Trigger value={tab.id} class="justify-start lg:justify-center">
+				<Tabs.Trigger
+					id="tab-trigger-{tab.id}"
+					value={tab.id}
+					class="tab-trigger justify-start lg:justify-center"
+				>
 					<LabelWithIcon icon={tab.Icon} label={tab.name} />
 				</Tabs.Trigger>
 			{/each}
 		</Tabs.List>
 		{#each tabs as { id, Component } (id)}
-			<Tabs.Content class="w-full" value={id}>
+			<Tabs.Content id="tab-content-{id}" class="tab-content w-full" value={id}>
 				<Component />
 			</Tabs.Content>
 		{/each}

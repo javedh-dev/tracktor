@@ -25,9 +25,12 @@
 	};
 </script>
 
-<div class=" flex flex-row justify-end">
+<div id="pollution-context-menu" class="pollution-context-menu flex flex-row justify-end">
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger class="data-[state=open]:bg-muted text-muted-foreground flex size-8">
+		<DropdownMenu.Trigger
+			id="pollution-menu-trigger"
+			class="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+		>
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
@@ -35,15 +38,20 @@
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end" class="w-32">
+		<DropdownMenu.Content id="pollution-menu-content" align="end" class="w-32">
 			<DropdownMenu.Item
+				id="pollution-menu-edit"
 				onclick={() => {
 					sheetStore.openSheet(PollutionCertificateForm, 'Update Pollution Certificate', '', pucc);
 				}}
 			>
 				Edit
 			</DropdownMenu.Item>
-			<DropdownMenu.Item variant="destructive" onclick={() => (showDeleteDialog = true)}>
+			<DropdownMenu.Item
+				id="pollution-menu-delete"
+				variant="destructive"
+				onclick={() => (showDeleteDialog = true)}
+			>
 				Delete
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>

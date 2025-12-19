@@ -103,7 +103,7 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="settings-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="space-y-6">
 		<Tabs.Root value="interface" class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">

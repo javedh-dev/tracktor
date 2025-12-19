@@ -2,4 +2,6 @@
 	import ReminderTab from '$feature/reminder/ReminderTab.svelte';
 </script>
 
-<ReminderTab />
+<div id="reminders-page-container" class="w-full">
+	<ReminderTab />
+</div>

@@ -69,13 +69,17 @@
 	};
 </script>
 
-<nav class="grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center">
+<nav
+	id="dashboard-nav"
+	class="grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center"
+>
 	{#each sections as section}
 		<a
 			use:spaLink
+			id="nav-{section.label.toLowerCase().replace(/\s+/g, '-')}"
 			href={section.href}
 			aria-current={currentPath.startsWith(section.href) ? 'page' : undefined}
-			class={linkClasses(section.href)}
+			class="{linkClasses(section.href)} nav-link"
 		>
 			<LabelWithIcon icon={section.icon} label={section.label} iconClass="h-4 w-4" />
 		</a>

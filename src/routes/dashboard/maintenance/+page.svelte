@@ -2,4 +2,6 @@
 	import MaintenenceLogTab from '$feature/maintenance/MaintenenceLogTab.svelte';
 </script>
 
-<MaintenenceLogTab />
+<div id="maintenance-page-container" class="w-full">
+	<MaintenenceLogTab />
+</div>

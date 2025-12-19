@@ -76,7 +76,7 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="maintenance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="attachment" class="w-full">

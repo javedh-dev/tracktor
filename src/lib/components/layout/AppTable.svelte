@@ -104,7 +104,7 @@
 	});
 </script>
 
-<div>
+<div id="app-table-container">
 	{#if !data || data.length === 0}
 		<div class="flex h-24 flex-col items-center justify-center">
 			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={`No data avaialble`} />

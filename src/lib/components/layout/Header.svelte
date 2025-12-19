@@ -20,9 +20,10 @@
 </script>
 
 <header
+	id="app-header"
 	class="flex h-auto shrink-0 justify-center gap-2 border-b py-3 text-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)"
 >
-	<div class="flex w-full items-center px-2 lg:px-6">
+	<div id="header-container" class="flex w-full items-center px-2 lg:px-6">
 		<LabelWithIcon
 			icon={Tractor}
 			iconClass="h-8 w-8"
@@ -30,12 +31,13 @@
 			id="header-logo"
 			label="Tracktor"
 		/>
-		<div class="ml-auto flex items-center gap-2">
-			<div class="flex items-center gap-2">
+		<div id="header-actions" class="ml-auto flex items-center gap-2">
+			<div class="header-toolbar flex items-center gap-2">
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}
 					<Notifications />
 					<Button
+						id="settings-button"
 						variant="ghost"
 						onclick={() => {
 							sheetStore.openSheet(SettingsForm, 'Settings');
@@ -46,14 +48,16 @@
 					{#if !env.DISABLE_AUTH}
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger
+								id="account-menu-trigger"
 								class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 								aria-label="Account menu"
 								title="Account"
 							>
 								<CircleUser class="h-[1.2rem] w-[1.2rem]" />
 							</DropdownMenu.Trigger>
-							<DropdownMenu.Content align="end">
+							<DropdownMenu.Content id="account-menu" align="end">
 								<DropdownMenu.Item
+									id="profile-menu-item"
 									onclick={() => {
 										sheetStore.openSheet(
 											ProfileForm,
@@ -68,13 +72,15 @@
 								</DropdownMenu.Item>
 								<DropdownMenu.Sub>
 									<DropdownMenu.SubTrigger
+										id="tools-submenu-trigger"
 										class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus-visible:ring-1"
 									>
 										<ToolCase class="h-[1.2rem] w-[1.2rem]" />
 										<span class="flex-1 text-left">Tools</span>
 									</DropdownMenu.SubTrigger>
-									<DropdownMenu.SubContent alignOffset={-4} class="min-w-48">
+									<DropdownMenu.SubContent id="tools-submenu" alignOffset={-4} class="min-w-48">
 										<DropdownMenu.Item
+											id="export-import-menu-item"
 											onclick={() => {
 												sheetStore.openSheet(
 													DataExportImport,
@@ -89,7 +95,7 @@
 									</DropdownMenu.SubContent>
 								</DropdownMenu.Sub>
 								<DropdownMenu.Separator />
-								<DropdownMenu.Item onclick={authStore.logout}>
+								<DropdownMenu.Item id="logout-menu-item" onclick={authStore.logout}>
 									<LogOut class="h-[1.2rem] w-[1.2rem]" />
 									Logout
 								</DropdownMenu.Item>

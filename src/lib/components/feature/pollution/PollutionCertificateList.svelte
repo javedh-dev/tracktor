@@ -19,7 +19,7 @@
 </script>
 
 {#if puccStore.processing}
-	<div class="space-y-4 pt-4">
+	<div id="pollution-list-skeleton" class="space-y-4 pt-4">
 		{#each [0, 1] as i (i)}
 			<div class="bg-background rounded-lg border p-4 shadow-sm lg:p-6">
 				<div class="mb-4 flex items-center justify-between">
@@ -46,7 +46,10 @@
 	/>
 {:else}
 	{#each puccStore.pollutionCerts as pucc (pucc.id)}
-		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
+		<div
+			id="pollution-certificate-item-{pucc.id}"
+			class="pollution-certificate-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+		>
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-fuchsia-500 dark:text-fuchsia-400">
 					<BadgeCheck class="h-6 w-6 " />

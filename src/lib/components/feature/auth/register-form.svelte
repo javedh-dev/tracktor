@@ -40,7 +40,7 @@
 	};
 </script>
 
-<form onsubmit={handleRegister}>
+<form id="auth-register-form" onsubmit={handleRegister}>
 	<fieldset disabled={processing} class="w-full">
 		<FieldGroup class="w-full">
 			<Field>

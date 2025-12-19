@@ -62,7 +62,10 @@
 	/>
 {:else if reminders.length > 0}
 	{#each reminders as reminder (reminderKey(reminder))}
-		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
+		<div
+			id="reminder-item-{reminderKey(reminder)}"
+			class="reminder-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+		>
 			<div class="flex items-center justify-between">
 				<div class="flex flex-wrap items-center gap-4 align-middle">
 					<div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">

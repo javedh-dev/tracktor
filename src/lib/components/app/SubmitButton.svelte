@@ -11,11 +11,11 @@
 	}: ButtonProps & { processing?: boolean; loadingText?: string } = $props();
 </script>
 
-<Button type="submit" disabled={processing} {...rest}>
+<Button id="submit-button" type="submit" disabled={processing} {...rest}>
 	{#if processing}
-		<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+		<Loader2 id="submit-button-spinner" class="mr-2 h-4 w-4 animate-spin" />
 		{#if loadingText}
-			{loadingText}
+			<span id="submit-button-loading-text">{loadingText}</span>
 		{/if}
 	{/if}
 	{#if !processing || !loadingText}

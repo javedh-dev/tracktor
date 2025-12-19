@@ -114,18 +114,18 @@
 	}
 </script>
 
-<div class="space-y-6">
-	<Tabs.Root value="export" class="w-full">
+<div id="data-export-import-container" class="data-export-import space-y-6">
+	<Tabs.Root id="data-export-import-tabs" value="export" class="w-full">
 		<Tabs.List class="grid w-full grid-cols-2">
 			<Tabs.Trigger value="export">Export Data</Tabs.Trigger>
 			<Tabs.Trigger value="import">Import Data</Tabs.Trigger>
 		</Tabs.List>
 
-		<Tabs.Content value="export" class="space-y-4">
+		<Tabs.Content id="data-export-tab" value="export" class="space-y-4">
 			<div class="space-y-4">
 				<div class="flex items-center space-x-2">
-					<Checkbox bind:checked={useEncryption} id="encrypt" />
-					<Label for="encrypt" class="flex items-center gap-2">
+					<Checkbox id="data-export-encryption-checkbox" bind:checked={useEncryption} />
+					<Label for="data-export-encryption-checkbox" class="flex items-center gap-2">
 						{#if useEncryption}
 							<Lock class="h-4 w-4" />
 						{:else}
@@ -151,6 +151,7 @@
 				{/if}
 
 				<Button
+					id="data-export-button"
 					onclick={exportData}
 					disabled={isExporting || (useEncryption && !exportPassword)}
 					class="w-full"
@@ -171,7 +172,7 @@
 			</div>
 		</Tabs.Content>
 
-		<Tabs.Content value="import" class="space-y-4">
+		<Tabs.Content id="data-import-tab" value="import" class="space-y-4">
 			<div class="space-y-4">
 				<div class="space-y-2">
 					<Label for="import-file">Upload JSON File</Label>
@@ -199,6 +200,7 @@
 				</div>
 
 				<Button
+					id="data-import-button"
 					onclick={handleImportData}
 					disabled={isImporting || !importData.trim()}
 					class="w-full"

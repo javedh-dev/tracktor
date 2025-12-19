@@ -213,6 +213,7 @@
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger
+		id="notifications-trigger"
 		class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 		aria-label="Notifications"
 		title="Notifications"
@@ -220,47 +221,60 @@
 		<Bell class="h-[1.15rem] w-[1.15rem]" />
 		{#if notificationCount > 0}
 			<span
-				class="bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.65rem] leading-none font-semibold"
+				id="notification-badge"
+				class="notification-count bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.65rem] leading-none font-semibold"
 			>
 				{notificationCount > 9 ? '9+' : notificationCount}
 			</span>
 		{/if}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="end" class="w-88 space-y-2">
-		<div class="flex items-center justify-between px-2 py-1.5">
+	<DropdownMenu.Content id="notifications-menu" align="end" class="w-88 space-y-2">
+		<div id="notifications-header" class="flex items-center justify-between px-2 py-1.5">
 			<span class="text-sm font-semibold">Notifications</span>
 			{#if notificationCount > 0}
-				<span class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold">
+				<span
+					id="notifications-count-badge"
+					class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold"
+				>
 					{notificationCount} new
 				</span>
 			{/if}
 		</div>
 		<DropdownMenu.Separator />
 		{#if !vehicleStore.selectedId}
-			<div class="text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm">
+			<div
+				class="notifications-empty text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+			>
 				<AlertTriangle class="h-4 w-4" />
 				<span>Select a vehicle to load reminders and alerts.</span>
 			</div>
 		{:else if notificationLoading}
-			<div class="text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm">
+			<div
+				class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+			>
 				<Loader2 class="h-4 w-4 animate-spin" />
 				<span>Syncing latest data...</span>
 			</div>
 		{:else if notificationCount === 0}
-			<div class="text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm">
+			<div
+				class="notifications-success text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+			>
 				<CheckCircle2 class="h-4 w-4" />
 				<span>You're all caught up.</span>
 			</div>
 		{:else}
-			<div class="max-h-80 space-y-3 overflow-auto px-1 py-2">
+			<div id="notifications-list-container" class="max-h-80 space-y-3 overflow-auto px-1 py-2">
 				{#if reminderNotifications.length}
-					<p class="text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase">
+					<p
+						class="notifications-section-title text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase"
+					>
 						Reminders
 					</p>
-					<ul class="space-y-2">
+					<ul id="notifications-reminders-list" class="space-y-2">
 						{#each reminderNotifications as reminder (reminder.id ?? `${reminder.vehicleId}-${reminder.dueDate.getTime()}`)}
 							<li
-								class="border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 shadow-sm"
+								id="notification-reminder-{reminder.id}"
+								class="notification-item border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 shadow-sm"
 							>
 								<div class="rounded-full border p-1 {reminderSeverityRing[reminder.severity]}">
 									<CalendarDays class="h-4 w-4" />
@@ -310,13 +324,16 @@
 					</ul>
 				{/if}
 				{#if alertNotifications.length}
-					<p class="text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase">
+					<p
+						class="notifications-section-title text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase"
+					>
 						Compliance Alerts
 					</p>
-					<ul class="space-y-2">
+					<ul id="notifications-alerts-list" class="space-y-2">
 						{#each alertNotifications as alert (alert.type)}
 							<li
-								class="border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 align-middle shadow-sm"
+								id="notification-alert-{alert.type}"
+								class="notification-item border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 align-middle shadow-sm"
 							>
 								<div class="rounded-full border p-1 {alertStatusRing[alert.status]}">
 									{#if alert.type === 'insurance'}

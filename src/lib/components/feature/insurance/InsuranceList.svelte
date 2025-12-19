@@ -49,7 +49,10 @@
 	/>
 {:else}
 	{#each insuranceStore.insurances as ins (ins.id)}
-		<div class="bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6">
+		<div
+			id="insurance-item-{ins.id}"
+			class="insurance-item bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6"
+		>
 			<div class="flex items-center justify-between">
 				<div class="dark: flex items-center gap-2 text-blue-400">
 					<Shield class="h-6 w-6" />
