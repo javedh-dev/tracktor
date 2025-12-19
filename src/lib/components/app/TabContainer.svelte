@@ -8,7 +8,7 @@
 
 <div
 	id="tab-container"
-	class="tab-container bg-secondary rounded-md p-2 lg:p-8"
+	class="tab-container lg:bg-secondary rounded-md p-2 lg:p-8"
 	role="tabpanel"
 	aria-labelledby="dashboard-tab"
 >

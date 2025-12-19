@@ -52,7 +52,10 @@
 	} satisfies Chart.ChartConfig);
 </script>
 
-<div id="chart-area-{title}" class="area-chart bg-background/50 rounded-lg px-4 pt-2 pb-6 lg:p-6">
+<div
+	id="chart-area-{title}"
+	class="area-chart lg:bg-background/50 bg-secondary rounded-lg px-4 pt-2 pb-6 lg:p-6"
+>
 	<div class="mb-4 flex flex-row justify-start font-bold">{title}</div>
 	{#if loading}
 		<div class="flex h-[200px] flex-col justify-end space-y-2">

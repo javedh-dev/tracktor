@@ -61,7 +61,7 @@
 			isActive
 				? 'border-primary bg-primary/10 text-primary'
 				: 'border-border bg-card text-muted-foreground hover:border-foreground hover:text-foreground'
-		} rounded-md px-3 py-1 text-left text-sm font-medium flex items-center justify-start`;
+		} rounded-md px-3 py-2 lg:py-1 text-left text-sm font-medium flex items-center justify-start`;
 	};
 
 	const spaLink = (node: HTMLAnchorElement) => {
@@ -100,7 +100,7 @@
 
 <nav
 	id="dashboard-nav"
-	class="grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center"
+	class="xs:p-4 flex h-auto w-full flex-row gap-2 lg:items-center lg:bg-transparent lg:p-0"
 >
 	{#each visibleSections as section}
 		<a
@@ -110,7 +110,12 @@
 			aria-current={currentPath.startsWith(section.href) ? 'page' : undefined}
 			class="{linkClasses(section.href)} nav-link"
 		>
-			<LabelWithIcon icon={section.icon} label={section.label} iconClass="h-4 w-4" />
+			<LabelWithIcon
+				icon={section.icon}
+				label={section.label}
+				iconClass="h-4 w-4"
+				labelClass="hidden lg:inline-block"
+			/>
 		</a>
 	{/each}
 </nav>

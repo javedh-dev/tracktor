@@ -51,7 +51,7 @@
 	{#each insuranceStore.insurances as ins (ins.id)}
 		<div
 			id="insurance-item-{ins.id}"
-			class="insurance-item bg-background/50 mt-4 rounded-lg p-4 shadow-sm lg:p-6"
+			class="insurance-item lg:bg-background/50 bg-secondary mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
 		>
 			<div class="flex items-center justify-between">
 				<div class="dark: flex items-center gap-2 text-blue-400">

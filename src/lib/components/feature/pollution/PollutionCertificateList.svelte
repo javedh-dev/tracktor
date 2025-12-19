@@ -48,7 +48,7 @@
 	{#each puccStore.pollutionCerts as pucc (pucc.id)}
 		<div
 			id="pollution-certificate-item-{pucc.id}"
-			class="pollution-certificate-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+			class="pollution-certificate-item lg:bg-background/50 bg-secondary mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
 		>
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2 text-fuchsia-500 dark:text-fuchsia-400">

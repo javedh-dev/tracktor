@@ -111,7 +111,7 @@
 				{#if vehicleStore.selectedId}
 					<div id="dashboard-vehicle-content" class="space-y-6">
 						<DashboardNav />
-						<div id="dashboard-vehicle-details" class="bg-secondary rounded-2xl p-4 lg:p-6">
+						<div id="dashboard-vehicle-details" class="lg:bg-secondary rounded-2xl p-0 lg:p-6">
 							{@render children()}
 						</div>
 					</div>
