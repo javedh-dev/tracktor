@@ -64,7 +64,7 @@
 				class={cn(
 					'file-preview-header absolute top-0 right-0 left-0 z-20 flex items-center justify-between p-3 transition-opacity duration-300',
 					isViewable
-						? 'bg-gradient-to-b from-black/60 to-transparent text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100'
+						? 'bg-linear-to-b from-black/60 to-transparent text-white opacity-0 group-hover:opacity-100 focus-within:opacity-100'
 						: 'bg-background relative border-b opacity-100'
 				)}
 			>
@@ -76,7 +76,7 @@
 						>{fileName}</span
 					>
 				</div>
-				<div id="file-preview-actions" class="flex flex-shrink-0 items-center gap-2">
+				<div id="file-preview-actions" class="flex shrink-0 items-center gap-2">
 					<Button
 						id="file-preview-download"
 						variant="ghost"

@@ -105,41 +105,12 @@
 
 <form id="settings-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="space-y-6">
-		<Tabs.Root value="interface" class="flex w-full flex-col gap-4">
+		<Tabs.Root value="personalization" class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">
-				<Tabs.Trigger value="interface">Interface</Tabs.Trigger>
 				<Tabs.Trigger value="personalization">Personalization</Tabs.Trigger>
+				<Tabs.Trigger value="interface">Interface</Tabs.Trigger>
 				<Tabs.Trigger value="features">Features</Tabs.Trigger>
 			</Tabs.List>
-
-			<!-- Interface Tab -->
-			<Tabs.Content value="interface" class="space-y-6">
-				<fieldset class="flex flex-col gap-6" disabled={processing}>
-					<!-- Date Format -->
-					<Form.Field {form} name="customCss" class="w-full">
-						<Form.Control>
-							{#snippet children({ props })}
-								<FormLabel description="CSS Styles for customizing the interface">
-									Custom CSS
-								</FormLabel>
-								<Textarea
-									{...props}
-									placeholder="Add your custom CSS here..."
-									class="mono h-72 resize-none"
-									bind:value={$formData.customCss}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<!-- <div class="border-muted rounded-lg border border-dashed p-6 text-center">
-						<p class="text-muted-foreground text-sm">
-							No interface settings available yet. Check back soon for themes, layouts, and other UI
-							customization options.
-						</p>
-					</div> -->
-				</fieldset>
-			</Tabs.Content>
 
 			<!-- Personalization Tab -->
 			<Tabs.Content value="personalization" class="grow space-y-6">
@@ -261,6 +232,35 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
+				</fieldset>
+			</Tabs.Content>
+
+			<!-- Interface Tab -->
+			<Tabs.Content value="interface" class="space-y-6">
+				<fieldset class="flex flex-col gap-6" disabled={processing}>
+					<!-- Date Format -->
+					<Form.Field {form} name="customCss" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="CSS Styles for customizing the interface">
+									Custom CSS
+								</FormLabel>
+								<Textarea
+									{...props}
+									placeholder="Add your custom CSS here..."
+									class="mono h-72 resize-none"
+									bind:value={$formData.customCss}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- <div class="border-muted rounded-lg border border-dashed p-6 text-center">
+						<p class="text-muted-foreground text-sm">
+							No interface settings available yet. Check back soon for themes, layouts, and other UI
+							customization options.
+						</p>
+					</div> -->
 				</fieldset>
 			</Tabs.Content>
 
