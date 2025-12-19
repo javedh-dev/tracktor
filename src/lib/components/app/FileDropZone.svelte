@@ -49,6 +49,9 @@
 		...rest
 	}: Props = $props();
 
+	const inputId = $derived(id);
+	const labelId = $derived(`${inputId}-label`);
+
 	let uploading = $state(false);
 	let previewSrc = $state<string>();
 	let fileType = $state<'image' | 'pdf' | 'unknown'>('unknown');
@@ -276,10 +279,10 @@
 	{:else}
 		<!-- Drop zone for new uploads -->
 		<label
-			{id}
+			id={labelId}
 			ondragover={(e) => e.preventDefault()}
 			ondrop={drop}
-			for={id}
+			for={inputId}
 			aria-disabled={!canUploadFiles}
 			class={cn(
 				'border-border hover:bg-accent/25 file-drop-zone flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
@@ -345,7 +348,7 @@
 			<input
 				{...rest}
 				disabled={!canUploadFiles}
-				{id}
+				id={inputId}
 				{accept}
 				multiple={false}
 				type="file"
