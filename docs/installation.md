@@ -1,14 +1,18 @@
-# Installation
+# Installation Guide
 
-There are couple of ways to install the tracktor app.
+This guide covers multiple installation methods for Tracktor.
 
 ## Docker Compose (Recommended)
 
-The recommended way to install tracktor is by using Docker Compose. This method ensures that all dependencies are properly managed and the application runs in an isolated environment.
+Docker Compose is the recommended installation method as it ensures proper dependency management and runs the application in an isolated environment.
 
-1. Make sure you have Docker and Docker Compose installed on your system.
+### Prerequisites
 
-2. Create a `docker-compose.yml` file with the following content:
+- Docker and Docker Compose installed on your system
+
+### Steps
+
+1. Create a `docker-compose.yml` file:
 
 ```yaml
 services:
@@ -35,13 +39,13 @@ volumes:
     name: tracktor-data
 ```
 
-3. Start the application using Docker Compose:
+2. Start the application:
 
 ```bash
 docker-compose up -d
 ```
 
-4. Access the application by navigating to `http://<your_ip_address>:3333` in your web browser.
+3. Access the application at `http://<your_ip_address>:3333`.
 
 ### Updating Tracktor
 
@@ -83,24 +87,27 @@ docker-compose down
 docker volume rm tracktor-data
 ```
 
-## Manual Docker Installation
+## Docker (Manual)
 
-If you prefer not to use Docker Compose, you can manually run the Tracktor application using Docker
+### Prerequisites
 
-1. Make sure you have Docker installed on your system.
-2. Pull the latest Tracktor image from GitHub Container Registry:
+- Docker installed on your system
+
+### Steps
+
+1. Pull the latest Tracktor image:
 
 ```bash
 docker pull ghcr.io/javedh-dev/tracktor:latest
 ```
 
-3. Create a Docker volume to persist data:
+2. Create a Docker volume:
 
 ```bash
 docker volume create tracktor-data
 ```
 
-4. Run the Tracktor container with the necessary configurations:
+3. Run the container:
 
 ```bash
 docker run -d \
@@ -113,31 +120,23 @@ docker run -d \
     ghcr.io/javedh-dev/tracktor:latest
 ```
 
-5. Access the application by navigating to `http://<your_ip_address>:3333` in your web browser.
+4. Access the application at `http://<your_ip_address>:3333`.
 
-### Updating Tracktor
+### Updating
 
-To update Tracktor to the latest version, follow these steps:
-
-1. Stop the running Tracktor container:
+1. Stop and remove the container:
 
 ```bash
-docker stop tracktor-app
+docker stop tracktor-app && docker rm tracktor-app
 ```
 
-2. Remove the existing Tracktor container:
-
-```bash
-docker rm tracktor-app
-```
-
-3. Pull the latest Tracktor image from GitHub Container Registry:
+2. Pull the latest image:
 
 ```bash
 docker pull ghcr.io/javedh-dev/tracktor:latest
 ```
 
-4. Re-run the Tracktor container with the same configurations as before:
+3. Restart the container with the same configuration as before:
 
 ```bash
 docker run -d \
@@ -150,73 +149,70 @@ docker run -d \
     ghcr.io/javedh-dev/tracktor:latest
 ```
 
-5. Access the application by navigating to `http://<your_ip_address>:3333` in your web browser.
+### Uninstalling
 
-### Uninstalling Tracktor
-
-To uninstall Tracktor and remove all associated data, follow these steps:
-
-1. Stop the running Tracktor container:
+1. Stop and remove the container:
 
 ```bash
-docker stop tracktor-app
+docker stop tracktor-app && docker rm tracktor-app
 ```
 
-2. Remove the Tracktor container:
-
-```bash
-docker rm tracktor-app
-```
-
-3. Remove the Docker volume that contains Tracktor data:
+2. Remove the data volume:
 
 ```bash
 docker volume rm tracktor-data
 ```
 
-## Proxmox LXC Setup
+## Proxmox LXC
 
-To set up Tracktor in a Proxmox LXC container, Please use [Community-Scripts](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracktor) by following the instructions provided there for a streamlined installation process.
+For Proxmox LXC container setup, use [Community-Scripts](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracktor) for a streamlined installation process.
 
-## Local Development Setup
+## Local Development
 
-To set up Tracktor for local development, follow these steps:
+### Prerequisites
 
-1. Ensure you have Node.js and pnpm installed on your system.
-2. Clone the Tracktor repository from GitHub:
+- Node.js (v18 or higher)
+- pnpm package manager
+
+### Steps
+
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/javedh-dev/tracktor.git
 cd tracktor
 ```
 
-3. Install the required dependencies:
+2. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-4. Update the environment variables as needed in the `.env` file in root directory.
+3. Configure environment variables in the `.env` file (refer to [environment.md](./environment.md)).
 
-5. Migrate the database:
+4. Run database migrations:
 
 ```bash
-pnpm run db:migrate:dev
+pnpm run db:migrate
 ```
 
-6. Start the development server:
+5. Start the development server:
 
 ```bash
 pnpm run dev
 ```
 
-7. Access the application by navigating to `http://localhost:5173` in your web browser.
-   The app is now running in development mode. Both frontend and backend will automatically reload upon code changes. Frontend runs on port 5173 and backend on port 3000 by default.
+6. Access the application at `http://localhost:5173`.
 
-## Additional Configuration
+The development server runs on port 5173 with hot module reloading enabled.
 
-For more configuration options and environment variables, please refer to the official documentation.
+## Configuration
+
+For environment variables and configuration options, refer to the [environment documentation](./environment.md).
 
 ## Troubleshooting
 
-If you encounter any issues during installation or setup, please check the logs of the Docker container or the terminal output for error messages. You can also refer to the GitHub repository for known issues and solutions.
+- Check Docker container logs: `docker logs tracktor-app`
+- For local development, check terminal output for error messages
+- Review the [GitHub repository](https://github.com/javedh-dev/tracktor) for known issues and solutions
