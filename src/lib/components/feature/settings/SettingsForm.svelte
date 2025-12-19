@@ -2,6 +2,7 @@
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import * as Select from '$ui/select/index.js';
+	import * as Tabs from '$ui/tabs';
 	import { configStore } from '$stores/config.svelte';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Currency from '@lucide/svelte/icons/currency';
@@ -9,6 +10,7 @@
 	import Languages from '@lucide/svelte/icons/languages';
 	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
 	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
+	import Image from '@lucide/svelte/icons/image';
 	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -100,146 +102,165 @@
 </script>
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
-	<fieldset class="flex flex-col gap-6" disabled={processing}>
-		<!-- Date Format -->
-		<Form.Field {form} name="dateFormat" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Choose your preferred date format">Date Format</FormLabel>
-					<Input
-						{...props}
-						bind:value={$formData.dateFormat}
-						icon={Calendar}
-						type="text"
-						class="mono"
-					/>
-					<Form.Description>
-						Example - {isValidFormat($formData.dateFormat).ex || 'Invalid Format...'}
-					</Form.Description>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+	<div class="space-y-6">
+		<Tabs.Root value="interface" class="flex w-full flex-col">
+			<Tabs.List class="grid w-full grid-cols-3">
+				<Tabs.Trigger value="interface">Interface</Tabs.Trigger>
+				<Tabs.Trigger value="personalization">Personalization</Tabs.Trigger>
+				<Tabs.Trigger value="features">Features</Tabs.Trigger>
+			</Tabs.List>
 
-		<!-- Locale -->
-		<Form.Field {form} name="locale" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Locale for formatting">Locale</FormLabel>
-					<Input
-						{...props}
-						bind:value={$formData.locale}
-						icon={Languages}
-						type="text"
-						class="mono"
-						disabled
-					/>
-					<Form.Description>This will be enabled with i18 support</Form.Description>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+			<!-- Interface Tab -->
+			<Tabs.Content value="interface" class="space-y-6">
+				<fieldset class="flex flex-col gap-6" disabled={processing}>
+					<div class="border-muted rounded-lg border border-dashed p-6 text-center">
+						<p class="text-muted-foreground text-sm">
+							No interface settings available yet. Check back soon for themes, layouts, and other UI
+							customization options.
+						</p>
+					</div>
+				</fieldset>
+			</Tabs.Content>
 
-		<!-- Timezone -->
-		<Form.Field {form} name="timezone" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Choose your timezone for date display">Timezone</FormLabel>
-					<SearchableSelect
-						bind:value={$formData.timezone}
-						options={getTimezoneOptions()}
-						icon={Earth}
-						{...props}
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+			<!-- Personalization Tab -->
+			<Tabs.Content value="personalization" class="grow space-y-6">
+				<fieldset class="flex flex-col gap-4" disabled={processing}>
+					<!-- Date Format -->
+					<Form.Field {form} name="dateFormat" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Choose your preferred date format">Date Format</FormLabel>
+								<Input
+									{...props}
+									bind:value={$formData.dateFormat}
+									icon={Calendar}
+									type="text"
+									class="mono"
+								/>
+								<Form.Description>
+									Example - {isValidFormat($formData.dateFormat).ex || 'Invalid Format...'}
+								</Form.Description>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- Locale -->
+					<Form.Field {form} name="locale" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Locale for formatting">Locale</FormLabel>
+								<Input
+									{...props}
+									bind:value={$formData.locale}
+									icon={Languages}
+									type="text"
+									class="mono"
+									disabled
+								/>
+								<Form.Description>This will be enabled with i18 support</Form.Description>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- Unit of Distance -->
+					<Form.Field {form} name="unitOfDistance" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Measurement of distance uint">Unit of Distance</FormLabel>
+								<Select.Root bind:value={$formData.unitOfDistance} type="single">
+									<Select.Trigger {...props} class="w-full">
+										<div class="flex items-center justify-start">
+											<RulerDimensionLine class="mr-2 h-4 w-4" />
+											{uodOptions.find((opt) => opt.value === $formData.unitOfDistance)?.label ||
+												'Select unit system'}
+										</div>
+									</Select.Trigger>
+									<Select.Content>
+										{#each uodOptions as option}
+											<Select.Item value={option.value}>
+												{option.label}
+											</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- Unit of Volume -->
+					<Form.Field {form} name="unitOfVolume" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Measurement of volume unit">Unit of Volume</FormLabel>
+								<Select.Root bind:value={$formData.unitOfVolume} type="single">
+									<Select.Trigger {...props} class="w-full">
+										<div class="flex items-center justify-start">
+											<PaintBucket class="mr-2 h-4 w-4" />
+											{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)?.label ||
+												'Select unit system'}
+										</div>
+									</Select.Trigger>
+									<Select.Content>
+										{#each uovOptions as option}
+											<Select.Item value={option.value}>
+												{option.label}
+											</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- Timezone -->
+					<Form.Field {form} name="timezone" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Choose your timezone for date display">Timezone</FormLabel>
+								<SearchableSelect
+									bind:value={$formData.timezone}
+									options={getTimezoneOptions()}
+									icon={Earth}
+									{...props}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- Currency -->
+					<Form.Field {form} name="currency" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="Choose your preferred currency">Currency</FormLabel>
+								<SearchableSelect
+									bind:value={$formData.currency}
+									icon={Currency}
+									options={currencyOptions}
+									{...props}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</fieldset>
+			</Tabs.Content>
 
-		<!-- Currency -->
-		<Form.Field {form} name="currency" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Choose your preferred currency">Currency</FormLabel>
-					<!-- <Select.Root bind:value={$formData.currency} type="single">
-							<Select.Trigger {...props} class="w-full">
-								<div class="flex items-center justify-start">
-									<Currency class="mr-2 h-4 w-4" />
-									{currencyOptions.find((opt) => opt.value === $formData.currency)?.label ||
-										'Select currency'}
-								</div>
-							</Select.Trigger>
-							<Select.Content class="max-w-xs">
-								{#each currencyOptions as option}
-									<Select.Item value={option.value} class="text-ellipsis">
-										{option.label}
-									</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root> -->
-					<SearchableSelect
-						bind:value={$formData.currency}
-						icon={Currency}
-						options={currencyOptions}
-						{...props}
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+			<!-- Features Tab -->
+			<Tabs.Content value="features" class="space-y-6">
+				<fieldset class="flex flex-col gap-6" disabled={processing}>
+					<div class="border-muted rounded-lg border border-dashed p-6 text-center">
+						<p class="text-muted-foreground text-sm">
+							No features available yet. Check back soon for feature toggles and experimental
+							options.
+						</p>
+					</div>
+				</fieldset>
+			</Tabs.Content>
+		</Tabs.Root>
 
-		<!-- Unit of Distance -->
-		<Form.Field {form} name="unitOfDistance" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Measurement of distance uint">Unit of Distance</FormLabel>
-					<Select.Root bind:value={$formData.unitOfDistance} type="single">
-						<Select.Trigger {...props} class="w-full">
-							<div class="flex items-center justify-start">
-								<RulerDimensionLine class="mr-2 h-4 w-4" />
-								{uodOptions.find((opt) => opt.value === $formData.unitOfDistance)?.label ||
-									'Select unit system'}
-							</div>
-						</Select.Trigger>
-						<Select.Content>
-							{#each uodOptions as option}
-								<Select.Item value={option.value}>
-									{option.label}
-								</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-
-		<!-- Unit of Volume -->
-		<Form.Field {form} name="unitOfVolume" class="w-full">
-			<Form.Control>
-				{#snippet children({ props })}
-					<FormLabel description="Measurement of volume unit">Unit of Volume</FormLabel>
-					<Select.Root bind:value={$formData.unitOfVolume} type="single">
-						<Select.Trigger {...props} class="w-full">
-							<div class="flex items-center justify-start">
-								<PaintBucket class="mr-2 h-4 w-4" />
-								{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)?.label ||
-									'Select unit system'}
-							</div>
-						</Select.Trigger>
-						<Select.Content>
-							{#each uovOptions as option}
-								<Select.Item value={option.value}>
-									{option.label}
-								</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-
-		<SubmitButton {processing} class="w-full">Update Settings</SubmitButton>
-	</fieldset>
+		<!-- Submit Button -->
+		<fieldset disabled={processing} class="flex justify-end gap-2">
+			<SubmitButton {processing} class="w-full">Update Settings</SubmitButton>
+		</fieldset>
+	</div>
 </form>
