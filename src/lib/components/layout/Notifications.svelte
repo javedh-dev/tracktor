@@ -218,7 +218,7 @@
 		aria-label="Notifications"
 		title="Notifications"
 	>
-		<Bell class="h-[1.15rem] w-[1.15rem]" />
+		<Bell class="text-primary h-[1.15rem] w-[1.15rem]" />
 		{#if notificationCount > 0}
 			<span
 				id="notification-badge"

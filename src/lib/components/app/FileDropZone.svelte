@@ -60,7 +60,7 @@
 			(variant === 'image'
 				? 'Click or drag image to upload'
 				: variant === 'attachment'
-					? 'Drop receipt here, or click to select'
+					? 'Drop file here, or click to select'
 					: 'Click or drag files to upload')
 	);
 

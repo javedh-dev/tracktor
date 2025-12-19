@@ -80,7 +80,7 @@
 				<div class="flex flex-col">
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2">
-							<span class="text-2xl font-bold">{vehicle.make} {vehicle.model}</span>
+							<span class="text-primary text-2xl font-bold">{vehicle.make} {vehicle.model}</span>
 						</div>
 						<p class="flex items-center gap-2">
 							{#if vehicle.color}

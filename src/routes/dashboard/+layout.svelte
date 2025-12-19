@@ -93,12 +93,14 @@
 	{:else}
 		<div id="dashboard-content-container" class="mx-auto p-4 lg:container lg:p-6">
 			<div id="dashboard-header" class="mb-2 flex items-center justify-between">
-				<h1 id="dashboard-title" class="text-2xl font-semibold lg:text-3xl">Your Garage</h1>
+				<h1 id="dashboard-title" class="text-primary text-2xl font-semibold lg:text-3xl">
+					Your Garage
+				</h1>
 				<Button
 					id="dashboard-add-vehicle-btn"
-					variant="outline"
+					variant="default"
 					size="default"
-					class="cursor-pointer"
+					class="border-primary text-primary hover:text-accent hover:bg-primary cursor-pointer border bg-transparent"
 					onclick={() => sheetStore.openSheet(VehicleForm, 'Add Vehicle')}
 				>
 					<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />

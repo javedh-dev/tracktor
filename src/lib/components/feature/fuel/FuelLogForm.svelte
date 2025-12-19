@@ -91,18 +91,6 @@
 
 <form id="fuel-log-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
-		<Form.Field {form} name="attachment" class="w-full">
-			<Form.Control>
-				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
-				<FileDropZone
-					bind:file={attachment}
-					existingFileUrl={existingAttachmentUrl}
-					bind:removeExisting={removeExistingAttachment}
-					variant="attachment"
-					accept="application/pdf,image/*"
-				/>
-			</Form.Control>
-		</Form.Field>
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -202,6 +190,18 @@
 			</Form.Control>
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
+		</Form.Field>
+		<Form.Field {form} name="attachment" class="w-full">
+			<Form.Control>
+				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
+				<FileDropZone
+					bind:file={attachment}
+					existingFileUrl={existingAttachmentUrl}
+					bind:removeExisting={removeExistingAttachment}
+					variant="attachment"
+					accept="application/pdf,image/*"
+				/>
+			</Form.Control>
 		</Form.Field>
 		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
 	</fieldset>

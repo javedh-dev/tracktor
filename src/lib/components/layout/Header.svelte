@@ -43,7 +43,7 @@
 							sheetStore.openSheet(SettingsForm, 'Settings');
 						}}
 					>
-						<Settings class="h-[1.2rem] w-[1.2rem]" />
+						<Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
 					</Button>
 					{#if !env.DISABLE_AUTH}
 						<DropdownMenu.Root>
@@ -53,7 +53,7 @@
 								aria-label="Account menu"
 								title="Account"
 							>
-								<CircleUser class="h-[1.2rem] w-[1.2rem]" />
+								<CircleUser class="text-primary h-[1.2rem] w-[1.2rem]" />
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content id="account-menu" align="end">
 								<DropdownMenu.Item
