@@ -11,6 +11,7 @@
 	import { env } from '$lib/config/env';
 	import { toast } from 'svelte-sonner';
 	import { configStore } from '$lib/stores/config.svelte';
+	import { themeStore } from '$lib/stores/theme.svelte';
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
@@ -41,6 +42,9 @@
 	}
 
 	onMount(() => {
+		// Initialize theme
+		themeStore.initializeTheme();
+
 		detectSWUpdate();
 		configStore.getCustomCss().then((css) => {
 			customCss = css;
