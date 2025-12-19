@@ -15,6 +15,21 @@ class ConfigStore {
 	processing = $state(false);
 	error = $state<string>();
 
+	getCustomCss = async () => {
+		this.processing = true;
+		return apiClient
+			.get<ApiResponse>('/config/branding')
+			.then(({ data: res }) => {
+				const configData = res.data as Config;
+				return configData.value || '';
+			})
+			.catch((_) => {
+				this.error = 'Failed to fetch custom CSS';
+				return '';
+			})
+			.finally(() => (this.processing = false));
+	};
+
 	refreshConfigs = async () => {
 		this.processing = true;
 		apiClient
@@ -42,10 +57,13 @@ class ConfigStore {
 						case 'timezone':
 							this.configs.timezone = item.value || this.configs.timezone;
 							break;
+						case 'customCss':
+							this.configs.customCss = item.value || this.configs.customCss;
+							break;
 					}
 				});
 			})
-			.catch((err) => (this.error = 'Failed to fetch vehicles'))
+			.catch((_) => (this.error = 'Failed to fetch vehicles'))
 			.finally(() => (this.processing = false));
 	};
 }

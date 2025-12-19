@@ -27,6 +27,7 @@
 			icon={Tractor}
 			iconClass="h-8 w-8"
 			style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
+			id="header-logo"
 			label="Tracktor"
 		/>
 		<div class="ml-auto flex items-center gap-2">

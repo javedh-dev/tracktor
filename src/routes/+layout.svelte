@@ -10,9 +10,11 @@
 	import { onMount } from 'svelte';
 	import { env } from '$lib/config/env';
 	import { toast } from 'svelte-sonner';
+	import { configStore } from '$lib/stores/config.svelte';
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
+	let customCss = $state('');
 	let isDashboardTransition = $derived(
 		navigating.to &&
 			navigating.to.url.pathname.startsWith('/dashboard') &&
@@ -40,6 +42,14 @@
 
 	onMount(() => {
 		detectSWUpdate();
+		configStore.getCustomCss().then((css) => {
+			customCss = css;
+			if (customCss) {
+				const style = document.createElement('style');
+				style.innerHTML = customCss;
+				document.head.appendChild(style);
+			}
+		});
 	});
 </script>
 

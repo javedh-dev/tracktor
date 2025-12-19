@@ -11,4 +11,5 @@ export interface Configs {
 	unitOfVolume: string;
 	locale: string;
 	timezone: string;
+	customCss?: string;
 }

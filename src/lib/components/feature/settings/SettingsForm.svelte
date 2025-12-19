@@ -29,6 +29,7 @@
 	import { saveConfig } from '$lib/services/config.service';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
+	import { Textarea } from '$lib/components/ui/textarea';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
@@ -46,7 +47,8 @@
 		timezone: z.string().min(3).refine(isValidTimezone, 'Invalid timzone value.'),
 		currency: z.string().min(1, 'Currency is required'),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
-		unitOfVolume: z.enum(['liter', 'gallon'])
+		unitOfVolume: z.enum(['liter', 'gallon']),
+		customCss: z.string().optional()
 	});
 
 	const form = superForm(defaults(zod4(configSchema)), {
@@ -103,7 +105,7 @@
 
 <form use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="space-y-6">
-		<Tabs.Root value="interface" class="flex w-full flex-col">
+		<Tabs.Root value="interface" class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">
 				<Tabs.Trigger value="interface">Interface</Tabs.Trigger>
 				<Tabs.Trigger value="personalization">Personalization</Tabs.Trigger>
@@ -113,12 +115,29 @@
 			<!-- Interface Tab -->
 			<Tabs.Content value="interface" class="space-y-6">
 				<fieldset class="flex flex-col gap-6" disabled={processing}>
-					<div class="border-muted rounded-lg border border-dashed p-6 text-center">
+					<!-- Date Format -->
+					<Form.Field {form} name="customCss" class="w-full">
+						<Form.Control>
+							{#snippet children({ props })}
+								<FormLabel description="CSS Styles for customizing the interface">
+									Custom CSS
+								</FormLabel>
+								<Textarea
+									{...props}
+									placeholder="Add your custom CSS here..."
+									class="mono h-72 resize-none"
+									bind:value={$formData.customCss}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<!-- <div class="border-muted rounded-lg border border-dashed p-6 text-center">
 						<p class="text-muted-foreground text-sm">
 							No interface settings available yet. Check back soon for themes, layouts, and other UI
 							customization options.
 						</p>
-					</div>
+					</div> -->
 				</fieldset>
 			</Tabs.Content>
 
