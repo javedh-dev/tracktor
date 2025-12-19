@@ -8,21 +8,50 @@
 	import SquareKanban from '@lucide/svelte/icons/square-kanban';
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import Bell from '@lucide/svelte/icons/bell';
+	import { configStore } from '$stores/config.svelte';
 
 	type Section = {
 		label: string;
 		href: string;
 		icon: typeof SquareKanban;
+		featureKey?: keyof typeof configStore.configs;
 	};
 
 	const sections: Section[] = [
-		{ label: 'Overview', href: '/dashboard/overview', icon: SquareKanban },
-		{ label: 'Fuel Logs', href: '/dashboard/fuel', icon: Fuel },
-		{ label: 'Maintenance', href: '/dashboard/maintenance', icon: Wrench },
-		{ label: 'Insurance', href: '/dashboard/insurance', icon: Shield },
-		{ label: 'Emissions', href: '/dashboard/pollution', icon: BadgeInfo },
-		{ label: 'Reminders', href: '/dashboard/reminders', icon: Bell }
+		{
+			label: 'Overview',
+			href: '/dashboard/overview',
+			icon: SquareKanban,
+			featureKey: 'featureOverview'
+		},
+		{ label: 'Fuel Logs', href: '/dashboard/fuel', icon: Fuel, featureKey: 'featureFuelLog' },
+		{
+			label: 'Maintenance',
+			href: '/dashboard/maintenance',
+			icon: Wrench,
+			featureKey: 'featureMaintenance'
+		},
+		{
+			label: 'Insurance',
+			href: '/dashboard/insurance',
+			icon: Shield,
+			featureKey: 'featureInsurance'
+		},
+		{
+			label: 'Pollution',
+			href: '/dashboard/pollution',
+			icon: BadgeInfo,
+			featureKey: 'featurePucc'
+		},
+		{ label: 'Reminders', href: '/dashboard/reminders', icon: Bell, featureKey: 'featureReminders' }
 	];
+
+	let visibleSections = $derived(
+		sections.filter((section) => {
+			if (!section.featureKey) return true;
+			return configStore.configs[section.featureKey] === true;
+		})
+	);
 
 	let currentPath = $derived($page.url.pathname);
 
@@ -73,7 +102,7 @@
 	id="dashboard-nav"
 	class="grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center"
 >
-	{#each sections as section}
+	{#each visibleSections as section}
 		<a
 			use:spaLink
 			id="nav-{section.label.toLowerCase().replace(/\s+/g, '-')}"

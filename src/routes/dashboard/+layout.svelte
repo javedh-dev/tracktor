@@ -12,6 +12,7 @@
 	import Button from '$ui/button/button.svelte';
 	import CirclePlus from '@lucide/svelte/icons/circle-plus';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
@@ -29,6 +30,40 @@
 
 		vehicleStore.refreshVehicles();
 		isLoading = false;
+	});
+
+	// Watch for config changes and redirect to first enabled feature if current is disabled
+	$effect(() => {
+		const currentPath = $page.url.pathname;
+		const configs = configStore.configs;
+
+		// Feature to path mapping
+		const featureMap = [
+			{ key: 'featureOverview', path: '/dashboard/overview' },
+			{ key: 'featureFuelLog', path: '/dashboard/fuel' },
+			{ key: 'featureMaintenance', path: '/dashboard/maintenance' },
+			{ key: 'featureInsurance', path: '/dashboard/insurance' },
+			{ key: 'featurePucc', path: '/dashboard/pollution' },
+			{ key: 'featureReminders', path: '/dashboard/reminders' }
+		];
+
+		// Check if current page's feature is disabled
+		const currentFeature = featureMap.find((f) => currentPath.includes(f.path));
+
+		if (currentFeature) {
+			const featureKey = currentFeature.key as keyof typeof configs;
+			if (configs[featureKey] === false) {
+				// Find first enabled feature and redirect
+				const firstEnabled = featureMap.find((f) => {
+					const fKey = f.key as keyof typeof configs;
+					return configs[fKey] !== false;
+				});
+
+				if (firstEnabled) {
+					goto(firstEnabled.path, { replaceState: true });
+				}
+			}
+		}
 	});
 </script>
 

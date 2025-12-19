@@ -3,6 +3,7 @@
 	import FormLabel from '$appui/FormLabel.svelte';
 	import * as Select from '$ui/select/index.js';
 	import * as Tabs from '$ui/tabs';
+	import { Checkbox } from '$ui/checkbox';
 	import { configStore } from '$stores/config.svelte';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Currency from '@lucide/svelte/icons/currency';
@@ -10,7 +11,6 @@
 	import Languages from '@lucide/svelte/icons/languages';
 	import PaintBucket from '@lucide/svelte/icons/paint-bucket';
 	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
-	import Image from '@lucide/svelte/icons/image';
 	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -48,7 +48,13 @@
 		currency: z.string().min(1, 'Currency is required'),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
 		unitOfVolume: z.enum(['liter', 'gallon']),
-		customCss: z.string().optional()
+		customCss: z.string().optional(),
+		featureFuelLog: z.boolean().default(true),
+		featureMaintenance: z.boolean().default(true),
+		featurePucc: z.boolean().default(true),
+		featureReminders: z.boolean().default(true),
+		featureInsurance: z.boolean().default(true),
+		featureOverview: z.boolean().default(true)
 	});
 
 	const form = superForm(defaults(zod4(configSchema)), {
@@ -60,7 +66,10 @@
 				processing = true;
 				const updatedConfig = localConfig.map((item) => {
 					if (item.key in f.data) {
-						return { ...item, value: f.data[item.key as keyof typeof f.data] };
+						const value = f.data[item.key as keyof typeof f.data];
+						// Convert boolean values to strings for storage
+						const stringValue = typeof value === 'boolean' ? String(value) : value;
+						return { ...item, value: stringValue };
 					}
 					return item;
 				});
@@ -96,8 +105,14 @@
 		if (localConfig.length > 0) {
 			const configData: any = {};
 			localConfig.forEach((item) => {
-				configData[item.key] = item.value || '';
+				// Handle boolean values for feature toggles
+				if (item.key.startsWith('feature')) {
+					configData[item.key] = item.value === 'true';
+				} else {
+					configData[item.key] = item.value || '';
+				}
 			});
+			console.log('Setting form data:', configData);
 			formData.set(configData);
 		}
 	});
@@ -266,12 +281,123 @@
 
 			<!-- Features Tab -->
 			<Tabs.Content value="features" class="space-y-6">
-				<fieldset class="flex flex-col gap-6" disabled={processing}>
-					<div class="border-muted rounded-lg border border-dashed p-6 text-center">
-						<p class="text-muted-foreground text-sm">
-							No features available yet. Check back soon for feature toggles and experimental
-							options.
-						</p>
+				<fieldset class="flex flex-col gap-4" disabled={processing}>
+					<div class="space-y-4">
+						<div class="text-muted-foreground text-sm">
+							Enable or disable features to customize your experience
+						</div>
+
+						<!-- Fuel Log Feature -->
+						<Form.Field {form} name="featureFuelLog" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox
+										{...props}
+										bind:checked={$formData.featureFuelLog}
+										id="featureFuelLog"
+									/>
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featureFuelLog" class="font-medium">Fuel Log</Form.Label>
+										<Form.Description class="text-xs">
+											Track and manage fuel consumption and refueling history
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
+
+						<!-- Maintenance Feature -->
+						<Form.Field {form} name="featureMaintenance" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox
+										{...props}
+										bind:checked={$formData.featureMaintenance}
+										id="featureMaintenance"
+									/>
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featureMaintenance" class="font-medium">
+											Maintenance
+										</Form.Label>
+										<Form.Description class="text-xs">
+											Record and schedule vehicle maintenance activities
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
+
+						<!-- PUCC Feature -->
+						<Form.Field {form} name="featurePucc" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox {...props} bind:checked={$formData.featurePucc} id="featurePucc" />
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featurePucc" class="font-medium">Pollution</Form.Label>
+										<Form.Description class="text-xs">
+											Manage Pollution Under Control Certificate records
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
+
+						<!-- Reminders Feature -->
+						<Form.Field {form} name="featureReminders" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox
+										{...props}
+										bind:checked={$formData.featureReminders}
+										id="featureReminders"
+									/>
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featureReminders" class="font-medium">Reminders</Form.Label>
+										<Form.Description class="text-xs">
+											Set and receive reminders for important vehicle events
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
+
+						<!-- Insurance Feature -->
+						<Form.Field {form} name="featureInsurance" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox
+										{...props}
+										bind:checked={$formData.featureInsurance}
+										id="featureInsurance"
+									/>
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featureInsurance" class="font-medium">Insurance</Form.Label>
+										<Form.Description class="text-xs">
+											Manage vehicle insurance details and renewals
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
+
+						<!-- Overview Feature -->
+						<Form.Field {form} name="featureOverview" class="flex items-center space-x-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Checkbox
+										{...props}
+										bind:checked={$formData.featureOverview}
+										id="featureOverview"
+									/>
+									<div class="flex flex-col gap-1">
+										<Form.Label for="featureOverview" class="font-medium">Overview</Form.Label>
+										<Form.Description class="text-xs">
+											Display overview dashboard with key vehicle metrics
+										</Form.Description>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</Form.Field>
 					</div>
 				</fieldset>
 			</Tabs.Content>

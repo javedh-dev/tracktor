@@ -9,7 +9,13 @@ class ConfigStore {
 		unitOfDistance: 'kilometer',
 		unitOfVolume: 'liter',
 		locale: 'en',
-		timezone: 'UTC'
+		timezone: 'UTC',
+		featureFuelLog: true,
+		featureMaintenance: true,
+		featurePucc: true,
+		featureReminders: true,
+		featureInsurance: true,
+		featureOverview: true
 	});
 	rawConfig = $state<Config[]>([]);
 	processing = $state(false);
@@ -59,6 +65,24 @@ class ConfigStore {
 							break;
 						case 'customCss':
 							this.configs.customCss = item.value || this.configs.customCss;
+							break;
+						case 'featureFuelLog':
+							this.configs.featureFuelLog = item.value === 'true';
+							break;
+						case 'featureMaintenance':
+							this.configs.featureMaintenance = item.value === 'true';
+							break;
+						case 'featurePucc':
+							this.configs.featurePucc = item.value === 'true';
+							break;
+						case 'featureReminders':
+							this.configs.featureReminders = item.value === 'true';
+							break;
+						case 'featureInsurance':
+							this.configs.featureInsurance = item.value === 'true';
+							break;
+						case 'featureOverview':
+							this.configs.featureOverview = item.value === 'true';
 							break;
 					}
 				});
