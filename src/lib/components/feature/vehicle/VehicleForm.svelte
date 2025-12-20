@@ -25,6 +25,7 @@
 	let { data } = $props();
 
 	let image = $state<File>();
+	let removeExistingImage = $state(false);
 	let processing = $state(false);
 
 	// For showing existing image when editing
@@ -37,24 +38,31 @@
 		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
 				processing = true;
-				saveVehicleWithImage(f.data, image, data ? 'PUT' : 'POST').then((res) => {
-					if (res.status == 'OK') {
-						vehicleStore.refreshVehicles();
-						toast.success(`Vehicle ${data ? 'updated' : 'saved'} successfully...!!!`);
-						image = undefined;
-						sheetStore.closeSheet(() => vehicleStore.refreshVehicles());
-					} else {
-						toast.error(`Error while saving : ${res.error}`);
+				saveVehicleWithImage(f.data, image, data ? 'PUT' : 'POST', removeExistingImage).then(
+					(res) => {
+						if (res.status == 'OK') {
+							vehicleStore.refreshVehicles();
+							toast.success(`Vehicle ${data ? 'updated' : 'saved'} successfully...!!!`);
+							image = undefined;
+							removeExistingImage = false;
+							sheetStore.closeSheet(() => vehicleStore.refreshVehicles());
+						} else {
+							toast.error(`Error while saving : ${res.error}`);
+						}
+						processing = false;
 					}
-					processing = false;
-				});
+				);
 			}
 		}
 	});
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data) formData.set({ ...data });
+		if (data) {
+			formData.set({ ...data, image: null });
+			image = undefined;
+			removeExistingImage = false;
+		}
 	});
 </script>
 
@@ -75,6 +83,7 @@
 						bind:file={image}
 						disabled={processing}
 						{existingImageUrl}
+						bind:removeExisting={removeExistingImage}
 						variant="image"
 						accept="image/*"
 					/>
