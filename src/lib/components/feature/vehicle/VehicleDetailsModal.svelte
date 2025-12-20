@@ -6,6 +6,7 @@
 	import { formatDistance } from '$lib/helper/format.helper';
 	import { FUEL_TYPES } from '$lib/domain/vehicle';
 	import type { Vehicle } from '$lib/domain/vehicle';
+	import X from '@lucide/svelte/icons/x';
 
 	interface Props {
 		vehicle: Vehicle;
@@ -15,31 +16,33 @@
 	let { vehicle, open = $bindable(false) }: Props = $props();
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : undefined);
-	const fuelLabel = $derived(vehicle.fuelType ? FUEL_TYPES[vehicle.fuelType as keyof typeof FUEL_TYPES] : 'Petrol');
+	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
+	const fuelLabel = $derived(
+		vehicle.fuelType ? FUEL_TYPES[vehicle.fuelType as keyof typeof FUEL_TYPES] : 'Petrol'
+	);
 	const odometerText = $derived(vehicle.odometer ? formatDistance(vehicle.odometer) : null);
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="max-h-[90vh] max-w-2xl overflow-y-auto p-0">
+	<Dialog.Content class="max-h-[90vh] max-w-2xl overflow-y-auto p-0" showCloseButton={false}>
 		<!-- Vehicle Image Header -->
 		<div
 			class="relative h-48 w-full rounded-t-lg bg-cover bg-center"
-			style={`background-image: url('${imageUrl || '/default-vehicle.png'}')`}
+			style={`background-image: url('${imageUrl}'), url('/default-vehicle.png')`}
 		>
 			<div class="absolute inset-0 rounded-t-lg bg-black/30"></div>
 			{#if vehicle.color}
 				<div
-					class="absolute bottom-4 right-4 z-10 h-8 w-8 rounded-full border-2 border-white/70 shadow-md"
+					class="absolute right-4 bottom-4 z-10 h-8 w-8 rounded-full border-2 border-white/70 shadow-md"
 					style={`background-color: ${vehicle.color}`}
 					aria-label="Color"
 				></div>
 			{/if}
 			<Dialog.Close
-				class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-white shadow-md transition hover:bg-black/65 focus:outline-none"
+				class="absolute top-3 right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/85 text-white shadow-md ring-1 ring-black/10 backdrop-blur transition hover:bg-white hover:text-black focus:outline-none"
 				aria-label="Close"
 			>
-				<span aria-hidden="true" class="text-lg leading-none">×</span>
+				<X class="h-4 w-4" />
 			</Dialog.Close>
 			<div class="absolute bottom-4 left-4 z-10">
 				<h2 class="text-2xl font-bold text-white drop-shadow-lg">
@@ -53,18 +56,20 @@
 		<!-- Compact summary chips -->
 		<div class="flex flex-wrap gap-2 px-5 pt-4">
 			{#if vehicle.licensePlate}
-				<span class="rounded-full border border-input bg-background px-3 py-1 text-xs font-semibold">
+				<span
+					class="border-input bg-background rounded-full border px-3 py-1 text-xs font-semibold"
+				>
 					{vehicle.licensePlate}
 				</span>
 			{/if}
-			<span class="rounded-full border border-input bg-background px-3 py-1 text-xs font-medium">
+			<span class="border-input bg-background rounded-full border px-3 py-1 text-xs font-medium">
 				{vehicle.year}
 			</span>
-			<span class="rounded-full border border-input bg-background px-3 py-1 text-xs font-medium">
+			<span class="border-input bg-background rounded-full border px-3 py-1 text-xs font-medium">
 				{fuelLabel}
 			</span>
 			{#if odometerText}
-				<span class="rounded-full border border-input bg-background px-3 py-1 text-xs font-medium">
+				<span class="border-input bg-background rounded-full border px-3 py-1 text-xs font-medium">
 					{odometerText}
 				</span>
 			{/if}
@@ -91,7 +96,7 @@
 						{#if vehicle.vin}
 							<p class="font-mono text-sm break-all">{vehicle.vin}</p>
 						{:else}
-							<p class="text-sm text-muted-foreground">Not specified</p>
+							<p class="text-muted-foreground text-sm">Not specified</p>
 						{/if}
 					</div>
 					<div class="space-y-1">
@@ -134,6 +139,5 @@
 				</div>
 			{/if}
 		</div>
-
 	</Dialog.Content>
 </Dialog.Root>

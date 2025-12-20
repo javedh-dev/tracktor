@@ -24,13 +24,20 @@
 	class="flex h-auto shrink-0 justify-center gap-2 border-b py-3 text-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)"
 >
 	<div id="header-container" class="flex w-full items-center px-2 lg:px-6">
-		<LabelWithIcon
-			icon={Tractor}
-			iconClass="h-8 w-8"
-			style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
-			id="header-logo"
-			label="Tracktor"
-		/>
+		<a
+			href="/"
+			class="focus-visible:ring-ring text-primary hover:text-primary/80 inline-flex items-center gap-2 rounded-md p-1 text-2xl font-semibold transition focus-visible:ring-1 focus-visible:outline-none"
+			aria-label="Go to home"
+			id="header-logo-link"
+		>
+			<LabelWithIcon
+				icon={Tractor}
+				iconClass="h-8 w-8"
+				style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
+				id="header-logo"
+				label="Tracktor"
+			/>
+		</a>
 		<div id="header-actions" class="ml-auto flex items-center gap-2">
 			<div class="header-toolbar flex items-center gap-2">
 				<ThemeToggle />

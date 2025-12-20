@@ -55,7 +55,7 @@
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : undefined);
+	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
 </script>
 
 <div
