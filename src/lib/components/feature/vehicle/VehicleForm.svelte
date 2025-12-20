@@ -53,7 +53,7 @@
 	const { form: formData, enhance } = form;
 
 	$effect(() => {
-		if (data) formData.set({ ...data, image: null });
+		if (data) formData.set({ ...data });
 	});
 </script>
 
