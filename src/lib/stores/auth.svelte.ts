@@ -13,15 +13,30 @@ class AuthStore {
 	user = $state<User | null>(null);
 	isLoggedIn = $state<boolean>(false);
 	hasUsers = $state<boolean>(false);
+	isAuthDisabled = $state<boolean>(env.DISABLE_AUTH);
 
 	constructor() {
 		this.isLoggedIn = env.DISABLE_AUTH;
+		this.hasUsers = env.DISABLE_AUTH;
 	}
 
 	checkAuthStatus = async () => {
+		if (this.isAuthDisabled) {
+			this.isLoggedIn = true;
+			this.hasUsers = true;
+			return;
+		}
+
 		try {
 			const { data: res } = await apiClient.get<ApiResponse>('/auth', { skipInterceptors: true });
-			this.hasUsers = res.data.hasUsers;
+			this.isAuthDisabled = !!res.data?.isAuthDisabled;
+			this.hasUsers = res.data?.hasUsers ?? false;
+
+			if (this.isAuthDisabled) {
+				this.isLoggedIn = true;
+				this.hasUsers = true;
+				return;
+			}
 
 			if (res.data.isAuthenticated && res.data.user) {
 				this.user = res.data.user;
@@ -34,7 +49,7 @@ class AuthStore {
 			console.error('Error checking auth status:', error);
 			this.hasUsers = false;
 			this.user = null;
-			this.isLoggedIn = false;
+			this.isLoggedIn = this.isAuthDisabled;
 		}
 	};
 

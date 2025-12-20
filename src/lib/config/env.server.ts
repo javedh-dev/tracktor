@@ -7,7 +7,9 @@ import { env as publicEnv } from '$env/dynamic/public';
  */
 export const clientEnv = {
 	DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
-	DISABLE_AUTH: publicEnv.TRACKTOR_DISABLE_AUTH === 'true'
+	// Allow disabling auth via either the public or private env var so it works in container deployments
+	DISABLE_AUTH:
+		publicEnv.TRACKTOR_DISABLE_AUTH === 'true' || privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
 } as const;
 
 function getCorsOrigins(origins?: string): string[] {

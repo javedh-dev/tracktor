@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { env } from '$lib/config/env';
 	import RegisterForm from '$lib/components/feature/auth/register-form.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import { onMount } from 'svelte';
@@ -9,11 +8,6 @@
 	let authCheckComplete = $state(false);
 
 	onMount(async () => {
-		if (env.DISABLE_AUTH) {
-			goto('/dashboard', { replaceState: true });
-			return;
-		}
-
 		await authStore.checkAuthStatus();
 		authCheckComplete = true;
 

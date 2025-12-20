@@ -52,7 +52,7 @@
 					>
 						<Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
 					</Button>
-					{#if !env.DISABLE_AUTH}
+					{#if !authStore.isAuthDisabled}
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger
 								id="account-menu-trigger"
@@ -72,7 +72,7 @@
 											'Update your username and password'
 										);
 									}}
-									disabled={env.DISABLE_AUTH || env.DEMO_MODE}
+									disabled={authStore.isAuthDisabled || env.DEMO_MODE}
 								>
 									<UserCog class="h-[1.2rem] w-[1.2rem]" />
 									Profile

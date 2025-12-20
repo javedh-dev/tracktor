@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { authStore } from '$stores/auth.svelte';
 	import { onMount } from 'svelte';
-	import { env } from '$lib/config/env';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import Tractor from '@lucide/svelte/icons/tractor';
@@ -10,19 +9,11 @@
 	let authCheckComplete = $state(false);
 
 	onMount(async () => {
-		if (env.DISABLE_AUTH) {
-			goto('/dashboard', { replaceState: true });
-			return;
-		}
-
 		await authStore.checkAuthStatus();
 		authCheckComplete = true;
 
-		if (authStore.isLoggedIn) {
-			goto('/dashboard', { replaceState: true });
-		} else {
-			goto('/login', { replaceState: true });
-		}
+		if (authStore.isLoggedIn) goto('/dashboard', { replaceState: true });
+		else goto('/login', { replaceState: true });
 	});
 </script>
 

@@ -47,6 +47,7 @@ export const POST: RequestHandler = async (event) => {
 export const GET: RequestHandler = async (event) => {
 	try {
 		const result = await authService.getUsersCount();
+		const isAuthDisabled = env.DISABLE_AUTH;
 
 		// Check if user has a valid session
 		const sessionToken = event.cookies.get('session');
@@ -66,8 +67,9 @@ export const GET: RequestHandler = async (event) => {
 			...result,
 			data: {
 				...result.data,
+				isAuthDisabled,
 				user,
-				isAuthenticated: !!user
+				isAuthenticated: isAuthDisabled || !!user
 			}
 		});
 	} catch (err) {
