@@ -92,13 +92,22 @@ const calculateOverallMileage = async (vehicleId: string) => {
 };
 
 export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
+	// Serialize customFields to JSON string
+	const processedData = {
+		...vehicleData,
+		customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
+	};
+
 	const [vehicle] = await db
 		.insert(schema.vehicleTable)
-		.values({ ...vehicleData, id: undefined })
+		.values({ ...processedData, id: undefined })
 		.returning();
 
 	return {
-		data: vehicle,
+		data: {
+			...vehicle,
+			customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null
+		},
 		success: true,
 		message: 'Vehicle added successfully.'
 	};
@@ -117,7 +126,8 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
 				odometer: true,
 				vin: true,
 				image: true,
-				fuelType: true
+				fuelType: true,
+				customFields: true
 			}
 		}),
 		db.query.insuranceTable.findMany({
@@ -149,6 +159,7 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
 
 			return {
 				...vehicle,
+				customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
 				odometer: latestOdometer || vehicle.odometer || 0,
 				overallMileage,
 				insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
@@ -180,6 +191,7 @@ export const getVehicleById = async (id: string): Promise<ApiResponse> => {
 	return {
 		data: {
 			...vehicle,
+			customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
 			currentOdometer: currentOdometer || vehicle.odometer || 0,
 			overallMileage
 		},
@@ -190,14 +202,23 @@ export const getVehicleById = async (id: string): Promise<ApiResponse> => {
 export const updateVehicle = async (id: string, vehicleData: any): Promise<ApiResponse> => {
 	await getVehicleById(id); // Validates vehicle exists
 
+	// Serialize customFields to JSON string
+	const processedData = {
+		...vehicleData,
+		customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
+	};
+
 	const [updatedVehicle] = await db
 		.update(schema.vehicleTable)
-		.set(vehicleData)
+		.set(processedData)
 		.where(eq(schema.vehicleTable.id, id))
 		.returning();
 
 	return {
-		data: updatedVehicle,
+		data: {
+			...updatedVehicle,
+			customFields: updatedVehicle.customFields ? JSON.parse(updatedVehicle.customFields) : null
+		},
 		success: true,
 		message: 'Vehicle updated successfully.'
 	};

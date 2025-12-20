@@ -13,6 +13,7 @@ export interface Vehicle {
 	puccStatus?: string;
 	image: string | null;
 	fuelType: 'diesel' | 'petrol' | 'ev';
+	customFields?: Record<string, string> | null;
 }
 
 export const FUEL_TYPES = {
@@ -53,7 +54,8 @@ export const vehicleSchema = z.object({
 		.nullable(),
 	odometer: z.number().nonnegative().nullable(),
 	image: z.string().nullable(),
-	fuelType: z.enum(['diesel', 'petrol', 'ev']).default('petrol')
+	fuelType: z.enum(['diesel', 'petrol', 'ev']).default('petrol'),
+	customFields: z.record(z.string(), z.string()).nullable().optional()
 });
 
 export type VehicleSchema = typeof vehicleSchema;

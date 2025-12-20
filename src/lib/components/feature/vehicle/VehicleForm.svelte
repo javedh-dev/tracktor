@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { FileDropZone } from '$lib/components/app';
+	import CustomFieldsEditor from '$lib/components/app/CustomFieldsEditor.svelte';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -182,6 +183,11 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
+
+		<!-- Custom Fields Section -->
+		<div class="border-t pt-4">
+			<CustomFieldsEditor bind:customFields={$formData.customFields} />
+		</div>
 
 		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
 	</fieldset>

@@ -21,5 +21,6 @@ export const vehicleTable = table('vehicles', {
 		})
 		.notNull()
 		.default('petrol'),
+	customFields: t.text(),
 	...timestamps
 });

@@ -7,11 +7,9 @@
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import Shield from '@lucide/svelte/icons/shield';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import BadgeAlert from '@lucide/svelte/icons/badge-alert';
-	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import BellRing from '@lucide/svelte/icons/bell-ring';
+	import Info from '@lucide/svelte/icons/info';
 	import { formatDistance } from '$lib/helper/format.helper';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { browser } from '$app/environment';
@@ -20,8 +18,8 @@
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import * as Card from '$ui/card';
 	import Badge from '$ui/badge/badge.svelte';
-	import IconWithTooltip from '$appui/IconWithPopover.svelte';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+	import VehicleDetailsModal from '$lib/components/feature/vehicle/VehicleDetailsModal.svelte';
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';
 	import { sheetStore } from '$stores/sheet.svelte';
@@ -36,6 +34,7 @@
 
 	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
+	let detailsModalOpen = $state(false);
 
 	const performDelete = async (vehicleId: string) => {
 		deleteVehicle(vehicleId).then((res) => {
@@ -104,24 +103,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-row justify-between">
-					<IconWithTooltip
-						icon={vehicle.insuranceStatus === 'Active' ? ShieldCheck : ShieldAlert}
-						className={vehicle.insuranceStatus === 'Active'
-							? 'dark:text-green-600 text-green-800'
-							: 'dark:text-rose-600 text-rose-800'}
-						tooltip={`Insurance is ${vehicle.insuranceStatus}`}
-						side="right"
-					/>
-					<IconWithTooltip
-						icon={vehicle.puccStatus === 'Active' ? BadgeCheck : BadgeAlert}
-						className={vehicle.puccStatus === 'Active'
-							? 'dark:text-green-600 text-green-800'
-							: 'dark:text-rose-600 text-rose-800'}
-						tooltip={`Pollution Status is ${vehicle.puccStatus}`}
-						side="left"
-					/>
-				</div>
+				<div class="flex flex-row justify-end"></div>
 			</div>
 		</Card.Header>
 		<Card.Content class="px-4">
@@ -213,6 +195,14 @@
 				</div>
 				<div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
 					<IconButton
+						id="vehicle-card-info-btn"
+						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
+						iconStyles="text-gray-600 dark:text-gray-100 hover:text-blue-500"
+						icon={Info}
+						onclick={() => (detailsModalOpen = true)}
+						ariaLabel="More info"
+					/>
+					<IconButton
 						id="vehicle-card-edit-btn"
 						buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
@@ -236,3 +226,4 @@
 	</Card.Root>
 </div>
 <DeleteConfirmation onConfirm={() => performDelete(vehicle.id)} bind:open={deleteDialog} />
+<VehicleDetailsModal bind:open={detailsModalOpen} {vehicle} />
