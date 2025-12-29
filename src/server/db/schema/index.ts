@@ -6,7 +6,6 @@ import { maintenanceLogTable } from './maintenance-logs';
 import { vehicleTable } from './vehicle';
 import { pollutionCertificateTable } from './pucc';
 import { reminderTable } from './reminder';
-import { technicalExaminationTable } from './technical-examination';
 
 export {
 	authTable,
@@ -18,6 +17,5 @@ export {
 	maintenanceLogTable,
 	pollutionCertificateTable,
 	vehicleTable,
-	reminderTable,
-	technicalExaminationTable
+	reminderTable
 };
