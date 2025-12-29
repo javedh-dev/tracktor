@@ -6,7 +6,9 @@
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { saveInsuranceWithAttachment } from '$lib/services/insurance.service';
 	import { insuranceStore } from '$stores/insurance.svelte';
-	import { insuranceSchema } from '$lib/domain/insurance';
+	import { insuranceSchema, INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
+	import * as Select from '$ui/select/index.js';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import { FileDropZone } from '$lib/components/app';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
@@ -41,7 +43,8 @@
 					{
 						...f.data,
 						startDate: parseDate(f.data.startDate),
-						endDate: parseDate(f.data.endDate)
+						endDate:
+							f.data.recurrenceType !== 'none' || !f.data.endDate ? null : parseDate(f.data.endDate)
 					},
 					attachment,
 					removeExistingAttachment
@@ -57,6 +60,8 @@
 				});
 			} else {
 				toast.error('Please fix the errors in the form before submitting.');
+				f.errors._errors?.forEach((err) => toast.error(err));
+				console.error('Form validation errors:', f.errors);
 			}
 		}
 	});
@@ -67,7 +72,7 @@
 			formData.set({
 				...data,
 				startDate: formatDate(data.startDate),
-				endDate: formatDate(data.endDate),
+				endDate: data.endDate ? formatDate(data.endDate) : '',
 				attachment: null
 			});
 			// Reset attachment state when editing existing record
@@ -127,15 +132,58 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Field {form} name="endDate" class="w-full">
+        <Form.Field {form} name="recurrenceType" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Insurance end date">End Date</FormLabel>
-					<Input {...props} bind:value={$formData.endDate} icon={Calendar1} type="calendar" />
+					<FormLabel description="How should this insurance renew?">Recurrence</FormLabel>
+					<Select.Root bind:value={$formData.recurrenceType} type="single">
+						<Select.Trigger {...props} class="w-full">
+							<div class="flex items-center gap-2">
+								<Repeat class="h-4 w-4" />
+								<span>
+									{INSURANCE_RECURRENCE_TYPES[
+										$formData.recurrenceType as keyof typeof INSURANCE_RECURRENCE_TYPES
+									] || 'Select recurrence'}
+								</span>
+							</div>
+						</Select.Trigger>
+						<Select.Content>
+							{#each Object.entries(INSURANCE_RECURRENCE_TYPES) as [value, label]}
+								<Select.Item {value}>{label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
+
+		{#if $formData.recurrenceType === 'yearly' || $formData.recurrenceType === 'monthly'}
+			<Form.Field {form} name="recurrenceInterval" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="Renewal frequency">
+							Renew every {$formData.recurrenceInterval || 1}
+							{$formData.recurrenceType === 'yearly' ? 'year(s)' : 'month(s)'}
+						</FormLabel>
+						<Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
+
+		{#if $formData.recurrenceType === 'none'}
+			<Form.Field {form} name="endDate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="Insurance end date">End Date</FormLabel>
+						<Input {...props} bind:value={$formData.endDate} icon={Calendar1} type="calendar" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
 
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>

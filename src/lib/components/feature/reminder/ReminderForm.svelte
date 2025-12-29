@@ -3,8 +3,14 @@
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
 	import { Textarea } from '$ui/textarea';
-	import { REMINDER_TYPES, REMINDER_SCHEDULES, reminderSchema } from '$lib/domain/reminder';
+	import {
+		REMINDER_TYPES,
+		REMINDER_SCHEDULES,
+		REMINDER_RECURRENCE_TYPES,
+		reminderSchema
+	} from '$lib/domain/reminder';
 	import { superForm, defaults } from 'sveltekit-superforms';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import SubmitButton from '$appui/SubmitButton.svelte';
@@ -29,7 +35,11 @@
 		onUpdated: async ({ form: f }) => {
 			if (f.valid) {
 				processing = true;
-				saveReminder({ ...f.data, dueDate: parseDate(f.data.dueDate) }).then((res) => {
+				saveReminder({
+					...f.data,
+					dueDate: parseDate(f.data.dueDate),
+					recurrenceEndDate: f.data.recurrenceEndDate ? parseDate(f.data.recurrenceEndDate) : null
+				}).then((res) => {
 					if (res.status === 'OK') {
 						toast.success(`Reminder ${data ? 'updated' : 'created'} successfully.`);
 						sheetStore.closeSheet(reminderStore.refreshReminders);
@@ -65,6 +75,11 @@
 				type: data.type || fd.type,
 				dueDate: data.dueDate ? formatDate(data.dueDate) : fd.dueDate,
 				remindSchedule: data.remindSchedule || fd.remindSchedule,
+				recurrenceType: data.recurrenceType || fd.recurrenceType,
+				recurrenceInterval: data.recurrenceInterval || fd.recurrenceInterval,
+				recurrenceEndDate: data.recurrenceEndDate
+					? formatDate(data.recurrenceEndDate)
+					: fd.recurrenceEndDate,
 				note: data.note ?? fd.note,
 				isCompleted: data.isCompleted ?? fd.isCompleted
 			}));
@@ -134,6 +149,68 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
+
+		<Form.Field {form} name="recurrenceType" class="w-full">
+			<Form.Control>
+				{#snippet children({ props })}
+					<FormLabel description="Should this reminder repeat?">Recurrence</FormLabel>
+					<Select.Root bind:value={$formData.recurrenceType} type="single">
+						<Select.Trigger {...props} class="w-full">
+							<div class="flex items-center gap-2">
+								<Repeat class="h-4 w-4" />
+								<span>
+									{REMINDER_RECURRENCE_TYPES[
+										$formData.recurrenceType as keyof typeof REMINDER_RECURRENCE_TYPES
+									] || 'Select recurrence'}
+								</span>
+							</div>
+						</Select.Trigger>
+						<Select.Content>
+							{#each Object.entries(REMINDER_RECURRENCE_TYPES) as [value, label]}
+								<Select.Item {value}>{label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		{#if $formData.recurrenceType && $formData.recurrenceType !== 'none'}
+			<Form.Field {form} name="recurrenceInterval" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="Frequency of recurrence">
+							Repeat every {$formData.recurrenceInterval || 1}
+							{$formData.recurrenceType === 'yearly'
+								? 'year(s)'
+								: $formData.recurrenceType === 'monthly'
+									? 'month(s)'
+									: $formData.recurrenceType === 'weekly'
+										? 'week(s)'
+										: 'day(s)'}
+						</FormLabel>
+						<Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="recurrenceEndDate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="When should recurrence stop? (optional)">End Date</FormLabel>
+						<Input
+							{...props}
+							bind:value={$formData.recurrenceEndDate}
+							icon={Calendar1}
+							type="calendar"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
 
 		<Form.Field {form} name="note" class="w-full">
 			<Form.Control>

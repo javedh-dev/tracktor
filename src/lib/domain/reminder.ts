@@ -18,12 +18,23 @@ export const REMINDER_SCHEDULES = {
 	one_month_before: '1 month before'
 } as const;
 
+export const REMINDER_RECURRENCE_TYPES = {
+	none: 'No recurrence',
+	daily: 'Daily',
+	weekly: 'Weekly',
+	monthly: 'Monthly',
+	yearly: 'Yearly'
+} as const;
+
 export interface Reminder {
 	id: string | null;
 	vehicleId: string;
 	type: keyof typeof REMINDER_TYPES;
 	dueDate: Date;
 	remindSchedule: keyof typeof REMINDER_SCHEDULES;
+	recurrenceType: keyof typeof REMINDER_RECURRENCE_TYPES;
+	recurrenceInterval: number;
+	recurrenceEndDate: Date | null;
 	note: string | null;
 	isCompleted: boolean;
 }
@@ -32,6 +43,9 @@ const reminderTypeOptions = Object.keys(REMINDER_TYPES) as (keyof typeof REMINDE
 const reminderScheduleOptions = Object.keys(
 	REMINDER_SCHEDULES
 ) as (keyof typeof REMINDER_SCHEDULES)[];
+const reminderRecurrenceOptions = Object.keys(
+	REMINDER_RECURRENCE_TYPES
+) as (keyof typeof REMINDER_RECURRENCE_TYPES)[];
 
 export const reminderSchema = z.object({
 	id: z.string().nullable(),
@@ -57,6 +71,27 @@ export const reminderSchema = z.object({
 			]
 		)
 		.default('same_day'),
+	recurrenceType: z
+		.enum(
+			reminderRecurrenceOptions as [
+				keyof typeof REMINDER_RECURRENCE_TYPES,
+				...Array<keyof typeof REMINDER_RECURRENCE_TYPES>
+			]
+		)
+		.default('none'),
+	recurrenceInterval: z.number().int().positive().default(1),
+	recurrenceEndDate: z
+		.string()
+		.refine((val) => {
+			if (!val) return true;
+			try {
+				parseDate(val);
+				return true;
+			} catch (err) {
+				return false;
+			}
+		}, 'Invalid date format')
+		.nullable(),
 	note: z.string().max(500, 'Notes cannot be longer than 500 characters.').nullable(),
 	isCompleted: z.boolean().default(false)
 });

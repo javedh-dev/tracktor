@@ -40,7 +40,10 @@ export const PUT: RequestHandler = async (event) => {
 		const body = event.locals.requestBody || (await event.request.json());
 
 		// Validation for insurance updates
-		if (body.startDate && body.endDate) {
+		if (body.recurrenceType !== 'none') {
+			// Ensure endDate is removed when no_end is selected
+			delete body.endDate;
+		} else if (body.startDate && body.endDate) {
 			const startDate = new Date(body.startDate);
 			const endDate = new Date(body.endDate);
 
@@ -51,6 +54,14 @@ export const PUT: RequestHandler = async (event) => {
 			if (endDate <= startDate) {
 				throw error(400, 'End date must be after start date');
 			}
+		}
+
+		// Set default recurrence values if not provided in partial update
+		if (body.recurrenceType === undefined) {
+			body.recurrenceType = 'none';
+		}
+		if (body.recurrenceInterval === undefined) {
+			body.recurrenceInterval = 1;
 		}
 
 		const result = await insuranceService.updateInsurance(id, insuranceId, body);

@@ -40,7 +40,9 @@ export const PUT: RequestHandler = async (event) => {
 		const body = event.locals.requestBody || (await event.request.json());
 
 		// Validation for PUCC updates
-		if (body.issueDate && body.expiryDate) {
+		if (body.recurrenceType !== 'none') {
+			delete body.expiryDate;
+		} else if (body.issueDate && body.expiryDate) {
 			const issueDate = new Date(body.issueDate);
 			const expiryDate = new Date(body.expiryDate);
 
@@ -51,6 +53,14 @@ export const PUT: RequestHandler = async (event) => {
 			if (expiryDate <= issueDate) {
 				throw error(400, 'Expiry date must be after issue date');
 			}
+		}
+
+		// Set default recurrence values if not provided in partial update
+		if (body.recurrenceType === undefined) {
+			body.recurrenceType = 'none';
+		}
+		if (body.recurrenceInterval === undefined) {
+			body.recurrenceInterval = 1;
 		}
 
 		const result = await pollutionCertificateService.updatePollutionCertificate(id, puccId, body);

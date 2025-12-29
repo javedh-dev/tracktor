@@ -23,3 +23,13 @@ export type { PollutionCertificate, PollutionCertificateSchema } from './pucc';
 export type { MaintenanceLog, MaintenanceSchema } from './maintenance';
 export type { Config } from './config';
 export type { Reminder, ReminderSchema } from './reminder';
+
+// Re-export constants
+export { INSURANCE_RECURRENCE_TYPES, insuranceSchema } from './insurance';
+export { PUCC_RECURRENCE_TYPES, pollutionCertificateSchema } from './pucc';
+export {
+	REMINDER_TYPES,
+	REMINDER_SCHEDULES,
+	REMINDER_RECURRENCE_TYPES,
+	reminderSchema
+} from './reminder';

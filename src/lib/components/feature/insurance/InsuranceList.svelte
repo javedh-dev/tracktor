@@ -5,6 +5,7 @@
 	import Notebook from '@lucide/svelte/icons/notebook';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatCurrency, formatDate } from '$lib/helper/format.helper';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
@@ -13,6 +14,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import { INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
 
 	let vehicleId = $derived(vehicleStore.selectedId);
 
@@ -82,10 +84,25 @@
 					<span>{formatDate(ins.startDate)}</span>
 				</div>
 				<div class="flex items-center gap-2">
-					<Calendar class="h-5 w-5 " />
-					<span class="font-semibold">End Date:</span>
-					<span>{formatDate(ins.endDate)}</span>
+					{#if ins.endDate}
+						<Calendar class="h-5 w-5 " />
+						<span class="font-semibold">End Date:</span>
+						<span>{formatDate(ins.endDate)}</span>
+					{/if}
 				</div>
+				{#if ins.recurrenceType && ins.recurrenceType !== 'none'}
+					<div class="flex items-center gap-2">
+						<Repeat class="h-5 w-5" />
+						<span class="font-semibold">Recurrence:</span>
+						<span>
+							{INSURANCE_RECURRENCE_TYPES[ins.recurrenceType]}
+							{#if (ins.recurrenceType === 'yearly' || ins.recurrenceType === 'monthly') && ins.recurrenceInterval > 1}
+								(every {ins.recurrenceInterval}
+								{ins.recurrenceType === 'yearly' ? 'years' : 'months'})
+							{/if}
+						</span>
+					</div>
+				{/if}
 				{#if ins.notes}
 					<div class="flex items-center gap-2">
 						<Notebook class="h-5 w-5 " />

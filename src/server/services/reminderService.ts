@@ -15,7 +15,8 @@ const sanitizeNote = (note: unknown) => {
 
 const normalizeReminderPayload = (data: any, fallback?: any) => {
 	const merged = { ...fallback, ...data };
-	const { type, remindSchedule, dueDate } = merged;
+	const { type, remindSchedule, dueDate, recurrenceType, recurrenceInterval, recurrenceEndDate } =
+		merged;
 	if (!type) {
 		throw new AppError('Reminder type is required', Status.BAD_REQUEST);
 	}
@@ -30,10 +31,22 @@ const normalizeReminderPayload = (data: any, fallback?: any) => {
 		throw new AppError('Invalid due date supplied', Status.BAD_REQUEST);
 	}
 
+	// Parse recurrence end date if provided
+	let parsedRecurrenceEndDate = null;
+	if (recurrenceEndDate) {
+		parsedRecurrenceEndDate = new Date(recurrenceEndDate);
+		if (Number.isNaN(parsedRecurrenceEndDate.getTime())) {
+			throw new AppError('Invalid recurrence end date supplied', Status.BAD_REQUEST);
+		}
+	}
+
 	return {
 		type,
 		dueDate: parsedDate.toISOString(),
 		remindSchedule,
+		recurrenceType: recurrenceType || 'none',
+		recurrenceInterval: recurrenceInterval || 1,
+		recurrenceEndDate: parsedRecurrenceEndDate ? parsedRecurrenceEndDate.toISOString() : null,
 		note: sanitizeNote(merged.note),
 		isCompleted: Boolean(merged.isCompleted)
 	};

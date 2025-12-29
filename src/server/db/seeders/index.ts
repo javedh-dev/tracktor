@@ -71,6 +71,8 @@ const seedDemoData = async (enforce: boolean = false) => {
 		.returning();
 
 	vehicles.forEach(async (vehicle) => {
+		const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
+		const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
 		await db
 			.insert(insuranceTable)
 			.values({
@@ -78,7 +80,12 @@ const seedDemoData = async (enforce: boolean = false) => {
 				provider: faker.company.name(),
 				policyNumber: faker.string.numeric({ length: { min: 12, max: 18 } }),
 				startDate: faker.date.past({ years: 1 }).toDateString(),
-				endDate: faker.date.future({ years: 1 }).toDateString(),
+				endDate: recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
+				recurrenceType: recurrenceType,
+				recurrenceInterval:
+					recurrenceType === 'none' || recurrenceType === 'no_end'
+						? 1
+						: faker.number.int({ min: 1, max: 3 }),
 				cost: faker.number.int({ min: 1000, max: 5000 })
 			})
 			.run();
@@ -98,6 +105,8 @@ const seedDemoData = async (enforce: boolean = false) => {
 	});
 
 	vehicles.forEach(async (vehicle) => {
+		const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
+		const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
 		await db
 			.insert(pollutionCertificateTable)
 			.values({
@@ -107,7 +116,13 @@ const seedDemoData = async (enforce: boolean = false) => {
 					length: 10
 				}),
 				issueDate: faker.date.past({ years: 1 }).toDateString(),
-				expiryDate: faker.date.future({ years: 1 }).toDateString(),
+				expiryDate:
+					recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
+				recurrenceType: recurrenceType,
+				recurrenceInterval:
+					recurrenceType === 'none' || recurrenceType === 'no_end'
+						? 1
+						: faker.number.int({ min: 1, max: 2 }),
 				testingCenter: faker.company.name()
 			})
 			.run();

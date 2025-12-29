@@ -7,6 +7,10 @@ import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 
 export const addInsurance = async (vehicleId: string, insuranceData: any): Promise<ApiResponse> => {
 	await validateVehicleExists(vehicleId);
+	// Sanitize: remove endDate on backend when recurrence is not fixed
+	if (insuranceData && insuranceData.recurrenceType !== 'none') {
+		insuranceData.endDate = null;
+	}
 	const insurance = await db
 		.insert(schema.insuranceTable)
 		.values({
@@ -26,8 +30,12 @@ export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => 
 	const insurance = await db.query.insuranceTable.findMany({
 		where: (insurances, { eq }) => eq(insurances.vehicleId, vehicleId)
 	});
+	// Ensure response does not include endDate for non-fixed recurrence
+	const normalized = insurance.map((i) =>
+		i.recurrenceType !== 'none' ? { ...i, endDate: null } : i
+	);
 	return {
-		data: insurance,
+		data: normalized,
 		success: true
 	};
 };
@@ -60,7 +68,9 @@ export const updateInsurance = async (
 	const updatedInsurance = await db
 		.update(schema.insuranceTable)
 		.set({
-			...insuranceData
+			...((insuranceData && insuranceData.recurrenceType !== 'none')
+				? { ...insuranceData, endDate: null }
+				: insuranceData)
 		})
 		.where(eq(schema.insuranceTable.id, id))
 		.returning();

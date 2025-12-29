@@ -6,7 +6,9 @@
 	import { formatDate, parseDate } from '$lib/helper/format.helper';
 	import { savePollutionCertificateWithAttachment } from '$lib/services/pucc.service';
 	import { puccStore } from '$stores/pucc.svelte';
-	import { pollutionCertificateSchema } from '$lib/domain/pucc';
+	import { pollutionCertificateSchema, PUCC_RECURRENCE_TYPES } from '$lib/domain/pucc';
+	import * as Select from '$ui/select/index.js';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import { FileDropZone } from '$lib/components/app';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -41,7 +43,10 @@
 					{
 						...f.data,
 						issueDate: parseDate(f.data.issueDate),
-						expiryDate: parseDate(f.data.expiryDate)
+						expiryDate:
+							f.data.recurrenceType !== 'none' || !f.data.expiryDate
+								? null
+								: parseDate(f.data.expiryDate)
 					},
 					attachment,
 					removeExistingAttachment
@@ -67,7 +72,7 @@
 			formData.set({
 				...data,
 				issueDate: formatDate(data.issueDate),
-				expiryDate: formatDate(data.expiryDate),
+				expiryDate: data.expiryDate ? formatDate(data.expiryDate) : '',
 				attachment: null
 			});
 			// Reset attachment state when editing existing record
@@ -118,15 +123,59 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Field {form} name="expiryDate" class="w-full">
+        <Form.Field {form} name="recurrenceType" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Certificate expiry date">Expiry Date</FormLabel>
-					<Input {...props} bind:value={$formData.expiryDate} icon={Calendar1} type="calendar" />
+					<FormLabel description="How should this certificate renew?">Recurrence</FormLabel>
+					<Select.Root bind:value={$formData.recurrenceType} type="single">
+						<Select.Trigger {...props} class="w-full">
+							<div class="flex items-center gap-2">
+								<Repeat class="h-4 w-4" />
+								<span>
+									{PUCC_RECURRENCE_TYPES[
+										$formData.recurrenceType as keyof typeof PUCC_RECURRENCE_TYPES
+									] || 'Select recurrence'}
+								</span>
+							</div>
+						</Select.Trigger>
+						<Select.Content>
+							{#each Object.entries(PUCC_RECURRENCE_TYPES) as [value, label]}
+								<Select.Item {value}>{label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
+
+		{#if $formData.recurrenceType === 'yearly' || $formData.recurrenceType === 'monthly'}
+			<Form.Field {form} name="recurrenceInterval" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="Renewal frequency">
+							Renew every {$formData.recurrenceInterval || 1}
+							{$formData.recurrenceType === 'yearly' ? 'year(s)' : 'month(s)'}
+						</FormLabel>
+						<Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
+
+		{#if $formData.recurrenceType === 'none'}
+			<Form.Field {form} name="endDate" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<FormLabel description="PUCC expiry date">Expiry Date</FormLabel>
+						<Input {...props} bind:value={$formData.expiryDate} icon={Calendar1} type="calendar" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
+
 
 		<Form.Field {form} name="testingCenter" class="w-full">
 			<Form.Control>

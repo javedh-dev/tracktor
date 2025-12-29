@@ -4,6 +4,7 @@
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatDate } from '$lib/helper/format.helper';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
@@ -12,6 +13,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import { PUCC_RECURRENCE_TYPES } from '$lib/domain/pucc';
 
 	$effect(() => {
 		if (vehicleStore.selectedId) puccStore.refreshPuccs();
@@ -69,10 +71,25 @@
 					<span>{formatDate(pucc.issueDate)}</span>
 				</div>
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-					<Calendar class="h-5 w-5" />
-					<span class="font-semibold">Expiry Date:</span>
-					<span>{formatDate(pucc.expiryDate)}</span>
+					{#if pucc.expiryDate}
+						<Calendar class="h-5 w-5" />
+						<span class="font-semibold">Expiry Date:</span>
+						<span>{formatDate(pucc.expiryDate)}</span>
+					{/if}
 				</div>
+				{#if pucc.recurrenceType && pucc.recurrenceType !== 'none'}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<Repeat class="h-5 w-5" />
+						<span class="font-semibold">Recurrence:</span>
+						<span>
+							{PUCC_RECURRENCE_TYPES[pucc.recurrenceType]}
+							{#if (pucc.recurrenceType === 'yearly' || pucc.recurrenceType === 'monthly') && pucc.recurrenceInterval > 1}
+								(every {pucc.recurrenceInterval}
+								{pucc.recurrenceType === 'yearly' ? 'years' : 'months'})
+							{/if}
+						</span>
+					</div>
+				{/if}
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 					<MapPin class="h-5 w-5" />
 					<span class="font-semibold">Testing Center:</span>

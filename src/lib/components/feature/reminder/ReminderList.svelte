@@ -4,13 +4,18 @@
 	import Badge from '$ui/badge/badge.svelte';
 	import { reminderStore } from '$stores/reminder.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
-	import { REMINDER_TYPES, REMINDER_SCHEDULES } from '$lib/domain/reminder';
+	import {
+		REMINDER_TYPES,
+		REMINDER_SCHEDULES,
+		REMINDER_RECURRENCE_TYPES
+	} from '$lib/domain/reminder';
 	import { formatDate } from '$lib/helper/format.helper';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import BellRing from '@lucide/svelte/icons/bell-ring';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import AlarmClock from '@lucide/svelte/icons/alarm-clock';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import { browser } from '$app/environment';
 	import type { Reminder } from '$lib/domain';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -102,6 +107,28 @@
 					<span class="font-semibold">Reminder schedule:</span>
 					<span>{REMINDER_SCHEDULES[reminder.remindSchedule]}</span>
 				</div>
+				{#if reminder.recurrenceType && reminder.recurrenceType !== 'none'}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<Repeat class="h-5 w-5" />
+						<span class="font-semibold">Recurrence:</span>
+						<span>
+							{REMINDER_RECURRENCE_TYPES[reminder.recurrenceType]}
+							{#if reminder.recurrenceInterval > 1}
+								(every {reminder.recurrenceInterval}
+								{reminder.recurrenceType === 'yearly'
+									? 'years'
+									: reminder.recurrenceType === 'monthly'
+										? 'months'
+										: reminder.recurrenceType === 'weekly'
+											? 'weeks'
+											: 'days'})
+							{/if}
+							{#if reminder.recurrenceEndDate}
+								- Until {formatDate(reminder.recurrenceEndDate)}
+							{/if}
+						</span>
+					</div>
+				{/if}
 				{#if reminder.note}
 					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 						<FileText class="h-5 w-5" />
