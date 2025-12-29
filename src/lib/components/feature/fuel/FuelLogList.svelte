@@ -29,13 +29,31 @@
 	import { fuelLogStore } from '$stores/fuel-log.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import {
+		col_date,
+		col_odometer,
+		col_filled,
+		col_missed_last,
+		col_fuel_amount,
+		col_cost,
+		col_mileage,
+		col_notes,
+		col_attachment,
+		fuel_volume_label_energy,
+		fuel_volume_label_fuel,
+		fuel_empty_list,
+		common_yes,
+		common_no
+	} from '$lib/paraglide/messages/_index.js';
 
 	// Get the selected vehicle to determine fuel type and units
 	const selectedVehicle = $derived(
 		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
-	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Fuel Amount');
+	const volumeLabel = $derived(
+		selectedVehicle?.fuelType === 'ev' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
+	);
 
 	const columns: ColumnDef<FuelLog>[] = [
 		{
@@ -44,7 +62,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Calendar1,
 					iconClass: 'h-4 w-4',
-					label: 'Date',
+					label: col_date(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
@@ -55,7 +73,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: CircleGauge,
 					iconClass: 'h-4 w-4 ',
-					label: 'Odometer',
+					label: col_odometer(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
@@ -66,7 +84,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Fuel,
 					iconClass: 'h-4 w-4',
-					label: 'Filled',
+					label: col_filled(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(badge, { value: row.getValue('filled') })
@@ -77,7 +95,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: SquircleDashed,
 					iconClass: 'h-4 w-4',
-					label: 'Missed Last',
+					label: col_missed_last(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(badge, { value: row.getValue('missedLast') })
@@ -103,7 +121,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Banknote,
 					iconClass: 'h-4 w-4 ',
-					label: 'Cost',
+					label: col_cost(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
@@ -114,7 +132,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Rabbit,
 					iconClass: 'h-4 w-4 ',
-					label: selectedVehicle?.fuelType === 'ev' ? 'Efficiency' : 'Mileage',
+					label: col_mileage(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) =>
@@ -129,7 +147,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Notebook,
 					iconClass: 'h-4 w-4',
-					label: 'Notes',
+					label: col_notes(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
@@ -140,7 +158,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Paperclip,
 					iconClass: 'h-4 w-4',
-					label: 'Attachment',
+					label: col_attachment(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(attachmentCell, { value: row.getValue('attachment') })
@@ -177,7 +195,7 @@
 		icon={CircleSlash2}
 		iconClass="h-5 w-5"
 		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-		label="No fuel refill logs found for this vehicle."
+		label={fuel_empty_list()}
 	/>
 {:else}
 	<AppTable data={fuelLogStore.fuelLogs || []} {columns} />
@@ -185,7 +203,7 @@
 
 {#snippet badge(params: any)}
 	<div class="flex flex-row justify-center">
-		<Badge variant="outline"><span>{params.value ? 'Yes' : 'No'}</span></Badge>
+		<Badge variant="outline"><span>{params.value ? common_yes() : common_no()}</span></Badge>
 	</div>
 {/snippet}
 

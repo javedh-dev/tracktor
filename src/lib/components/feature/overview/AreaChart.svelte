@@ -7,6 +7,7 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+	import { overview_chart_no_data } from '$lib/paraglide/messages/_index.js';
 
 	let {
 		chartData,
@@ -105,7 +106,7 @@
 		</Chart.Container>
 	{:else}
 		<div class="flex h-full flex-col items-center justify-center">
-			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={`No data avaialble`} />
+			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={overview_chart_no_data()} />
 		</div>
 	{/if}
 </div>

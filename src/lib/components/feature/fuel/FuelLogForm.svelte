@@ -20,6 +20,30 @@
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import {
+		form_date,
+		form_date_desc,
+		form_odometer,
+		form_odometer_desc,
+		form_volume_fuel,
+		form_volume_energy,
+		form_cost,
+		form_cost_desc,
+		form_cost_desc_ev,
+		form_full_charge,
+		form_full_tank,
+		form_full_charge_desc,
+		form_full_tank_desc,
+		form_missed_last,
+		form_missed_last_desc,
+		form_notes,
+		form_notes_placeholder,
+		form_attachment,
+		common_submit,
+		fuel_toast_saved,
+		fuel_toast_updated,
+		fuel_toast_error_prefix
+	} from '$lib/paraglide/messages/_index.js';
 
 	let { data } = $props();
 
@@ -32,7 +56,9 @@
 		vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
-	const volumeLabel = $derived(selectedVehicle?.fuelType === 'ev' ? 'Energy' : 'Volume');
+	const volumeLabel = $derived(
+		selectedVehicle?.fuelType === 'ev' ? form_volume_energy() : form_volume_fuel()
+	);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
@@ -53,11 +79,11 @@
 					removeExistingAttachment
 				).then((res) => {
 					if (res.status == 'OK') {
-						toast.success(`FuelLog ${data ? 'updated' : 'saved'} successfully...!!!`);
+						toast.success(data ? fuel_toast_updated() : fuel_toast_saved());
 						attachment = undefined;
 						sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
 					} else {
-						toast.error(`Error while saving : ${res.error}`);
+						toast.error(`${fuel_toast_error_prefix()}${res.error}`);
 					}
 					processing = false;
 				});
@@ -94,7 +120,7 @@
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Date of fuel refill">Date</FormLabel>
+					<FormLabel description={form_date_desc()}>{form_date()}</FormLabel>
 					<Input {...props} bind:value={$formData.date} icon={Calendar1} type="calendar" disabled />
 				{/snippet}
 			</Form.Control>
@@ -103,7 +129,7 @@
 		<Form.Field {form} name="odometer" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
+					<FormLabel description={form_odometer_desc()}>{form_odometer()}</FormLabel>
 					<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 				{/snippet}
 			</Form.Control>
@@ -114,7 +140,9 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev' ? 'Energy consumed' : 'Volume of fuel'}
+						description={selectedVehicle?.fuelType === 'ev'
+							? form_volume_energy()
+							: form_volume_fuel()}
 						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</FormLabel
 					>
 					<Input
@@ -123,7 +151,7 @@
 						icon={Fuel}
 						type="number"
 						step=".01"
-						placeholder={`Enter ${volumeLabel.toLowerCase()} in ${getFuelUnit(selectedVehicle?.fuelType as string)}`}
+						placeholder={`${volumeLabel} (${getFuelUnit(selectedVehicle?.fuelType as string)})`}
 					/>
 				{/snippet}
 			</Form.Control>
@@ -134,8 +162,9 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev' ? 'Cost of charging' : 'Cost of refill'}
-						>Cost</FormLabel
+						description={selectedVehicle?.fuelType === 'ev'
+							? form_cost_desc_ev()
+							: form_cost_desc()}>{form_cost()}</FormLabel
 					>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
@@ -152,10 +181,10 @@
 							<FormLabel
 								class="font-normal"
 								description={selectedVehicle?.fuelType === 'ev'
-									? 'Is battery fully charged?'
-									: 'Is tank filled to top?'}
+									? form_full_charge_desc()
+									: form_full_tank_desc()}
 							>
-								{selectedVehicle?.fuelType === 'ev' ? 'Full Charge' : 'Full Tank'}
+								{selectedVehicle?.fuelType === 'ev' ? form_full_charge() : form_full_tank()}
 							</FormLabel>
 						</div>
 					{/snippet}
@@ -167,8 +196,8 @@
 					{#snippet children({ props })}
 						<div class="flex flex-row items-center gap-2">
 							<Checkbox {...props} bind:checked={$formData.missedLast} />
-							<FormLabel class="font-normal" description="Were any of last entries missed?">
-								Missed Last
+							<FormLabel class="font-normal" description={form_missed_last_desc()}>
+								{form_missed_last()}
 							</FormLabel>
 						</div>
 					{/snippet}
@@ -179,10 +208,10 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="More details">Notes</FormLabel>
+					<FormLabel description={form_notes_placeholder()}>{form_notes()}</FormLabel>
 					<Textarea
 						{...props}
-						placeholder="Add more details. If any..."
+						placeholder={form_notes_placeholder()}
 						class="resize-none"
 						bind:value={$formData.notes}
 					/>
@@ -193,7 +222,7 @@
 		</Form.Field>
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
-				<FormLabel description="Upload receipt or fuel log document">Attachment</FormLabel>
+				<FormLabel description={form_attachment()}>{form_attachment()}</FormLabel>
 				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
@@ -203,6 +232,6 @@
 				/>
 			</Form.Control>
 		</Form.Field>
-		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+		<SubmitButton {processing} class="w-full">{common_submit()}</SubmitButton>
 	</fieldset>
 </form>
