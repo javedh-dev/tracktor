@@ -7,6 +7,7 @@
 	import Repeat from '@lucide/svelte/icons/repeat';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatDate } from '$lib/helper/format.helper';
+	import { getNextDueDate } from '$lib/helper/recurrence.helper';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import PuccContextMenu from './PuccContextMenu.svelte';
 	import { puccStore } from '$stores/pucc.svelte';
@@ -14,6 +15,15 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import { PUCC_RECURRENCE_TYPES } from '$lib/domain/pucc';
+	import type { PollutionCertificate } from '$lib/domain/pucc';
+
+	const getNextPuccDue = (pucc: PollutionCertificate) => {
+		const baseDate = pucc.expiryDate ?? pucc.issueDate;
+		if (!baseDate) return null;
+		if (pucc.recurrenceType === 'no_end') return null;
+		if (pucc.recurrenceType === 'none') return baseDate;
+		return getNextDueDate(new Date(baseDate), pucc.recurrenceType, pucc.recurrenceInterval);
+	};
 
 	$effect(() => {
 		if (vehicleStore.selectedId) puccStore.refreshPuccs();
@@ -70,15 +80,31 @@
 					<span class="font-semibold">Issue Date:</span>
 					<span>{formatDate(pucc.issueDate)}</span>
 				</div>
-				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-					{#if pucc.expiryDate}
+				{#if pucc.expiryDate}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 						<Calendar class="h-5 w-5" />
 						<span class="font-semibold">Expiry Date:</span>
 						<span>{formatDate(pucc.expiryDate)}</span>
-					{/if}
-				</div>
-				{#if pucc.recurrenceType && pucc.recurrenceType !== 'none'}
+					</div>
+				{/if}
+				{#if true}
+					{@const nextDue = getNextPuccDue(pucc)}
 					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<Calendar class="h-5 w-5" />
+						<span class="font-semibold">Next Due:</span>
+						<span>
+							{#if nextDue}
+								{formatDate(nextDue)}
+							{:else if pucc.recurrenceType === 'no_end'}
+								No end date
+							{:else}
+								—
+							{/if}
+						</span>
+					</div>
+				{/if}
+				{#if pucc.recurrenceType && pucc.recurrenceType !== 'none'}
+					<div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
 						<Repeat class="h-5 w-5" />
 						<span class="font-semibold">Recurrence:</span>
 						<span>
@@ -96,7 +122,7 @@
 					<span>{pucc.testingCenter}</span>
 				</div>
 				{#if pucc.notes}
-					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
 						<FileText class="h-5 w-5" />
 						<span class="font-semibold">Notes:</span>
 						<span>{pucc.notes}</span>
@@ -104,7 +130,7 @@
 				{/if}
 				{#if pucc.attachment}
 					{@const fileName = pucc.attachment}
-					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+					<div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
 						<Paperclip class="h-5 w-5" />
 						<span class="font-semibold">Attachment:</span>
 						<AttachmentLink {fileName}>

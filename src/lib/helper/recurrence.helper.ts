@@ -132,3 +132,43 @@ export function formatRecurrenceDescription(recurrenceType: string, interval: nu
 
 	return `Renews ${intervalText}${periodText}`;
 }
+
+/**
+ * Calculate the next due date for a recurring item.
+ * Returns null when there is no further scheduled occurrence.
+ */
+export function getNextDueDate(
+	baseDate: Date,
+	recurrenceType: string,
+	interval: number = 1,
+	recurrenceEndDate: Date | null = null
+): Date | null {
+	// Fixed date: return the base date as the only due date. Perpetual coverage has no next due date.
+	if (recurrenceType === 'none') {
+		return baseDate;
+	}
+	if (recurrenceType === 'no_end') {
+		return null;
+	}
+
+	if (!shouldRecur(recurrenceType)) {
+		return null;
+	}
+
+	const today = new Date();
+	let nextDate = calculateNextOccurrence(baseDate, recurrenceType, interval);
+
+	// Advance until the next future occurrence (if any)
+	while (nextDate <= today) {
+		nextDate = calculateNextOccurrence(nextDate, recurrenceType, interval);
+		if (recurrenceEndDate && nextDate > recurrenceEndDate) {
+			return null;
+		}
+	}
+
+	if (recurrenceEndDate && nextDate > recurrenceEndDate) {
+		return null;
+	}
+
+	return nextDate;
+}

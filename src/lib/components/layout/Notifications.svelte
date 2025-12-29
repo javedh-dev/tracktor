@@ -15,6 +15,7 @@
 	import { puccStore } from '$stores/pucc.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { differenceInDays, format } from 'date-fns';
+	import { getNextDueDate } from '$lib/helper/recurrence.helper';
 	import { calculateVehicleAlerts, type VehicleAlert } from '$lib/helper/alert.helper';
 	import { saveReminder } from '$lib/services/reminder.service';
 	import { toast } from 'svelte-sonner';
@@ -100,7 +101,10 @@
 		dueDate: reminder.dueDate,
 		remindSchedule: reminder.remindSchedule,
 		note: reminder.note,
-		isCompleted
+		isCompleted,
+		recurrenceType: reminder.recurrenceType,
+		recurrenceInterval: reminder.recurrenceInterval,
+		recurrenceEndDate: reminder.recurrenceEndDate
 	});
 
 	let completingReminderIds: Record<string, boolean> = {};
@@ -147,9 +151,24 @@
 			return reminderStore.reminders
 				.filter((reminder) => !reminder.isCompleted)
 				.map((reminder) => {
-					const dueDate =
+					const baseDueDate =
 						reminder.dueDate instanceof Date ? reminder.dueDate : new Date(reminder.dueDate);
-					const daysRemaining = differenceInDays(dueDate, now);
+					const recurrenceEnd =
+						reminder.recurrenceEndDate instanceof Date
+							? reminder.recurrenceEndDate
+							: reminder.recurrenceEndDate
+								? new Date(reminder.recurrenceEndDate)
+								: null;
+					const nextDueDate =
+						reminder.recurrenceType && reminder.recurrenceType !== 'none'
+							? (getNextDueDate(
+									baseDueDate,
+									reminder.recurrenceType,
+									reminder.recurrenceInterval ?? 1,
+									recurrenceEnd
+								) ?? baseDueDate)
+							: baseDueDate;
+					const daysRemaining = differenceInDays(nextDueDate, now);
 					const severity: ReminderSeverity =
 						daysRemaining < 0
 							? 'critical'
@@ -158,7 +177,7 @@
 								: 'info';
 					return {
 						...reminder,
-						dueDate,
+						dueDate: nextDueDate,
 						daysRemaining,
 						severity
 					};

@@ -8,6 +8,7 @@
 	import Repeat from '@lucide/svelte/icons/repeat';
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 	import { formatCurrency, formatDate } from '$lib/helper/format.helper';
+	import { getNextDueDate } from '$lib/helper/recurrence.helper';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import InsuranceContextMenu from './InsuranceContextMenu.svelte';
 	import { insuranceStore } from '$stores/insurance.svelte';
@@ -15,8 +16,17 @@
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import { INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
+	import type { Insurance } from '$lib/domain/insurance';
 
 	let vehicleId = $derived(vehicleStore.selectedId);
+
+	const getNextInsuranceDue = (ins: Insurance) => {
+		const baseDate = ins.endDate ?? ins.startDate;
+		if (!baseDate) return null;
+		if (ins.recurrenceType === 'no_end') return null;
+		if (ins.recurrenceType === 'none') return baseDate;
+		return getNextDueDate(new Date(baseDate), ins.recurrenceType, ins.recurrenceInterval);
+	};
 
 	$effect(() => {
 		if (vehicleId) insuranceStore.refreshInsurances();
@@ -51,6 +61,7 @@
 	/>
 {:else}
 	{#each insuranceStore.insurances as ins (ins.id)}
+		{@const nextDue = getNextInsuranceDue(ins)}
 		<div
 			id="insurance-item-{ins.id}"
 			class="insurance-item lg:bg-background/50 bg-secondary mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
@@ -83,15 +94,28 @@
 					<span class="font-semibold">Start Date:</span>
 					<span>{formatDate(ins.startDate)}</span>
 				</div>
-				<div class="flex items-center gap-2">
-					{#if ins.endDate}
+				{#if ins.endDate}
+					<div class="flex items-center gap-2">
 						<Calendar class="h-5 w-5 " />
 						<span class="font-semibold">End Date:</span>
 						<span>{formatDate(ins.endDate)}</span>
-					{/if}
+					</div>
+				{/if}
+				<div class="flex items-center gap-2">
+					<Calendar class="h-5 w-5 " />
+					<span class="font-semibold">Next Due:</span>
+					<span>
+						{#if nextDue}
+							{formatDate(nextDue)}
+						{:else if ins.recurrenceType === 'no_end'}
+							No end date
+						{:else}
+							—
+						{/if}
+					</span>
 				</div>
 				{#if ins.recurrenceType && ins.recurrenceType !== 'none'}
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2 md:col-span-2">
 						<Repeat class="h-5 w-5" />
 						<span class="font-semibold">Recurrence:</span>
 						<span>
@@ -104,7 +128,7 @@
 					</div>
 				{/if}
 				{#if ins.notes}
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2 md:col-span-2">
 						<Notebook class="h-5 w-5 " />
 						<span class="font-semibold">Notes:</span>
 						<span>{ins.notes}</span>
@@ -112,7 +136,7 @@
 				{/if}
 				{#if ins.attachment}
 					{@const fileName = ins.attachment}
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2 md:col-span-2">
 						<Paperclip class="h-5 w-5" />
 						<span class="font-semibold">Attachment:</span>
 						<AttachmentLink {fileName}>

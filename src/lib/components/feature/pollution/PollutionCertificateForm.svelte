@@ -123,7 +123,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-        <Form.Field {form} name="recurrenceType" class="w-full">
+		<Form.Field {form} name="recurrenceType" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel description="How should this certificate renew?">Recurrence</FormLabel>
@@ -165,7 +165,7 @@
 		{/if}
 
 		{#if $formData.recurrenceType === 'none'}
-			<Form.Field {form} name="endDate" class="w-full">
+			<Form.Field {form} name="expiryDate" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
 						<FormLabel description="PUCC expiry date">Expiry Date</FormLabel>
@@ -175,7 +175,6 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-
 
 		<Form.Field {form} name="testingCenter" class="w-full">
 			<Form.Control>
