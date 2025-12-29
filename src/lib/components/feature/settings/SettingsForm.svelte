@@ -32,6 +32,23 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
+	import {
+		settings_tab_personalization,
+		settings_tab_interface,
+		settings_tab_features,
+		settings_label_date_format,
+		settings_label_locale,
+		settings_label_timezone,
+		settings_label_currency,
+		settings_label_unit_distance,
+		settings_label_unit_volume,
+		settings_label_theme,
+		settings_label_custom_css,
+		settings_update_button,
+		settings_select_unit_system,
+		settings_select_theme
+	} from '$lib/paraglide/messages/_index.js';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
@@ -85,7 +102,18 @@
 					return item;
 				});
 
-				saveConfig(updatedConfig);
+				// Persist configuration before applying a locale change
+				await saveConfig(updatedConfig);
+
+				// If locale changed, update Paraglide (triggers reload by default)
+				if (f.data.locale && f.data.locale !== getLocale()) {
+					try {
+						await setLocale(f.data.locale as any);
+					} catch (_) {
+						/* noop */
+					}
+				}
+
 				toast.success('Configuration updated successfully!');
 				configStore.refreshConfigs();
 				sheetStore.closeSheet(vehicleStore.refreshVehicles);
@@ -112,6 +140,18 @@
 		{ value: 'gallon', label: 'Gallon' }
 	];
 
+	const localeLabels: Record<string, string> = {
+		en: 'English',
+		hi: 'हिंदी',
+		es: 'Español',
+		fr: 'Français',
+		de: 'Deutsch'
+	};
+	const localeOptions = locales.map((code) => ({
+		value: code,
+		label: localeLabels[code] || code.toUpperCase()
+	}));
+
 	$effect(() => {
 		if (localConfig.length > 0) {
 			const configData: any = {};
@@ -135,9 +175,9 @@
 	<div class="space-y-6">
 		<Tabs.Root value="personalization" class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">
-				<Tabs.Trigger value="personalization">Personalization</Tabs.Trigger>
-				<Tabs.Trigger value="interface">Interface</Tabs.Trigger>
-				<Tabs.Trigger value="features">Features</Tabs.Trigger>
+				<Tabs.Trigger value="personalization">{settings_tab_personalization()}</Tabs.Trigger>
+				<Tabs.Trigger value="interface">{settings_tab_interface()}</Tabs.Trigger>
+				<Tabs.Trigger value="features">{settings_tab_features()}</Tabs.Trigger>
 			</Tabs.List>
 
 			<!-- Personalization Tab -->
@@ -147,7 +187,9 @@
 					<Form.Field {form} name="dateFormat" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Choose your preferred date format">Date Format</FormLabel>
+								<FormLabel description="Choose your preferred date format"
+									>{settings_label_date_format()}</FormLabel
+								>
 								<Input
 									{...props}
 									bind:value={$formData.dateFormat}
@@ -166,16 +208,23 @@
 					<Form.Field {form} name="locale" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Locale for formatting">Locale</FormLabel>
-								<Input
-									{...props}
-									bind:value={$formData.locale}
-									icon={Languages}
-									type="text"
-									class="mono"
-									disabled
-								/>
-								<Form.Description>This will be enabled with i18 support</Form.Description>
+								<FormLabel description="Choose the language for the interface"
+									>{settings_label_locale()}</FormLabel
+								>
+								<Select.Root bind:value={$formData.locale} type="single">
+									<Select.Trigger {...props} class="w-full">
+										<div class="flex items-center justify-start">
+											<Languages class="mr-2 h-4 w-4" />
+											{localeOptions.find((opt) => opt.value === $formData.locale)?.label ||
+												'Select language'}
+										</div>
+									</Select.Trigger>
+									<Select.Content>
+										{#each localeOptions as option}
+											<Select.Item value={option.value}>{option.label}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
@@ -184,13 +233,15 @@
 					<Form.Field {form} name="unitOfDistance" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Measurement of distance uint">Unit of Distance</FormLabel>
+								<FormLabel description="Measurement of distance uint"
+									>{settings_label_unit_distance()}</FormLabel
+								>
 								<Select.Root bind:value={$formData.unitOfDistance} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<RulerDimensionLine class="mr-2 h-4 w-4" />
 											{uodOptions.find((opt) => opt.value === $formData.unitOfDistance)?.label ||
-												'Select unit system'}
+												settings_select_unit_system()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -209,13 +260,15 @@
 					<Form.Field {form} name="unitOfVolume" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Measurement of volume unit">Unit of Volume</FormLabel>
+								<FormLabel description="Measurement of volume unit"
+									>{settings_label_unit_volume()}</FormLabel
+								>
 								<Select.Root bind:value={$formData.unitOfVolume} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<Currency class="mr-2 h-4 w-4" />
 											{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)?.label ||
-												'Select unit system'}
+												settings_select_unit_system()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -234,7 +287,9 @@
 					<Form.Field {form} name="timezone" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Choose your timezone for date display">Timezone</FormLabel>
+								<FormLabel description="Choose your timezone for date display"
+									>{settings_label_timezone()}</FormLabel
+								>
 								<SearchableSelect
 									bind:value={$formData.timezone}
 									options={getTimezoneOptions()}
@@ -249,7 +304,9 @@
 					<Form.Field {form} name="currency" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Choose your preferred currency">Currency</FormLabel>
+								<FormLabel description="Choose your preferred currency"
+									>{settings_label_currency()}</FormLabel
+								>
 								<SearchableSelect
 									bind:value={$formData.currency}
 									icon={Currency}
@@ -270,12 +327,14 @@
 					<Form.Field {form} name="theme" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="Choose your preferred theme">Theme</FormLabel>
+								<FormLabel description="Choose your preferred theme"
+									>{settings_label_theme()}</FormLabel
+								>
 								<Select.Root bind:value={$formData.theme} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<Palette class="mr-2 h-4 w-4" />
-											{themes[$formData.theme]?.label || 'Select theme'}
+											{themes[$formData.theme]?.label || settings_select_theme()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -300,9 +359,9 @@
 					<Form.Field {form} name="customCss" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description="CSS Styles for customizing the interface">
-									Custom CSS
-								</FormLabel>
+								<FormLabel description="CSS Styles for customizing the interface"
+									>{settings_label_custom_css()}</FormLabel
+								>
 								<Textarea
 									{...props}
 									placeholder="Add your custom CSS here..."
@@ -448,7 +507,7 @@
 
 		<!-- Submit Button -->
 		<fieldset disabled={processing} class="flex justify-end gap-2">
-			<SubmitButton {processing} class="w-full">Update Settings</SubmitButton>
+			<SubmitButton {processing} class="w-full">{settings_update_button()}</SubmitButton>
 		</fieldset>
 	</div>
 </form>

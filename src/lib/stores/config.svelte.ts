@@ -1,6 +1,7 @@
 import type { Config, Configs } from '$lib/domain/config';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '$lib/response';
+import { setLocale } from '$lib/paraglide/runtime.js';
 
 class ConfigStore {
 	configs = $state<Configs>({
@@ -59,6 +60,14 @@ class ConfigStore {
 							break;
 						case 'locale':
 							this.configs.locale = item.value || this.configs.locale;
+							// Update paraglide locale without reloading during config refresh
+							try {
+								if (this.configs.locale) {
+									setLocale(this.configs.locale as any, { reload: false });
+								}
+							} catch (_) {
+								/* noop */
+							}
 							break;
 						case 'timezone':
 							this.configs.timezone = item.value || this.configs.timezone;

@@ -1,11 +1,15 @@
+import { sequence } from '@sveltejs/kit/hooks';
+import { paraglideMiddleware } from '$lib/paraglide/server';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { createErrorResponseBody, logError } from './server/utils/errorHandler';
+
 import {
 	CorsMiddleware,
 	RateLimitMiddleware,
 	AuthMiddleware,
 	LoggingMiddleware
 } from '$server/middlewares';
+
 import { MiddlewareChain } from '$server/middlewares/base';
 import { initializeDatabase } from '$server/db/init';
 import { appAsciiArt, logger } from '$server/config';
@@ -25,10 +29,12 @@ const envSnapshot = () => ({
 
 const logEnvSnapshot = () => {
 	const snapshot = envSnapshot();
+
 	Object.entries(snapshot).forEach(([key, value]) => logger.info(`${key}: ${String(value)}`));
 };
 
 let dbInitialized = false;
+
 const initPromise = (async () => {
 	if (dbInitialized) return;
 
@@ -43,8 +49,11 @@ const initPromise = (async () => {
 		await ensureAppDirectories();
 	} catch (error) {
 		logger.error('Failed to create required application directories', error);
+
 		const wrapped = new Error('Failed to create required application directories');
+
 		(wrapped as any).cause = error;
+
 		throw wrapped;
 	}
 
@@ -54,8 +63,11 @@ const initPromise = (async () => {
 		logger.info('Database initialization completed');
 	} catch (error) {
 		logger.error('Failed to initialize database', error);
+
 		const wrapped = new Error('Failed to initialize database');
+
 		(wrapped as any).cause = error;
+
 		throw wrapped;
 	}
 })();
@@ -67,27 +79,38 @@ const buildMiddlewares = () => [
 	new LoggingMiddleware()
 ];
 
-export const handle: Handle = async ({ event, resolve }) => {
-	await initPromise;
+export const handleError: HandleServerError = async ({ error, event }) => {
+	logError(error, event);
 
+	const body = createErrorResponseBody(error);
+
+	return { message: body.message || 'Internal server error' };
+};
+
+const originalHandle: Handle = async ({ event, resolve }) => {
+	await initPromise;
 	middlewareChain.init(buildMiddlewares());
 
 	const middlewareResult = await middlewareChain.handle(event);
+
 	if (middlewareResult.response) {
 		return middlewareResult.response;
 	}
 
 	const response = await resolve(event);
+
 	CorsMiddleware.addCorsHeaders(response, event.request);
 
 	return response;
 };
 
-export const handleError: HandleServerError = async ({ error, event }) => {
-	logError(error, event);
-	const body = createErrorResponseBody(error);
+const handleParaglide: Handle = ({ event, resolve }) =>
+	paraglideMiddleware(event.request, ({ request, locale }) => {
+		event.request = request;
 
-	return {
-		message: body.message || 'Internal server error'
-	};
-};
+		return resolve(event, {
+			transformPageChunk: ({ html }) => html.replace('%paraglide.lang%', locale)
+		});
+	});
+
+export const handle = sequence(originalHandle, handleParaglide);

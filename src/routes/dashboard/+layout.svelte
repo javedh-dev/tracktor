@@ -14,6 +14,12 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import {
+		app_title,
+		app_add_vehicle,
+		app_empty_select_message,
+		app_empty_select_hint
+	} from '$lib/paraglide/messages/_index.js';
 
 	let { children } = $props();
 
@@ -94,7 +100,7 @@
 		<div id="dashboard-content-container" class="mx-auto p-4 lg:container lg:p-6">
 			<div id="dashboard-header" class="mb-2 flex items-center justify-between">
 				<h1 id="dashboard-title" class="text-primary text-2xl font-semibold lg:text-3xl">
-					Your Garage
+					{app_title()}
 				</h1>
 				<Button
 					id="dashboard-add-vehicle-btn"
@@ -103,7 +109,7 @@
 					class="border-primary text-primary hover:text-accent hover:bg-primary cursor-pointer border bg-transparent"
 					onclick={() => sheetStore.openSheet(VehicleForm, 'Add Vehicle')}
 				>
-					<LabelWithIcon icon={CirclePlus} label="Add Vehicle" />
+					<LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
 				</Button>
 			</div>
 
@@ -123,11 +129,9 @@
 						class="bg-muted text-muted-foreground border-border flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed text-center"
 					>
 						<p id="dashboard-empty-message" class="text-lg font-medium">
-							Select a vehicle to view its details
+							{app_empty_select_message()}
 						</p>
-						<p id="dashboard-empty-hint" class="text-sm">
-							Choose one from the garage above to load its dashboard.
-						</p>
+						<p id="dashboard-empty-hint" class="text-sm">{app_empty_select_hint()}</p>
 					</div>
 				{/if}
 			</div>

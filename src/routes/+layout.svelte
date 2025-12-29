@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import { ModeWatcher } from 'mode-watcher';
 	import '../styles/app.css';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { Toaster } from '$ui/sonner';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import { navigating } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import Header from '$layout/Header.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$lib/config/env';
 	import { toast } from 'svelte-sonner';
 	import { configStore } from '$lib/stores/config.svelte';
 	import { themeStore } from '$lib/stores/theme.svelte';
+	import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
@@ -27,11 +29,14 @@
 
 	async function detectSWUpdate() {
 		const registrations = await navigator?.serviceWorker?.ready;
+
 		registrations?.addEventListener('updatefound', () => {
 			const newSW = registrations.installing;
+
 			newSW?.addEventListener('statechange', () => {
 				if (newSW.state === 'installed') {
 					toast.info('New Update is available. Reloading..!');
+
 					setTimeout(() => {
 						newSW.postMessage({ type: 'SKIP_WAITING' });
 						window.location.reload();
@@ -46,10 +51,13 @@
 		themeStore.initializeTheme();
 
 		detectSWUpdate();
+
 		configStore.getCustomCss().then((css) => {
 			customCss = css;
+
 			if (customCss) {
 				const style = document.createElement('style');
+
 				style.innerHTML = customCss;
 				document.head.appendChild(style);
 			}
@@ -70,14 +78,15 @@
 			iconClass="h-5 w-5"
 			style="text-amber-500 dark:text-amber-700 gap-1 flex-col lg:flex-row text-center lg:text-sm text-xs"
 		>
-			This is a demo instance. Data will be reset periodically and is not saved permanently. Please
-			avoid adding any personal info.
+			{demo_banner()}
+
 			{#if !env.DISABLE_AUTH}
-				<strong>Default Login: demo / demo</strong>
+				<strong>{default_login()}</strong>
 			{/if}
 		</LabelWithIcon>
 	</div>
 {/if}
+
 {#if showGlobalLoader}
 	<div id="global-loading-layout" class="flex min-h-svh w-full flex-col">
 		<header
@@ -112,7 +121,13 @@
 	</div>
 {:else}
 	<div id="app-container" class="flex min-h-svh w-full flex-col">
-		<Header />
-		{@render children()}
+		<Header />{@render children()}
 	</div>
 {/if}
+<div style="display:none">
+	{#each locales as locale}
+		<a href={localizeHref(page.url.pathname, { locale })}>
+			{locale}
+		</a>
+	{/each}
+</div>
