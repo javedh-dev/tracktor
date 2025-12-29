@@ -47,6 +47,9 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
+      csv-parse:
+        specifier: ^6.1.0
+        version: 6.1.0
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -1792,6 +1795,9 @@ packages:
   cssstyle@5.3.4:
     resolution: {integrity: sha512-KyOS/kJMEq5O9GdPnaf82noigg5X5DYn0kZPJTaAsCUaBizp6Xa1y9D4Qoqf/JazEXWuruErHgVXwjN5391ZJw==}
     engines: {node: '>=20'}
+
+  csv-parse@6.1.0:
+    resolution: {integrity: sha512-CEE+jwpgLn+MmtCpVcPtiCZpVtB6Z2OKPTr34pycYYoL7sxdOkXDdQ4lRiw6ioC0q6BLqhc6cKweCVvral8yhw==}
 
   currency-codes@2.2.0:
     resolution: {integrity: sha512-vpbQc5sEYHGdTVAYUhHnKv0DWiYLRvzl/KKyqeHzBh7HD/j3UlWoScpZ9tN/jG6w2feddWoObsBbaNVu5yDapg==}
@@ -5027,6 +5033,8 @@ snapshots:
       css-tree: 3.1.0
     transitivePeerDependencies:
       - postcss
+
+  csv-parse@6.1.0: {}
 
   currency-codes@2.2.0:
     dependencies:

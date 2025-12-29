@@ -1,0 +1,11 @@
+Date,Odometer,FuelAmount,Cost,Filled,MissedLast,Notes
+2025-01-01,45000,50.5,75.25,true,false,Full tank
+2025-01-05,45250,48.2,72.30,true,false,Regular fill
+2025-01-10,45500,52.1,78.15,true,false,Highway drive
+2025-01-15,45750,49.8,74.70,true,false,City driving
+2025-01-20,46000,51.3,77.00,true,false,Mixed route
+2025-01-25,46250,47.9,71.85,false,true,Partial fill
+2025-02-01,46500,50.0,75.00,true,false,Full tank at station
+2025-02-05,46750,48.5,72.75,true,false,Regular fill
+2025-02-10,47000,51.0,76.50,true,false,Premium fuel
+2025-02-15,47250,49.5,74.25,true,false,Standard fuel

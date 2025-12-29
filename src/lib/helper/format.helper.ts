@@ -33,6 +33,15 @@ const isValidFormat = (fmt: string): { ex?: string; valid: boolean } => {
 	}
 };
 
+const parseWithFormat = (dateStr: string, fmt: string): Date | null => {
+	try {
+		const parsed = parse(dateStr, fmt, new Date());
+		return isNaN(parsed.getTime()) ? null : parsed;
+	} catch (_) {
+		return null;
+	}
+};
+
 const getTimezoneOptions = (): { value: string; label: string; offset: number }[] => {
 	if (typeof Intl.supportedValuesOf === 'function') {
 		return Intl.supportedValuesOf('timeZone')
@@ -165,7 +174,8 @@ export {
 	formatFuel,
 	getMileageUnit,
 	formatMileage,
-	roundNumber
+	roundNumber,
+	parseWithFormat
 };
 
 export const cleanup = (obj: Record<string, any>): Record<string, any> => {
