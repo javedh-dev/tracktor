@@ -102,6 +102,47 @@
 			}
 		}
 	});
+
+	// Calculate visible page numbers with ellipsis
+	const visiblePages = $derived(() => {
+		const totalPages = table.getPageCount();
+		const currentPage = table.getState().pagination.pageIndex;
+		const maxVisiblePages = 7; // Show max 7 page buttons
+
+		if (totalPages <= maxVisiblePages) {
+			// Show all pages if total is small
+			return Array.from({ length: totalPages }, (_, i) => i);
+		}
+
+		const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
+
+		// Always show first page
+		pages.push(0);
+
+		// Calculate range around current page
+		const rangeStart = Math.max(1, currentPage - 1);
+		const rangeEnd = Math.min(totalPages - 2, currentPage + 2);
+
+		// Add ellipsis after first page if needed
+		if (rangeStart > 1) {
+			pages.push('ellipsis-start');
+		}
+
+		// Add pages around current page
+		for (let i = rangeStart; i <= rangeEnd; i++) {
+			pages.push(i);
+		}
+
+		// Add ellipsis before last page if needed
+		if (rangeEnd < totalPages - 2) {
+			pages.push('ellipsis-end');
+		}
+
+		// Always show last page
+		pages.push(totalPages - 1);
+
+		return pages;
+	});
 </script>
 
 <div id="app-table-container">
@@ -192,25 +233,33 @@
 			<div class="flex flex-row items-center space-x-2">
 				<Button
 					variant="outline"
-					size="icon"
+					size="icon-sm"
 					onclick={() => table.previousPage()}
 					disabled={!table.getCanPreviousPage()}
 					class="cursor-pointer"
 				>
 					<ArrowLeft />
 				</Button>
-				{#each table.getPageOptions() as pageNum}
-					<Badge
-						variant="outline"
-						onclick={() => table.setPageIndex(pageNum)}
-						class="hover:bg-primary hover:text-background hidden cursor-pointer lg:inline-block"
-					>
-						{pageNum + 1}
-					</Badge>
+				{#each visiblePages() as pageItem}
+					{#if typeof pageItem === 'number'}
+						<Badge
+							variant="outline"
+							onclick={() => table.setPageIndex(pageItem)}
+							class={`hover:bg-primary hover:text-background hidden cursor-pointer lg:inline-block ${
+								table.getState().pagination.pageIndex === pageItem
+									? 'bg-primary text-background'
+									: ''
+							}`}
+						>
+							{pageItem + 1}
+						</Badge>
+					{:else}
+						<span class="hidden px-2 lg:inline-block">...</span>
+					{/if}
 				{/each}
 				<Button
 					variant="outline"
-					size="icon"
+					size="icon-sm"
 					onclick={() => table.nextPage()}
 					disabled={!table.getCanNextPage()}
 					class="cursor-pointer"
