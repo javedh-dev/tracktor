@@ -10,6 +10,7 @@
 	import Lock from '@lucide/svelte/icons/lock';
 	import Unlock from '@lucide/svelte/icons/unlock';
 	import { toast } from 'svelte-sonner';
+	import * as m from '$lib/paraglide/messages';
 
 	let exportPassword = $state('');
 	let importPassword = $state('');
@@ -35,7 +36,7 @@
 			});
 
 			if (!response.ok) {
-				throw new Error('Export failed');
+				throw new Error(m.tools_export_error());
 			}
 
 			const result = await response.json();
@@ -53,10 +54,10 @@
 			document.body.removeChild(a);
 			URL.revokeObjectURL(url);
 
-			toast.success('Data exported successfully');
+			toast.success(m.tools_export_success());
 		} catch (error) {
 			console.error('Export error:', error);
-			toast.error('Failed to export data');
+			toast.error(error instanceof Error ? error.message : m.tools_export_error());
 		} finally {
 			isExporting = false;
 		}
@@ -71,7 +72,7 @@
 			try {
 				parsedData = JSON.parse(importData);
 			} catch {
-				throw new Error('Invalid JSON format');
+				throw new Error(m.tools_import_invalid_json());
 			}
 
 			const response = await fetch('/api/data/import', {
@@ -87,15 +88,15 @@
 
 			if (!response.ok) {
 				const error = await response.json();
-				throw new Error(error.message || 'Import failed');
+				throw new Error(error.message || m.tools_import_error());
 			}
 
-			toast.success('Data imported successfully');
+			toast.success(m.tools_import_success());
 			importData = '';
 			importPassword = '';
 		} catch (error) {
 			console.error('Import error:', error);
-			toast.error(error instanceof Error ? error.message : 'Failed to import data');
+			toast.error(error instanceof Error ? error.message : m.tools_import_error());
 		} finally {
 			isImporting = false;
 		}
@@ -117,8 +118,8 @@
 <div id="data-export-import-container" class="data-export-import space-y-6">
 	<Tabs.Root id="data-export-import-tabs" value="export" class="w-full">
 		<Tabs.List class="grid w-full grid-cols-2">
-			<Tabs.Trigger value="export">Export Data</Tabs.Trigger>
-			<Tabs.Trigger value="import">Import Data</Tabs.Trigger>
+			<Tabs.Trigger value="export">{m.tools_export_data()}</Tabs.Trigger>
+			<Tabs.Trigger value="import">{m.tools_import_data()}</Tabs.Trigger>
 		</Tabs.List>
 
 		<Tabs.Content id="data-export-tab" value="export" class="space-y-4">
@@ -131,21 +132,21 @@
 						{:else}
 							<Unlock class="h-4 w-4" />
 						{/if}
-						Encrypt export data
+						{m.tools_export_encrypt_label()}
 					</Label>
 				</div>
 
 				{#if useEncryption}
 					<div class="space-y-2">
-						<Label for="export-password">Encryption Password</Label>
+						<Label for="export-password">{m.tools_export_password_label()}</Label>
 						<Input
 							id="export-password"
 							type="password"
 							bind:value={exportPassword}
-							placeholder="Enter password for encryption"
+							placeholder={m.tools_export_password_placeholder()}
 						/>
 						<p class="text-muted-foreground text-sm">
-							Keep this password safe - you'll need it to decrypt the data during import.
+							{m.tools_export_password_hint()}
 						</p>
 					</div>
 				{/if}
@@ -157,16 +158,16 @@
 					class="w-full"
 				>
 					<Download class="mr-2 h-4 w-4" />
-					{isExporting ? 'Exporting...' : 'Export Database'}
+					{isExporting ? m.tools_export_status_exporting() : m.tools_export_button()}
 				</Button>
 
 				<div class="bg-muted rounded-lg p-4">
-					<h4 class="font-medium">Export Information</h4>
+					<h4 class="font-medium">{m.tools_export_info_title()}</h4>
 					<ul class="text-muted-foreground mt-2 text-sm">
-						<li>• Exports all database tables and data</li>
-						<li>• Includes vehicles, fuel logs, maintenance records, etc.</li>
-						<li>• Optional encryption for sensitive data protection</li>
-						<li>• Downloads as JSON file</li>
+						<li>{m.tools_export_info_bullet_1()}</li>
+						<li>{m.tools_export_info_bullet_2()}</li>
+						<li>{m.tools_export_info_bullet_3()}</li>
+						<li>{m.tools_export_info_bullet_4()}</li>
 					</ul>
 				</div>
 			</div>
@@ -175,27 +176,27 @@
 		<Tabs.Content id="data-import-tab" value="import" class="space-y-4">
 			<div class="space-y-4">
 				<div class="space-y-2">
-					<Label for="import-file">Upload JSON File</Label>
+					<Label for="import-file">{m.tools_import_upload_label()}</Label>
 					<Input id="import-file" type="file" accept=".json" onchange={handleFileUpload} />
 				</div>
 
 				<div class="space-y-2">
-					<Label for="import-data">Or Paste JSON Data</Label>
+					<Label for="import-data">{m.tools_import_paste_label()}</Label>
 					<Textarea
 						id="import-data"
 						bind:value={importData}
-						placeholder="Paste your exported JSON data here..."
+						placeholder={m.tools_import_paste_placeholder()}
 						rows={8}
 					/>
 				</div>
 
 				<div class="space-y-2">
-					<Label for="import-password">Decryption Password (if encrypted)</Label>
+					<Label for="import-password">{m.tools_import_password_label()}</Label>
 					<Input
 						id="import-password"
 						type="password"
 						bind:value={importPassword}
-						placeholder="Enter password if data is encrypted"
+						placeholder={m.tools_import_password_placeholder()}
 					/>
 				</div>
 
@@ -207,16 +208,16 @@
 					variant="destructive"
 				>
 					<Upload class="mr-2 h-4 w-4" />
-					{isImporting ? 'Importing...' : 'Import Database'}
+					{isImporting ? m.tools_import_status_importing() : m.tools_import_button()}
 				</Button>
 
 				<div class="bg-destructive/10 rounded-lg p-4">
-					<h4 class="text-destructive font-medium">⚠️ Import Warning</h4>
+					<h4 class="text-destructive font-medium">{m.tools_import_warning_title()}</h4>
 					<ul class="text-destructive/80 mt-2 text-sm">
-						<li>• This will replace ALL existing data</li>
-						<li>• Make sure to backup current data first</li>
-						<li>• Import cannot be undone</li>
-						<li>• Verify the JSON format is correct</li>
+						<li>{m.tools_import_warning_bullet_1()}</li>
+						<li>{m.tools_import_warning_bullet_2()}</li>
+						<li>{m.tools_import_warning_bullet_3()}</li>
+						<li>{m.tools_import_warning_bullet_4()}</li>
 					</ul>
 				</div>
 			</div>

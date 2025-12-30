@@ -8,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import InsuranceForm from './InsuranceForm.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { insurance, onaction }: { insurance: Insurance; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -16,10 +17,10 @@
 		deleteInsurance(insurance).then((res) => {
 			if (res.status === 'OK') {
 				showDeleteDialog = false;
-				toast.success('Deleted Insurance');
+				toast.success(m.insurance_delete_success());
 				onaction();
 			} else {
-				toast.error(res.error || 'Some error occurred while deleting vehicle.');
+				toast.error(res.error || m.insurance_delete_error());
 			}
 		});
 	};
@@ -34,7 +35,7 @@
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
-					<span class="sr-only">Open menu</span>
+					<span class="sr-only">{m.insurance_menu_open()}</span>
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
@@ -42,17 +43,17 @@
 			<DropdownMenu.Item
 				id="insurance-menu-edit"
 				onclick={() => {
-					sheetStore.openSheet(InsuranceForm, 'Update Insurance', '', insurance);
+					sheetStore.openSheet(InsuranceForm, m.insurance_menu_sheet_title(), '', insurance);
 				}}
 			>
-				Edit
+				{m.insurance_menu_edit()}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				id="insurance-menu-delete"
 				variant="destructive"
 				onclick={() => (showDeleteDialog = true)}
 			>
-				Delete
+				{m.insurance_menu_delete()}
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>

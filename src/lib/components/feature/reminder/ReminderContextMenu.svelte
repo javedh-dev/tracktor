@@ -12,6 +12,7 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 	import ReminderForm from './ReminderForm.svelte';
 	import { reminderStore } from '$lib/stores/reminder.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { reminder, onaction }: { reminder: Reminder; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -20,10 +21,10 @@
 		deleteReminderService(reminder).then((res) => {
 			if (res.status === 'OK') {
 				showDeleteDialog = false;
-				toast.success('Deleted reminder...!!!');
+				toast.success(m.reminder_delete_success());
 				onaction();
 			} else {
-				toast.error(res.error || 'Some error occurred while deleting PUCC.');
+				toast.error(res.error || m.reminder_delete_error());
 			}
 		});
 	};
@@ -31,10 +32,10 @@
 		const updated = { ...reminder, isCompleted: !reminder.isCompleted };
 		const res = await saveReminder(updated);
 		if (res.status === 'OK') {
-			toast.success(`Reminder marked ${updated.isCompleted ? 'complete' : 'pending'}.`);
+			toast.success(m.reminder_status_completed());
 			reminderStore.refreshReminders();
 		} else {
-			toast.error(res.error || 'Unable to update reminder status.');
+			toast.error(res.error || m.reminder_status_error());
 		}
 	};
 </script>
@@ -48,28 +49,30 @@
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
-					<span class="sr-only">Open menu</span>
+					<span class="sr-only">{m.reminder_menu_open()}</span>
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content id="reminder-menu-content" align="end" class="w-32">
 			<DropdownMenu.Item id="reminder-menu-toggle" onclick={() => toggleCompletion(reminder)}>
-				{reminder.isCompleted ? 'Mark as pending' : 'Mark as done'}
+				{reminder.isCompleted
+					? m.reminder_menu_toggle_done_done()
+					: m.reminder_menu_toggle_done_pending()}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				id="reminder-menu-edit"
 				onclick={() => {
-					sheetStore.openSheet(ReminderForm, 'Update Reminder', '', reminder);
+					sheetStore.openSheet(ReminderForm, m.reminder_menu_sheet_title(), '', reminder);
 				}}
 			>
-				Edit
+				{m.reminder_menu_edit()}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				id="reminder-menu-delete"
 				variant="destructive"
 				onclick={() => (showDeleteDialog = true)}
 			>
-				Delete
+				{m.reminder_menu_delete()}
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>

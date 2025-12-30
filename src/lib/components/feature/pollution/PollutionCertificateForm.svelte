@@ -14,6 +14,7 @@
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import TestTubeDiagonal from '@lucide/svelte/icons/test-tube-diagonal';
 	import SubmitButton from '$appui/SubmitButton.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -53,12 +54,12 @@
 				).then((res) => {
 					if (res.status == 'OK') {
 						toast.success(
-							`Pollution Certificate ${puccStore.editMode ? 'updated' : 'saved'} successfully...!!!`
+							m[puccStore.editMode ? 'pollution_toast_updated' : 'pollution_toast_saved']()
 						);
 						attachment = undefined;
 						sheetStore.closeSheet(puccStore.refreshPuccs);
 					} else {
-						toast.error(`Error while saving : ${res.error}`);
+						toast.error(m.pollution_toast_error_prefix() + res.error);
 					}
 					processing = false;
 				});
@@ -92,7 +93,9 @@
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
-				<FormLabel description="Upload certificate document">Attachment</FormLabel>
+				<FormLabel description={m.pollution_form_attachment_desc()}
+					>{m.pollution_form_attachment_label()}</FormLabel
+				>
 				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
@@ -106,7 +109,9 @@
 		<Form.Field {form} name="certificateNumber" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Pollution certificate number">Certificate Number</FormLabel>
+					<FormLabel description={m.pollution_form_certificate_number_desc()}
+						>{m.pollution_form_certificate_number_label()}</FormLabel
+					>
 					<Input {...props} bind:value={$formData.certificateNumber} icon={IdCard} />
 				{/snippet}
 			</Form.Control>
@@ -116,7 +121,9 @@
 		<Form.Field {form} name="issueDate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Certificate issue date">Issue Date</FormLabel>
+					<FormLabel description={m.pollution_form_issue_date_desc()}
+						>{m.pollution_form_issue_date_label()}</FormLabel
+					>
 					<Input {...props} bind:value={$formData.issueDate} icon={Calendar1} type="calendar" />
 				{/snippet}
 			</Form.Control>
@@ -126,7 +133,9 @@
 		<Form.Field {form} name="recurrenceType" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="How should this certificate renew?">Recurrence</FormLabel>
+					<FormLabel description={m.pollution_form_recurrence_type_desc()}
+						>{m.pollution_form_recurrence_type_label()}</FormLabel
+					>
 					<Select.Root bind:value={$formData.recurrenceType} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center gap-2">
@@ -153,7 +162,7 @@
 			<Form.Field {form} name="recurrenceInterval" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Renewal frequency">
+						<FormLabel description={m.pollution_form_recurrence_interval_desc()}>
 							Renew every {$formData.recurrenceInterval || 1}
 							{$formData.recurrenceType === 'yearly' ? 'year(s)' : 'month(s)'}
 						</FormLabel>
@@ -168,7 +177,9 @@
 			<Form.Field {form} name="expiryDate" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="PUCC expiry date">Expiry Date</FormLabel>
+						<FormLabel description={m.pollution_form_expiry_date_desc()}
+							>{m.pollution_form_expiry_date_label()}</FormLabel
+						>
 						<Input {...props} bind:value={$formData.expiryDate} icon={Calendar1} type="calendar" />
 					{/snippet}
 				</Form.Control>
@@ -179,7 +190,9 @@
 		<Form.Field {form} name="testingCenter" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Testing center name">Testing Center</FormLabel>
+					<FormLabel description={m.pollution_form_testing_center_desc()}
+						>{m.pollution_form_testing_center_label()}</FormLabel
+					>
 					<Input {...props} bind:value={$formData.testingCenter} icon={TestTubeDiagonal} />
 				{/snippet}
 			</Form.Control>
@@ -189,10 +202,12 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Additional notes">Notes</FormLabel>
+					<FormLabel description={m.pollution_form_notes_desc()}
+						>{m.pollution_form_notes_label()}</FormLabel
+					>
 					<Textarea
 						{...props}
-						placeholder="Add additional notes..."
+						placeholder={m.pollution_form_notes_placeholder()}
 						class="resize-none"
 						bind:value={$formData.notes}
 					/>
@@ -200,6 +215,6 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+		<SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
 	</fieldset>
 </form>

@@ -6,6 +6,7 @@
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const selectVehicle = (vehicleId: string | null) => {
 		if (vehicleId) {
@@ -51,6 +52,6 @@
 		icon={CircleSlash2}
 		iconClass="h-6 w-6"
 		style="flex min-h-98 items-center justify-center gap-4 text-xl"
-		label="It's empty here. Please add your first vehicle to begin."
+		label={m.vehicle_list_empty()}
 	/>
 {/if}

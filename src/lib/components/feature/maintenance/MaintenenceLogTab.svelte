@@ -4,12 +4,13 @@
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 	import MaintenanceForm from './MaintenanceForm.svelte';
 	import MaintenanceLogList from './MaintenanceLogList.svelte';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <TabContainer
-	title="Maintenance History"
+	title={m.maintenance_tab_title()}
 	addAction={() => {
-		sheetStore.openSheet(MaintenanceForm, 'Add Maintenance Log', '');
+		sheetStore.openSheet(MaintenanceForm, m.maintenance_add_action(), '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >

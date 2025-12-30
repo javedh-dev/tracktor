@@ -31,6 +31,7 @@
 	import ReminderForm from '../reminder/ReminderForm.svelte';
 	import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
 	import { Features } from '$lib/helper/feature.helper';
+	import * as m from '$lib/paraglide/messages';
 
 	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
@@ -40,9 +41,9 @@
 		deleteVehicle(vehicleId).then((res) => {
 			if (res.status == 'OK') {
 				fetchVehicles();
-				toast.success('Successfully deleted vehicle...!!!');
+				toast.success(m.vehicle_delete_success());
 			} else {
-				toast.error(res.error || 'Some error occurred while deleting vehicle.');
+				toast.error(res.error || m.vehicle_delete_error());
 			}
 		});
 	};
@@ -130,8 +131,9 @@
 								buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
 								iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
 								icon={Fuel}
-								onclick={() => sheetStore.openSheet(FuelLogForm, 'Add Fuel Log', '')}
-								ariaLabel="Log fuel refill"
+								onclick={() =>
+									sheetStore.openSheet(FuelLogForm, m.vehicle_action_add_fuel_log(), '')}
+								ariaLabel={m.vehicle_action_add_fuel_log()}
 							/>
 						{/snippet}
 					</FeatureGate>
@@ -144,8 +146,9 @@
 								buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
 								iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
 								icon={Wrench}
-								onclick={() => sheetStore.openSheet(MaintenanceForm, 'Add Maintenence Log', '')}
-								ariaLabel="Maintenence"
+								onclick={() =>
+									sheetStore.openSheet(MaintenanceForm, m.vehicle_action_add_maintenance_log(), '')}
+								ariaLabel={m.vehicle_action_add_maintenance_log()}
 							/>
 						{/snippet}
 					</FeatureGate>
@@ -158,8 +161,9 @@
 								buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
 								iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
 								icon={Shield}
-								onclick={() => sheetStore.openSheet(InsuranceForm, 'Add Insurance', '')}
-								ariaLabel="Insurance"
+								onclick={() =>
+									sheetStore.openSheet(InsuranceForm, m.vehicle_action_add_insurance(), '')}
+								ariaLabel={m.vehicle_action_add_insurance()}
 							/>
 						{/snippet}
 					</FeatureGate>
@@ -173,8 +177,12 @@
 								iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
 								icon={BadgeCheck}
 								onclick={() =>
-									sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate', '')}
-								ariaLabel="Pollution Certificate"
+									sheetStore.openSheet(
+										PollutionCertificateForm,
+										m.vehicle_action_add_pollution(),
+										''
+									)}
+								ariaLabel={m.vehicle_action_add_pollution()}
 							/>
 						{/snippet}
 					</FeatureGate>
@@ -187,8 +195,9 @@
 								buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
 								iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
 								icon={BellRing}
-								onclick={() => sheetStore.openSheet(ReminderForm, 'Add Reminder', '')}
-								ariaLabel="Schedule reminder"
+								onclick={() =>
+									sheetStore.openSheet(ReminderForm, m.vehicle_action_add_reminder(), '')}
+								ariaLabel={m.vehicle_action_add_reminder()}
 							/>
 						{/snippet}
 					</FeatureGate>
@@ -200,7 +209,7 @@
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-blue-500"
 						icon={Info}
 						onclick={() => (detailsModalOpen = true)}
-						ariaLabel="More info"
+						ariaLabel={m.vehicle_action_more_info()}
 					/>
 					<IconButton
 						id="vehicle-card-edit-btn"
@@ -208,9 +217,9 @@
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
 						icon={Pencil}
 						onclick={() => {
-							sheetStore.openSheet(VehicleForm, 'Update Vehicle', '', vehicle);
+							sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle);
 						}}
-						ariaLabel="Edit"
+						ariaLabel={m.vehicle_action_edit()}
 					/>
 					<IconButton
 						id="vehicle-card-delete-btn"
@@ -218,7 +227,7 @@
 						iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
 						icon={Trash2}
 						onclick={() => (deleteDialog = true)}
-						ariaLabel="Delete"
+						ariaLabel={m.vehicle_action_delete()}
 					/>
 				</div>
 			</div>

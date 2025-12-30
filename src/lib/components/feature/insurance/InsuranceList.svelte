@@ -17,6 +17,7 @@
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import { INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
 	import type { Insurance } from '$lib/domain/insurance';
+	import * as m from '$lib/paraglide/messages';
 
 	let vehicleId = $derived(vehicleStore.selectedId);
 
@@ -57,7 +58,7 @@
 		icon={CircleSlash2}
 		iconClass="h-5 w-5"
 		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-		label="No Insurance found for this vehicle."
+		label={m.insurance_list_empty()}
 	/>
 {:else}
 	{#each insuranceStore.insurances as ins (ins.id)}
@@ -81,34 +82,34 @@
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2">
 					<Hash class="h-5 w-5" />
-					<span class="font-semibold">Policy Number:</span>
+					<span class="font-semibold">{m.insurance_col_policy_number()}:</span>
 					<span>{ins.policyNumber}</span>
 				</div>
 				<div class="flex items-center gap-2">
 					<Banknote class="h-5 w-5" />
-					<span class="font-semibold">Cost:</span>
+					<span class="font-semibold">{m.insurance_col_cost()}:</span>
 					<span>{formatCurrency(ins.cost)}</span>
 				</div>
 				<div class="flex items-center gap-2">
 					<Calendar class="h-5 w-5 " />
-					<span class="font-semibold">Start Date:</span>
+					<span class="font-semibold">{m.insurance_col_start_date()}:</span>
 					<span>{formatDate(ins.startDate)}</span>
 				</div>
 				{#if ins.endDate}
 					<div class="flex items-center gap-2">
 						<Calendar class="h-5 w-5 " />
-						<span class="font-semibold">End Date:</span>
+						<span class="font-semibold">{m.insurance_col_end_date()}:</span>
 						<span>{formatDate(ins.endDate)}</span>
 					</div>
 				{/if}
 				<div class="flex items-center gap-2">
 					<Calendar class="h-5 w-5 " />
-					<span class="font-semibold">Next Due:</span>
+					<span class="font-semibold">{m.insurance_col_next_due()}:</span>
 					<span>
 						{#if nextDue}
 							{formatDate(nextDue)}
 						{:else if ins.recurrenceType === 'no_end'}
-							No end date
+							{m.col_no_end_date()}
 						{:else}
 							—
 						{/if}
@@ -117,7 +118,7 @@
 				{#if ins.recurrenceType && ins.recurrenceType !== 'none'}
 					<div class="flex items-center gap-2 md:col-span-2">
 						<Repeat class="h-5 w-5" />
-						<span class="font-semibold">Recurrence:</span>
+						<span class="font-semibold">{m.insurance_col_recurrence()}:</span>
 						<span>
 							{INSURANCE_RECURRENCE_TYPES[ins.recurrenceType]}
 							{#if (ins.recurrenceType === 'yearly' || ins.recurrenceType === 'monthly') && ins.recurrenceInterval > 1}
@@ -130,7 +131,7 @@
 				{#if ins.notes}
 					<div class="flex items-center gap-2 md:col-span-2">
 						<Notebook class="h-5 w-5 " />
-						<span class="font-semibold">Notes:</span>
+						<span class="font-semibold">{m.insurance_col_notes()}:</span>
 						<span>{ins.notes}</span>
 					</div>
 				{/if}
@@ -138,9 +139,9 @@
 					{@const fileName = ins.attachment}
 					<div class="flex items-center gap-2 md:col-span-2">
 						<Paperclip class="h-5 w-5" />
-						<span class="font-semibold">Attachment:</span>
+						<span class="font-semibold">{m.col_attachment()}:</span>
 						<AttachmentLink {fileName}>
-							<span class="text-sm">View Document</span>
+							<span class="text-sm">{m.insurance_col_view_document()}</span>
 						</AttachmentLink>
 					</div>
 				{/if}

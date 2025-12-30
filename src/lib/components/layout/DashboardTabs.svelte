@@ -14,57 +14,32 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import {
+		nav_overview,
+		nav_fuel_logs,
+		nav_maintenance,
+		nav_insurance,
+		nav_pollution
+	} from '$lib/paraglide/messages';
 
 	let isLoading = $derived(!vehicleStore.selectedId && vehicleStore.processing);
+	let currentTab = $state('overview');
 
-	const tabs: {
-		name: string;
-		id: string;
-		Component: any;
-		Icon?: any;
-	}[] = [
-		{
-			name: 'Overview',
-			id: 'overview',
-			Component: OverviewTab,
-			Icon: SquareKanban
-		},
-		{
-			name: 'Fuel Logs',
-			id: 'fuel',
-			Component: FuelLogTab,
-			Icon: Fuel
-		},
-		{
-			name: 'Maintenance',
-			id: 'maintenance',
-			Component: MaintenenceLogTab,
-			Icon: Wrench
-		},
-		{
-			name: 'Insurance',
-			id: 'insurance',
-			Component: InsuranceTab,
-			Icon: Shield
-		},
-		{
-			name: 'Pollution Certificate',
-			id: 'pollution',
-			Component: PollutionTab,
-			Icon: BadgeInfo
-		}
+	const tabs: { name: string; id: string; Component: any; Icon?: any }[] = [
+		{ name: nav_overview(), id: 'overview', Component: OverviewTab, Icon: SquareKanban },
+		{ name: nav_fuel_logs(), id: 'fuel', Component: FuelLogTab, Icon: Fuel },
+		{ name: nav_maintenance(), id: 'maintenance', Component: MaintenenceLogTab, Icon: Wrench },
+		{ name: nav_insurance(), id: 'insurance', Component: InsuranceTab, Icon: Shield },
+		{ name: nav_pollution(), id: 'pollution', Component: PollutionTab, Icon: BadgeInfo }
 	];
-
-	let currentTab = $state(tabs[0].id);
 </script>
 
 {#if isLoading}
-	<div id="dashboard-tabs-skeleton" class="w-full">
+	<div class="space-y-2">
 		<div
-			id="dashboard-tabs-header-skeleton"
-			class="mb-4 grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center lg:gap-4"
+			class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 		>
-			{#each [0, 1, 2, 3, 4] as i (i)}
+			{#each Array(5) as _}
 				<Skeleton class="skeleton-tab-trigger h-10 w-full rounded-md lg:w-28" />
 			{/each}
 		</div>

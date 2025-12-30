@@ -21,6 +21,7 @@
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
 	import { sheetStore } from '$stores/sheet.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { data } = $props();
 
@@ -42,12 +43,12 @@
 					(res) => {
 						if (res.status == 'OK') {
 							vehicleStore.refreshVehicles();
-							toast.success(`Vehicle ${data ? 'updated' : 'saved'} successfully...!!!`);
+							toast.success(data ? m.vehicle_toast_updated() : m.vehicle_toast_saved());
 							image = undefined;
 							removeExistingImage = false;
 							sheetStore.closeSheet(() => vehicleStore.refreshVehicles());
 						} else {
-							toast.error(`Error while saving : ${res.error}`);
+							toast.error(`${m.vehicle_toast_error_prefix()}${res.error}`);
 						}
 						processing = false;
 					}
@@ -95,7 +96,9 @@
 			<Form.Field {form} name="make" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Manufacturer of the vehicle" required>Make</FormLabel>
+						<FormLabel description={m.vehicle_form_make_desc()} required>
+							{m.vehicle_form_make_label()}
+						</FormLabel>
 						<Input {...props} bind:value={$formData.make} icon={Building2} />
 					{/snippet}
 				</Form.Control>
@@ -104,7 +107,9 @@
 			<Form.Field {form} name="model" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Model of the vehicle" required>Model</FormLabel>
+						<FormLabel description={m.vehicle_form_model_desc()} required>
+							{m.vehicle_form_model_label()}
+						</FormLabel>
 						<Input {...props} bind:value={$formData.model} icon={CarFront} />
 					{/snippet}
 				</Form.Control>
@@ -116,7 +121,9 @@
 			<Form.Field {form} name="year" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Year of Manufacturing" required>Year</FormLabel>
+						<FormLabel description={m.vehicle_form_year_desc()} required>
+							{m.vehicle_form_year_label()}
+						</FormLabel>
 						<Input {...props} bind:value={$formData.year} icon={Calendar} type="number" />
 					{/snippet}
 				</Form.Control>
@@ -126,7 +133,9 @@
 			<Form.Field {form} name="color" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Color of the vehicle" required>Color</FormLabel>
+						<FormLabel description={m.vehicle_form_color_desc()} required>
+							{m.vehicle_form_color_label()}
+						</FormLabel>
 						<Input {...props} bind:value={$formData.color} icon={Paintbrush} type="color" />
 					{/snippet}
 				</Form.Control>
@@ -138,7 +147,9 @@
 			<Form.Field {form} name="fuelType" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Type of fuel used by the vehicle" required>Fuel Type</FormLabel>
+						<FormLabel description={m.vehicle_form_fuel_type_desc()} required>
+							{m.vehicle_form_fuel_type_label()}
+						</FormLabel>
 						<Select.Root bind:value={$formData.fuelType} type="single">
 							<Select.Trigger {...props} class="w-full">
 								<div class="flex items-center justify-start">
@@ -146,7 +157,7 @@
 									<span>
 										{$formData.fuelType
 											? FUEL_TYPES[$formData.fuelType as keyof typeof FUEL_TYPES]
-											: 'Select fuel type'}
+											: m.vehicle_form_fuel_type_placeholder()}
 									</span>
 								</div>
 							</Select.Trigger>
@@ -163,7 +174,9 @@
 			<Form.Field {form} name="odometer" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
+						<FormLabel description={m.vehicle_form_odometer_desc()}>
+							{m.vehicle_form_odometer_label()}
+						</FormLabel>
 						<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 					{/snippet}
 				</Form.Control>
@@ -175,7 +188,9 @@
 		<Form.Field {form} name="licensePlate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Registration Number of vehicle">License Plate</FormLabel>
+					<FormLabel description={m.vehicle_form_license_desc()}>
+						{m.vehicle_form_license_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.licensePlate} icon={IdCard} />
 				{/snippet}
 			</Form.Control>
@@ -185,7 +200,9 @@
 		<Form.Field {form} name="vin" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Vehicle Idenification Number">VIN</FormLabel>
+					<FormLabel description={m.vehicle_form_vin_desc()}>
+						{m.vehicle_form_vin_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.vin} icon={Fingerprint} />
 				{/snippet}
 			</Form.Control>
@@ -198,6 +215,6 @@
 			<CustomFieldsEditor bind:customFields={$formData.customFields} />
 		</div>
 
-		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+		<SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
 	</fieldset>
 </form>

@@ -24,6 +24,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { saveReminder } from '$lib/services/reminder.service';
 	import { toast } from 'svelte-sonner';
+	import * as m from '$lib/paraglide/messages';
 
 	let { data }: { data?: Partial<Reminder> } = $props();
 	let processing = $state(false);
@@ -41,10 +42,10 @@
 					recurrenceEndDate: f.data.recurrenceEndDate ? parseDate(f.data.recurrenceEndDate) : null
 				}).then((res) => {
 					if (res.status === 'OK') {
-						toast.success(`Reminder ${data ? 'updated' : 'created'} successfully.`);
+						toast.success(m[data ? 'reminder_toast_updated' : 'reminder_toast_created']());
 						sheetStore.closeSheet(reminderStore.refreshReminders);
 					} else {
-						toast.error(res.error || 'Failed to save reminder.');
+						toast.error(res.error || m.reminder_toast_error_fallback());
 					}
 					processing = false;
 				});
@@ -92,7 +93,9 @@
 		<Form.Field {form} name="dueDate" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="When should this reminder trigger?" required>Due Date</FormLabel>
+					<FormLabel description={m.reminder_form_due_date_desc()} required
+						>{m.reminder_form_due_date_label()}</FormLabel
+					>
 					<Input {...props} bind:value={$formData.dueDate} type="calendar" icon={Calendar1} />
 				{/snippet}
 			</Form.Control>
@@ -102,7 +105,9 @@
 		<Form.Field {form} name="type" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Choose the reminder type" required>Type</FormLabel>
+					<FormLabel description={m.reminder_form_type_desc()} required
+						>{m.reminder_form_type_label()}</FormLabel
+					>
 					<Select.Root bind:value={$formData.type} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center gap-2">
@@ -127,7 +132,9 @@
 		<Form.Field {form} name="remindSchedule" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="When should we remind you?" required>Reminder Schedule</FormLabel>
+					<FormLabel description={m.reminder_form_schedule_desc()} required
+						>{m.reminder_form_schedule_label()}</FormLabel
+					>
 					<Select.Root bind:value={$formData.remindSchedule} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center gap-2">
@@ -153,7 +160,9 @@
 		<Form.Field {form} name="recurrenceType" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Should this reminder repeat?">Recurrence</FormLabel>
+					<FormLabel description={m.reminder_form_recurrence_type_desc()}
+						>{m.reminder_form_recurrence_type_label()}</FormLabel
+					>
 					<Select.Root bind:value={$formData.recurrenceType} type="single">
 						<Select.Trigger {...props} class="w-full">
 							<div class="flex items-center gap-2">
@@ -180,7 +189,7 @@
 			<Form.Field {form} name="recurrenceInterval" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="Frequency of recurrence">
+						<FormLabel description={m.reminder_form_recurrence_interval_desc()}>
 							Repeat every {$formData.recurrenceInterval || 1}
 							{$formData.recurrenceType === 'yearly'
 								? 'year(s)'
@@ -199,7 +208,9 @@
 			<Form.Field {form} name="recurrenceEndDate" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
-						<FormLabel description="When should recurrence stop? (optional)">End Date</FormLabel>
+						<FormLabel description={m.reminder_form_recurrence_end_date_desc()}
+							>{m.reminder_form_recurrence_end_date_label()}</FormLabel
+						>
 						<Input
 							{...props}
 							bind:value={$formData.recurrenceEndDate}
@@ -215,10 +226,12 @@
 		<Form.Field {form} name="note" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Add more context">Note</FormLabel>
+					<FormLabel description={m.reminder_form_note_desc()}
+						>{m.reminder_form_note_label()}</FormLabel
+					>
 					<Textarea
 						{...props}
-						placeholder="Detail what needs attention"
+						placeholder={m.reminder_form_note_placeholder()}
 						class="resize-none"
 						bind:value={$formData.note}
 					/>
@@ -232,13 +245,13 @@
 				{#snippet children({ props })}
 					<label class="flex items-center gap-2 text-sm font-medium">
 						<input type="checkbox" {...props} bind:checked={$formData.isCompleted} />
-						<span>Mark as done</span>
+						<span>{m.reminder_form_is_completed_label()}</span>
 					</label>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+		<SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
 	</fieldset>
 </form>
