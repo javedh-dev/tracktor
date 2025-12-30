@@ -1,47 +1,30 @@
-# Authentication System
+# Authentication
 
-Tracktor uses a modern username/password authentication system with session management for secure access to your vehicle data.
+Tracktor uses username/password authentication with session management for secure access.
 
-## Overview
+## Features
 
-The authentication system has been migrated from PIN-based authentication to a more robust username/password system with the following features:
+- **Username/Password Authentication**: Secure login credentials
+- **Session Management**: HTTP-only secure session cookies
+- **User Registration**: First time account creation through web interface
+- **Password Hashing**: Bcrypt-based password security
+- **Session Expiration**: Automatic expiration after 30 days of inactivity
 
-- **Username/Password Authentication**: Secure login with username and password
-- **Session Management**: Uses secure session cookies for maintaining login state
-- **User Registration**: Create new user accounts
-- **Password Hashing**: Passwords are securely hashed using bcrypt
-- **Session Expiration**: Sessions automatically expire after 30 days of inactivity
+## Creating User Accounts
 
-## Creating Your First User
-
-When you first set up Tracktor, you'll need to create a user account. You can do this in two ways:
-
-### Method 1: Through the Web Interface
+### Web Interface
 
 1. Navigate to the login page
-2. If no users exist, you'll see a registration form
-3. Enter your desired username and password
+2. If no users exist, a registration form will be displayed
+3. Enter username and password
 4. Click "Create Account"
+   ˝
 
-### Method 2: Using the Command Line Script
-
-```bash
-pnpm tsx scripts/create-user.ts <username> <password>
-```
-
-Example:
-
-```bash
-pnpm tsx scripts/create-user.ts admin mypassword123
-```
-
-## API Authentication
-
-For API access, the system uses session-based authentication:
+## API Endpoints
 
 ### Login
 
-```bash
+```http
 POST /api/auth
 Content-Type: application/json
 
@@ -53,50 +36,44 @@ Content-Type: application/json
 
 ### Logout
 
-```bash
+```http
 DELETE /api/auth
 ```
 
 ### Check Authentication Status
 
-```bash
+```http
 GET /api/auth
 ```
 
 ## Session Management
 
-- Sessions are stored in the database and linked to user accounts
-- Session cookies are HTTP-only and secure (in production)
-- Sessions automatically refresh when they're close to expiring
-- Sessions are invalidated on logout
+- Sessions stored in database and linked to user accounts
+- HTTP-only secure cookies (in production)
+- Automatic session refresh when approaching expiration
+- Sessions invalidated on logout
 
-## Security Features
+## Security
 
-- **Password Hashing**: All passwords are hashed using bcrypt with salt rounds
-- **Session Tokens**: Cryptographically secure session tokens
-- **Automatic Cleanup**: Expired sessions are automatically removed
-- **CSRF Protection**: Session cookies include CSRF protection
+- **Password Hashing**: Bcrypt with salt rounds
+- **Session Tokens**: Cryptographically secure tokens
+- **Automatic Cleanup**: Expired sessions removed automatically
+- **CSRF Protection**: Built-in session cookie protection
 
-## Migration from PIN Authentication
+## Configuration
 
-If you're upgrading from a PIN-based system:
+**Environment Variable**: `TRACKTOR_DISABLE_AUTH`
 
-1. The old PIN authentication table is preserved for backward compatibility
-2. Create new user accounts using the registration system
-3. The old PIN endpoints are still available but deprecated
-4. Consider migrating to the new authentication system for better security
-
-## Environment Variables
-
-- `TRACKTOR_DISABLE_AUTH`: Set to 'true' to disable authentication (not recommended for production)
+- Set to `true` to disable authentication (not recommended for production)
+- Default: `false`
 
 ## Troubleshooting
 
-### Can't Login
+**Login Issues**:
 
-- Ensure you've created a user account
-- Check that your username and password are correct
-- Clear your browser cookies if you're having session issues
+- Verify user account exists
+- Confirm username and password are correct
+- Clear browser cookies if experiencing session issues
 
 ### Session Expired
 

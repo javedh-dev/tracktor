@@ -13,13 +13,28 @@ export interface Vehicle {
 	puccStatus?: string;
 	image: string | null;
 	fuelType: 'diesel' | 'petrol' | 'ev';
+	customFields?: Record<string, string> | null;
 }
 
 export const FUEL_TYPES = {
-	diesel: 'Diesel',
-	petrol: 'Petrol',
-	ev: 'Electric (EV)'
+	diesel: 'diesel',
+	petrol: 'petrol',
+	ev: 'ev'
 } as const;
+
+// Helper function to get localized fuel type label
+export function getFuelTypeLabel(fuelType: string, m: any): string {
+	switch (fuelType) {
+		case 'diesel':
+			return m.fuel_type_diesel();
+		case 'petrol':
+			return m.fuel_type_petrol();
+		case 'ev':
+			return m.fuel_type_ev();
+		default:
+			return m.fuel_type_petrol();
+	}
+}
 
 export const vehicleSchema = z.object({
 	id: z.string().nullable(),
@@ -53,7 +68,8 @@ export const vehicleSchema = z.object({
 		.nullable(),
 	odometer: z.number().nonnegative().nullable(),
 	image: z.string().nullable(),
-	fuelType: z.enum(['diesel', 'petrol', 'ev']).default('petrol')
+	fuelType: z.enum(['diesel', 'petrol', 'ev']).default('petrol'),
+	customFields: z.record(z.string(), z.string()).nullable().optional()
 });
 
 export type VehicleSchema = typeof vehicleSchema;

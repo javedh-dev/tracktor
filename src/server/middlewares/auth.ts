@@ -6,14 +6,13 @@ import { CorsMiddleware } from './cors';
 import { AppError, Status } from '$server/exceptions/AppError';
 import { validateSession, getUsersCount } from '$server/services/authService';
 
-const BYPASS_PATHS = ['/api/auth', '/api/files/', '/api/health'];
+const BYPASS_PATHS = ['/api/auth', '/api/files/', '/api/health', '/api/config/branding'];
 
 export class AuthMiddleware extends BaseMiddleware {
 	protected async process(event: RequestEvent): Promise<MiddlewareResult> {
 		if (!this.requiresAuth(event.url.pathname)) {
 			return { continue: true };
 		}
-
 		return await this.handleAuthentication(event);
 	}
 

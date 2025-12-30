@@ -11,4 +11,11 @@ export interface Configs {
 	unitOfVolume: string;
 	locale: string;
 	timezone: string;
+	customCss?: string;
+	featureFuelLog?: boolean;
+	featureMaintenance?: boolean;
+	featurePucc?: boolean;
+	featureReminders?: boolean;
+	featureInsurance?: boolean;
+	featureOverview?: boolean;
 }

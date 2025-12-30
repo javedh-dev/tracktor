@@ -8,6 +8,7 @@
 	import { deleteMaintenanceLog } from '$lib/services/maintenance.service';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import MaintenanceForm from './MaintenanceForm.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { maintenanceLog, onaction }: { maintenanceLog: MaintenanceLog; onaction: () => void } =
 		$props();
@@ -17,35 +18,48 @@
 		deleteMaintenanceLog(maintenanceLog).then((res) => {
 			if (res.status === 'OK') {
 				showDeleteDialog = false;
-				toast.success('Deleted Fuel Log');
+				toast.success(m.maintenance_delete_success());
 				onaction();
 			} else {
-				toast.error(res.error || 'Some error occurred while deleting vehicle.');
+				toast.error(res.error || m.maintenance_delete_error());
 			}
 		});
 	};
 </script>
 
-<div class=" flex flex-row justify-end">
+<div id="maintenance-context-menu" class="maintenance-context-menu flex flex-row justify-end">
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger class="data-[state=open]:bg-muted text-muted-foreground flex size-8">
+		<DropdownMenu.Trigger
+			id="maintenance-menu-trigger"
+			class="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+		>
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
-					<span class="sr-only">Open menu</span>
+					<span class="sr-only">{m.maintenance_menu_open()}</span>
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end" class="w-32">
+		<DropdownMenu.Content id="maintenance-menu-content" align="end" class="w-32">
 			<DropdownMenu.Item
+				id="maintenance-menu-edit"
 				onclick={() => {
-					sheetStore.openSheet(MaintenanceForm, 'Update Maintenance Log', '', maintenanceLog);
+					sheetStore.openSheet(
+						MaintenanceForm,
+						m.maintenance_menu_sheet_title(),
+						'',
+						maintenanceLog
+					);
 				}}
 			>
-				Edit
+				{m.maintenance_menu_edit()}
 			</DropdownMenu.Item>
-			<DropdownMenu.Item variant="destructive" onclick={() => (showDeleteDialog = true)}>
-				Delete
+			<DropdownMenu.Item
+				id="maintenance-menu-delete"
+				variant="destructive"
+				onclick={() => (showDeleteDialog = true)}
+			>
+				{m.maintenance_menu_delete()}
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>

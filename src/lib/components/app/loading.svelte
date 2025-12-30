@@ -13,13 +13,16 @@
 	};
 </script>
 
-<div class="flex items-center justify-center">
-	<div class="text-center">
+<div id="loading-spinner" class="loading-container flex items-center justify-center">
+	<div id="loading-content" class="text-center">
 		<div
-			class="animate-spin rounded-full {sizeClasses[size]} border-primary mx-auto border-b-2"
+			id="loading-spinner-element"
+			class="loading-spinner animate-spin rounded-full {sizeClasses[
+				size
+			]} border-primary mx-auto border-b-2"
 		></div>
 		{#if message}
-			<p class="text-muted-foreground mt-2 text-sm">{message}</p>
+			<p id="loading-message" class="text-muted-foreground mt-2 text-sm">{message}</p>
 		{/if}
 	</div>
 </div>

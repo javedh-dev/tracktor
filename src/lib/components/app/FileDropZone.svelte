@@ -49,6 +49,9 @@
 		...rest
 	}: Props = $props();
 
+	const inputId = $derived(id);
+	const labelId = $derived(`${inputId}-label`);
+
 	let uploading = $state(false);
 	let previewSrc = $state<string>();
 	let fileType = $state<'image' | 'pdf' | 'unknown'>('unknown');
@@ -60,7 +63,7 @@
 			(variant === 'image'
 				? 'Click or drag image to upload'
 				: variant === 'attachment'
-					? 'Drop receipt here, or click to select'
+					? 'Drop file here, or click to select'
 					: 'Click or drag files to upload')
 	);
 
@@ -220,17 +223,19 @@
 	const canUploadFiles = $derived(!disabled && !uploading);
 </script>
 
-<div class="w-full min-w-0">
+<div id="file-drop-zone-container" class="w-full min-w-0">
 	{#if shouldShowFile}
 		<!-- File is selected - show based on file type -->
 		{#if fileType === 'image' && previewSrc && showPreview}
 			<!-- Always show image preview for images -->
 			<div
-				class="border-border relative h-48 w-full overflow-hidden rounded-lg border-2 border-dashed"
+				id="file-preview-image"
+				class="file-preview border-border relative h-48 w-full overflow-hidden rounded-lg border-2 border-dashed"
 			>
 				<img src={previewSrc} alt="Uploaded" class="h-full w-full object-cover" />
 				<button
 					type="button"
+					id="file-preview-remove-btn"
 					onclick={removeFile}
 					class="bg-accent/20 text-accent-foreground hover:bg-accent absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full p-1 shadow-md transition-colors"
 				>
@@ -240,30 +245,33 @@
 		{:else}
 			<!-- Always show file info for non-images -->
 			<div
+				id="file-info-container"
 				class="border-border bg-muted/25 grid w-full grid-cols-[auto_1fr_auto] items-center gap-3 rounded-lg border p-4"
 			>
 				{#if file}
 					{@const Icon = getFileIcon(file.name)}
-					<Icon class="text-muted-foreground h-8 w-8" />
-					<div class="min-w-0">
-						<p class="truncate text-sm font-medium" title={file.name}>
+					<Icon id="file-icon" class="text-muted-foreground h-8 w-8" />
+					<div id="file-info" class="min-w-0">
+						<p id="file-name" class="truncate text-sm font-medium" title={file.name}>
 							{file.name}
 						</p>
-						<p class="text-muted-foreground text-xs">{displaySize(file.size)}</p>
+						<p id="file-size" class="text-muted-foreground text-xs">{displaySize(file.size)}</p>
 					</div>
 				{:else if effectiveExistingUrl && !removeExisting}
 					{@const Icon = getFileIcon(effectiveExistingUrl)}
-					<Icon class="text-muted-foreground h-8 w-8" />
-					<div class="min-w-0">
+					<Icon id="existing-file-icon" class="text-muted-foreground h-8 w-8" />
+					<div id="existing-file-info" class="min-w-0">
 						<AttachmentLink fileName={displayFileName || ''}>
 							<span class="block truncate text-sm font-medium" title={displayFileName}>
 								{displayFileName}
 							</span>
 						</AttachmentLink>
-						<p class="text-muted-foreground text-xs">Existing attachment (Click to view)</p>
+						<p id="existing-file-note" class="text-muted-foreground text-xs">
+							Existing attachment (Click to view)
+						</p>
 					</div>
 				{/if}
-				<button type="button" onclick={removeFile} {disabled}>
+				<button type="button" id="file-remove-btn" onclick={removeFile} {disabled}>
 					<X class="h-4 w-4" />
 				</button>
 			</div>
@@ -271,29 +279,40 @@
 	{:else}
 		<!-- Drop zone for new uploads -->
 		<label
+			id={labelId}
 			ondragover={(e) => e.preventDefault()}
 			ondrop={drop}
-			for={id}
+			for={inputId}
 			aria-disabled={!canUploadFiles}
 			class={cn(
-				'border-border hover:bg-accent/25 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+				'border-border hover:bg-accent/25 file-drop-zone flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
 				variant === 'attachment' ? 'h-32 p-6' : 'h-48 p-4',
 				className
 			)}
 		>
 			{#if variant === 'attachment'}
 				<!-- Attachment style drop zone -->
-				<div class="flex w-full flex-col items-center justify-center gap-2 overflow-hidden">
+				<div
+					id="file-drop-zone-attachment"
+					class="flex w-full flex-col items-center justify-center gap-2 overflow-hidden"
+				>
 					<div
+						id="file-drop-zone-icon"
 						class="border-border text-muted-foreground flex size-12 items-center justify-center rounded-full border border-dashed"
 					>
 						<Upload class="size-5" />
 					</div>
-					<div class="flex w-full flex-col gap-0.5 overflow-hidden text-center">
-						<span class="text-muted-foreground truncate text-sm font-medium">
+					<div
+						id="file-drop-zone-text"
+						class="flex w-full flex-col gap-0.5 overflow-hidden text-center"
+					>
+						<span
+							id="file-drop-zone-placeholder"
+							class="text-muted-foreground truncate text-sm font-medium"
+						>
 							{effectivePlaceholder}
 						</span>
-						<span class="text-muted-foreground/75 truncate text-xs">
+						<span id="file-drop-zone-details" class="text-muted-foreground/75 truncate text-xs">
 							{accept.replace(/,/g, ', ')} up to {displaySize(maxFileSize)}
 						</span>
 					</div>
@@ -301,20 +320,24 @@
 			{:else}
 				<!-- Image style drop zone -->
 				<div
+					id="file-drop-zone-image"
 					class="text-muted-foreground flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden text-center"
 				>
 					{#if uploading}
-						<div class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
-						<p class="text-sm">Uploading...</p>
+						<div
+							id="file-upload-spinner"
+							class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"
+						></div>
+						<p id="file-uploading-text" class="text-sm">Uploading...</p>
 					{:else}
 						<Upload class="mb-2 h-4 w-4" />
-						<p class="truncate text-sm">{effectivePlaceholder}</p>
+						<p id="file-drop-zone-instruction" class="truncate text-sm">{effectivePlaceholder}</p>
 						{#if variant !== 'image'}
-							<p class="text-muted-foreground truncate text-xs">
+							<p id="file-accepted-types" class="text-muted-foreground truncate text-xs">
 								Supports: {accept.replace(/,/g, ', ')}
 							</p>
 							{#if maxFileSize}
-								<p class="text-muted-foreground text-xs">
+								<p id="file-max-size" class="text-muted-foreground text-xs">
 									Max size: {displaySize(maxFileSize)}
 								</p>
 							{/if}
@@ -325,7 +348,7 @@
 			<input
 				{...rest}
 				disabled={!canUploadFiles}
-				{id}
+				id={inputId}
 				{accept}
 				multiple={false}
 				type="file"

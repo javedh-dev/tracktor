@@ -10,6 +10,7 @@
 	import User from '@lucide/svelte/icons/user';
 	import Lock from '@lucide/svelte/icons/lock';
 	import { sheetStore } from '$stores/sheet.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let processing = $state(false);
 
@@ -85,12 +86,12 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="auth-profile-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-6" disabled={processing}>
 		<Form.Field {form} name="username" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Your display name">Username</FormLabel>
+					<FormLabel description={m.profile_username_desc()}>{m.profile_username()}</FormLabel>
 					<Input {...props} bind:value={$formData.username} icon={User} type="text" />
 				{/snippet}
 			</Form.Control>
@@ -99,14 +100,16 @@
 
 		<div class="border-t pt-4">
 			<p class="text-muted-foreground mb-4 text-sm">
-				Leave password fields empty to keep your current password
+				{m.profile_password_hint()}
 			</p>
 
 			<div class="flex flex-col gap-6">
 				<Form.Field {form} name="currentPassword" class="w-full">
 					<Form.Control>
 						{#snippet children({ props })}
-							<FormLabel description="Required to change password">Current Password</FormLabel>
+							<FormLabel description={m.profile_current_password_desc()}
+								>{m.profile_current_password()}</FormLabel
+							>
 							<Input
 								{...props}
 								bind:value={$formData.currentPassword}
@@ -122,7 +125,9 @@
 				<Form.Field {form} name="newPassword" class="w-full">
 					<Form.Control>
 						{#snippet children({ props })}
-							<FormLabel description="Minimum 6 characters">New Password</FormLabel>
+							<FormLabel description={m.profile_new_password_desc()}
+								>{m.profile_new_password()}</FormLabel
+							>
 							<Input
 								{...props}
 								bind:value={$formData.newPassword}
@@ -138,7 +143,9 @@
 				<Form.Field {form} name="confirmPassword" class="w-full">
 					<Form.Control>
 						{#snippet children({ props })}
-							<FormLabel description="Re-enter your new password">Confirm Password</FormLabel>
+							<FormLabel description={m.profile_confirm_password_desc()}
+								>{m.profile_confirm_password()}</FormLabel
+							>
 							<Input
 								{...props}
 								bind:value={$formData.confirmPassword}
@@ -153,6 +160,6 @@
 			</div>
 		</div>
 
-		<SubmitButton {processing} class="w-full">Update Profile</SubmitButton>
+		<SubmitButton {processing} class="w-full">{m.profile_update_button()}</SubmitButton>
 	</fieldset>
 </form>

@@ -4,12 +4,13 @@
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 	import InsuranceForm from './InsuranceForm.svelte';
 	import InsuranceDetailsList from './InsuranceList.svelte';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <TabContainer
-	title="Insurance Details"
+	title={m.insurance_tab_title()}
 	addAction={() => {
-		sheetStore.openSheet(InsuranceForm, 'Add Insurance', '');
+		sheetStore.openSheet(InsuranceForm, m.insurance_add_action(), '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >

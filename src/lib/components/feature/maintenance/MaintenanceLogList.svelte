@@ -17,6 +17,7 @@
 	import { maintenanceStore } from '$stores/maintenance.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+	import * as m from '$lib/paraglide/messages';
 
 	const columns: ColumnDef<MaintenanceLog>[] = [
 		{
@@ -25,7 +26,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Calendar1,
 					iconClass: 'h-4 w-4',
-					label: 'Date',
+					label: m.col_date(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
@@ -36,7 +37,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: CircleGauge,
 					iconClass: 'h-4 w-4 ',
-					label: 'Odometer',
+					label: m.col_odometer(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
@@ -47,7 +48,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Wrench,
 					iconClass: 'h-4 w-4',
-					label: 'Service Center',
+					label: m.maintenance_col_service_center(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(serviceCenterCell, { value: row.getValue('serviceCenter') })
@@ -58,7 +59,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Banknote,
 					iconClass: 'h-4 w-4 ',
-					label: 'Cost',
+					label: m.col_cost(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
@@ -69,7 +70,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Notebook,
 					iconClass: 'h-4 w-4',
-					label: 'Notes',
+					label: m.col_notes(),
 					style: 'justify-start'
 				}),
 			cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
@@ -80,7 +81,7 @@
 				renderComponent(LabelWithIcon, {
 					icon: Paperclip,
 					iconClass: 'h-4 w-4',
-					label: 'Attachment',
+					label: m.col_attachment(),
 					style: 'justify-center'
 				}),
 			cell: ({ row }) => renderSnippet(attachmentCell, { value: row.getValue('attachment') })
@@ -103,7 +104,7 @@
 </script>
 
 {#if maintenanceStore.processing}
-	<div class="space-y-3">
+	<div id="maintenance-log-list-skeleton" class="space-y-3">
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />
 		<Skeleton class="h-12 w-full rounded-md" />
@@ -117,10 +118,12 @@
 		icon={CircleSlash2}
 		iconClass="h-5 w-5"
 		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-		label="No Maintenance Logs found for this vehicle."
+		label={m.maintenance_list_empty()}
 	/>
 {:else}
-	<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
+	<div id="maintenance-log-table" class="maintenance-log-table">
+		<AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
+	</div>
 {/if}
 
 {#snippet dateCell(params: any)}

@@ -10,6 +10,10 @@ export const addPollutionCertificate = async (
 	pollutionCertificateData: any
 ): Promise<ApiResponse> => {
 	await validateVehicleExists(vehicleId);
+	// Sanitize: remove expiryDate on backend when recurrence is not fixed
+	if (pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none') {
+		pollutionCertificateData.expiryDate = null;
+	}
 	const pollutionCertificate = await db
 		.insert(schema.pollutionCertificateTable)
 		.values({
@@ -29,8 +33,11 @@ export const getPollutionCertificates = async (vehicleId: string): Promise<ApiRe
 	const pollutionCertificates = await db.query.pollutionCertificateTable.findMany({
 		where: (certificates, { eq }) => eq(certificates.vehicleId, vehicleId)
 	});
+	const normalized = pollutionCertificates.map((c) =>
+		c.recurrenceType !== 'none' ? { ...c, expiryDate: null } : c
+	);
 	return {
-		data: pollutionCertificates,
+		data: normalized,
 		success: true
 	};
 };
@@ -64,7 +71,9 @@ export const updatePollutionCertificate = async (
 	const updatedCertificate = await db
 		.update(schema.pollutionCertificateTable)
 		.set({
-			...pollutionCertificateData
+			...((pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none')
+				? { ...pollutionCertificateData, expiryDate: null }
+				: pollutionCertificateData)
 		})
 		.where(eq(schema.pollutionCertificateTable.id, id))
 		.returning();

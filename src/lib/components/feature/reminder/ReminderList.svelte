@@ -4,17 +4,25 @@
 	import Badge from '$ui/badge/badge.svelte';
 	import { reminderStore } from '$stores/reminder.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
-	import { REMINDER_TYPES, REMINDER_SCHEDULES } from '$lib/domain/reminder';
+	import {
+		REMINDER_TYPES,
+		REMINDER_SCHEDULES,
+		REMINDER_RECURRENCE_TYPES,
+		getReminderScheduleLabel,
+		getRecurrenceTypeLabel
+	} from '$lib/domain/reminder';
 	import { formatDate } from '$lib/helper/format.helper';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
 	import BellRing from '@lucide/svelte/icons/bell-ring';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import AlarmClock from '@lucide/svelte/icons/alarm-clock';
+	import Repeat from '@lucide/svelte/icons/repeat';
 	import { browser } from '$app/environment';
 	import type { Reminder } from '$lib/domain';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ReminderContextMenu from './ReminderContextMenu.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let lastVehicleId: string | undefined;
 
@@ -45,8 +53,8 @@
 	<div
 		class="bg-muted text-muted-foreground border-border flex flex-col items-center justify-center rounded-2xl border border-dashed p-6 text-center"
 	>
-		<p class="text-base font-semibold">Select a vehicle to view reminders.</p>
-		<p class="text-sm">Pick a vehicle above to load its upcoming reminders.</p>
+		<p class="text-base font-semibold">{m.reminder_list_select_vehicle()}</p>
+		<p class="text-sm">{m.reminder_list_select_hint()}</p>
 	</div>
 {:else if reminderStore.processing}
 	<div class="space-y-4 pt-4">
@@ -62,7 +70,10 @@
 	/>
 {:else if reminders.length > 0}
 	{#each reminders as reminder (reminderKey(reminder))}
-		<div class="bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6">
+		<div
+			id="reminder-item-{reminderKey(reminder)}"
+			class="reminder-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+		>
 			<div class="flex items-center justify-between">
 				<div class="flex flex-wrap items-center gap-4 align-middle">
 					<div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
@@ -73,10 +84,10 @@
 					</div>
 					<div class="flex flex-wrap items-center gap-2">
 						<Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
-							{reminder.isCompleted ? 'Completed' : 'Pending'}
+							{reminder.isCompleted ? m.reminder_status_completed() : m.reminder_status_pending()}
 						</Badge>
 						{#if isOverdue(reminder)}
-							<Badge variant="destructive">Overdue</Badge>
+							<Badge variant="destructive">{m.reminder_status_overdue()}</Badge>
 						{/if}
 					</div>
 				</div>
@@ -91,18 +102,41 @@
 			<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 					<Calendar class="h-5 w-5" />
-					<span class="font-semibold">Due Date:</span>
+					<span class="font-semibold">{m.reminder_col_due_date()}:</span>
 					<span>{formatDate(reminder.dueDate)}</span>
 				</div>
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 					<AlarmClock class="h-5 w-5" />
-					<span class="font-semibold">Reminder schedule:</span>
-					<span>{REMINDER_SCHEDULES[reminder.remindSchedule]}</span>
+					<span class="font-semibold">{m.reminder_col_reminder_schedule()}:</span>
+					<span>{getReminderScheduleLabel(reminder.remindSchedule, m)}</span>
 				</div>
+				{#if reminder.recurrenceType && reminder.recurrenceType !== 'none'}
+					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+						<Repeat class="h-5 w-5" />
+						<span class="font-semibold">{m.reminder_col_recurrence()}:</span>
+						<span>
+							{getRecurrenceTypeLabel(reminder.recurrenceType, m)}
+							{#if reminder.recurrenceInterval > 1}
+								({m.recurrence_every()}
+								{reminder.recurrenceInterval}
+								{reminder.recurrenceType === 'yearly'
+									? m.recurrence_interval_years()
+									: reminder.recurrenceType === 'monthly'
+										? m.recurrence_interval_months()
+										: reminder.recurrenceType === 'weekly'
+											? m.recurrence_interval_weeks()
+											: m.recurrence_interval_days()})
+							{/if}
+							{#if reminder.recurrenceEndDate}
+								- {m.recurrence_until()} {formatDate(reminder.recurrenceEndDate)}
+							{/if}
+						</span>
+					</div>
+				{/if}
 				{#if reminder.note}
 					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 						<FileText class="h-5 w-5" />
-						<span class="font-semibold">Notes:</span>
+						<span class="font-semibold">{m.reminder_col_note()}:</span>
 						<span>{reminder.note}</span>
 					</div>
 				{/if}
@@ -114,6 +148,6 @@
 		icon={CircleSlash2}
 		iconClass="h-5 w-5"
 		style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-		label="No reminders yet. Create one to stay ahead of upcoming renewals."
+		label={m.reminder_list_empty()}
 	/>
 {/if}

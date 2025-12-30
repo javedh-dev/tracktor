@@ -4,12 +4,13 @@
 	import { vehicleStore } from '$lib/stores/vehicle.svelte';
 	import PollutionCertificateForm from './PollutionCertificateForm.svelte';
 	import PollutionCertificateList from './PollutionCertificateList.svelte';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <TabContainer
-	title={'Pollution Certificate Details'}
+	title={m.pollution_tab_title()}
 	addAction={() => {
-		sheetStore.openSheet(PollutionCertificateForm, 'Add Pollution Certificate', '');
+		sheetStore.openSheet(PollutionCertificateForm, m.pollution_add_action(), '');
 	}}
 	addActionDisabled={!vehicleStore.selectedId}
 >

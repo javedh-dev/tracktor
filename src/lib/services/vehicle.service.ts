@@ -49,7 +49,8 @@ export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => 
 export const saveVehicleWithImage = async (
 	vehicle: Vehicle,
 	image: File | undefined,
-	method: 'PUT' | 'POST'
+	method: 'PUT' | 'POST',
+	removeExisting: boolean = false
 ): Promise<Response<Vehicle>> => {
 	if (image) {
 		try {
@@ -61,6 +62,16 @@ export const saveVehicleWithImage = async (
 				error: e.response?.data?.message || 'Failed to upload image'
 			};
 		}
+	}
+
+	// Handle explicit removal of existing image while editing
+	if (removeExisting) {
+		vehicle.image = null;
+	}
+	// Preserve current image when editing without uploading/replacing
+	else if (!image && vehicle.id) {
+		const { image: _, ...vehicleWithoutImage } = vehicle;
+		return saveVehicle(vehicleWithoutImage as Vehicle, method);
 	}
 	return saveVehicle(vehicle, method);
 };

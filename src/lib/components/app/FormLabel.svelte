@@ -16,15 +16,19 @@
 
 <FormPrimitive.Label {...restProps} bind:ref tabindex={-1}>
 	{#snippet child({ props })}
-		<div class="flex flex-row items-center justify-between gap-2">
+		<div
+			id="form-label-container"
+			class="form-label-wrapper flex flex-row items-center justify-between gap-2"
+		>
 			<Label
+				id="form-label-text"
 				{...props}
 				data-slot="form-label"
-				class={cn('data-[fs-error]:text-destructive', className)}
+				class={cn('data-fs-error:text-destructive', className)}
 			>
 				{@render children?.()}
 				{#if props.required}
-					<span class="text-destructive">*</span>
+					<span id="form-required-indicator" class="text-destructive">*</span>
 				{/if}
 			</Label>
 			{#if description}

@@ -64,6 +64,27 @@
 			"when": 1765980000000,
 			"tag": "20251217120000_add_reminders_table",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "6",
+			"when": 1766139510883,
+			"tag": "20251219101830_adding-configs",
+			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "6",
+			"when": 1766207631034,
+			"tag": "20251220051351_adding-custom-fields",
+			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "6",
+			"when": 1766920569315,
+			"tag": "20251228111609_adding-recurring-end-dates",
+			"breakpoints": true
 		}
 	]
 }

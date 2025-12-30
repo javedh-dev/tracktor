@@ -29,10 +29,11 @@
 	let open = $state(false);
 </script>
 
-<div class="relative">
+<div id="input-wrapper" class="relative">
 	{#if type === 'file'}
 		<input
 			bind:this={ref}
+			id="file-input"
 			data-slot="input"
 			class={cn(
 				'selection:bg-primary dark:bg-input/30 selection:text-primary-foreground border-input',
@@ -52,6 +53,7 @@
 		/>
 	{:else if type === 'color'}
 		<div
+			id="color-input-wrapper"
 			class={cn(
 				'border-input bg-background selection:bg-primary dark:bg-input/30',
 				'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
@@ -75,6 +77,7 @@
 	{:else if type == 'calendar'}
 		<Popover.Root bind:open>
 			<Popover.Trigger
+				id="calendar-input-trigger"
 				class={cn(
 					'border-input bg-background selection:bg-primary dark:bg-input/30',
 					'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
@@ -90,8 +93,9 @@
 			>
 				{value || 'Pick a date'}
 			</Popover.Trigger>
-			<Popover.Content class="w-auto p-0">
+			<Popover.Content id="calendar-input-popover" class="w-auto p-0">
 				<Calendar
+					id="date-calendar"
 					type="single"
 					captionLayout="dropdown"
 					onValueChange={(v) => {
@@ -107,6 +111,7 @@
 	{:else}
 		<input
 			bind:this={ref}
+			id="text-input"
 			data-slot="input"
 			class={cn(
 				'border-input bg-background selection:bg-primary dark:bg-input/30',
@@ -126,6 +131,10 @@
 	{/if}
 
 	{#if Icon}
-		<Icon class="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 opacity-50" aria-hidden="true" />
+		<Icon
+			id="input-icon"
+			class="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2 opacity-50"
+			aria-hidden="true"
+		/>
 	{/if}
 </div>

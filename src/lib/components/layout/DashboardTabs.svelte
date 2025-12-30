@@ -14,83 +14,64 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
+	import {
+		nav_overview,
+		nav_fuel_logs,
+		nav_maintenance,
+		nav_insurance,
+		nav_pollution
+	} from '$lib/paraglide/messages';
 
 	let isLoading = $derived(!vehicleStore.selectedId && vehicleStore.processing);
+	let currentTab = $state('overview');
 
-	const tabs: {
-		name: string;
-		id: string;
-		Component: any;
-		Icon?: any;
-	}[] = [
-		{
-			name: 'Overview',
-			id: 'overview',
-			Component: OverviewTab,
-			Icon: SquareKanban
-		},
-		{
-			name: 'Fuel Logs',
-			id: 'fuel',
-			Component: FuelLogTab,
-			Icon: Fuel
-		},
-		{
-			name: 'Maintenance',
-			id: 'maintenance',
-			Component: MaintenenceLogTab,
-			Icon: Wrench
-		},
-		{
-			name: 'Insurance',
-			id: 'insurance',
-			Component: InsuranceTab,
-			Icon: Shield
-		},
-		{
-			name: 'Pollution Certificate',
-			id: 'pollution',
-			Component: PollutionTab,
-			Icon: BadgeInfo
-		}
+	const tabs: { name: string; id: string; Component: any; Icon?: any }[] = [
+		{ name: nav_overview(), id: 'overview', Component: OverviewTab, Icon: SquareKanban },
+		{ name: nav_fuel_logs(), id: 'fuel', Component: FuelLogTab, Icon: Fuel },
+		{ name: nav_maintenance(), id: 'maintenance', Component: MaintenenceLogTab, Icon: Wrench },
+		{ name: nav_insurance(), id: 'insurance', Component: InsuranceTab, Icon: Shield },
+		{ name: nav_pollution(), id: 'pollution', Component: PollutionTab, Icon: BadgeInfo }
 	];
-
-	let currentTab = $state(tabs[0].id);
 </script>
 
 {#if isLoading}
-	<div class="w-full">
+	<div class="space-y-2">
 		<div
-			class="mb-4 grid h-auto w-full grid-cols-2 gap-2 lg:flex lg:flex-row lg:items-center lg:gap-4"
+			class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 		>
-			{#each [0, 1, 2, 3, 4] as i (i)}
-				<Skeleton class="h-10 w-full rounded-md lg:w-28" />
+			{#each Array(5) as _}
+				<Skeleton class="skeleton-tab-trigger h-10 w-full rounded-md lg:w-28" />
 			{/each}
 		</div>
-		<div class="bg-secondary rounded-md p-2 lg:p-8">
-			<Skeleton class="mb-6 h-8 w-48" />
+		<div id="dashboard-tabs-content-skeleton" class="bg-secondary rounded-md p-2 lg:p-8">
+			<Skeleton class="skeleton-content-title mb-6 h-8 w-48" />
 			<div class="space-y-4">
-				<Skeleton class="h-32 w-full rounded-lg" />
+				<Skeleton class="skeleton-content-block h-32 w-full rounded-lg" />
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<Skeleton class="h-64 w-full rounded-lg" />
-					<Skeleton class="h-64 w-full rounded-lg" />
+					<Skeleton class="skeleton-content-card h-64 w-full rounded-lg" />
+					<Skeleton class="skeleton-content-card h-64 w-full rounded-lg" />
 				</div>
 			</div>
 		</div>
 	</div>
 {:else}
-	<Tabs.Root bind:value={currentTab} class="w-full">
+	<Tabs.Root id="dashboard-tabs" bind:value={currentTab} class="w-full">
 		<Tabs.List
+			id="dashboard-tabs-list"
 			class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 		>
 			{#each tabs as tab}
-				<Tabs.Trigger value={tab.id} class="justify-start lg:justify-center">
+				<Tabs.Trigger
+					id="tab-trigger-{tab.id}"
+					value={tab.id}
+					class="tab-trigger justify-start lg:justify-center"
+				>
 					<LabelWithIcon icon={tab.Icon} label={tab.name} />
 				</Tabs.Trigger>
 			{/each}
 		</Tabs.List>
 		{#each tabs as { id, Component } (id)}
-			<Tabs.Content class="w-full" value={id}>
+			<Tabs.Content id="tab-content-{id}" class="tab-content w-full" value={id}>
 				<Component />
 			</Tabs.Content>
 		{/each}

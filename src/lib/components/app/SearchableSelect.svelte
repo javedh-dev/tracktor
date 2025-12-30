@@ -33,9 +33,19 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef} class="mono flex w-full justify-between">
+	<Popover.Trigger
+		id="searchable-select-trigger"
+		bind:ref={triggerRef}
+		class="mono flex w-full justify-between"
+	>
 		{#snippet child({ props })}
-			<Button variant="outline" {...props} role="combobox" aria-expanded={open}>
+			<Button
+				id="searchable-select-button"
+				variant="outline"
+				{...props}
+				role="combobox"
+				aria-expanded={open}
+			>
 				<div class="flex items-center gap-2 overflow-hidden font-normal">
 					<Icon class="h-5 w-5 opacity-50" />
 					<span class="">{selectedValue || value || `Select ${name}...`}</span>
@@ -45,14 +55,16 @@
 			</Button>
 		{/snippet}
 	</Popover.Trigger>
-	<Popover.Content class="min-w-xs p-0">
+	<Popover.Content id="searchable-select-content" class="min-w-xs p-0">
 		<Command.Root>
-			<Command.Input placeholder={`Search ${name}`} />
-			<Command.List>
+			<Command.Input id="searchable-select-input" placeholder={`Search ${name}`} />
+			<Command.List id="searchable-select-list">
 				<Command.Empty>No match found.</Command.Empty>
 				<Command.Group>
 					{#each options as option}
 						<Command.Item
+							id="searchable-select-option-{option.value}"
+							class="searchable-select-option"
 							value={option.label}
 							onSelect={() => {
 								value = option.value;

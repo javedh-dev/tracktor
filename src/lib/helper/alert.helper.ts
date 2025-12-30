@@ -64,20 +64,52 @@ const buildMissingAlert = (type: VehicleAlertType): VehicleAlert => {
 
 export const calculateInsuranceAlert = (insurances?: Insurance[] | null): VehicleAlert | null => {
 	if (!insurances || insurances.length === 0) return buildMissingAlert('insurance');
+
+	const perpetual = insurances.find(
+		(insurance) => !insurance.endDate || insurance.recurrenceType === 'no_end'
+	);
+	if (perpetual) {
+		return {
+			type: 'insurance',
+			status: 'valid',
+			title: 'Insurance',
+			message: 'Insurance is active with no end date',
+			daysRemaining: Number.POSITIVE_INFINITY,
+			expiryDate: null,
+			hasRecord: true
+		};
+	}
+
 	const latest = insurances.reduce((latest, current) => {
-		return new Date(current.endDate) > new Date(latest.endDate) ? current : latest;
+		return new Date(current.endDate!) > new Date(latest.endDate!) ? current : latest;
 	});
-	return buildAlert('insurance', new Date(latest.endDate));
+	return buildAlert('insurance', new Date(latest.endDate!));
 };
 
 export const calculatePuccAlert = (
 	certificates?: PollutionCertificate[] | null
 ): VehicleAlert | null => {
 	if (!certificates || certificates.length === 0) return buildMissingAlert('pucc');
+
+	const perpetual = certificates.find(
+		(certificate) => !certificate.expiryDate || certificate.recurrenceType === 'no_end'
+	);
+	if (perpetual) {
+		return {
+			type: 'pucc',
+			status: 'valid',
+			title: 'Pollution Certificate',
+			message: 'PUCC is active with no end date',
+			daysRemaining: Number.POSITIVE_INFINITY,
+			expiryDate: null,
+			hasRecord: true
+		};
+	}
+
 	const latest = certificates.reduce((latest, current) => {
-		return new Date(current.expiryDate) > new Date(latest.expiryDate) ? current : latest;
+		return new Date(current.expiryDate!) > new Date(latest.expiryDate!) ? current : latest;
 	});
-	return buildAlert('pucc', new Date(latest.expiryDate));
+	return buildAlert('pucc', new Date(latest.expiryDate!));
 };
 
 export const calculateVehicleAlerts = (

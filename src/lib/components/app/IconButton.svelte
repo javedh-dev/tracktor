@@ -2,6 +2,7 @@
 	import type { Component } from 'svelte';
 
 	const {
+		id = '',
 		buttonStyles,
 		iconStyles,
 		onclick,
@@ -13,12 +14,14 @@
 		onclick: () => void;
 		icon: Component;
 		ariaLabel: string;
+		id?: string;
 	} = $props();
 </script>
 
 <button
+	id="icon-button-{id || 'default'}"
 	type="button"
-	class={`cursor-pointer rounded-full p-2 transition-colors duration-300 ${buttonStyles}`}
+	class={`icon-button cursor-pointer rounded-full p-2 transition-colors duration-300 ${buttonStyles}`}
 	{onclick}
 	aria-label={ariaLabel}
 >

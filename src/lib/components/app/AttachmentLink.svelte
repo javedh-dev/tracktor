@@ -13,7 +13,8 @@
 </script>
 
 <button
-	class="text-primary hover:text-primary/80 inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 overflow-hidden border-0 bg-transparent p-0 text-left transition-colors"
+	id="attachment-link-{fileName.replace(/[^a-zA-Z0-9]/g, '-')}"
+	class="attachment-link text-primary hover:text-primary/80 inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 overflow-hidden border-0 bg-transparent p-0 text-left transition-colors"
 	title="View attachment"
 	onclick={(e) => {
 		e.stopPropagation();

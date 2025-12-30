@@ -1,6 +1,7 @@
 import type { Config, Configs } from '$lib/domain/config';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '$lib/response';
+import { setLocale } from '$lib/paraglide/runtime.js';
 
 class ConfigStore {
 	configs = $state<Configs>({
@@ -9,11 +10,32 @@ class ConfigStore {
 		unitOfDistance: 'kilometer',
 		unitOfVolume: 'liter',
 		locale: 'en',
-		timezone: 'UTC'
+		timezone: 'UTC',
+		featureFuelLog: true,
+		featureMaintenance: true,
+		featurePucc: true,
+		featureReminders: true,
+		featureInsurance: true,
+		featureOverview: true
 	});
 	rawConfig = $state<Config[]>([]);
 	processing = $state(false);
 	error = $state<string>();
+
+	getCustomCss = async () => {
+		this.processing = true;
+		return apiClient
+			.get<ApiResponse>('/config/branding')
+			.then(({ data: res }) => {
+				const configData = res.data as Config;
+				return configData.value || '';
+			})
+			.catch((_) => {
+				this.error = 'Failed to fetch custom CSS';
+				return '';
+			})
+			.finally(() => (this.processing = false));
+	};
 
 	refreshConfigs = async () => {
 		this.processing = true;
@@ -38,14 +60,43 @@ class ConfigStore {
 							break;
 						case 'locale':
 							this.configs.locale = item.value || this.configs.locale;
+							// Update paraglide locale without reloading during config refresh
+							try {
+								if (this.configs.locale) {
+									setLocale(this.configs.locale as any, { reload: false });
+								}
+							} catch (_) {
+								/* noop */
+							}
 							break;
 						case 'timezone':
 							this.configs.timezone = item.value || this.configs.timezone;
 							break;
+						case 'customCss':
+							this.configs.customCss = item.value || this.configs.customCss;
+							break;
+						case 'featureFuelLog':
+							this.configs.featureFuelLog = item.value === 'true';
+							break;
+						case 'featureMaintenance':
+							this.configs.featureMaintenance = item.value === 'true';
+							break;
+						case 'featurePucc':
+							this.configs.featurePucc = item.value === 'true';
+							break;
+						case 'featureReminders':
+							this.configs.featureReminders = item.value === 'true';
+							break;
+						case 'featureInsurance':
+							this.configs.featureInsurance = item.value === 'true';
+							break;
+						case 'featureOverview':
+							this.configs.featureOverview = item.value === 'true';
+							break;
 					}
 				});
 			})
-			.catch((err) => (this.error = 'Failed to fetch vehicles'))
+			.catch((_) => (this.error = 'Failed to fetch vehicles'))
 			.finally(() => (this.processing = false));
 	};
 }

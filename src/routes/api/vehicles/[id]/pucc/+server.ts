@@ -40,21 +40,35 @@ export const POST: RequestHandler = async (event) => {
 		const body = event.locals.requestBody || (await event.request.json());
 
 		// Basic validation for PUCC data
-		if (!body.certificateNumber || !body.issueDate || !body.expiryDate) {
-			throw error(400, 'Certificate number, issue date, and expiry date are required');
+		if (!body.certificateNumber || !body.issueDate) {
+			throw error(400, 'Certificate number and issue date are required');
 		}
 
 		// Validate dates
 		const issueDate = new Date(body.issueDate);
-		const expiryDate = new Date(body.expiryDate);
 
-		if (isNaN(issueDate.getTime()) || isNaN(expiryDate.getTime())) {
-			throw error(400, 'Invalid date format');
+		if (isNaN(issueDate.getTime())) {
+			throw error(400, 'Invalid issue date format');
 		}
 
-		if (expiryDate <= issueDate) {
-			throw error(400, 'Expiry date must be after issue date');
+		if (body.recurrenceType !== 'none') {
+			delete body.expiryDate;
+		} else {
+			if (!body.expiryDate) {
+				throw error(400, 'Expiry date is required when recurrence is fixed date');
+			}
+			const expiryDate = new Date(body.expiryDate);
+			if (isNaN(expiryDate.getTime())) {
+				throw error(400, 'Invalid expiry date format');
+			}
+			if (expiryDate <= issueDate) {
+				throw error(400, 'Expiry date must be after issue date');
+			}
 		}
+
+		// Set default recurrence values if not provided
+		body.recurrenceType = body.recurrenceType || 'none';
+		body.recurrenceInterval = body.recurrenceInterval || 1;
 
 		const result = await pollutionCertificateService.addPollutionCertificate(id, body);
 		return json(result, { status: 201 });

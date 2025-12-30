@@ -22,14 +22,16 @@
 
 ## ✨ Features
 
-- 🚗 **Vehicle Management:** Add, edit, and manage multiple vehicles.
+- 🚗 **Vehicle Management:** Add, edit, and manage multiple vehicles with support for different fuel types.
 - ⛽ **Fuel Tracking:** Log fuel refills and monitor fuel efficiency over time.
 - 🛠️ **Maintenance Log:** Record and view maintenance history for each vehicle.
-- 📄 **Document Tracking:** Track insurance, pollution certificates, and other important documents.
-- 📊 **Dashboard:** Visualize key metrics and upcoming renewals.
+- 📄 **Document Tracking:** Track insurance and pollution certificates with renewal dates.
+- 🔔 **Reminders:** Set and manage reminders for maintenance, renewals, and other vehicle events.
+- 📊 **Dashboard:** Visualize key metrics, analytics, and upcoming renewals.
 - 🔒 **User Authentication:** Secure username/password authentication with session management.
+- 🎨 **Feature Toggles:** Enable or disable specific features based on your needs.
 
-## 🖼️ images
+## 🖼️ Screenshots
 
 <p align="center">
   <h3>🔐 Login Page</h3><br>
@@ -82,20 +84,28 @@
 
 ## 🛠️ Tech Stack
 
-- 🎨 **Frontend:** SvelteKit, Tailwind CSS
-- 🖥️ **Backend:** Node.js, Express.js
-- 🗄️ **Database:** SQLite, sequelize ORM
-- 🐳 **Containerization:** Docker & Docker Compose
+- 🎨 **Frontend:** SvelteKit, Tailwind CSS, Svelte 5
+- 🖥️ **Backend:** SvelteKit Server Routes
+- 🗄️ **Database:** SQLite with Drizzle ORM
+- 🐳 **Deployment:** Docker & Docker Compose
 
 ## 🚀 Getting Started
 
-Please check the [installation guide](./docs/installation.md) for detailed instructions on setting up the project.
+Refer to the [installation guide](./docs/installation.md) for setup instructions.
+
+## 📚 Documentation
+
+- [Installation Guide](./docs/installation.md) - Setup instructions for Docker, local development, and Proxmox LXC
+- [Authentication](./docs/authentication.md) - User authentication and session management
+- [Environment Variables](./docs/environment.md) - Configuration options
+- [Feature Toggles](./docs/feature-toggles.md) - Customizing enabled features
+- [Contributing](./docs/contributing.md) - Guidelines for contributing
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please read the [contributing guidelines](./docs/contributing.md) before submitting a pull request.
 
-Please consider supporting this project by giving it a star! ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
+Consider supporting this project by giving it a star ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
 
 ## 📄 License
 

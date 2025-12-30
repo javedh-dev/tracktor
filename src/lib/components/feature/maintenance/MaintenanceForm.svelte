@@ -18,6 +18,7 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { FileDropZone } from '$lib/components/app';
+	import * as m from '$lib/paraglide/messages';
 
 	let { data } = $props();
 
@@ -43,18 +44,16 @@
 					removeExistingAttachment
 				).then((res) => {
 					if (res.status == 'OK') {
-						toast.success(`Maintenance Log ${data ? 'updated' : 'saved'} successfully...!!!`);
+						toast.success(data ? m.maintenance_toast_updated() : m.maintenance_toast_saved());
 						attachment = undefined;
 						sheetStore.closeSheet(maintenanceStore.refreshMaintenanceLogs);
 					} else {
-						toast.error(`Error while saving : ${res.error}`);
+						toast.error(`${m.maintenance_toast_error_prefix()}${res.error}`);
 					}
 					processing = false;
 				});
 			} else {
-				toast.error(
-					'Please fix the errors in the form before submitting.' + JSON.stringify(f.errors)
-				);
+				toast.error(`${m.maintenance_form_error_fix()} ${JSON.stringify(f.errors)}`);
 			}
 		}
 	});
@@ -76,12 +75,14 @@
 	});
 </script>
 
-<form use:enhance onsubmit={(e) => e.preventDefault()}>
+<form id="maintenance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<fieldset class="flex flex-col gap-4" disabled={processing}>
 		<!-- <div class="flex w-full flex-row gap-4"> -->
 		<Form.Field {form} name="attachment" class="w-full">
 			<Form.Control>
-				<FormLabel description="Upload receipt or maintenance document">Attachment</FormLabel>
+				<FormLabel description={m.maintenance_form_attachment_desc()}>
+					{m.maintenance_form_attachment_label()}
+				</FormLabel>
 				<FileDropZone
 					bind:file={attachment}
 					existingFileUrl={existingAttachmentUrl}
@@ -94,7 +95,9 @@
 		<Form.Field {form} name="date" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Maintenance Date">Date</FormLabel>
+					<FormLabel description={m.maintenance_form_date_desc()}>
+						{m.maintenance_form_date_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.date} icon={Calendar1} type="calendar" disabled />
 				{/snippet}
 			</Form.Control>
@@ -103,7 +106,9 @@
 		<Form.Field {form} name="odometer" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Current vehicle odometer reading">Odometer</FormLabel>
+					<FormLabel description={m.maintenance_form_odometer_desc()}>
+						{m.maintenance_form_odometer_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
 				{/snippet}
 			</Form.Control>
@@ -114,7 +119,9 @@
 		<Form.Field {form} name="serviceCenter" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Name of Service center">Service Center</FormLabel>
+					<FormLabel description={m.maintenance_form_service_center_desc()}>
+						{m.maintenance_form_service_center_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.serviceCenter} icon={Hammer} />
 				{/snippet}
 			</Form.Control>
@@ -125,7 +132,9 @@
 		<Form.Field {form} name="cost" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="Cost of Maintenance">Cost</FormLabel>
+					<FormLabel description={m.maintenance_form_cost_desc()}>
+						{m.maintenance_form_cost_label()}
+					</FormLabel>
 					<Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
 				{/snippet}
 			</Form.Control>
@@ -136,10 +145,12 @@
 		<Form.Field {form} name="notes" class="w-full">
 			<Form.Control>
 				{#snippet children({ props })}
-					<FormLabel description="More details">Notes</FormLabel>
+					<FormLabel description={m.maintenance_form_notes_desc()}>
+						{m.maintenance_form_notes_label()}
+					</FormLabel>
 					<Textarea
 						{...props}
-						placeholder="Add more details. If any..."
+						placeholder={m.maintenance_form_notes_placeholder()}
 						class="resize-none"
 						bind:value={$formData.notes}
 					/>
@@ -148,6 +159,6 @@
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
 			<Form.FieldErrors />
 		</Form.Field>
-		<SubmitButton {processing} class="w-full">Submit</SubmitButton>
+		<SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
 	</fieldset>
 </form>
