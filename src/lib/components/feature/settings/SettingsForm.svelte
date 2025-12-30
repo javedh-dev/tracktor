@@ -34,38 +34,6 @@
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
-	import {
-		settings_tab_personalization,
-		settings_tab_interface,
-		settings_tab_features,
-		settings_label_date_format,
-		settings_label_locale,
-		settings_label_timezone,
-		settings_label_currency,
-		settings_label_unit_distance,
-		settings_label_unit_volume,
-		settings_label_theme,
-		settings_label_custom_css,
-		settings_update_button,
-		settings_select_unit_system,
-		settings_select_theme,
-		settings_desc_date_format,
-		settings_desc_locale,
-		settings_desc_timezone,
-		settings_desc_currency,
-		settings_desc_unit_distance,
-		settings_desc_unit_volume,
-		settings_desc_theme,
-		settings_desc_custom_css,
-		settings_select_language,
-		settings_updated_success,
-		common_example_prefix,
-		common_invalid_format,
-		common_kilometer,
-		common_mile,
-		common_litre,
-		common_gallon
-	} from '$lib/paraglide/messages/_index.js';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
@@ -131,7 +99,7 @@
 					}
 				}
 
-				toast.success(settings_updated_success());
+				toast.success(m.settings_updated_success());
 				configStore.refreshConfigs();
 				sheetStore.closeSheet(vehicleStore.refreshVehicles);
 				processing = false;
@@ -148,13 +116,13 @@
 	});
 
 	const uodOptions = [
-		{ value: 'kilometer', label: common_kilometer() },
-		{ value: 'mile', label: common_mile() }
+		{ value: 'kilometer', label: m.common_kilometer() },
+		{ value: 'mile', label: m.common_mile() }
 	];
 
 	const uovOptions = [
-		{ value: 'liter', label: common_litre() },
-		{ value: 'gallon', label: common_gallon() }
+		{ value: 'liter', label: m.common_litre() },
+		{ value: 'gallon', label: m.common_gallon() }
 	];
 
 	const localeLabels: Record<string, string> = {
@@ -162,7 +130,8 @@
 		hi: 'हिंदी',
 		es: 'Español',
 		fr: 'Français',
-		de: 'Deutsch'
+		de: 'Deutsch',
+		it: 'Italiano'
 	};
 	const localeOptions = locales.map((code) => ({
 		value: code,
@@ -192,9 +161,9 @@
 	<div class="space-y-6">
 		<Tabs.Root value="personalization" class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">
-				<Tabs.Trigger value="personalization">{settings_tab_personalization()}</Tabs.Trigger>
-				<Tabs.Trigger value="interface">{settings_tab_interface()}</Tabs.Trigger>
-				<Tabs.Trigger value="features">{settings_tab_features()}</Tabs.Trigger>
+				<Tabs.Trigger value="personalization">{m.settings_tab_personalization()}</Tabs.Trigger>
+				<Tabs.Trigger value="interface">{m.settings_tab_interface()}</Tabs.Trigger>
+				<Tabs.Trigger value="features">{m.settings_tab_features()}</Tabs.Trigger>
 			</Tabs.List>
 
 			<!-- Personalization Tab -->
@@ -204,8 +173,8 @@
 					<Form.Field {form} name="dateFormat" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_date_format()}
-									>{settings_label_date_format()}</FormLabel
+								<FormLabel description={m.settings_desc_date_format()}
+									>{m.settings_label_date_format()}</FormLabel
 								>
 								<Input
 									{...props}
@@ -215,8 +184,8 @@
 									class="mono"
 								/>
 								<Form.Description>
-									{common_example_prefix()}
-									{isValidFormat($formData.dateFormat).ex || common_invalid_format()}
+									{m.common_example_prefix()}
+									{isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
 								</Form.Description>
 							{/snippet}
 						</Form.Control>
@@ -226,14 +195,15 @@
 					<Form.Field {form} name="locale" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_locale()}>{settings_label_locale()}</FormLabel
+								<FormLabel description={m.settings_desc_locale()}
+									>{m.settings_label_locale()}</FormLabel
 								>
 								<Select.Root bind:value={$formData.locale} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<Languages class="mr-2 h-4 w-4" />
 											{localeOptions.find((opt) => opt.value === $formData.locale)?.label ||
-												settings_select_language()}
+												m.settings_select_language()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -250,15 +220,15 @@
 					<Form.Field {form} name="unitOfDistance" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_unit_distance()}
-									>{settings_label_unit_distance()}</FormLabel
+								<FormLabel description={m.settings_desc_unit_distance()}
+									>{m.settings_label_unit_distance()}</FormLabel
 								>
 								<Select.Root bind:value={$formData.unitOfDistance} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<RulerDimensionLine class="mr-2 h-4 w-4" />
 											{uodOptions.find((opt) => opt.value === $formData.unitOfDistance)?.label ||
-												settings_select_unit_system()}
+												m.settings_select_unit_system()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -277,15 +247,15 @@
 					<Form.Field {form} name="unitOfVolume" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_unit_volume()}
-									>{settings_label_unit_volume()}</FormLabel
+								<FormLabel description={m.settings_desc_unit_volume()}
+									>{m.settings_label_unit_volume()}</FormLabel
 								>
 								<Select.Root bind:value={$formData.unitOfVolume} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<Currency class="mr-2 h-4 w-4" />
 											{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)?.label ||
-												settings_select_unit_system()}
+												m.settings_select_unit_system()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -304,8 +274,8 @@
 					<Form.Field {form} name="timezone" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_timezone()}
-									>{settings_label_timezone()}</FormLabel
+								<FormLabel description={m.settings_desc_timezone()}
+									>{m.settings_label_timezone()}</FormLabel
 								>
 								<SearchableSelect
 									bind:value={$formData.timezone}
@@ -321,8 +291,8 @@
 					<Form.Field {form} name="currency" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_currency()}
-									>{settings_label_currency()}</FormLabel
+								<FormLabel description={m.settings_desc_currency()}
+									>{m.settings_label_currency()}</FormLabel
 								>
 								<SearchableSelect
 									bind:value={$formData.currency}
@@ -344,12 +314,14 @@
 					<Form.Field {form} name="theme" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_theme()}>{settings_label_theme()}</FormLabel>
+								<FormLabel description={m.settings_desc_theme()}
+									>{m.settings_label_theme()}</FormLabel
+								>
 								<Select.Root bind:value={$formData.theme} type="single">
 									<Select.Trigger {...props} class="w-full">
 										<div class="flex items-center justify-start">
 											<Palette class="mr-2 h-4 w-4" />
-											{themes[$formData.theme]?.label || settings_select_theme()}
+											{themes[$formData.theme]?.label || m.settings_select_theme()}
 										</div>
 									</Select.Trigger>
 									<Select.Content>
@@ -374,8 +346,8 @@
 					<Form.Field {form} name="customCss" class="w-full">
 						<Form.Control>
 							{#snippet children({ props })}
-								<FormLabel description={settings_desc_custom_css()}
-									>{settings_label_custom_css()}</FormLabel
+								<FormLabel description={m.settings_desc_custom_css()}
+									>{m.settings_label_custom_css()}</FormLabel
 								>
 								<Textarea
 									{...props}
@@ -532,7 +504,7 @@
 
 		<!-- Submit Button -->
 		<fieldset disabled={processing} class="flex justify-end gap-2">
-			<SubmitButton {processing} class="w-full">{settings_update_button()}</SubmitButton>
+			<SubmitButton {processing} class="w-full">{m.settings_update_button()}</SubmitButton>
 		</fieldset>
 	</div>
 </form>
