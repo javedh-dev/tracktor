@@ -15,7 +15,10 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import { INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
+	import {
+		INSURANCE_RECURRENCE_TYPES,
+		getInsuranceRecurrenceTypeLabel
+	} from '$lib/domain/insurance';
 	import type { Insurance } from '$lib/domain/insurance';
 	import * as m from '$lib/paraglide/messages';
 
@@ -120,10 +123,13 @@
 						<Repeat class="h-5 w-5" />
 						<span class="font-semibold">{m.insurance_col_recurrence()}:</span>
 						<span>
-							{INSURANCE_RECURRENCE_TYPES[ins.recurrenceType]}
+							{getInsuranceRecurrenceTypeLabel(ins.recurrenceType, m)}
 							{#if (ins.recurrenceType === 'yearly' || ins.recurrenceType === 'monthly') && ins.recurrenceInterval > 1}
-								(every {ins.recurrenceInterval}
-								{ins.recurrenceType === 'yearly' ? 'years' : 'months'})
+								({m.recurrence_every()}
+								{ins.recurrenceInterval}
+								{ins.recurrenceType === 'yearly'
+									? m.recurrence_interval_years()
+									: m.recurrence_interval_months()})
 							{/if}
 						</span>
 					</div>

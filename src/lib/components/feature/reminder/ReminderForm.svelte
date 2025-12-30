@@ -7,7 +7,9 @@
 		REMINDER_TYPES,
 		REMINDER_SCHEDULES,
 		REMINDER_RECURRENCE_TYPES,
-		reminderSchema
+		reminderSchema,
+		getReminderScheduleLabel,
+		getRecurrenceTypeLabel
 	} from '$lib/domain/reminder';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import Repeat from '@lucide/svelte/icons/repeat';
@@ -140,15 +142,15 @@
 							<div class="flex items-center gap-2">
 								<BellRing class="h-4 w-4" />
 								<span>
-									{REMINDER_SCHEDULES[
-										$formData.remindSchedule as keyof typeof REMINDER_SCHEDULES
-									] || 'Reminder timing'}
+									{$formData.remindSchedule
+										? getReminderScheduleLabel($formData.remindSchedule, m)
+										: 'Reminder timing'}
 								</span>
 							</div>
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(REMINDER_SCHEDULES) as [value, label]}
-								<Select.Item {value}>{label}</Select.Item>
+							{#each Object.keys(REMINDER_SCHEDULES) as value}
+								<Select.Item {value}>{getReminderScheduleLabel(value, m)}</Select.Item>
 							{/each}
 						</Select.Content>
 					</Select.Root>
@@ -168,15 +170,15 @@
 							<div class="flex items-center gap-2">
 								<Repeat class="h-4 w-4" />
 								<span>
-									{REMINDER_RECURRENCE_TYPES[
-										$formData.recurrenceType as keyof typeof REMINDER_RECURRENCE_TYPES
-									] || 'Select recurrence'}
+									{$formData.recurrenceType
+										? getRecurrenceTypeLabel($formData.recurrenceType, m)
+										: 'Select recurrence'}
 								</span>
 							</div>
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(REMINDER_RECURRENCE_TYPES) as [value, label]}
-								<Select.Item {value}>{label}</Select.Item>
+							{#each Object.keys(REMINDER_RECURRENCE_TYPES) as value}
+								<Select.Item {value}>{getRecurrenceTypeLabel(value, m)}</Select.Item>
 							{/each}
 						</Select.Content>
 					</Select.Root>

@@ -14,7 +14,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import { PUCC_RECURRENCE_TYPES } from '$lib/domain/pucc';
+	import { PUCC_RECURRENCE_TYPES, getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
 	import type { PollutionCertificate } from '$lib/domain/pucc';
 	import * as m from '$lib/paraglide/messages';
 
@@ -109,10 +109,13 @@
 						<Repeat class="h-5 w-5" />
 						<span class="font-semibold">{m.pollution_col_recurrence()}:</span>
 						<span>
-							{PUCC_RECURRENCE_TYPES[pucc.recurrenceType]}
+							{getPuccRecurrenceTypeLabel(pucc.recurrenceType, m)}
 							{#if (pucc.recurrenceType === 'yearly' || pucc.recurrenceType === 'monthly') && pucc.recurrenceInterval > 1}
-								(every {pucc.recurrenceInterval}
-								{pucc.recurrenceType === 'yearly' ? 'years' : 'months'})
+								({m.recurrence_every()}
+								{pucc.recurrenceInterval}
+								{pucc.recurrenceType === 'yearly'
+									? m.recurrence_interval_years()
+									: m.recurrence_interval_months()})
 							{/if}
 						</span>
 					</div>

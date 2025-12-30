@@ -2,11 +2,27 @@ import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
 
 export const INSURANCE_RECURRENCE_TYPES = {
-	none: 'Fixed end date',
-	yearly: 'Renews yearly',
-	monthly: 'Renews monthly',
-	no_end: 'No end date'
+	none: 'none',
+	yearly: 'yearly',
+	monthly: 'monthly',
+	no_end: 'no_end'
 } as const;
+
+// Helper function to get localized insurance recurrence type label
+export function getInsuranceRecurrenceTypeLabel(type: string, m: any): string {
+	switch (type) {
+		case 'none':
+			return m.insurance_recurrence_type_fixed();
+		case 'yearly':
+			return m.insurance_recurrence_type_yearly();
+		case 'monthly':
+			return m.insurance_recurrence_type_monthly();
+		case 'no_end':
+			return m.insurance_recurrence_type_no_end();
+		default:
+			return m.insurance_recurrence_type_fixed();
+	}
+}
 
 export interface Insurance {
 	id: string | null;

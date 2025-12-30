@@ -2,11 +2,30 @@ import configs from '$stores/config.svelte';
 import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
+import { es, fr, de, hi } from 'date-fns/locale';
+
+const getDateFnsLocale = () => {
+	switch (configs.locale) {
+		case 'es':
+			return es;
+		case 'fr':
+			return fr;
+		case 'de':
+			return de;
+		case 'hi':
+			return hi;
+		case 'en':
+		default:
+			return undefined; // English is the default locale in date-fns
+	}
+};
 
 const formatDate = (date: Date | string): string => {
 	const dateObj = typeof date === 'string' ? new Date(date) : date;
 	try {
-		return formatInTimeZone(dateObj, configs.timezone, configs.dateFormat);
+		const zonedDate = formatInTimeZone(dateObj, configs.timezone, 'yyyy-MM-dd HH:mm:ss');
+		const parsedDate = parse(zonedDate, 'yyyy-MM-dd HH:mm:ss', new Date());
+		return format(parsedDate, configs.dateFormat, { locale: getDateFnsLocale() });
 	} catch (e) {
 		return '';
 	}
@@ -14,7 +33,7 @@ const formatDate = (date: Date | string): string => {
 
 const formatDateForCalendar = (date: DateValue): string => {
 	const dateObj = date.toDate(configs.timezone);
-	return format(dateObj, configs.dateFormat);
+	return format(dateObj, configs.dateFormat, { locale: getDateFnsLocale() });
 };
 
 const parseDate = (date: string) => {

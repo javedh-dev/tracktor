@@ -7,7 +7,9 @@
 	import {
 		REMINDER_TYPES,
 		REMINDER_SCHEDULES,
-		REMINDER_RECURRENCE_TYPES
+		REMINDER_RECURRENCE_TYPES,
+		getReminderScheduleLabel,
+		getRecurrenceTypeLabel
 	} from '$lib/domain/reminder';
 	import { formatDate } from '$lib/helper/format.helper';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
@@ -106,26 +108,27 @@
 				<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 					<AlarmClock class="h-5 w-5" />
 					<span class="font-semibold">{m.reminder_col_reminder_schedule()}:</span>
-					<span>{REMINDER_SCHEDULES[reminder.remindSchedule]}</span>
+					<span>{getReminderScheduleLabel(reminder.remindSchedule, m)}</span>
 				</div>
 				{#if reminder.recurrenceType && reminder.recurrenceType !== 'none'}
 					<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
 						<Repeat class="h-5 w-5" />
 						<span class="font-semibold">{m.reminder_col_recurrence()}:</span>
 						<span>
-							{REMINDER_RECURRENCE_TYPES[reminder.recurrenceType]}
+							{getRecurrenceTypeLabel(reminder.recurrenceType, m)}
 							{#if reminder.recurrenceInterval > 1}
-								(every {reminder.recurrenceInterval}
+								({m.recurrence_every()}
+								{reminder.recurrenceInterval}
 								{reminder.recurrenceType === 'yearly'
-									? 'years'
+									? m.recurrence_interval_years()
 									: reminder.recurrenceType === 'monthly'
-										? 'months'
+										? m.recurrence_interval_months()
 										: reminder.recurrenceType === 'weekly'
-											? 'weeks'
-											: 'days'})
+											? m.recurrence_interval_weeks()
+											: m.recurrence_interval_days()})
 							{/if}
 							{#if reminder.recurrenceEndDate}
-								- Until {formatDate(reminder.recurrenceEndDate)}
+								- {m.recurrence_until()} {formatDate(reminder.recurrenceEndDate)}
 							{/if}
 						</span>
 					</div>

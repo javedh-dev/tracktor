@@ -7,7 +7,11 @@
 	import { saveInsuranceWithAttachment } from '$lib/services/insurance.service';
 	import { insuranceStore } from '$stores/insurance.svelte';
 	import * as m from '$lib/paraglide/messages';
-	import { insuranceSchema, INSURANCE_RECURRENCE_TYPES } from '$lib/domain/insurance';
+	import {
+		insuranceSchema,
+		INSURANCE_RECURRENCE_TYPES,
+		getInsuranceRecurrenceTypeLabel
+	} from '$lib/domain/insurance';
 	import * as Select from '$ui/select/index.js';
 	import Repeat from '@lucide/svelte/icons/repeat';
 	import { FileDropZone } from '$lib/components/app';
@@ -152,15 +156,15 @@
 							<div class="flex items-center gap-2">
 								<Repeat class="h-4 w-4" />
 								<span>
-									{INSURANCE_RECURRENCE_TYPES[
-										$formData.recurrenceType as keyof typeof INSURANCE_RECURRENCE_TYPES
-									] || 'Select recurrence'}
+									{$formData.recurrenceType
+										? getInsuranceRecurrenceTypeLabel($formData.recurrenceType, m)
+										: 'Select recurrence'}
 								</span>
 							</div>
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(INSURANCE_RECURRENCE_TYPES) as [value, label]}
-								<Select.Item {value}>{label}</Select.Item>
+							{#each Object.keys(INSURANCE_RECURRENCE_TYPES) as value}
+								<Select.Item {value}>{getInsuranceRecurrenceTypeLabel(value, m)}</Select.Item>
 							{/each}
 						</Select.Content>
 					</Select.Root>
@@ -174,8 +178,11 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<FormLabel description={m.insurance_form_recurrence_interval_desc()}>
-							Renew every {$formData.recurrenceInterval || 1}
-							{$formData.recurrenceType === 'yearly' ? 'year(s)' : 'month(s)'}
+							{m.recurrence_renew_every()}
+							{$formData.recurrenceInterval || 1}
+							{$formData.recurrenceType === 'yearly'
+								? m.recurrence_interval_years()
+								: m.recurrence_interval_months()}
 						</FormLabel>
 						<Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
 					{/snippet}

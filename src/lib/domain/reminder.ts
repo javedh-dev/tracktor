@@ -11,20 +11,56 @@ export const REMINDER_TYPES = {
 } as const;
 
 export const REMINDER_SCHEDULES = {
-	same_day: 'On due date',
-	one_day_before: '1 day before',
-	three_days_before: '3 days before',
-	one_week_before: '1 week before',
-	one_month_before: '1 month before'
+	same_day: 'same_day',
+	one_day_before: 'one_day_before',
+	three_days_before: 'three_days_before',
+	one_week_before: 'one_week_before',
+	one_month_before: 'one_month_before'
 } as const;
 
 export const REMINDER_RECURRENCE_TYPES = {
-	none: 'No recurrence',
-	daily: 'Daily',
-	weekly: 'Weekly',
-	monthly: 'Monthly',
-	yearly: 'Yearly'
+	none: 'none',
+	daily: 'daily',
+	weekly: 'weekly',
+	monthly: 'monthly',
+	yearly: 'yearly'
 } as const;
+
+// Helper function to get localized reminder schedule label
+export function getReminderScheduleLabel(schedule: string, m: any): string {
+	switch (schedule) {
+		case 'same_day':
+			return m.reminder_schedule_same_day();
+		case 'one_day_before':
+			return m.reminder_schedule_one_day_before();
+		case 'three_days_before':
+			return m.reminder_schedule_three_days_before();
+		case 'one_week_before':
+			return m.reminder_schedule_one_week_before();
+		case 'one_month_before':
+			return m.reminder_schedule_one_month_before();
+		default:
+			return m.reminder_schedule_same_day();
+	}
+}
+
+// Helper function to get localized recurrence type label
+export function getRecurrenceTypeLabel(type: string, m: any): string {
+	switch (type) {
+		case 'none':
+			return m.recurrence_type_none();
+		case 'daily':
+			return m.recurrence_type_daily();
+		case 'weekly':
+			return m.recurrence_type_weekly();
+		case 'monthly':
+			return m.recurrence_type_monthly();
+		case 'yearly':
+			return m.recurrence_type_yearly();
+		default:
+			return m.recurrence_type_none();
+	}
+}
 
 export interface Reminder {
 	id: string | null;
