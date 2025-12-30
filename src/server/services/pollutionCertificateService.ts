@@ -71,7 +71,7 @@ export const updatePollutionCertificate = async (
 	const updatedCertificate = await db
 		.update(schema.pollutionCertificateTable)
 		.set({
-			...((pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none')
+			...(pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none'
 				? { ...pollutionCertificateData, expiryDate: null }
 				: pollutionCertificateData)
 		})

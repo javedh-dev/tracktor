@@ -6,8 +6,6 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import {
 		REMINDER_TYPES,
-		REMINDER_SCHEDULES,
-		REMINDER_RECURRENCE_TYPES,
 		getReminderScheduleLabel,
 		getRecurrenceTypeLabel
 	} from '$lib/domain/reminder';

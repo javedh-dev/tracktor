@@ -126,7 +126,7 @@
 				if (f.data.locale && f.data.locale !== getLocale()) {
 					try {
 						await setLocale(f.data.locale as any);
-					} catch (_) {
+					} catch {
 						/* noop */
 					}
 				}

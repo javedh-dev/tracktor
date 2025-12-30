@@ -162,7 +162,7 @@
 								</div>
 							</Select.Trigger>
 							<Select.Content>
-								{#each Object.entries(FUEL_TYPES) as [value, _]}
+								{#each Object.keys(FUEL_TYPES) as value}
 									<Select.Item {value}>{getFuelTypeLabel(value, m)}</Select.Item>
 								{/each}
 							</Select.Content>

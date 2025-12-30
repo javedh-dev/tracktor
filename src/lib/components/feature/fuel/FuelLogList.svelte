@@ -34,7 +34,6 @@
 		col_odometer,
 		col_filled,
 		col_missed_last,
-		col_fuel_amount,
 		col_cost,
 		col_mileage,
 		col_notes,
