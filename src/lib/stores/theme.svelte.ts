@@ -14,7 +14,7 @@ interface ThemeStore {
 }
 
 function createThemeStore(): ThemeStore {
-	let theme = $state<ThemeName>('light');
+	let theme = $state<ThemeName>('slate');
 	let initialized = false;
 
 	function applyTheme(name: ThemeName) {
@@ -32,7 +32,7 @@ function createThemeStore(): ThemeStore {
 		if (storedTheme && storedTheme in themes) {
 			theme = storedTheme;
 		} else {
-			theme = 'light';
+			theme = 'slate';
 		}
 
 		applyTheme(theme);

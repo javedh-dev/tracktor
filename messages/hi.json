@@ -43,6 +43,8 @@
 	"common_cancel": "रद्द करें",
 	"common_continue": "जारी रखें",
 	"common_skip": "छोड़ें",
+	"delete_dialog_title": "हटाएँ",
+	"delete_dialog_message": "क्या आप वाकई हटाना चाहते हैं?",
 	"common_select_column": "कॉलम चुनें",
 	"common_import": "आयात करें",
 	"nav_overview": "ओवरव्यू",

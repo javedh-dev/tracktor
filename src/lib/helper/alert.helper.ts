@@ -81,9 +81,9 @@ export const calculateInsuranceAlert = (insurances?: Insurance[] | null): Vehicl
 	}
 
 	const latest = insurances.reduce((latest, current) => {
-		return new Date(current.endDate) > new Date(latest.endDate) ? current : latest;
+		return new Date(current.endDate!) > new Date(latest.endDate!) ? current : latest;
 	});
-	return buildAlert('insurance', new Date(latest.endDate));
+	return buildAlert('insurance', new Date(latest.endDate!));
 };
 
 export const calculatePuccAlert = (
@@ -107,9 +107,9 @@ export const calculatePuccAlert = (
 	}
 
 	const latest = certificates.reduce((latest, current) => {
-		return new Date(current.expiryDate) > new Date(latest.expiryDate) ? current : latest;
+		return new Date(current.expiryDate!) > new Date(latest.expiryDate!) ? current : latest;
 	});
-	return buildAlert('pucc', new Date(latest.expiryDate));
+	return buildAlert('pucc', new Date(latest.expiryDate!));
 };
 
 export const calculateVehicleAlerts = (

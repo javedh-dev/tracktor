@@ -150,13 +150,12 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
 
 			// Calculate statuses
 			const vehicleInsuranceDates = insurances
-				.filter((ins) => ins.vehicleId === vehicle.id)
-				.map((ins) => new Date(ins.endDate));
+				.filter((ins) => ins.vehicleId === vehicle.id && ins.endDate)
+				.map((ins) => new Date(ins.endDate!));
 
 			const vehiclePuccDates = pollutionCerts
-				.filter((pucc) => pucc.vehicleId === vehicle.id)
-				.map((pucc) => new Date(pucc.expiryDate));
-
+				.filter((pucc) => pucc.vehicleId === vehicle.id && pucc.expiryDate)
+				.map((pucc) => new Date(pucc.expiryDate!));
 			return {
 				...vehicle,
 				customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,

@@ -43,6 +43,8 @@
 	"common_cancel": "Cancelar",
 	"common_continue": "Continuar",
 	"common_skip": "Omitir",
+	"delete_dialog_title": "Eliminar",
+	"delete_dialog_message": "¿Estás seguro de que deseas eliminar?",
 	"common_select_column": "Seleccionar columna",
 	"common_import": "Importar",
 	"nav_overview": "Resumen",

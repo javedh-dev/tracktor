@@ -2,6 +2,7 @@
 	import { scale } from 'svelte/transition';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Button from '../ui/button/button.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { onConfirm, open = $bindable() } = $props();
 </script>
@@ -20,18 +21,18 @@
 				<Trash2 class="h-6 w-6 text-rose-600" />
 			</span>
 			<h3 id="delete-confirmation-title" class="mt-4 text-2xl text-black dark:text-white">
-				Delete
+				{m.delete_dialog_title()}
 			</h3>
-			<h5 id="delete-confirmation-message" class="">Are you sure you want to delete?</h5>
+			<h5 id="delete-confirmation-message" class="">{m.delete_dialog_message()}</h5>
 			<div id="delete-confirmation-actions" class="mt-8 flex w-full justify-around gap-4">
 				<Button
 					id="delete-confirmation-cancel"
 					variant="secondary"
 					type="button"
-					onclick={() => (open = false)}>Cancel</Button
+					onclick={() => (open = false)}>{m.common_cancel()}</Button
 				>
 				<Button id="delete-confirmation-confirm" variant="default" type="button" onclick={onConfirm}
-					>Confirm</Button
+					>{m.common_confirm()}</Button
 				>
 			</div>
 		</div>

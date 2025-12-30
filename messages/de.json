@@ -43,6 +43,8 @@
 	"common_cancel": "Abbrechen",
 	"common_continue": "Weiter",
 	"common_skip": "Überspringen",
+	"delete_dialog_title": "Löschen",
+	"delete_dialog_message": "Bist du sicher, dass du löschen möchtest?",
 	"common_select_column": "Spalte auswählen",
 	"common_import": "Importieren",
 	"nav_overview": "Übersicht",
