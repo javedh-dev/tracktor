@@ -13,7 +13,7 @@
 	import { formatDistance } from '$lib/helper/format.helper';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { browser } from '$app/environment';
-	import { FUEL_TYPES } from '$lib/domain/vehicle';
+	import { getFuelTypeLabel } from '$lib/domain/vehicle';
 	import IconButton from '$appui/IconButton.svelte';
 	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 	import * as Card from '$ui/card';
@@ -23,6 +23,7 @@
 	import { deleteVehicle } from '$lib/services/vehicle.service';
 	import { toast } from 'svelte-sonner';
 	import { sheetStore } from '$stores/sheet.svelte';
+	import * as m from '$lib/paraglide/messages';
 	import FuelLogForm from '../fuel/FuelLogForm.svelte';
 	import MaintenanceForm from '../maintenance/MaintenanceForm.svelte';
 	import InsuranceForm from '../insurance/InsuranceForm.svelte';
@@ -31,7 +32,6 @@
 	import ReminderForm from '../reminder/ReminderForm.svelte';
 	import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
 	import { Features } from '$lib/helper/feature.helper';
-	import * as m from '$lib/paraglide/messages';
 
 	const { vehicle, onclick, onkeydown, isSelected = false } = $props();
 	let deleteDialog = $state(false);
@@ -113,8 +113,8 @@
 				<div class="flex gap-2">
 					<Badge variant="secondary" class="text-xs"
 						>{vehicle.fuelType
-							? FUEL_TYPES[vehicle.fuelType as keyof typeof FUEL_TYPES]
-							: 'Petrol'}</Badge
+							? getFuelTypeLabel(vehicle.fuelType, m)
+							: getFuelTypeLabel('petrol', m)}</Badge
 					>
 					<Badge variant="outline" class="text-sm">{vehicle.year}</Badge>
 				</div>

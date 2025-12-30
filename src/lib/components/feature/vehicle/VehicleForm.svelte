@@ -6,7 +6,7 @@
 	import Input from '$appui/input.svelte';
 	import { saveVehicleWithImage } from '$lib/services/vehicle.service';
 	import { vehicleStore } from '$stores/vehicle.svelte';
-	import { vehicleSchema, FUEL_TYPES } from '$lib/domain/vehicle';
+	import { vehicleSchema, FUEL_TYPES, getFuelTypeLabel } from '$lib/domain/vehicle';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import CarFront from '@lucide/svelte/icons/car-front';
@@ -156,14 +156,14 @@
 									<Fuel class="mr-2 h-4 w-4" />
 									<span>
 										{$formData.fuelType
-											? FUEL_TYPES[$formData.fuelType as keyof typeof FUEL_TYPES]
+											? getFuelTypeLabel($formData.fuelType, m)
 											: m.vehicle_form_fuel_type_placeholder()}
 									</span>
 								</div>
 							</Select.Trigger>
 							<Select.Content>
-								{#each Object.entries(FUEL_TYPES) as [value, label]}
-									<Select.Item {value}>{label}</Select.Item>
+								{#each Object.entries(FUEL_TYPES) as [value, _]}
+									<Select.Item {value}>{getFuelTypeLabel(value, m)}</Select.Item>
 								{/each}
 							</Select.Content>
 						</Select.Root>

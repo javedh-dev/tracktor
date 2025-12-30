@@ -3,6 +3,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import Input from '$appui/input.svelte';
 	import IconButton from '$appui/IconButton.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	interface CustomField {
 		key: string;
@@ -53,14 +54,14 @@
 
 <div class="space-y-2">
 	<div class="flex items-center justify-between">
-		<label for="custom-fields-section" class="text-sm font-medium">Custom Fields</label>
+		<label for="custom-fields-section" class="text-sm font-medium">{m.custom_fields_label()}</label>
 		<button
 			type="button"
 			onclick={addField}
 			class="text-primary hover:text-primary/80 flex items-center gap-1 text-xs"
 		>
 			<Plus size={14} />
-			Add Field
+			{m.custom_fields_add_button()}
 		</button>
 	</div>
 
@@ -69,7 +70,7 @@
 			<div class="flex gap-2">
 				<Input
 					type="text"
-					placeholder="Field name"
+					placeholder={m.custom_fields_name_placeholder()}
 					bind:value={field.key}
 					onchange={() => updateCustomFields()}
 					class="flex-1"
@@ -77,7 +78,7 @@
 				/>
 				<Input
 					type="text"
-					placeholder="Field value"
+					placeholder={m.custom_fields_value_placeholder()}
 					bind:value={field.value}
 					onchange={() => updateCustomFields()}
 					class="flex-1"
@@ -86,7 +87,7 @@
 				<IconButton
 					icon={X}
 					onclick={() => removeField(index)}
-					ariaLabel="Remove field"
+					ariaLabel={m.custom_fields_remove_aria()}
 					buttonStyles="hover:bg-red-100 dark:hover:bg-red-700"
 					iconStyles="text-red-500"
 				/>
@@ -96,7 +97,7 @@
 
 	{#if fields.length === 0}
 		<p class="text-muted-foreground text-xs">
-			No custom fields added. Click "Add Field" to get started.
+			{m.custom_fields_empty_message()}
 		</p>
 	{/if}
 </div>

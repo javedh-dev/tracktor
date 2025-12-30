@@ -17,6 +17,7 @@
 	import ProfileForm from '../feature/auth/profile-form.svelte';
 	import { env } from '$lib/config/env';
 	import Notifications from './Notifications.svelte';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <header
@@ -47,7 +48,7 @@
 						id="settings-button"
 						variant="ghost"
 						onclick={() => {
-							sheetStore.openSheet(SettingsForm, 'Settings');
+							sheetStore.openSheet(SettingsForm, m.settings_sheet_title());
 						}}
 					>
 						<Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
@@ -68,14 +69,14 @@
 									onclick={() => {
 										sheetStore.openSheet(
 											ProfileForm,
-											'Profile',
-											'Update your username and password'
+											m.profile_sheet_title(),
+											m.profile_sheet_desc()
 										);
 									}}
 									disabled={authStore.isAuthDisabled || env.DEMO_MODE}
 								>
 									<UserCog class="h-[1.2rem] w-[1.2rem]" />
-									Profile
+									{m.profile_menu_item()}
 								</DropdownMenu.Item>
 								<DropdownMenu.Sub>
 									<DropdownMenu.SubTrigger
@@ -83,7 +84,7 @@
 										class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus-visible:ring-1"
 									>
 										<ToolCase class="h-[1.2rem] w-[1.2rem]" />
-										<span class="flex-1 text-left">Tools</span>
+										<span class="flex-1 text-left">{m.tools_menu()}</span>
 									</DropdownMenu.SubTrigger>
 									<DropdownMenu.SubContent id="tools-submenu" alignOffset={-4} class="min-w-48">
 										<DropdownMenu.Item
@@ -91,20 +92,20 @@
 											onclick={() => {
 												sheetStore.openSheet(
 													DataExportImport,
-													'Data Export/Import',
-													'Export or import your database with optional encryption'
+													m.data_export_import_sheet_title(),
+													m.data_export_import_sheet_desc()
 												);
 											}}
 										>
 											<Database class="h-[1.2rem] w-[1.2rem]" />
-											Export/Import Data
+											{m.data_export_import_menu_item()}
 										</DropdownMenu.Item>
 									</DropdownMenu.SubContent>
 								</DropdownMenu.Sub>
 								<DropdownMenu.Separator />
 								<DropdownMenu.Item id="logout-menu-item" onclick={authStore.logout}>
 									<LogOut class="h-[1.2rem] w-[1.2rem]" />
-									Logout
+									{m.logout_menu_item()}
 								</DropdownMenu.Item>
 							</DropdownMenu.Content>
 						</DropdownMenu.Root>

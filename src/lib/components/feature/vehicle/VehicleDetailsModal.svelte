@@ -4,9 +4,10 @@
 	import IdCard from '@lucide/svelte/icons/id-card';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import { formatDistance } from '$lib/helper/format.helper';
-	import { FUEL_TYPES } from '$lib/domain/vehicle';
+	import { getFuelTypeLabel } from '$lib/domain/vehicle';
 	import type { Vehicle } from '$lib/domain/vehicle';
 	import X from '@lucide/svelte/icons/x';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		vehicle: Vehicle;
@@ -18,7 +19,7 @@
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
 	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
 	const fuelLabel = $derived(
-		vehicle.fuelType ? FUEL_TYPES[vehicle.fuelType as keyof typeof FUEL_TYPES] : 'Petrol'
+		vehicle.fuelType ? getFuelTypeLabel(vehicle.fuelType, m) : getFuelTypeLabel('petrol', m)
 	);
 	const odometerText = $derived(vehicle.odometer ? formatDistance(vehicle.odometer) : null);
 </script>
@@ -82,37 +83,39 @@
 				<div>
 					<h3 class="mb-2 flex items-center text-base font-semibold">
 						<IdCard class="mr-2 h-4 w-4" />
-						Details
+						{m.vehicle_details_section_title()}
 					</h3>
 					<Separator />
 				</div>
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">License Plate</p>
-						<p class="text-sm font-medium">{vehicle.licensePlate || 'Not specified'}</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_license_plate()}</p>
+						<p class="text-sm font-medium">
+							{vehicle.licensePlate || m.vehicle_details_not_specified()}
+						</p>
 					</div>
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">VIN</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_vin()}</p>
 						{#if vehicle.vin}
 							<p class="font-mono text-sm break-all">{vehicle.vin}</p>
 						{:else}
-							<p class="text-muted-foreground text-sm">Not specified</p>
+							<p class="text-muted-foreground text-sm">{m.vehicle_details_not_specified()}</p>
 						{/if}
 					</div>
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">Fuel Type</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_fuel_type()}</p>
 						<p class="text-sm font-medium">{fuelLabel}</p>
 					</div>
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">Odometer</p>
-						<p class="text-sm font-medium">{odometerText || 'Not recorded'}</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_odometer()}</p>
+						<p class="text-sm font-medium">{odometerText || m.vehicle_details_not_recorded()}</p>
 					</div>
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">Color</p>
-						<p class="text-sm font-medium">{vehicle.color || 'Not specified'}</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_color()}</p>
+						<p class="text-sm font-medium">{vehicle.color || m.vehicle_details_not_specified()}</p>
 					</div>
 					<div class="space-y-1">
-						<p class="text-muted-foreground text-xs">Year</p>
+						<p class="text-muted-foreground text-xs">{m.vehicle_details_year()}</p>
 						<p class="text-sm font-medium">{vehicle.year}</p>
 					</div>
 				</div>
@@ -124,7 +127,7 @@
 					<div>
 						<h3 class="mb-2 flex items-center text-base font-semibold">
 							<FileText class="mr-2 h-4 w-4" />
-							Custom Fields
+							{m.custom_fields_label()}
 						</h3>
 						<Separator />
 					</div>

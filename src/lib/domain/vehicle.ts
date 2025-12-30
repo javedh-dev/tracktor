@@ -17,10 +17,24 @@ export interface Vehicle {
 }
 
 export const FUEL_TYPES = {
-	diesel: 'Diesel',
-	petrol: 'Petrol',
-	ev: 'Electric (EV)'
+	diesel: 'diesel',
+	petrol: 'petrol',
+	ev: 'ev'
 } as const;
+
+// Helper function to get localized fuel type label
+export function getFuelTypeLabel(fuelType: string, m: any): string {
+	switch (fuelType) {
+		case 'diesel':
+			return m.fuel_type_diesel();
+		case 'petrol':
+			return m.fuel_type_petrol();
+		case 'ev':
+			return m.fuel_type_ev();
+		default:
+			return m.fuel_type_petrol();
+	}
+}
 
 export const vehicleSchema = z.object({
 	id: z.string().nullable(),

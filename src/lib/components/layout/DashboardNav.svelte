@@ -9,6 +9,7 @@
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import Bell from '@lucide/svelte/icons/bell';
 	import { configStore } from '$stores/config.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	type Section = {
 		label: string;
@@ -19,31 +20,36 @@
 
 	const sections: Section[] = [
 		{
-			label: 'Overview',
+			label: m.nav_overview(),
 			href: '/dashboard/overview',
 			icon: SquareKanban,
 			featureKey: 'featureOverview'
 		},
-		{ label: 'Fuel Logs', href: '/dashboard/fuel', icon: Fuel, featureKey: 'featureFuelLog' },
+		{ label: m.nav_fuel_logs(), href: '/dashboard/fuel', icon: Fuel, featureKey: 'featureFuelLog' },
 		{
-			label: 'Maintenance',
+			label: m.nav_maintenance(),
 			href: '/dashboard/maintenance',
 			icon: Wrench,
 			featureKey: 'featureMaintenance'
 		},
 		{
-			label: 'Insurance',
+			label: m.nav_insurance(),
 			href: '/dashboard/insurance',
 			icon: Shield,
 			featureKey: 'featureInsurance'
 		},
 		{
-			label: 'Pollution',
+			label: m.nav_pollution(),
 			href: '/dashboard/pollution',
 			icon: BadgeInfo,
 			featureKey: 'featurePucc'
 		},
-		{ label: 'Reminders', href: '/dashboard/reminders', icon: Bell, featureKey: 'featureReminders' }
+		{
+			label: m.nav_reminders(),
+			href: '/dashboard/reminders',
+			icon: Bell,
+			featureKey: 'featureReminders'
+		}
 	];
 
 	let visibleSections = $derived(

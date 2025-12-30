@@ -28,6 +28,7 @@
 		isValidTimezone
 	} from '$lib/helper/format.helper';
 	import type { Config } from '$lib/domain/config';
+	import * as m from '$lib/paraglide/messages';
 	import { saveConfig } from '$lib/services/config.service';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
@@ -400,7 +401,7 @@
 				<fieldset class="flex flex-col gap-4" disabled={processing}>
 					<div class="space-y-4">
 						<div class="text-muted-foreground text-sm">
-							Enable or disable features to customize your experience
+							{m.settings_features_intro()}
 						</div>
 
 						<!-- Fuel Log Feature -->
@@ -413,9 +414,11 @@
 										id="featureFuelLog"
 									/>
 									<div class="flex flex-col gap-1">
-										<Form.Label for="featureFuelLog" class="font-medium">Fuel Log</Form.Label>
+										<Form.Label for="featureFuelLog" class="font-medium"
+											>{m.feature_label_fuel()}</Form.Label
+										>
 										<Form.Description class="text-xs">
-											Track and manage fuel consumption and refueling history
+											{m.feature_desc_fuel()}
 										</Form.Description>
 									</div>
 								{/snippet}
@@ -433,10 +436,10 @@
 									/>
 									<div class="flex flex-col gap-1">
 										<Form.Label for="featureMaintenance" class="font-medium">
-											Maintenance
+											{m.feature_label_maintenance()}
 										</Form.Label>
 										<Form.Description class="text-xs">
-											Record and schedule vehicle maintenance activities
+											{m.feature_desc_maintenance()}
 										</Form.Description>
 									</div>
 								{/snippet}
@@ -449,9 +452,11 @@
 								{#snippet children({ props })}
 									<Checkbox {...props} bind:checked={$formData.featurePucc} id="featurePucc" />
 									<div class="flex flex-col gap-1">
-										<Form.Label for="featurePucc" class="font-medium">Pollution</Form.Label>
+										<Form.Label for="featurePucc" class="font-medium"
+											>{m.feature_label_pollution()}</Form.Label
+										>
 										<Form.Description class="text-xs">
-											Manage Pollution Under Control Certificate records
+											{m.feature_desc_pollution()}
 										</Form.Description>
 									</div>
 								{/snippet}
@@ -468,9 +473,11 @@
 										id="featureReminders"
 									/>
 									<div class="flex flex-col gap-1">
-										<Form.Label for="featureReminders" class="font-medium">Reminders</Form.Label>
+										<Form.Label for="featureReminders" class="font-medium"
+											>{m.feature_label_reminders()}</Form.Label
+										>
 										<Form.Description class="text-xs">
-											Set and receive reminders for important vehicle events
+											{m.feature_desc_reminders()}
 										</Form.Description>
 									</div>
 								{/snippet}
@@ -487,9 +494,11 @@
 										id="featureInsurance"
 									/>
 									<div class="flex flex-col gap-1">
-										<Form.Label for="featureInsurance" class="font-medium">Insurance</Form.Label>
+										<Form.Label for="featureInsurance" class="font-medium"
+											>{m.feature_label_insurance()}</Form.Label
+										>
 										<Form.Description class="text-xs">
-											Manage vehicle insurance details and renewals
+											{m.feature_desc_insurance()}
 										</Form.Description>
 									</div>
 								{/snippet}
@@ -506,9 +515,11 @@
 										id="featureOverview"
 									/>
 									<div class="flex flex-col gap-1">
-										<Form.Label for="featureOverview" class="font-medium">Overview</Form.Label>
+										<Form.Label for="featureOverview" class="font-medium"
+											>{m.feature_label_overview()}</Form.Label
+										>
 										<Form.Description class="text-xs">
-											Display overview dashboard with key vehicle metrics
+											{m.feature_desc_overview()}
 										</Form.Description>
 									</div>
 								{/snippet}
