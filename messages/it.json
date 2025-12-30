@@ -423,7 +423,7 @@
 	"recurrence_type_weekly": "Settimanale",  
 	"recurrence_type_monthly": "Mensile",  
 	"recurrence_type_yearly": "Annuale",  
-	"recurrence_every": "ogni"
+	"recurrence_every": "ogni",
   "recurrence_renew_every": "Rinnova ogni",  
 	"recurrence_interval_days": "giorni",  
 	"recurrence_interval_weeks": "settimane",  
