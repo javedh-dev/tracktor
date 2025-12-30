@@ -512,17 +512,19 @@
 				<Button variant="outline" onclick={() => (step = 2)} class="cursor-pointer" size="icon-sm">
 					<ChevronLeft class="h-4 w-4" />
 				</Button>
-				<Button
-					onclick={handleImport}
-					disabled={!canImport || hasDateErrors}
-					class="cursor-pointer"
-					size="sm"
-				>
+				<div class="flex items-center gap-2">
 					{#if processing === 'importing'}
-						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						<Loader2 class="text-muted-foreground mr-2 inline-block h-4 w-4 animate-spin" />
 					{/if}
-					Import
-				</Button>
+					<Button
+						onclick={handleImport}
+						disabled={!canImport || hasDateErrors || processing === 'importing'}
+						class="cursor-pointer"
+						size="sm"
+					>
+						Import
+					</Button>
+				</div>
 			</div>
 		</section>
 	{/if}
