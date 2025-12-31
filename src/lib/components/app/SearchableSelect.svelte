@@ -6,6 +6,7 @@
 	import * as Popover from '$ui/popover/index.js';
 	import { Button } from '$ui/button/index.js';
 	import { cn } from '$lib/utils.js';
+	import * as m from '$lib/paraglide/messages';
 
 	let {
 		options,
@@ -48,7 +49,7 @@
 			>
 				<div class="flex items-center gap-2 overflow-hidden font-normal">
 					<Icon class="h-5 w-5 opacity-50" />
-					<span class="">{selectedValue || value || `Select ${name}...`}</span>
+					<span class="">{selectedValue || value || m.common_select_placeholder({ name })}</span>
 				</div>
 
 				<ChevronsUpDownIcon class="ml-2 size-4 shrink-0 opacity-50" />
@@ -57,9 +58,12 @@
 	</Popover.Trigger>
 	<Popover.Content id="searchable-select-content" class="min-w-xs p-0">
 		<Command.Root>
-			<Command.Input id="searchable-select-input" placeholder={`Search ${name}`} />
+			<Command.Input
+				id="searchable-select-input"
+				placeholder={m.common_search_placeholder({ name })}
+			/>
 			<Command.List id="searchable-select-list">
-				<Command.Empty>No match found.</Command.Empty>
+				<Command.Empty>{m.common_no_match_found()}</Command.Empty>
 				<Command.Group>
 					{#each options as option}
 						<Command.Item

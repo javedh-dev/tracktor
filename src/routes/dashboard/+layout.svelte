@@ -107,7 +107,7 @@
 					variant="default"
 					size="default"
 					class="border-primary text-primary hover:text-accent hover:bg-primary cursor-pointer border bg-transparent"
-					onclick={() => sheetStore.openSheet(VehicleForm, 'Add Vehicle')}
+					onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
 				>
 					<LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
 				</Button>

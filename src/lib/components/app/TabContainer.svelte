@@ -3,6 +3,7 @@
 	import Import from '@lucide/svelte/icons/import';
 	import Button from '$ui/button/button.svelte';
 	import LabelWithIcon from './LabelWithIcon.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const {
 		title,
@@ -46,7 +47,7 @@
 					class="cursor-pointer"
 					onclick={addAction}
 				>
-					<LabelWithIcon icon={CirclePlus} label="Add New" />
+					<LabelWithIcon icon={CirclePlus} label={m.common_add_new()} />
 				</Button>
 			{/if}
 		</div>

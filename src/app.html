@@ -1,10 +1,20 @@
 <!doctype html>
-<html lang="%paraglide.lang%" dir="auto">
+<html lang="%paraglide.lang%" dir="%paraglide.lang%" data-lang="%paraglide.lang%">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
 		<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			// Set correct dir attribute based on language for RTL support
+			const lang = document.documentElement.getAttribute('lang');
+			const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+			if (lang && rtlLanguages.includes(lang)) {
+				document.documentElement.setAttribute('dir', 'rtl');
+			} else {
+				document.documentElement.setAttribute('dir', 'ltr');
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

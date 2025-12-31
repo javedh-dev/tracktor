@@ -39,7 +39,7 @@
 				label="Tracktor"
 			/>
 		</a>
-		<div id="header-actions" class="ml-auto flex items-center gap-2">
+		<div id="header-actions" class="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
 			<div class="header-toolbar flex items-center gap-2">
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}

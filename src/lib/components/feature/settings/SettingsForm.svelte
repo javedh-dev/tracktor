@@ -127,6 +127,7 @@
 
 	const localeLabels: Record<string, string> = {
 		en: 'English',
+		ar: 'العربية',
 		hi: 'हिंदी',
 		es: 'Español',
 		fr: 'Français',

@@ -25,6 +25,7 @@
 	import * as Select from '$ui/select';
 	import Badge from '$ui/badge/badge.svelte';
 	import Input from '$appui/input.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -148,12 +149,12 @@
 <div id="app-table-container">
 	{#if !data || data.length === 0}
 		<div class="flex h-24 flex-col items-center justify-center">
-			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={`No data avaialble`} />
+			<LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={m.common_no_data_available()} />
 		</div>
 	{:else}
 		<div class="mb-4 flex flex-row items-center justify-between gap-2">
 			<Input
-				placeholder="Search"
+				placeholder={m.common_search()}
 				value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
 				oninput={(e) => table.getColumn('notes')?.setFilterValue(e.currentTarget.value)}
 				onchange={(e) => {
@@ -167,7 +168,7 @@
 					{#snippet child({ props })}
 						<Button variant="outline" size="sm" {...props}>
 							<Columns3 />
-							<span class="inline">Columns</span>
+							<span class="inline">{m.common_columns()}</span>
 							<ChevronDownIcon />
 						</Button>
 					{/snippet}
@@ -176,12 +177,28 @@
 					{#each table
 						.getAllColumns()
 						.filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
+						{@const headerContent = column.columnDef.header}
+						{@const displayName =
+							typeof headerContent === 'function'
+								? (() => {
+										try {
+											const result = headerContent({} as any);
+											// Try to extract label from rendered component
+											if (result && typeof result === 'object' && 'props' in result) {
+												return result.props?.label || column.id;
+											}
+											return column.id;
+										} catch {
+											return column.id;
+										}
+									})()
+								: column.id}
 						<DropdownMenu.CheckboxItem
 							class="capitalize"
 							checked={column.getIsVisible()}
 							onCheckedChange={(value) => column.toggleVisibility(!!value)}
 						>
-							{column.id}
+							{displayName}
 						</DropdownMenu.CheckboxItem>
 					{/each}
 				</DropdownMenu.Content>
@@ -221,7 +238,7 @@
 									icon={CircleSlash2}
 									iconClass="h-4 w-4"
 									style="justify-center"
-									label={`No data avaialble`}
+									label={m.common_no_data_available()}
 								/>
 							</Table.Cell>
 						</Table.Row>
@@ -268,7 +285,7 @@
 				</Button>
 			</div>
 			<div class="flex flex-row items-center gap-4 text-sm">
-				Rows per page
+				{m.common_rows_per_page()}
 				<Select.Root type="single" bind:value={pageSize}>
 					<Select.Trigger size="sm">{pageSize}</Select.Trigger>
 					<Select.Content>
