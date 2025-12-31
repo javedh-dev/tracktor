@@ -36,7 +36,7 @@
 				iconClass="h-8 w-8"
 				style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
 				id="header-logo"
-				label="Tracktor"
+				label={m.app_name()}
 			/>
 		</a>
 		<div id="header-actions" class="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
