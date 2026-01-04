@@ -9,5 +9,6 @@
 	},
 	"baseLocale": "en",
 	"locales": ["en", "ar", "hi", "es", "fr", "de", "it"],
-	"sourceLanguageTag": "en"
+	"sourceLanguageTag": "en",
+	"languageTags": ["en", "ar", "hi", "es", "fr", "de", "it"]
 }
