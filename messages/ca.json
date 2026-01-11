@@ -170,7 +170,7 @@
 	"form_date": "Data",
 	"form_date_desc": "Data del repostatge",
 	"form_odometer": "Comptaquilòmetres",
-	"form_odometer_desc": "Lectura actual de l'comptaquilòmetres",
+	"form_odometer_desc": "Lectura actual del comptaquilòmetres",
 	"form_volume_fuel": "Volum de combustible",
 	"form_volume_energy": "Energia consumida",
 	"form_cost": "Cost",
