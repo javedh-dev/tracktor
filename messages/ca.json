@@ -87,7 +87,7 @@
 	"vehicle_form_fuel_type_desc": "Tipus de combustible del vehicle",
 	"vehicle_form_fuel_type_placeholder": "Selecciona el tipus de combustible",
 	"vehicle_form_odometer_label": "Comptaquilòmetres",
-	"vehicle_form_odometer_desc": "Lectura actual de l'comptaquilòmetres",
+	"vehicle_form_odometer_desc": "Lectura actual del comptaquilòmetres",
 	"vehicle_form_license_label": "Matrícula",
 	"vehicle_form_license_desc": "Número de registre del vehicle",
 	"vehicle_form_vin_label": "VIN",
