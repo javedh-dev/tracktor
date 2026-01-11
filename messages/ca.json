@@ -234,7 +234,7 @@
 	"maintenance_form_date_label": "Data",
 	"maintenance_form_date_desc": "Data del manteniment",
 	"maintenance_form_odometer_label": "Comptaquilòmetres",
-	"maintenance_form_odometer_desc": "Lectura actual de l'comptaquilòmetres",
+	"maintenance_form_odometer_desc": "Lectura actual del comptaquilòmetres",
 	"maintenance_form_service_center_label": "Centre de servei",
 	"maintenance_form_service_center_desc": "Nom del centre de servei",
 	"maintenance_form_cost_label": "Cost",
