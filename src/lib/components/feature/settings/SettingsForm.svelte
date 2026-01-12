@@ -132,7 +132,8 @@
 		es: 'Español',
 		fr: 'Français',
 		de: 'Deutsch',
-		it: 'Italiano'
+		it: 'Italiano',
+		hu: 'Magyar',
 	};
 	const localeOptions = locales.map((code) => ({
 		value: code,
