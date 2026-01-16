@@ -107,7 +107,7 @@
 			}
 		}
 	});
-	const { form: formData, enhance, errors, allErrors } = form;
+	const { form: formData, enhance, errors } = form;
 
 	// Map fields to their respective tabs
 	const fieldToTab: Record<string, string> = {
@@ -163,7 +163,7 @@
 		fr: 'Français',
 		de: 'Deutsch',
 		it: 'Italiano',
-		hu: 'Magyar',
+		hu: 'Magyar'
 	};
 	const localeOptions = locales.map((code) => ({
 		value: code,
