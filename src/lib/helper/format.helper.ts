@@ -3,6 +3,7 @@ import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { es, fr, de, hi } from 'date-fns/locale';
+import { CANONICAL_TIMEZONES } from '$lib/constants/timezones';
 
 const getDateFnsLocale = () => {
 	switch (configs.locale) {
@@ -62,27 +63,34 @@ const parseWithFormat = (dateStr: string, fmt: string): Date | null => {
 };
 
 const getTimezoneOptions = (): { value: string; label: string; offset: number }[] => {
-	if (typeof Intl.supportedValuesOf === 'function') {
-		return Intl.supportedValuesOf('timeZone')
-			.map((zone) => {
-				const offset = formatInTimeZone(new Date(), zone, 'xxx');
-				return {
-					value: zone,
-					label: `[${offset}] ${zone}`,
-					offset: Number(offset.replace(':', ''))
-				};
-			})
-			.sort((a, b) => a.offset - b.offset);
-	} else {
-		return [];
-	}
+	// Use a fixed reference date (Jan 1, 2024 UTC) to ensure consistent timezone offsets
+	// across all platforms and avoid DST variations
+	const referenceDate = new Date('2024-01-01T12:00:00Z');
+
+	// Use canonical timezone list instead of Intl.supportedValuesOf to ensure
+	// consistency across all operating systems and Node.js versions
+	return CANONICAL_TIMEZONES.map((zone) => {
+		try {
+			const offset = formatInTimeZone(referenceDate, zone, 'xxx');
+			return {
+				value: zone,
+				label: `[${offset}] ${zone}`,
+				offset: Number(offset.replace(':', ''))
+			};
+		} catch (e) {
+			// Fallback for any timezone that might not be supported
+			return {
+				value: zone,
+				label: zone,
+				offset: 0
+			};
+		}
+	}).sort((a, b) => a.offset - b.offset);
 };
 
 const isValidTimezone = (tz: string) => {
-	if (typeof Intl.supportedValuesOf === 'function') {
-		return Intl.supportedValuesOf('timeZone').includes(tz);
-	}
-	return true;
+	// Check against canonical timezone list for consistency across all platforms
+	return CANONICAL_TIMEZONES.includes(tz as any);
 };
 
 const getCurrencySymbol = (currency?: string): string => {
