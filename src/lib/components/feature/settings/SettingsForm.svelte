@@ -37,6 +37,7 @@
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
+	let activeTab = $state('personalization');
 
 	$effect(() => {
 		localConfig = JSON.parse(JSON.stringify(configStore.rawConfig));
@@ -106,7 +107,36 @@
 			}
 		}
 	});
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, errors, allErrors } = form;
+
+	// Map fields to their respective tabs
+	const fieldToTab: Record<string, string> = {
+		dateFormat: 'personalization',
+		locale: 'personalization',
+		unitOfDistance: 'personalization',
+		unitOfVolume: 'personalization',
+		timezone: 'personalization',
+		currency: 'personalization',
+		theme: 'interface',
+		customCss: 'interface',
+		featureFuelLog: 'features',
+		featureMaintenance: 'features',
+		featurePucc: 'features',
+		featureReminders: 'features',
+		featureInsurance: 'features',
+		featureOverview: 'features'
+	};
+
+	// Navigate to the first tab with errors
+	$effect(() => {
+		const errorFields = Object.keys($errors);
+		if (errorFields.length > 0) {
+			const firstErrorField = errorFields[0];
+			if (firstErrorField && fieldToTab[firstErrorField]) {
+				activeTab = fieldToTab[firstErrorField];
+			}
+		}
+	});
 
 	const currencyOptions = currencies.map((currency) => {
 		return {
@@ -161,7 +191,7 @@
 
 <form id="settings-form" use:enhance onsubmit={(e) => e.preventDefault()}>
 	<div class="space-y-6">
-		<Tabs.Root value="personalization" class="flex w-full flex-col gap-4">
+		<Tabs.Root bind:value={activeTab} class="flex w-full flex-col gap-4">
 			<Tabs.List class="grid w-full grid-cols-3">
 				<Tabs.Trigger value="personalization">{m.settings_tab_personalization()}</Tabs.Trigger>
 				<Tabs.Trigger value="interface">{m.settings_tab_interface()}</Tabs.Trigger>
