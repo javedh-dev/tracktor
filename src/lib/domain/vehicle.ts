@@ -49,7 +49,7 @@ export const vehicleSchema = z.object({
 		.max(50, 'It must be less than 50 characters.'),
 	year: z
 		.number()
-		.min(1970, 'It must be after 1970')
+		.min(1900, 'It must be after 1900')
 		.max(2100, 'It must be before current year.')
 		.default(2025),
 	licensePlate: z
