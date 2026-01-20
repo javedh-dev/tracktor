@@ -70,9 +70,7 @@ export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
 	const result = await db
 		.selectDistinct({ make: schema.vehicleTable.make })
 		.from(schema.vehicleTable)
-		.where(
-			sql`${schema.vehicleTable.make} IS NOT NULL AND ${schema.vehicleTable.make} != ''`
-		)
+		.where(sql`${schema.vehicleTable.make} IS NOT NULL AND ${schema.vehicleTable.make} != ''`)
 		.orderBy(schema.vehicleTable.make);
 
 	const values = result.map((r) => r.make).filter(Boolean);
@@ -86,22 +84,12 @@ export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
 /**
  * Get unique vehicle models (optionally filtered by make)
  */
-export const getUniqueVehicleModels = async (make?: string): Promise<ApiResponse> => {
-	let query = db
+export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
+	const result = await db
 		.selectDistinct({ model: schema.vehicleTable.model })
-		.from(schema.vehicleTable);
-
-	if (make) {
-		query = query.where(
-			sql`${schema.vehicleTable.make} = ${make} AND ${schema.vehicleTable.model} IS NOT NULL AND ${schema.vehicleTable.model} != ''`
-		);
-	} else {
-		query = query.where(
-			sql`${schema.vehicleTable.model} IS NOT NULL AND ${schema.vehicleTable.model} != ''`
-		);
-	}
-
-	const result = await query.orderBy(schema.vehicleTable.model);
+		.from(schema.vehicleTable)
+		.where(sql`${schema.vehicleTable.model} IS NOT NULL AND ${schema.vehicleTable.model} != ''`)
+		.orderBy(schema.vehicleTable.model);
 
 	const values = result.map((r) => r.model).filter(Boolean);
 

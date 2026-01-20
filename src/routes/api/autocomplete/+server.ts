@@ -31,13 +31,11 @@ export const GET: RequestHandler = async (event) => {
 				break;
 
 			case 'vehicleModel':
-				const make = event.url.searchParams.get('make');
-				result = await autocompleteService.getUniqueVehicleModels(make || undefined);
+				result = await autocompleteService.getUniqueVehicleModels();
 				break;
 
-
-		default:
-			throw error(400, `Unsupported field: ${field}`);
+			default:
+				throw error(400, `Unsupported field: ${field}`);
 		}
 
 		return json(result);

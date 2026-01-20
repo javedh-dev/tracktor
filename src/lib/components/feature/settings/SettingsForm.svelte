@@ -36,7 +36,6 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
-	import Settings from '@lucide/svelte/icons/settings';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
