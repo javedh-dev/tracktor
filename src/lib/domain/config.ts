@@ -11,6 +11,7 @@ export interface Configs {
 	unitOfVolume: string;
 	unitOfLpg: string;
 	unitOfCng: string;
+	mileageUnitFormat: string;
 	locale: string;
 	timezone: string;
 	customCss?: string;

@@ -11,6 +11,7 @@ class ConfigStore {
 		unitOfVolume: 'liter',
 		unitOfLpg: 'liter',
 		unitOfCng: 'kilogram',
+		mileageUnitFormat: 'distance-per-fuel',
 		locale: 'en',
 		timezone: 'UTC',
 		featureFuelLog: true,
@@ -65,6 +66,9 @@ class ConfigStore {
 							break;
 						case 'unitOfDistance':
 							this.configs.unitOfDistance = item.value || this.configs.unitOfDistance;
+							break;
+						case 'mileageUnitFormat':
+							this.configs.mileageUnitFormat = item.value || this.configs.mileageUnitFormat;
 							break;
 						case 'locale':
 							this.configs.locale = item.value || this.configs.locale;

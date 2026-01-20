@@ -27,6 +27,12 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any): Promise<A
 };
 
 export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
+	// Fetch mileage unit format config
+	const mileageFormatConfig = await db.query.configTable.findFirst({
+		where: (config, { eq }) => eq(config.key, 'mileageUnitFormat')
+	});
+	const mileageFormat = mileageFormatConfig?.value || 'distance-per-fuel';
+
 	const fuelLogs = await db.query.fuelLogTable.findMany({
 		where: (log, { eq }) => eq(log.vehicleId, vehicleId),
 		orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
@@ -71,7 +77,16 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 			return { ...log, mileage: null };
 		}
 
-		const mileage = distance / totalFuel;
+		// Calculate mileage based on format
+		let mileage: number;
+		if (mileageFormat === 'fuel-per-distance') {
+			// Fuel per 100 distance units (e.g., L/100km, gal/100mi)
+			mileage = (totalFuel / distance) * 100;
+		} else {
+			// Distance per fuel unit (e.g., km/L, mpg) - default
+			mileage = distance / totalFuel;
+		}
+
 		return { ...log, mileage: parseFloat(mileage.toFixed(2)) };
 	});
 	return {

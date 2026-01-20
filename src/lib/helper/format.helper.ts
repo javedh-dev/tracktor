@@ -193,11 +193,18 @@ const getMileageUnit = (vehicleType: string): string => {
 		return 'km/kWh';
 	}
 	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const distanceUnit = safeUnitLabel(configs.unitOfDistance);
+	const fuelLabel = safeUnitLabel(fuelUnit);
+
+	// Support both distance/fuel and fuel/distance formats
+	if (configs.mileageUnitFormat === 'fuel-per-distance') {
+		return `${fuelLabel}/100${distanceUnit}`;
+	}
+
+	// Default: distance-per-fuel (e.g., km/L, mpg)
 	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
 	const label = safeUnitLabel(mileageUnit);
-	return label === mileageUnit
-		? `${safeUnitLabel(configs.unitOfDistance)}/${safeUnitLabel(fuelUnit)}`
-		: label;
+	return label === mileageUnit ? `${distanceUnit}/${fuelLabel}` : label;
 };
 
 const formatMileage = (mileage: number, vehicleType: string): string => {
@@ -205,10 +212,19 @@ const formatMileage = (mileage: number, vehicleType: string): string => {
 		return `${mileage.toFixed(3)} km/kWh`;
 	}
 	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const distanceUnit = safeUnitLabel(configs.unitOfDistance);
+	const fuelLabel = safeUnitLabel(fuelUnit);
+
+	// Support both distance/fuel and fuel/distance formats
+	if (configs.mileageUnitFormat === 'fuel-per-distance') {
+		// For fuel/distance format (e.g., L/100km), display as fuel per 100 distance units
+		return `${mileage.toFixed(2)} ${fuelLabel}/100${distanceUnit}`;
+	}
+
+	// Default: distance-per-fuel (e.g., km/L, mpg)
 	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
 	return (
-		safeUnitFormat(mileage, mileageUnit) ||
-		`${mileage.toFixed(2)} ${safeUnitLabel(configs.unitOfDistance)}/${safeUnitLabel(fuelUnit)}`
+		safeUnitFormat(mileage, mileageUnit) || `${mileage.toFixed(2)} ${distanceUnit}/${fuelLabel}`
 	);
 };
 

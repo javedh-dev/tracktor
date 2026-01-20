@@ -18,6 +18,7 @@
 	import Languages from '@lucide/svelte/icons/languages';
 	import Palette from '@lucide/svelte/icons/palette';
 	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
+	import Rabbit from '@lucide/svelte/icons/rabbit';
 	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, defaults } from 'sveltekit-superforms';
@@ -60,6 +61,9 @@
 		unitOfVolume: z.enum(['liter', 'gallon']),
 		unitOfLpg: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('liter'),
 		unitOfCng: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('kilogram'),
+		mileageUnitFormat: z
+			.enum(['distance-per-fuel', 'fuel-per-distance'])
+			.default('distance-per-fuel'),
 		theme: z.string().default('light'),
 		customCss: z.string().optional(),
 		featureFuelLog: z.boolean().default(true),
@@ -129,6 +133,7 @@
 		unitOfVolume: 'units',
 		unitOfLpg: 'units',
 		unitOfCng: 'units',
+		mileageUnitFormat: 'units',
 		timezone: 'personalization',
 		currency: 'personalization',
 		theme: 'personalization',
@@ -176,6 +181,11 @@
 		{ value: 'pound', label: 'Pound (lb)' }
 	];
 
+	const mileageUnitFormatOptions = [
+		{ value: 'distance-per-fuel', label: m.settings_mileage_format_distance_per_fuel() },
+		{ value: 'fuel-per-distance', label: m.settings_mileage_format_fuel_per_distance() }
+	];
+
 	const localeLabels: Record<string, string> = {
 		en: 'English',
 		ar: 'العربية',
@@ -203,11 +213,13 @@
 				}
 			});
 			const fallbackConfigs = configStore.configs as unknown as Record<string, unknown>;
-			['unitOfLpg', 'unitOfCng', 'unitOfVolume', 'unitOfDistance'].forEach((key) => {
-				if (configData[key] === undefined) {
-					configData[key] = fallbackConfigs[key] as string;
+			['unitOfLpg', 'unitOfCng', 'unitOfVolume', 'unitOfDistance', 'mileageUnitFormat'].forEach(
+				(key) => {
+					if (configData[key] === undefined) {
+						configData[key] = fallbackConfigs[key] as string;
+					}
 				}
-			});
+			);
 			// Add current theme to form data
 			configData.theme = themeStore.theme;
 			formData.set(configData);
@@ -402,6 +414,34 @@
 													</Select.Trigger>
 													<Select.Content>
 														{#each uodOptions as option}
+															<Select.Item value={option.value}>
+																{option.label}
+															</Select.Item>
+														{/each}
+													</Select.Content>
+												</Select.Root>
+											{/snippet}
+										</Form.Control>
+										<Form.FieldErrors />
+									</Form.Field>
+									<!-- Mileage Unit Format -->
+									<Form.Field {form} name="mileageUnitFormat" class="w-full">
+										<Form.Control>
+											{#snippet children({ props })}
+												<FormLabel description={m.settings_desc_mileage_format()}
+													>{m.settings_label_mileage_format()}</FormLabel
+												>
+												<Select.Root bind:value={$formData.mileageUnitFormat} type="single">
+													<Select.Trigger {...props} class="w-full">
+														<div class="flex items-center justify-start">
+															<Rabbit class="mr-2 h-4 w-4" />
+															{mileageUnitFormatOptions.find(
+																(opt) => opt.value === $formData.mileageUnitFormat
+															)?.label || m.settings_select_unit_system()}
+														</div>
+													</Select.Trigger>
+													<Select.Content>
+														{#each mileageUnitFormatOptions as option}
 															<Select.Item value={option.value}>
 																{option.label}
 															</Select.Item>
