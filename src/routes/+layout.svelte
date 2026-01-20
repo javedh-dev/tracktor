@@ -14,7 +14,6 @@
 	import { configStore } from '$lib/stores/config.svelte';
 	import { themeStore } from '$lib/stores/theme.svelte';
 	import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
-	import SettingsModal from '$lib/components/feature/settings/SettingsModal.svelte';
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
@@ -123,7 +122,6 @@
 {:else}
 	<div id="app-container" class="flex min-h-svh w-full flex-col">
 		<Header />{@render children()}
-		<SettingsModal />
 	</div>
 {/if}
 <div style="display:none">

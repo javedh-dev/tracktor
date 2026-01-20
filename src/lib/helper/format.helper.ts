@@ -116,70 +116,100 @@ const formatCurrency = (amount: number): string => {
 	}).format(amount);
 };
 
+const UNIT_LABEL_FALLBACKS: Record<string, string> = {
+	liter: 'L',
+	gallon: 'gal',
+	kilogram: 'kg',
+	pound: 'lb',
+	kilometer: 'km',
+	mile: 'mi'
+};
+
+const safeUnitLabel = (unit: string): string => {
+	try {
+		return (
+			new Intl.NumberFormat(configs.locale, {
+				style: 'unit',
+				unit
+			})
+				.formatToParts(0)
+				.find((part) => part.type === 'unit')?.value ||
+			UNIT_LABEL_FALLBACKS[unit] ||
+			unit
+		);
+	} catch (_) {
+		return UNIT_LABEL_FALLBACKS[unit] || unit;
+	}
+};
+
+const safeUnitFormat = (value: number, unit: string): string | null => {
+	try {
+		return new Intl.NumberFormat(configs.locale, { style: 'unit', unit }).format(value);
+	} catch (_) {
+		return null;
+	}
+};
+
+const getFuelVolumeUnit = (fuelType: string): string => {
+	switch (fuelType) {
+		case 'lpg':
+			return configs.unitOfLpg || configs.unitOfVolume;
+		case 'cng':
+			return configs.unitOfCng || configs.unitOfVolume;
+		default:
+			return configs.unitOfVolume;
+	}
+};
+
 const getDistanceUnit = (): string => {
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: configs.unitOfDistance
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	return safeUnitLabel(configs.unitOfDistance);
 };
 
 const formatDistance = (distance: number): string => {
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: configs.unitOfDistance
-	}).format(distance);
+	return (
+		safeUnitFormat(distance, configs.unitOfDistance) ||
+		`${distance} ${safeUnitLabel(configs.unitOfDistance)}`
+	);
 };
 
 const getFuelUnit = (vehicleType: string): string => {
 	if (vehicleType === 'electric') {
 		return 'kWh';
 	}
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: configs.unitOfVolume
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	return safeUnitLabel(getFuelVolumeUnit(vehicleType));
 };
 
 const formatFuel = (amount: number, vehicleType: string): string => {
 	if (vehicleType === 'electric') {
 		return `${amount.toFixed(3)} kWh`;
 	}
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: configs.unitOfVolume
-	}).format(amount);
+
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	return safeUnitFormat(amount, fuelUnit) || `${amount.toFixed(2)} ${safeUnitLabel(fuelUnit)}`;
 };
 
 const getMileageUnit = (vehicleType: string): string => {
 	if (vehicleType === 'electric') {
 		return 'km/kWh';
 	}
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
+	const label = safeUnitLabel(mileageUnit);
+	return label === mileageUnit
+		? `${safeUnitLabel(configs.unitOfDistance)}/${safeUnitLabel(fuelUnit)}`
+		: label;
 };
 
 const formatMileage = (mileage: number, vehicleType: string): string => {
 	if (vehicleType === 'electric') {
 		return `${mileage.toFixed(3)} km/kWh`;
 	}
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
-	}).format(mileage);
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
+	return (
+		safeUnitFormat(mileage, mileageUnit) ||
+		`${mileage.toFixed(2)} ${safeUnitLabel(configs.unitOfDistance)}/${safeUnitLabel(fuelUnit)}`
+	);
 };
 
 const roundNumber = (num: number, decimal: number = 2): number => {

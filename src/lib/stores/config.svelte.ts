@@ -9,6 +9,8 @@ class ConfigStore {
 		currency: 'USD',
 		unitOfDistance: 'kilometer',
 		unitOfVolume: 'liter',
+		unitOfLpg: 'liter',
+		unitOfCng: 'kilogram',
 		locale: 'en',
 		timezone: 'UTC',
 		featureFuelLog: true,
@@ -54,6 +56,12 @@ class ConfigStore {
 							break;
 						case 'unitOfVolume':
 							this.configs.unitOfVolume = item.value || this.configs.unitOfVolume;
+							break;
+						case 'unitOfLpg':
+							this.configs.unitOfLpg = item.value || this.configs.unitOfLpg;
+							break;
+						case 'unitOfCng':
+							this.configs.unitOfCng = item.value || this.configs.unitOfCng;
 							break;
 						case 'unitOfDistance':
 							this.configs.unitOfDistance = item.value || this.configs.unitOfDistance;

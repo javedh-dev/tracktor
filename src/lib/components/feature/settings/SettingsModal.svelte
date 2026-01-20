@@ -14,6 +14,7 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Currency from '@lucide/svelte/icons/currency';
 	import Earth from '@lucide/svelte/icons/earth';
+	import Fuel from '@lucide/svelte/icons/fuel';
 	import Languages from '@lucide/svelte/icons/languages';
 	import Palette from '@lucide/svelte/icons/palette';
 	import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
@@ -57,6 +58,8 @@
 		currency: z.string().min(1, 'Currency is required'),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
 		unitOfVolume: z.enum(['liter', 'gallon']),
+		unitOfLpg: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('liter'),
+		unitOfCng: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('kilogram'),
 		theme: z.string().default('light'),
 		customCss: z.string().optional(),
 		featureFuelLog: z.boolean().default(true),
@@ -80,17 +83,22 @@
 					themeStore.setTheme(f.data.theme as any);
 				}
 
-				const updatedConfig = localConfig.map((item) => {
-					if (item.key in f.data) {
-						const value = f.data[item.key as keyof typeof f.data];
-						// Skip theme as it's not in config table
-						if (item.key === 'theme') return item;
-						// Convert boolean values to strings for storage
-						const stringValue = typeof value === 'boolean' ? String(value) : value;
-						return { ...item, value: stringValue };
+				const configMap = new Map<string, Config>();
+				localConfig.forEach((item) => configMap.set(item.key, item));
+
+				Object.entries(f.data).forEach(([key, value]) => {
+					if (key === 'theme') return;
+					const stringValue =
+						typeof value === 'boolean' ? String(value) : ((value || '') as string);
+					const existing = configMap.get(key);
+					if (existing) {
+						configMap.set(key, { ...existing, value: stringValue });
+					} else {
+						configMap.set(key, { key, value: stringValue });
 					}
-					return item;
 				});
+
+				const updatedConfig = Array.from(configMap.values());
 
 				// Persist configuration before applying a locale change
 				await saveConfig(updatedConfig);
@@ -117,12 +125,14 @@
 	const fieldToTab: Record<string, string> = {
 		dateFormat: 'personalization',
 		locale: 'personalization',
-		unitOfDistance: 'personalization',
-		unitOfVolume: 'personalization',
+		unitOfDistance: 'units',
+		unitOfVolume: 'units',
+		unitOfLpg: 'units',
+		unitOfCng: 'units',
 		timezone: 'personalization',
 		currency: 'personalization',
-		theme: 'interface',
-		customCss: 'interface',
+		theme: 'personalization',
+		customCss: 'personalization',
 		featureFuelLog: 'features',
 		featureMaintenance: 'features',
 		featurePucc: 'features',
@@ -159,6 +169,13 @@
 		{ value: 'gallon', label: m.common_gallon() }
 	];
 
+	const gasUnitOptions = [
+		{ value: 'liter', label: m.common_litre() },
+		{ value: 'gallon', label: m.common_gallon() },
+		{ value: 'kilogram', label: 'Kilogram (kg)' },
+		{ value: 'pound', label: 'Pound (lb)' }
+	];
+
 	const localeLabels: Record<string, string> = {
 		en: 'English',
 		ar: 'العربية',
@@ -185,6 +202,12 @@
 					configData[item.key] = item.value || '';
 				}
 			});
+			const fallbackConfigs = configStore.configs as unknown as Record<string, unknown>;
+			['unitOfLpg', 'unitOfCng', 'unitOfVolume', 'unitOfDistance'].forEach((key) => {
+				if (configData[key] === undefined) {
+					configData[key] = fallbackConfigs[key] as string;
+				}
+			});
 			// Add current theme to form data
 			configData.theme = themeStore.theme;
 			formData.set(configData);
@@ -196,7 +219,7 @@
 	<Dialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon' })}
 		><Settings class="text-primary h-[1.2rem] w-[1.2rem]" /></Dialog.Trigger
 	>
-	<Dialog.Content showCloseButton={false} class="flex h-[70vh] w-full max-w-3xl flex-col p-0">
+	<Dialog.Content showCloseButton={false} class="flex h-[70vh] w-full max-w-xl flex-col p-0">
 		<!-- Modal Header -->
 		<div class="flex shrink-0 items-center justify-between border-b px-6 pt-4 pb-2">
 			<Dialog.Title class="text-primary text-xl">{m.settings_sheet_title()}</Dialog.Title>
@@ -211,10 +234,9 @@
 		<!-- Tabs on top, form below -->
 		<div class="flex min-h-0 flex-1 overflow-hidden">
 			<Tabs.Root bind:value={activeTab} class="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden">
-				<Tabs.List class="mx-4 grid w-auto grid-cols-4">
+				<Tabs.List class="mx-4 grid w-auto grid-cols-3">
 					<Tabs.Trigger value="personalization">{m.settings_tab_personalization()}</Tabs.Trigger>
 					<Tabs.Trigger value="units">{m.settings_tab_units()}</Tabs.Trigger>
-					<Tabs.Trigger value="interface">{m.settings_tab_interface()}</Tabs.Trigger>
 					<Tabs.Trigger value="features">{m.settings_tab_features()}</Tabs.Trigger>
 				</Tabs.List>
 
@@ -228,24 +250,34 @@
 						<div class="flex-1 space-y-4">
 							<Tabs.Content value="personalization" class="space-y-6">
 								<fieldset class="flex flex-col gap-4" disabled={processing}>
-									<!-- Date Format -->
-									<Form.Field {form} name="dateFormat" class="w-full">
+									<!-- Theme -->
+									<Form.Field {form} name="theme" class="w-full">
 										<Form.Control>
 											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_date_format()}
-													>{m.settings_label_date_format()}</FormLabel
+												<FormLabel description={m.settings_desc_theme()}
+													>{m.settings_label_theme()}</FormLabel
 												>
-												<Input
-													{...props}
-													bind:value={$formData.dateFormat}
-													icon={Calendar}
-													type="text"
-													class="mono"
-												/>
-												<Form.Description>
-													{m.common_example_prefix()}
-													{isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
-												</Form.Description>
+												<Select.Root bind:value={$formData.theme} type="single">
+													<Select.Trigger {...props} class="w-full">
+														<div class="flex items-center justify-start">
+															<Palette class="mr-2 h-4 w-4" />
+															{themes[$formData.theme]?.label || m.settings_select_theme()}
+														</div>
+													</Select.Trigger>
+													<Select.Content>
+														{#each Object.values(themes) as theme (theme.name)}
+															<Select.Item value={theme.name}>
+																<div class="flex items-center gap-2">
+																	<div
+																		class="border-foreground/20 h-3 w-3 rounded border"
+																		style="background-color: {theme.colors?.primary || '#000'}"
+																	></div>
+																	{theme.label}
+																</div>
+															</Select.Item>
+														{/each}
+													</Select.Content>
+												</Select.Root>
 											{/snippet}
 										</Form.Control>
 										<Form.FieldErrors />
@@ -309,6 +341,45 @@
 										</Form.Control>
 										<Form.FieldErrors />
 									</Form.Field>
+									<!-- Date Format -->
+									<Form.Field {form} name="dateFormat" class="w-full">
+										<Form.Control>
+											{#snippet children({ props })}
+												<FormLabel description={m.settings_desc_date_format()}
+													>{m.settings_label_date_format()}</FormLabel
+												>
+												<Input
+													{...props}
+													bind:value={$formData.dateFormat}
+													icon={Calendar}
+													type="text"
+													class="mono"
+												/>
+												<Form.Description>
+													{m.common_example_prefix()}
+													{isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
+												</Form.Description>
+											{/snippet}
+										</Form.Control>
+										<Form.FieldErrors />
+									</Form.Field>
+									<!-- Custom CSS -->
+									<Form.Field {form} name="customCss" class="w-full">
+										<Form.Control>
+											{#snippet children({ props })}
+												<FormLabel description={m.settings_desc_custom_css()}
+													>{m.settings_label_custom_css()}</FormLabel
+												>
+												<Textarea
+													{...props}
+													placeholder="Add your custom CSS here..."
+													class="mono h-40 resize-none"
+													bind:value={$formData.customCss}
+												/>
+											{/snippet}
+										</Form.Control>
+										<Form.FieldErrors />
+									</Form.Field>
 								</fieldset>
 							</Tabs.Content>
 
@@ -341,87 +412,93 @@
 										</Form.Control>
 										<Form.FieldErrors />
 									</Form.Field>
-									<!-- Unit of Volume -->
-									<Form.Field {form} name="unitOfVolume" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_unit_volume()}
-													>{m.settings_label_unit_volume()}</FormLabel
-												>
-												<Select.Root bind:value={$formData.unitOfVolume} type="single">
-													<Select.Trigger {...props} class="w-full">
-														<div class="flex items-center justify-start">
-															<Currency class="mr-2 h-4 w-4" />
-															{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)
-																?.label || m.settings_select_unit_system()}
-														</div>
-													</Select.Trigger>
-													<Select.Content>
-														{#each uovOptions as option}
-															<Select.Item value={option.value}>
-																{option.label}
-															</Select.Item>
-														{/each}
-													</Select.Content>
-												</Select.Root>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
-								</fieldset>
-							</Tabs.Content>
-
-							<Tabs.Content value="interface" class="space-y-6">
-								<fieldset class="flex flex-col gap-6" disabled={processing}>
-									<!-- Theme -->
-									<Form.Field {form} name="theme" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_theme()}
-													>{m.settings_label_theme()}</FormLabel
-												>
-												<Select.Root bind:value={$formData.theme} type="single">
-													<Select.Trigger {...props} class="w-full">
-														<div class="flex items-center justify-start">
-															<Palette class="mr-2 h-4 w-4" />
-															{themes[$formData.theme]?.label || m.settings_select_theme()}
-														</div>
-													</Select.Trigger>
-													<Select.Content>
-														{#each Object.values(themes) as theme (theme.name)}
-															<Select.Item value={theme.name}>
-																<div class="flex items-center gap-2">
-																	<div
-																		class="border-foreground/20 h-3 w-3 rounded border"
-																		style="background-color: {theme.colors?.primary || '#000'}"
-																	></div>
-																	{theme.label}
+									<div class="space-y-3">
+										<div class="space-y-1">
+											<p class="text-sm font-medium">Fuel types</p>
+											<p class="text-muted-foreground text-xs">
+												Choose the measurement for each fuel.
+											</p>
+										</div>
+										<div class="flex flex-col gap-4">
+											<!-- Petrol/Diesel -->
+											<Form.Field {form} name="unitOfVolume" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_unit_volume()}
+															>Petrol/Diesel</FormLabel
+														>
+														<Select.Root bind:value={$formData.unitOfVolume} type="single">
+															<Select.Trigger {...props} class="w-full">
+																<div class="flex items-center justify-start">
+																	<Currency class="mr-2 h-4 w-4" />
+																	{uovOptions.find((opt) => opt.value === $formData.unitOfVolume)
+																		?.label || m.settings_select_unit_system()}
 																</div>
-															</Select.Item>
-														{/each}
-													</Select.Content>
-												</Select.Root>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
-									<!-- Custom CSS -->
-									<Form.Field {form} name="customCss" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_custom_css()}
-													>{m.settings_label_custom_css()}</FormLabel
-												>
-												<Textarea
-													{...props}
-													placeholder="Add your custom CSS here..."
-													class="mono h-40 resize-none"
-													bind:value={$formData.customCss}
-												/>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
+															</Select.Trigger>
+															<Select.Content>
+																{#each uovOptions as option}
+																	<Select.Item value={option.value}>
+																		{option.label}
+																	</Select.Item>
+																{/each}
+															</Select.Content>
+														</Select.Root>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+											<!-- LPG -->
+											<Form.Field {form} name="unitOfLpg" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_unit_volume()}>LPG</FormLabel>
+														<Select.Root bind:value={$formData.unitOfLpg} type="single">
+															<Select.Trigger {...props} class="w-full">
+																<div class="flex items-center justify-start">
+																	<Fuel class="mr-2 h-4 w-4" />
+																	{gasUnitOptions.find((opt) => opt.value === $formData.unitOfLpg)
+																		?.label || m.settings_select_unit_system()}
+																</div>
+															</Select.Trigger>
+															<Select.Content>
+																{#each gasUnitOptions as option}
+																	<Select.Item value={option.value}>
+																		{option.label}
+																	</Select.Item>
+																{/each}
+															</Select.Content>
+														</Select.Root>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+											<!-- CNG -->
+											<Form.Field {form} name="unitOfCng" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_unit_volume()}>CNG</FormLabel>
+														<Select.Root bind:value={$formData.unitOfCng} type="single">
+															<Select.Trigger {...props} class="w-full">
+																<div class="flex items-center justify-start">
+																	<Fuel class="mr-2 h-4 w-4" />
+																	{gasUnitOptions.find((opt) => opt.value === $formData.unitOfCng)
+																		?.label || m.settings_select_unit_system()}
+																</div>
+															</Select.Trigger>
+															<Select.Content>
+																{#each gasUnitOptions as option}
+																	<Select.Item value={option.value}>
+																		{option.label}
+																	</Select.Item>
+																{/each}
+															</Select.Content>
+														</Select.Root>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+										</div>
+									</div>
 								</fieldset>
 							</Tabs.Content>
 

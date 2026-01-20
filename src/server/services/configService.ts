@@ -39,18 +39,20 @@ export const updateAppConfig = async (
 			if (!key || value === undefined) {
 				throw new AppError('Key and value are required for each configuration', Status.BAD_REQUEST);
 			}
-			const existingConfig = await getAppConfigByKey(key);
-			let updatedConfig;
+
+			const existingConfig = await db.query.configTable.findFirst({
+				where: (configTable, { eq }) => eq(configTable.key, key)
+			});
+
 			if (!existingConfig) {
-				updatedConfig = await db.insert(schema.configTable).values({ key, value }).returning();
-			} else {
-				updatedConfig = await db
-					.update(schema.configTable)
-					.set({ value: value })
-					.where(eq(schema.configTable.key, key))
-					.returning();
+				return db.insert(schema.configTable).values({ key, value }).returning();
 			}
-			return updatedConfig;
+
+			return db
+				.update(schema.configTable)
+				.set({ value })
+				.where(eq(schema.configTable.key, key))
+				.returning();
 		})
 	);
 	return {

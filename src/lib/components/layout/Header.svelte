@@ -15,7 +15,9 @@
 	import { env } from '$lib/config/env';
 	import Notifications from './Notifications.svelte';
 	import * as m from '$lib/paraglide/messages';
-	import SettingsModal from '../feature/settings/SettingsModal.svelte';
+	import SettingsForm from '../feature/settings/SettingsForm.svelte';
+	import Button from '../ui/button/button.svelte';
+	import Settings from '@lucide/svelte/icons/settings';
 </script>
 
 <header
@@ -42,7 +44,17 @@
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}
 					<Notifications />
-					<SettingsModal />
+					<Button
+						variant="ghost"
+						size="icon"
+						onclick={() => {
+							sheetStore.openSheet(SettingsForm, m.settings_sheet_title());
+						}}
+						aria-label="Open settings"
+						title="Settings"
+					>
+						<Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
+					</Button>
 					{#if !authStore.isAuthDisabled}
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger

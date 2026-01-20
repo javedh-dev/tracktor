@@ -9,6 +9,8 @@ export interface Configs {
 	currency: string;
 	unitOfDistance: string;
 	unitOfVolume: string;
+	unitOfLpg: string;
+	unitOfCng: string;
 	locale: string;
 	timezone: string;
 	customCss?: string;

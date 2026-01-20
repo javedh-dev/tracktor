@@ -9,7 +9,7 @@
 
 export const CANONICAL_TIMEZONES = [
 	// UTC
-	// 'UTC',
+	'UTC',
 
 	// Africa
 	'Africa/Abidjan',
