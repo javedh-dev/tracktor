@@ -1,0 +1,3 @@
+-- Update fuel type enum values to support Petrol, Diesel, Electric, LPG, CNG
+-- This migration updates the fuel_type column to support the new fuel types
+-- Note: Electric replaces EV designation, LPG and CNG are new additions

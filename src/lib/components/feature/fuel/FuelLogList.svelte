@@ -51,7 +51,7 @@
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
 	const volumeLabel = $derived(
-		selectedVehicle?.fuelType === 'ev' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
+		selectedVehicle?.fuelType === 'electric' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
 	);
 
 	const columns: ColumnDef<FuelLog>[] = [

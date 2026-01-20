@@ -57,7 +57,7 @@
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
 	const volumeLabel = $derived(
-		selectedVehicle?.fuelType === 'ev' ? form_volume_energy() : form_volume_fuel()
+		selectedVehicle?.fuelType === 'electric' ? form_volume_energy() : form_volume_fuel()
 	);
 
 	// For showing existing attachment when editing
@@ -140,7 +140,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev'
+						description={selectedVehicle?.fuelType === 'electric'
 							? form_volume_energy()
 							: form_volume_fuel()}
 						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</FormLabel
@@ -162,7 +162,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev'
+						description={selectedVehicle?.fuelType === 'electric'
 							? form_cost_desc_ev()
 							: form_cost_desc()}>{form_cost()}</FormLabel
 					>
@@ -180,11 +180,11 @@
 							<Checkbox {...props} bind:checked={$formData.filled} />
 							<FormLabel
 								class="font-normal"
-								description={selectedVehicle?.fuelType === 'ev'
+								description={selectedVehicle?.fuelType === 'electric'
 									? form_full_charge_desc()
 									: form_full_tank_desc()}
 							>
-								{selectedVehicle?.fuelType === 'ev' ? form_full_charge() : form_full_tank()}
+								{selectedVehicle?.fuelType === 'electric' ? form_full_charge() : form_full_tank()}
 							</FormLabel>
 						</div>
 					{/snippet}
