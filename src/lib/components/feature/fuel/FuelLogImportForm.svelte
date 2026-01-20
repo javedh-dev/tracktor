@@ -45,11 +45,11 @@
 
 	const columns: ColumnDefinition[] = [
 		{ key: 'date', label: 'Date', required: true, hint: 'Date of fuel refill' },
-		{ key: 'odometer', label: 'Odometer', required: true, hint: 'Reading at time of refill' },
+		{ key: 'odometer', label: 'Odometer', required: false, hint: 'Reading at time of refill' },
 		{
 			key: 'fuelAmount',
 			label: 'Fuel Amount',
-			required: true,
+			required: false,
 			hint: 'Volume or energy charged'
 		},
 		{ key: 'cost', label: 'Cost', required: true, hint: 'Total cost for the entry' },

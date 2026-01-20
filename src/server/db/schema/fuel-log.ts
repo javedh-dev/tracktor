@@ -13,8 +13,8 @@ export const fuelLogTable = table('fuel_logs', {
 		.notNull()
 		.references(() => vehicleTable.id, { onDelete: 'cascade' }),
 	date: t.text().notNull(),
-	odometer: t.integer().notNull(),
-	fuelAmount: t.real().notNull(),
+	odometer: t.integer(),
+	fuelAmount: t.real(),
 	cost: t.real().notNull(),
 	filled: t.integer({ mode: 'boolean' }).notNull(),
 	missedLast: t.integer({ mode: 'boolean' }).notNull(),

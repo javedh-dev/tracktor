@@ -211,12 +211,16 @@
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-	<div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+	<div class="flex flex-row justify-center">
+		{params.value !== null && params.value !== undefined ? formatDistance(params.value) : '-'}
+	</div>
 {/snippet}
 
 {#snippet fuelAmountCell(params: any)}
 	<div class="flex flex-row justify-center">
-		{formatFuel(params.amount, params.fuelType as string)}
+		{params.amount !== null && params.amount !== undefined
+			? formatFuel(params.amount, params.fuelType as string)
+			: '-'}
 	</div>
 {/snippet}
 

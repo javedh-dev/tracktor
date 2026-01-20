@@ -5,10 +5,10 @@ export interface FuelLog {
 	id: string | null;
 	vehicleId: string;
 	date: Date;
-	odometer: number;
+	odometer: number | null;
 	filled: boolean;
 	missedLast: boolean;
-	fuelAmount: number;
+	fuelAmount: number | null;
 	cost: number;
 	notes: string | null;
 	attachment: string | null;
@@ -26,10 +26,10 @@ export const fuelSchema = z.object({
 			return false;
 		}
 	}, 'Invalid date format'),
-	odometer: z.number().positive(),
+	odometer: z.number().positive().nullable(),
 	filled: z.boolean().default(true),
 	missedLast: z.boolean(),
-	fuelAmount: z.float32().positive(),
+	fuelAmount: z.number().positive().nullable(),
 	cost: z.float32().positive(),
 	notes: z.string().nullable(),
 	attachment: z.string().nullable()

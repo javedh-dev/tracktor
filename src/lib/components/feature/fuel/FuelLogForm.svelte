@@ -98,13 +98,31 @@
 			formData.set({
 				...data,
 				date: formatDate(data.date),
-				fuelAmount: roundNumber(data.fuelAmount),
-				cost: roundNumber(data.cost),
+				fuelAmount:
+					data.fuelAmount !== null && data.fuelAmount !== undefined
+						? roundNumber(data.fuelAmount)
+						: null,
+				cost: data.cost !== null && data.cost !== undefined ? roundNumber(data.cost) : null,
+				odometer: data.odometer,
 				attachment: null // Don't include attachment in form data, handle separately
 			});
 			// Reset attachment state when editing existing record
 			attachment = undefined;
 			removeExistingAttachment = false;
+		} else {
+			// Initialize form with empty/default values for new entry
+			formData.set({
+				id: null,
+				vehicleId: vehicleStore.selectedId || '',
+				date: formatDate(new Date()),
+				odometer: null,
+				filled: true,
+				missedLast: false,
+				fuelAmount: null,
+				cost: 0,
+				notes: null,
+				attachment: null
+			});
 		}
 		formData.update((fd) => {
 			return {
