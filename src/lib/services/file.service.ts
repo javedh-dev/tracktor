@@ -1,10 +1,11 @@
 import { HttpClient } from '$lib/helper/http.helper';
 import type { Response } from '$lib/domain';
 import type { ApiResponse } from '$lib/response';
+import { withBase } from '$lib/utils';
 
 // Create a separate HTTP client for file uploads with longer timeout
 const fileUploadClient = new HttpClient({
-	baseURL: `/api`,
+	baseURL: withBase('/api'),
 	headers: {
 		// Don't set Content-Type for FormData - let the browser set it with boundary
 	},

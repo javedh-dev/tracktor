@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$ui/separator';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -17,7 +18,9 @@
 	let { vehicle, open = $bindable(false) }: Props = $props();
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
+	const imageUrl = $derived(
+		vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
+	);
 	const fuelLabel = $derived(
 		vehicle.fuelType ? getFuelTypeLabel(vehicle.fuelType, m) : getFuelTypeLabel('petrol', m)
 	);

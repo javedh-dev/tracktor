@@ -1,4 +1,5 @@
 import type { ApiResponse } from '$lib/response';
+import { withBase } from '$lib/utils';
 
 /**
  * Fetch autocomplete suggestions for a given field
@@ -9,7 +10,7 @@ async function fetchAutocompleteSuggestions(
 ): Promise<string[]> {
 	try {
 		const searchParams = new URLSearchParams({ field, ...params });
-		const response = await fetch(`/api/autocomplete?${searchParams.toString()}`);
+		const response = await fetch(withBase(`/api/autocomplete?${searchParams.toString()}`));
 
 		if (!response.ok) {
 			console.error(`Failed to fetch autocomplete suggestions for ${field}`);

@@ -12,6 +12,9 @@ const config = {
 			precompress: process.env.NODE_ENV === 'production',
 			envPrefix: ''
 		}),
+		paths: {
+			base: process.env.BASE_URL || ''
+		},
 		csrf: {
 			trustedOrigins: ['*']
 		},

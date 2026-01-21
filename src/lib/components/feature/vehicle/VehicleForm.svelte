@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import { FileDropZone, AutocompleteInput } from '$lib/components/app';
 	import CustomFieldsEditor from '$lib/components/app/CustomFieldsEditor.svelte';
 	import {
@@ -38,7 +39,7 @@
 	let loadingModelSuggestions = $state(false);
 
 	// For showing existing image when editing
-	const existingImageUrl = $derived(data?.image ? `/api/files/${data.image}` : undefined);
+	const existingImageUrl = $derived(data?.image ? withBase(`/api/files/${data.image}`) : undefined);
 
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),

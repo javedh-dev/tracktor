@@ -1,8 +1,22 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { base } from '$app/paths';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
+}
+
+/**
+ * Construct a URL path with the application base URL
+ * Useful when making API calls or navigating to routes when the app is hosted under a sub-path
+ * When BASE_URL="/tracktor"
+ * withBase('/api/vehicles') -> returns "/tracktor/api/vehicles"
+ * withBase('/dashboard') -> returns "/tracktor/dashboard"
+ */
+export function withBase(path: string): string {
+	// Remove leading slash from path if base already has trailing slash
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+	return `${base}${normalizedPath}`;
 }
 
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, 'child'> : T;
@@ -26,8 +40,6 @@ export function isRtlLanguage(locale: string): boolean {
 
 /**
  * Get the text direction for a given language
- * @param locale - Language/locale code
- * @returns 'rtl' or 'ltr'
  */
 export function getTextDirection(locale: string): 'rtl' | 'ltr' {
 	return isRtlLanguage(locale) ? 'rtl' : 'ltr';

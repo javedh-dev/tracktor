@@ -207,6 +207,68 @@ pnpm run dev
 
 The development server runs on port 5173 with hot module reloading enabled.
 
+## Reverse Proxy Setup
+
+Tracktor can be served behind a reverse proxy under a sub-path. This is useful when hosting multiple applications on the same domain.
+
+### Configure Tracktor
+
+Set the `BASE_URL` environment variable to match your sub-path:
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    image: ghcr.io/javedh-dev/tracktor:latest
+    environment:
+      - BASE_URL=/tracktor # Must start with / and not end with /
+```
+
+Or in `.env` file:
+
+```bash
+BASE_URL=/tracktor
+```
+
+### Nginx Configuration Example
+
+```nginx
+location /tracktor/ {
+    proxy_pass http://localhost:3000/tracktor/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+}
+```
+
+### Traefik Configuration Example
+
+```yaml
+# docker-compose.yml with Traefik labels
+services:
+  app:
+    image: ghcr.io/javedh-dev/tracktor:latest
+    environment:
+      - BASE_URL=/tracktor
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.tracktor.rule=Host(`example.com`) && PathPrefix(`/tracktor`)'
+      - 'traefik.http.services.tracktor.loadbalancer.server.port=3000'
+      - 'traefik.http.middlewares.tracktor-stripprefix.stripprefix.prefixes=/tracktor'
+      - 'traefik.http.routers.tracktor.middlewares=tracktor-stripprefix'
+```
+
+**Important Notes:**
+
+- The `BASE_URL` must start with `/` and should not end with `/`
+- Ensure your reverse proxy passes through the sub-path correctly
+- Test thoroughly after configuration changes
+
 ## Configuration
 
 For environment variables and configuration options, refer to the [environment documentation](./environment.md).

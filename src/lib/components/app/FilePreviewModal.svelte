@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Download from '@lucide/svelte/icons/download';
@@ -16,7 +17,7 @@
 		fileName: string;
 	} = $props();
 
-	let fileUrl = $derived(`/api/files/${fileName}`);
+	let fileUrl = $derived(withBase(`/api/files/${fileName}`));
 	let previewUrl = $derived(`${fileUrl}?preview=true`);
 
 	let isPdf = $derived(fileName.toLowerCase().endsWith('.pdf'));

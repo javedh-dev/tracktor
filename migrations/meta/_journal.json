@@ -1,104 +1,104 @@
 {
-  "version": "7",
-  "dialect": "sqlite",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "6",
-      "when": 1757488864795,
-      "tag": "20250910072104_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1757489161441,
-      "tag": "20250910072601_seed-config-data",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1758216910072,
-      "tag": "20250918173510_update_configs",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1759001825089,
-      "tag": "20250927193705_add_vehicle_image",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1762077262288,
-      "tag": "20251102095422_make_lpn_nullable",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1762094213825,
-      "tag": "20251102143653_add_fuel_type_to_vehicles",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1765624933032,
-      "tag": "20251213112213_add_user_auth",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1765727115489,
-      "tag": "20251214154515_add_attachment_columns",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1765980000000,
-      "tag": "20251217120000_add_reminders_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1766139510883,
-      "tag": "20251219101830_adding-configs",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1766207631034,
-      "tag": "20251220051351_adding-custom-fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "6",
-      "when": 1766920569315,
-      "tag": "20251228111609_adding-recurring-end-dates",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "6",
-      "when": 1768935981586,
-      "tag": "20260120190621_make_odometer_and_volume_optional",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "6",
-      "when": 1768936100461,
-      "tag": "20260120190820_config_changes",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "sqlite",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "6",
+			"when": 1757488864795,
+			"tag": "20250910072104_init",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "6",
+			"when": 1757489161441,
+			"tag": "20250910072601_seed-config-data",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "6",
+			"when": 1758216910072,
+			"tag": "20250918173510_update_configs",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "6",
+			"when": 1759001825089,
+			"tag": "20250927193705_add_vehicle_image",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "6",
+			"when": 1762077262288,
+			"tag": "20251102095422_make_lpn_nullable",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "6",
+			"when": 1762094213825,
+			"tag": "20251102143653_add_fuel_type_to_vehicles",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "6",
+			"when": 1765624933032,
+			"tag": "20251213112213_add_user_auth",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "6",
+			"when": 1765727115489,
+			"tag": "20251214154515_add_attachment_columns",
+			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "6",
+			"when": 1765980000000,
+			"tag": "20251217120000_add_reminders_table",
+			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "6",
+			"when": 1766139510883,
+			"tag": "20251219101830_adding-configs",
+			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "6",
+			"when": 1766207631034,
+			"tag": "20251220051351_adding-custom-fields",
+			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "6",
+			"when": 1766920569315,
+			"tag": "20251228111609_adding-recurring-end-dates",
+			"breakpoints": true
+		},
+		{
+			"idx": 12,
+			"version": "6",
+			"when": 1768935981586,
+			"tag": "20260120190621_make_odometer_and_volume_optional",
+			"breakpoints": true
+		},
+		{
+			"idx": 13,
+			"version": "6",
+			"when": 1768936100461,
+			"tag": "20260120190820_config_changes",
+			"breakpoints": true
+		}
+	]
 }

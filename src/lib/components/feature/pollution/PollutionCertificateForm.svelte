@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -37,7 +38,7 @@
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
-		data?.attachment ? `/api/files/${data.attachment}` : undefined
+		data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
 	);
 
 	const form = superForm(defaults(zod4(pollutionCertificateSchema)), {
