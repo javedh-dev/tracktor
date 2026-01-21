@@ -9,8 +9,8 @@ CREATE TABLE fuel_logs_new (
     odometer INTEGER,
     fuel_amount REAL,
     cost REAL NOT NULL,
-    filled INTEGER NOT NULL,
-    missed_last INTEGER NOT NULL,
+    filled tinyint(1) NOT NULL,
+    missed_last tinyint(1) NOT NULL,
     notes TEXT,
     attachment TEXT,
     created_at TEXT,
@@ -18,8 +18,8 @@ CREATE TABLE fuel_logs_new (
 );
 
 --> statement-breakpoint
-INSERT INTO fuel_logs_new 
-SELECT * FROM fuel_logs;
+INSERT INTO fuel_logs_new(id, vehicle_id, date, odometer, fuel_amount, cost, filled, missed_last, notes, attachment, created_at, updated_at) 
+SELECT id, vehicle_id, date, odometer, fuel_amount, cost, filled, missed_last, notes, attachment, created_at, updated_at FROM fuel_logs;
 
 --> statement-breakpoint
 DROP TABLE fuel_logs;
