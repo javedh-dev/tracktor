@@ -7,5 +7,7 @@ bun.lockb
 
 # Miscellaneous
 /static/
-./project.inlang/
-./src/lib/paraglide/
+
+# Ignore specific files for linting
+project.inlang/.meta.json
+project.inlang/README.md
