@@ -73,7 +73,8 @@ export default [
 			'*.config.js',
 			'*.config.ts',
 			'**/*.svelte.ts',
-			'src/lib/components/ui/**'
+			'src/lib/components/ui/**',
+			'src/lib/paraglide/**'
 		]
 	}
 ];
