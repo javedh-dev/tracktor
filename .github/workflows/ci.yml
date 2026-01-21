@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Compile Paraglide messages
+        run: pnpm paraglide-js compile
+
       - name: Run linting
         run: pnpm run lint
 
