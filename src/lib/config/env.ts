@@ -1,4 +1,5 @@
 import { env as publicEnv } from '$env/dynamic/public';
+import { resolve } from '$app/paths';
 
 /**
  * Client-side environment configuration
@@ -6,7 +7,8 @@ import { env as publicEnv } from '$env/dynamic/public';
  */
 export const clientEnv = {
 	DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
-	DISABLE_AUTH: publicEnv.TRACKTOR_DISABLE_AUTH === 'true'
+	DISABLE_AUTH: publicEnv.TRACKTOR_DISABLE_AUTH === 'true',
+	BASE_URL: resolve('/')
 } as const;
 
 export const env = {

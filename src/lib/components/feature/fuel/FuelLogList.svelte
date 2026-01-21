@@ -34,7 +34,6 @@
 		col_odometer,
 		col_filled,
 		col_missed_last,
-		col_fuel_amount,
 		col_cost,
 		col_mileage,
 		col_notes,
@@ -52,7 +51,7 @@
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
 	const volumeLabel = $derived(
-		selectedVehicle?.fuelType === 'ev' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
+		selectedVehicle?.fuelType === 'electric' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
 	);
 
 	const columns: ColumnDef<FuelLog>[] = [
@@ -212,12 +211,16 @@
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-	<div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+	<div class="flex flex-row justify-center">
+		{params.value !== null && params.value !== undefined ? formatDistance(params.value) : '-'}
+	</div>
 {/snippet}
 
 {#snippet fuelAmountCell(params: any)}
 	<div class="flex flex-row justify-center">
-		{formatFuel(params.amount, params.fuelType as string)}
+		{params.amount !== null && params.amount !== undefined
+			? formatFuel(params.amount, params.fuelType as string)
+			: '-'}
 	</div>
 {/snippet}
 

@@ -1,23 +1,23 @@
 <script lang="ts">
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Tractor from '@lucide/svelte/icons/tractor';
-	import Settings from '@lucide/svelte/icons/settings';
 	import Database from '@lucide/svelte/icons/database';
 	import UserCog from '@lucide/svelte/icons/user-cog';
 	import CircleUser from '@lucide/svelte/icons/circle-user';
 	import ToolCase from '@lucide/svelte/icons/tool-case';
 	import ThemeToggle from '$appui/ThemeToggle.svelte';
-	import { Button } from '$ui/button';
 	import * as DropdownMenu from '$ui/dropdown-menu';
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
-	import SettingsForm from '../feature/settings/SettingsForm.svelte';
 	import DataExportImport from '../feature/data-export-import/DataExportImport.svelte';
 	import ProfileForm from '../feature/auth/profile-form.svelte';
 	import { env } from '$lib/config/env';
 	import Notifications from './Notifications.svelte';
 	import * as m from '$lib/paraglide/messages';
+	import SettingsForm from '../feature/settings/SettingsForm.svelte';
+	import Button from '../ui/button/button.svelte';
+	import Settings from '@lucide/svelte/icons/settings';
 </script>
 
 <header
@@ -36,20 +36,22 @@
 				iconClass="h-8 w-8"
 				style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
 				id="header-logo"
-				label="Tracktor"
+				label={m.app_name()}
 			/>
 		</a>
-		<div id="header-actions" class="ml-auto flex items-center gap-2">
+		<div id="header-actions" class="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
 			<div class="header-toolbar flex items-center gap-2">
 				<ThemeToggle />
 				{#if authStore.isLoggedIn}
 					<Notifications />
 					<Button
-						id="settings-button"
 						variant="ghost"
+						size="icon"
 						onclick={() => {
 							sheetStore.openSheet(SettingsForm, m.settings_sheet_title());
 						}}
+						aria-label="Open settings"
+						title="Settings"
 					>
 						<Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
 					</Button>

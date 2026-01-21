@@ -39,9 +39,18 @@ export const PUT: RequestHandler = async (event) => {
 		// Use body from locals if available (from middleware), otherwise parse it
 		const body = event.locals.requestBody || (await event.request.json());
 
-		// Validation for fuel log updates
-		if (body.amount && (typeof body.amount !== 'number' || body.amount <= 0)) {
-			throw error(400, 'Amount must be a positive number');
+		// Validation for optional fuel amount updates
+		if (body.fuelAmount !== undefined && body.fuelAmount !== null) {
+			if (typeof body.fuelAmount !== 'number' || body.fuelAmount <= 0) {
+				throw error(400, 'Fuel amount must be a positive number');
+			}
+		}
+
+		// Validation for optional odometer updates
+		if (body.odometer !== undefined && body.odometer !== null) {
+			if (typeof body.odometer !== 'number' || body.odometer <= 0) {
+				throw error(400, 'Odometer must be a positive number');
+			}
 		}
 
 		if (body.cost && (typeof body.cost !== 'number' || body.cost <= 0)) {

@@ -39,8 +39,8 @@
 		<div
 			class="grid h-auto w-full grid-cols-2 flex-col items-start lg:flex lg:flex-row lg:items-center"
 		>
-			{#each Array(5) as _}
-				<Skeleton class="skeleton-tab-trigger h-10 w-full rounded-md lg:w-28" />
+			{#each Array.from({ length: 5 }) as index}
+				<Skeleton data-index={index} class="skeleton-tab-trigger h-10 w-full rounded-md lg:w-28" />
 			{/each}
 		</div>
 		<div id="dashboard-tabs-content-skeleton" class="bg-secondary rounded-md p-2 lg:p-8">

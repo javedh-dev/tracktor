@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as fuelLogService from '$server/services/fuelLogService';
 import { AppError } from '$server/exceptions/AppError';
+import { fuelSchema } from '$lib/domain/fuel';
 
 export const GET: RequestHandler = async (event) => {
 	try {
@@ -39,17 +40,33 @@ export const POST: RequestHandler = async (event) => {
 		// Use body from locals if available (from middleware), otherwise parse it
 		const body = event.locals.requestBody || (await event.request.json());
 
-		// Basic validation for fuel log data
-		if (!body.date || !body.fuelAmount || !body.cost) {
-			throw error(400, 'Date, amount, and cost are required');
+		// Basic validation for required fields
+		if (!body.date || body.cost === undefined || body.cost === null) {
+			throw error(400, 'Date and cost are required');
 		}
 
-		if (typeof body.fuelAmount !== 'number' || body.fuelAmount <= 0) {
-			throw error(400, 'Amount must be a positive number');
+		// Validate optional fields if provided
+		if (body.fuelAmount !== undefined && body.fuelAmount !== null) {
+			if (typeof body.fuelAmount !== 'number' || body.fuelAmount <= 0) {
+				throw error(400, 'Fuel amount must be a positive number');
+			}
+		}
+
+		if (body.odometer !== undefined && body.odometer !== null) {
+			if (typeof body.odometer !== 'number' || body.odometer <= 0) {
+				throw error(400, 'Odometer must be a positive number');
+			}
 		}
 
 		if (typeof body.cost !== 'number' || body.cost <= 0) {
 			throw error(400, 'Cost must be a positive number');
+		}
+
+		// Validate against schema
+		const validationResult = fuelSchema.safeParse({ ...body, vehicleId: id });
+		if (!validationResult.success) {
+			const errors = validationResult.error.flatten();
+			throw error(400, `Validation failed: ${JSON.stringify(errors.fieldErrors)}`);
 		}
 
 		const result = await fuelLogService.addFuelLog(id, body);

@@ -1,6 +1,11 @@
 <script lang="ts">
-	import { FileDropZone } from '$lib/components/app';
+	import { withBase } from '$lib/utils';
+	import { FileDropZone, AutocompleteInput } from '$lib/components/app';
 	import CustomFieldsEditor from '$lib/components/app/CustomFieldsEditor.svelte';
+	import {
+		getVehicleMakeSuggestions,
+		getVehicleModelSuggestions
+	} from '$lib/services/autocomplete.service';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -28,9 +33,13 @@
 	let image = $state<File>();
 	let removeExistingImage = $state(false);
 	let processing = $state(false);
+	let makeSuggestions = $state<string[]>([]);
+	let modelSuggestions = $state<string[]>([]);
+	let loadingMakeSuggestions = $state(false);
+	let loadingModelSuggestions = $state(false);
 
 	// For showing existing image when editing
-	const existingImageUrl = $derived(data?.image ? `/api/files/${data.image}` : undefined);
+	const existingImageUrl = $derived(data?.image ? withBase(`/api/files/${data.image}`) : undefined);
 
 	const form = superForm(defaults(zod4(vehicleSchema)), {
 		validators: zod4(vehicleSchema),
@@ -64,6 +73,24 @@
 			image = undefined;
 			removeExistingImage = false;
 		}
+	});
+
+	// Load autocomplete suggestions for make
+	$effect(() => {
+		loadingMakeSuggestions = true;
+		getVehicleMakeSuggestions().then((suggestions) => {
+			makeSuggestions = suggestions;
+			loadingMakeSuggestions = false;
+		});
+	});
+
+	// Load autocomplete suggestions for model (all models, not filtered)
+	$effect(() => {
+		loadingModelSuggestions = true;
+		getVehicleModelSuggestions().then((suggestions) => {
+			modelSuggestions = suggestions;
+			loadingModelSuggestions = false;
+		});
 	});
 </script>
 
@@ -99,7 +126,13 @@
 						<FormLabel description={m.vehicle_form_make_desc()} required>
 							{m.vehicle_form_make_label()}
 						</FormLabel>
-						<Input {...props} bind:value={$formData.make} icon={Building2} />
+						<AutocompleteInput
+							{...props}
+							bind:value={$formData.make}
+							icon={Building2}
+							suggestions={makeSuggestions}
+							loading={loadingMakeSuggestions}
+						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -110,7 +143,13 @@
 						<FormLabel description={m.vehicle_form_model_desc()} required>
 							{m.vehicle_form_model_label()}
 						</FormLabel>
-						<Input {...props} bind:value={$formData.model} icon={CarFront} />
+						<AutocompleteInput
+							{...props}
+							bind:value={$formData.model}
+							icon={CarFront}
+							suggestions={modelSuggestions}
+							loading={loadingModelSuggestions}
+						/>
 					{/snippet}
 				</Form.Control>
 				<!-- <Form.Description>Model of the vehicle</Form.Description> -->
@@ -162,7 +201,7 @@
 								</div>
 							</Select.Trigger>
 							<Select.Content>
-								{#each Object.entries(FUEL_TYPES) as [value, _]}
+								{#each Object.keys(FUEL_TYPES) as value}
 									<Select.Item {value}>{getFuelTypeLabel(value, m)}</Select.Item>
 								{/each}
 							</Select.Content>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$ui/separator';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -17,7 +18,9 @@
 	let { vehicle, open = $bindable(false) }: Props = $props();
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
+	const imageUrl = $derived(
+		vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
+	);
 	const fuelLabel = $derived(
 		vehicle.fuelType ? getFuelTypeLabel(vehicle.fuelType, m) : getFuelTypeLabel('petrol', m)
 	);
@@ -34,18 +37,18 @@
 			<div class="absolute inset-0 rounded-t-lg bg-black/30"></div>
 			{#if vehicle.color}
 				<div
-					class="absolute right-4 bottom-4 z-10 h-8 w-8 rounded-full border-2 border-white/70 shadow-md"
+					class="absolute bottom-4 z-10 h-8 w-8 rounded-full border-2 border-white/70 shadow-md ltr:right-4 rtl:left-4"
 					style={`background-color: ${vehicle.color}`}
 					aria-label="Color"
 				></div>
 			{/if}
 			<Dialog.Close
-				class="absolute top-3 right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/85 text-white shadow-md ring-1 ring-black/10 backdrop-blur transition hover:bg-white hover:text-black focus:outline-none"
+				class="absolute top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/85 text-white shadow-md ring-1 ring-black/10 backdrop-blur transition hover:bg-white hover:text-black focus:outline-none ltr:right-3 rtl:left-3"
 				aria-label="Close"
 			>
 				<X class="h-4 w-4" />
 			</Dialog.Close>
-			<div class="absolute bottom-4 left-4 z-10">
+			<div class="absolute bottom-4 z-10 ltr:left-4 rtl:right-4">
 				<h2 class="text-2xl font-bold text-white drop-shadow-lg">
 					{vehicle.make}
 					{vehicle.model}
@@ -82,7 +85,7 @@
 			<div class="space-y-3">
 				<div>
 					<h3 class="mb-2 flex items-center text-base font-semibold">
-						<IdCard class="mr-2 h-4 w-4" />
+						<IdCard class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
 						{m.vehicle_details_section_title()}
 					</h3>
 					<Separator />
@@ -126,7 +129,7 @@
 				<div class="space-y-3">
 					<div>
 						<h3 class="mb-2 flex items-center text-base font-semibold">
-							<FileText class="mr-2 h-4 w-4" />
+							<FileText class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
 							{m.custom_fields_label()}
 						</h3>
 						<Separator />

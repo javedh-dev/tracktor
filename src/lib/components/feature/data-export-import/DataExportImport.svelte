@@ -11,6 +11,7 @@
 	import Unlock from '@lucide/svelte/icons/unlock';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages';
+	import { withBase } from '$lib/utils';
 
 	let exportPassword = $state('');
 	let importPassword = $state('');
@@ -24,7 +25,7 @@
 
 		isExporting = true;
 		try {
-			const response = await fetch('/api/data/export', {
+			const response = await fetch(withBase('/api/data/export'), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -75,7 +76,7 @@
 				throw new Error(m.tools_import_invalid_json());
 			}
 
-			const response = await fetch('/api/data/import', {
+			const response = await fetch(withBase('/api/data/import'), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'

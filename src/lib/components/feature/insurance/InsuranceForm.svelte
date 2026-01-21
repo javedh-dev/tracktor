@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -14,7 +15,8 @@
 	} from '$lib/domain/insurance';
 	import * as Select from '$ui/select/index.js';
 	import Repeat from '@lucide/svelte/icons/repeat';
-	import { FileDropZone } from '$lib/components/app';
+	import { FileDropZone, AutocompleteInput } from '$lib/components/app';
+	import { getInsuranceProviderSuggestions } from '$lib/services/autocomplete.service';
 	import Banknote from '@lucide/svelte/icons/banknote';
 	import Calendar1 from '@lucide/svelte/icons/calendar-1';
 	import IdCard from '@lucide/svelte/icons/id-card';
@@ -31,10 +33,12 @@
 	let attachment = $state<File>();
 	let removeExistingAttachment = $state(false);
 	let processing = $state(false);
+	let insuranceProviderSuggestions = $state<string[]>([]);
+	let loadingSuggestions = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
-		data?.attachment ? `/api/files/${data.attachment}` : undefined
+		data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
 	);
 
 	const form = superForm(defaults(zod4(insuranceSchema)), {
@@ -91,6 +95,15 @@
 			};
 		});
 	});
+
+	// Load autocomplete suggestions
+	$effect(() => {
+		loadingSuggestions = true;
+		getInsuranceProviderSuggestions().then((suggestions) => {
+			insuranceProviderSuggestions = suggestions;
+			loadingSuggestions = false;
+		});
+	});
 </script>
 
 <form id="insurance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
@@ -115,7 +128,13 @@
 					<FormLabel description={m.insurance_form_provider_desc()}
 						>{m.insurance_form_provider_label()}</FormLabel
 					>
-					<Input {...props} bind:value={$formData.provider} icon={Building2} />
+					<AutocompleteInput
+						{...props}
+						bind:value={$formData.provider}
+						icon={Building2}
+						suggestions={insuranceProviderSuggestions}
+						loading={loadingSuggestions}
+					/>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />

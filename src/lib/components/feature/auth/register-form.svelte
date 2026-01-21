@@ -7,6 +7,7 @@
 	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
 	import SubmitButton from '$appui/SubmitButton.svelte';
 	import { toast } from 'svelte-sonner';
+	import * as m from '$lib/paraglide/messages';
 
 	let username = $state('');
 	let password = $state('');
@@ -23,7 +24,7 @@
 		if (!username || !password || !confirmPassword || processing) return;
 
 		if (password !== confirmPassword) {
-			toast.error('Passwords do not match!!!');
+			toast.error(m.auth_password_mismatch());
 			confirmPassword = '';
 			return;
 		}
@@ -44,34 +45,34 @@
 	<fieldset disabled={processing} class="w-full">
 		<FieldGroup class="w-full">
 			<Field>
-				<FieldLabel for="email">Username</FieldLabel>
+				<FieldLabel for="email">{m.auth_username()}</FieldLabel>
 				<Input
 					id="email"
 					icon={UserIcon}
 					type="text"
 					required
 					bind:value={username}
-					placeholder="username"
+					placeholder={m.auth_username_placeholder()}
 				/>
 			</Field>
 			<Field>
-				<FieldLabel for="password">Password</FieldLabel>
+				<FieldLabel for="password">{m.auth_password()}</FieldLabel>
 				<Input
 					id="password"
 					type="password"
 					required
-					placeholder="********"
+					placeholder={m.auth_password_placeholder()}
 					icon={RectangleEllipsis}
 					bind:value={password}
 				/>
 			</Field>
 			<Field>
-				<FieldLabel for="confirm-password">Confirm Password</FieldLabel>
+				<FieldLabel for="confirm-password">{m.auth_confirm_password()}</FieldLabel>
 				<Input
 					id="confirm-password"
 					type="password"
 					required
-					placeholder="********"
+					placeholder={m.auth_password_placeholder()}
 					icon={RectangleEllipsis}
 					bind:value={confirmPassword}
 				/>
@@ -80,9 +81,9 @@
 				<SubmitButton
 					{processing}
 					class="transition-all duration-300"
-					loadingText="Creating account..."
+					loadingText={m.auth_signup_loading()}
 				>
-					Sign up
+					{m.auth_signup_button()}
 				</SubmitButton>
 			</Field>
 			<!-- <FieldDescription class="text-center">

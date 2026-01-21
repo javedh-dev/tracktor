@@ -34,7 +34,7 @@
 		class="vehicle-list w-full whitespace-nowrap"
 		orientation="horizontal"
 	>
-		<div class="my-4 flex gap-4">
+		<div class="my-4 flex gap-4 rtl:flex-row-reverse">
 			{#each vehicleStore.vehicles as vehicle (vehicle.id)}
 				<VehicleCard
 					{vehicle}

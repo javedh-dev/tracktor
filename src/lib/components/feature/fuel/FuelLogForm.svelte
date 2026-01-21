@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import Checkbox from '$ui/checkbox/checkbox.svelte';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
@@ -57,12 +58,12 @@
 	);
 	// const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
 	const volumeLabel = $derived(
-		selectedVehicle?.fuelType === 'ev' ? form_volume_energy() : form_volume_fuel()
+		selectedVehicle?.fuelType === 'electric' ? form_volume_energy() : form_volume_fuel()
 	);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
-		data?.attachment ? `/api/files/${data.attachment}` : undefined
+		data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
 	);
 
 	const form = superForm(defaults(zod4(fuelSchema)), {
@@ -98,13 +99,31 @@
 			formData.set({
 				...data,
 				date: formatDate(data.date),
-				fuelAmount: roundNumber(data.fuelAmount),
-				cost: roundNumber(data.cost),
+				fuelAmount:
+					data.fuelAmount !== null && data.fuelAmount !== undefined
+						? roundNumber(data.fuelAmount)
+						: null,
+				cost: data.cost !== null && data.cost !== undefined ? roundNumber(data.cost) : null,
+				odometer: data.odometer,
 				attachment: null // Don't include attachment in form data, handle separately
 			});
 			// Reset attachment state when editing existing record
 			attachment = undefined;
 			removeExistingAttachment = false;
+		} else {
+			// Initialize form with empty/default values for new entry
+			formData.set({
+				id: null,
+				vehicleId: vehicleStore.selectedId || '',
+				date: formatDate(new Date()),
+				odometer: null,
+				filled: true,
+				missedLast: false,
+				fuelAmount: null,
+				cost: 0,
+				notes: null,
+				attachment: null
+			});
 		}
 		formData.update((fd) => {
 			return {
@@ -140,7 +159,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev'
+						description={selectedVehicle?.fuelType === 'electric'
 							? form_volume_energy()
 							: form_volume_fuel()}
 						>{volumeLabel} ({getFuelUnit(selectedVehicle?.fuelType as string)})</FormLabel
@@ -162,7 +181,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<FormLabel
-						description={selectedVehicle?.fuelType === 'ev'
+						description={selectedVehicle?.fuelType === 'electric'
 							? form_cost_desc_ev()
 							: form_cost_desc()}>{form_cost()}</FormLabel
 					>
@@ -180,11 +199,11 @@
 							<Checkbox {...props} bind:checked={$formData.filled} />
 							<FormLabel
 								class="font-normal"
-								description={selectedVehicle?.fuelType === 'ev'
+								description={selectedVehicle?.fuelType === 'electric'
 									? form_full_charge_desc()
 									: form_full_tank_desc()}
 							>
-								{selectedVehicle?.fuelType === 'ev' ? form_full_charge() : form_full_tank()}
+								{selectedVehicle?.fuelType === 'electric' ? form_full_charge() : form_full_tank()}
 							</FormLabel>
 						</div>
 					{/snippet}

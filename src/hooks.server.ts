@@ -109,7 +109,14 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 		event.request = request;
 
 		return resolve(event, {
-			transformPageChunk: ({ html }) => html.replace('%paraglide.lang%', locale)
+			transformPageChunk: ({ html }) => {
+				// Set language and direction attributes based on locale
+				const rtlLanguages = ['ar', 'he', 'fa', 'ur', 'yi'];
+				const direction = rtlLanguages.includes(locale) ? 'rtl' : 'ltr';
+				return html
+					.replace('%paraglide.lang%', locale)
+					.replace('dir="%paraglide.lang%"', `dir="${direction}"`);
+			}
 		});
 	});
 

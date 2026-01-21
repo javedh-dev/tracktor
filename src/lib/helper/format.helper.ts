@@ -3,6 +3,7 @@ import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { es, fr, de, hi } from 'date-fns/locale';
+import { CANONICAL_TIMEZONES } from '$lib/constants/timezones';
 
 const getDateFnsLocale = () => {
 	switch (configs.locale) {
@@ -62,27 +63,34 @@ const parseWithFormat = (dateStr: string, fmt: string): Date | null => {
 };
 
 const getTimezoneOptions = (): { value: string; label: string; offset: number }[] => {
-	if (typeof Intl.supportedValuesOf === 'function') {
-		return Intl.supportedValuesOf('timeZone')
-			.map((zone) => {
-				const offset = formatInTimeZone(new Date(), zone, 'xxx');
-				return {
-					value: zone,
-					label: `[${offset}] ${zone}`,
-					offset: Number(offset.replace(':', ''))
-				};
-			})
-			.sort((a, b) => a.offset - b.offset);
-	} else {
-		return [];
-	}
+	// Use a fixed reference date (Jan 1, 2024 UTC) to ensure consistent timezone offsets
+	// across all platforms and avoid DST variations
+	const referenceDate = new Date('2024-01-01T12:00:00Z');
+
+	// Use canonical timezone list instead of Intl.supportedValuesOf to ensure
+	// consistency across all operating systems and Node.js versions
+	return CANONICAL_TIMEZONES.map((zone) => {
+		try {
+			const offset = formatInTimeZone(referenceDate, zone, 'xxx');
+			return {
+				value: zone,
+				label: `[${offset}] ${zone}`,
+				offset: Number(offset.replace(':', ''))
+			};
+		} catch (e) {
+			// Fallback for any timezone that might not be supported
+			return {
+				value: zone,
+				label: zone,
+				offset: 0
+			};
+		}
+	}).sort((a, b) => a.offset - b.offset);
 };
 
 const isValidTimezone = (tz: string) => {
-	if (typeof Intl.supportedValuesOf === 'function') {
-		return Intl.supportedValuesOf('timeZone').includes(tz);
-	}
-	return true;
+	// Check against canonical timezone list for consistency across all platforms
+	return CANONICAL_TIMEZONES.includes(tz as any);
 };
 
 const getCurrencySymbol = (currency?: string): string => {
@@ -108,70 +116,116 @@ const formatCurrency = (amount: number): string => {
 	}).format(amount);
 };
 
+const UNIT_LABEL_FALLBACKS: Record<string, string> = {
+	liter: 'L',
+	gallon: 'gal',
+	kilogram: 'kg',
+	pound: 'lb',
+	kilometer: 'km',
+	mile: 'mi'
+};
+
+const safeUnitLabel = (unit: string): string => {
+	try {
+		return (
+			new Intl.NumberFormat(configs.locale, {
+				style: 'unit',
+				unit
+			})
+				.formatToParts(0)
+				.find((part) => part.type === 'unit')?.value ||
+			UNIT_LABEL_FALLBACKS[unit] ||
+			unit
+		);
+	} catch (_) {
+		return UNIT_LABEL_FALLBACKS[unit] || unit;
+	}
+};
+
+const safeUnitFormat = (value: number, unit: string): string | null => {
+	try {
+		return new Intl.NumberFormat(configs.locale, { style: 'unit', unit }).format(value);
+	} catch (_) {
+		return null;
+	}
+};
+
+const getFuelVolumeUnit = (fuelType: string): string => {
+	switch (fuelType) {
+		case 'lpg':
+			return configs.unitOfLpg || configs.unitOfVolume;
+		case 'cng':
+			return configs.unitOfCng || configs.unitOfVolume;
+		default:
+			return configs.unitOfVolume;
+	}
+};
+
 const getDistanceUnit = (): string => {
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: configs.unitOfDistance
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	return safeUnitLabel(configs.unitOfDistance);
 };
 
 const formatDistance = (distance: number): string => {
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: configs.unitOfDistance
-	}).format(distance);
+	return (
+		safeUnitFormat(distance, configs.unitOfDistance) ||
+		`${distance} ${safeUnitLabel(configs.unitOfDistance)}`
+	);
 };
 
 const getFuelUnit = (vehicleType: string): string => {
-	if (vehicleType === 'ev') {
+	if (vehicleType === 'electric') {
 		return 'kWh';
 	}
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: configs.unitOfVolume
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	return safeUnitLabel(getFuelVolumeUnit(vehicleType));
 };
 
 const formatFuel = (amount: number, vehicleType: string): string => {
-	if (vehicleType === 'ev') {
+	if (vehicleType === 'electric') {
 		return `${amount.toFixed(3)} kWh`;
 	}
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: configs.unitOfVolume
-	}).format(amount);
+
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	return safeUnitFormat(amount, fuelUnit) || `${amount.toFixed(2)} ${safeUnitLabel(fuelUnit)}`;
 };
 
 const getMileageUnit = (vehicleType: string): string => {
-	if (vehicleType === 'ev') {
+	if (vehicleType === 'electric') {
 		return 'km/kWh';
 	}
-	return (
-		new Intl.NumberFormat(configs.locale, {
-			style: 'unit',
-			unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
-		})
-			.formatToParts(0)
-			.find((part) => part.type === 'unit')?.value || ''
-	);
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const distanceUnit = safeUnitLabel(configs.unitOfDistance);
+	const fuelLabel = safeUnitLabel(fuelUnit);
+
+	// Support both distance/fuel and fuel/distance formats
+	if (configs.mileageUnitFormat === 'fuel-per-distance') {
+		return `${fuelLabel}/100${distanceUnit}`;
+	}
+
+	// Default: distance-per-fuel (e.g., km/L, mpg)
+	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
+	const label = safeUnitLabel(mileageUnit);
+	return label === mileageUnit ? `${distanceUnit}/${fuelLabel}` : label;
 };
 
 const formatMileage = (mileage: number, vehicleType: string): string => {
-	if (vehicleType === 'ev') {
+	if (vehicleType === 'electric') {
 		return `${mileage.toFixed(3)} km/kWh`;
 	}
-	return new Intl.NumberFormat(configs.locale, {
-		style: 'unit',
-		unit: `${configs.unitOfDistance}-per-${configs.unitOfVolume}`
-	}).format(mileage);
+	const fuelUnit = getFuelVolumeUnit(vehicleType);
+	const distanceUnit = safeUnitLabel(configs.unitOfDistance);
+	const fuelLabel = safeUnitLabel(fuelUnit);
+
+	// Support both distance/fuel and fuel/distance formats
+	if (configs.mileageUnitFormat === 'fuel-per-distance') {
+		// For fuel/distance format (e.g., L/100km), display as fuel per 100 distance units
+		return `${mileage.toFixed(2)} ${fuelLabel}/100${distanceUnit}`;
+	}
+
+	// Default: distance-per-fuel (e.g., km/L, mpg)
+	const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
+	return (
+		safeUnitFormat(mileage, mileageUnit) || `${mileage.toFixed(2)} ${distanceUnit}/${fuelLabel}`
+	);
 };
 
 const roundNumber = (num: number, decimal: number = 2): number => {

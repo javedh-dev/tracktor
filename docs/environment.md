@@ -25,6 +25,15 @@ Port number for the server.
 - **Values**: Any available port number. Used only on production or build
 - **Default**: `3000`
 
+### BASE_URL
+
+Base path for serving the application behind a reverse proxy. When hosting Tracktor under a sub-path (e.g., `https://example.com/tracktor/`), set this to the sub-path (e.g., `/tracktor`). This ensures all assets, API calls, and routing work correctly.
+
+- **Values**: Any valid URL path (must start with `/` and not end with `/`)
+- **Default**: `` (empty string, serves from root)
+- **Example**: `/tracktor`, `/apps/tracktor`
+- **Note**: Do not include trailing slashes
+
 ## Database
 
 ### DB_PATH

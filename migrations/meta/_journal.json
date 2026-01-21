@@ -85,6 +85,20 @@
 			"when": 1766920569315,
 			"tag": "20251228111609_adding-recurring-end-dates",
 			"breakpoints": true
+		},
+		{
+			"idx": 12,
+			"version": "6",
+			"when": 1768935981586,
+			"tag": "20260120190621_make_odometer_and_volume_optional",
+			"breakpoints": true
+		},
+		{
+			"idx": 13,
+			"version": "6",
+			"when": 1768936100461,
+			"tag": "20260120190820_config_changes",
+			"breakpoints": true
 		}
 	]
 }

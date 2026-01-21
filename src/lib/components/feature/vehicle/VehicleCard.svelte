@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import LicensePlate from '$appui/LicensePlate.svelte';
 	import Gauge from '@lucide/svelte/icons/gauge';
 	import Pencil from '@lucide/svelte/icons/pencil';
@@ -56,7 +57,9 @@
 	};
 
 	// Dynamic image URL - fallback to default if vehicle doesn't have image
-	const imageUrl = $derived(vehicle.image ? `/api/files/${vehicle.image}` : '/default-vehicle.png');
+	const imageUrl = $derived(
+		vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
+	);
 </script>
 
 <div

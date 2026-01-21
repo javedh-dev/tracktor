@@ -17,7 +17,7 @@ export const vehicleTable = table('vehicles', {
 	image: t.text(),
 	fuelType: t
 		.text({
-			enum: ['petrol', 'diesel', 'ev', 'hybrid']
+			enum: ['petrol', 'diesel', 'electric', 'lpg', 'cng']
 		})
 		.notNull()
 		.default('petrol'),

@@ -14,7 +14,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import { PUCC_RECURRENCE_TYPES, getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
+	import { getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
 	import type { PollutionCertificate } from '$lib/domain/pucc';
 	import * as m from '$lib/paraglide/messages';
 

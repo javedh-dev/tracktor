@@ -68,7 +68,7 @@ export const updateInsurance = async (
 	const updatedInsurance = await db
 		.update(schema.insuranceTable)
 		.set({
-			...((insuranceData && insuranceData.recurrenceType !== 'none')
+			...(insuranceData && insuranceData.recurrenceType !== 'none'
 				? { ...insuranceData, endDate: null }
 				: insuranceData)
 		})

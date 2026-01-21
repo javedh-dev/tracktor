@@ -4,7 +4,14 @@ const config = {
 		extend: {}
 	},
 	darkMode: 'class',
-	plugins: []
+	plugins: [],
+	future: {
+		respectDefaultRingColorOpacity: true
+	},
+	// Enable RTL support via direction selector
+	corePlugins: {
+		preflight: true
+	}
 };
 
 export default config;

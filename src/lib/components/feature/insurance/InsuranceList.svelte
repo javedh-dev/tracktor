@@ -15,10 +15,7 @@
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
 	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import {
-		INSURANCE_RECURRENCE_TYPES,
-		getInsuranceRecurrenceTypeLabel
-	} from '$lib/domain/insurance';
+	import { getInsuranceRecurrenceTypeLabel } from '$lib/domain/insurance';
 	import type { Insurance } from '$lib/domain/insurance';
 	import * as m from '$lib/paraglide/messages';
 

@@ -4,6 +4,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* RTL Support - Automatic text direction based on language */
+html[dir='rtl'] {
+	direction: rtl;
+	text-align: right;
+}
+
+html[dir='ltr'] {
+	direction: ltr;
+	text-align: left;
+}
+
+/* RTL-friendly utilities */
+[dir='rtl'] [class*='ml-'],
+[dir='rtl'] [class*='mr-'] {
+	/* These will be automatically handled by Tailwind's RTL variant support */
+}
+
 :root {
 	--radius: 0.65rem;
 	--background: oklch(1 0 0);

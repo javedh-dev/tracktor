@@ -1,11 +1,12 @@
 import type { LayoutLoad } from './$types';
+import { withBase } from '$lib/utils';
 
 /**
  * Load configs for all dashboard child routes
  */
 export const load: LayoutLoad = async ({ fetch }) => {
 	try {
-		const response = await fetch('/api/config');
+		const response = await fetch(withBase('/api/config'));
 		const result = await response.json();
 
 		if (result.data && Array.isArray(result.data)) {

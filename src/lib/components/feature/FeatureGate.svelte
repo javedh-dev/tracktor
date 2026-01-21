@@ -33,7 +33,7 @@
 
 	let isEnabled = $derived.by(() => {
 		// Force reactivity on config changes
-		const _ = configStore.configs;
+		configStore.configs;
 
 		if (feature) {
 			return isFeatureEnabled(feature);

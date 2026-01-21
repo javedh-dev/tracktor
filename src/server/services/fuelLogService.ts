@@ -27,6 +27,12 @@ export const addFuelLog = async (vehicleId: string, fuelLogData: any): Promise<A
 };
 
 export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
+	// Fetch mileage unit format config
+	const mileageFormatConfig = await db.query.configTable.findFirst({
+		where: (config, { eq }) => eq(config.key, 'mileageUnitFormat')
+	});
+	const mileageFormat = mileageFormatConfig?.value || 'distance-per-fuel';
+
 	const fuelLogs = await db.query.fuelLogTable.findMany({
 		where: (log, { eq }) => eq(log.vehicleId, vehicleId),
 		orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
@@ -35,7 +41,14 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 	// Calculate mileage
 	const mileageData = fuelLogs.map((log, index, arr) => {
 		// mileage can only be calculated for a full tank and a previous log is needed
-		if (index === 0 || !log.filled || log.missedLast) {
+		// also need valid odometer and fuel amount values
+		if (
+			index === 0 ||
+			!log.filled ||
+			log.missedLast ||
+			log.odometer === null ||
+			log.fuelAmount === null
+		) {
 			return { ...log, mileage: null };
 		}
 
@@ -43,7 +56,7 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 		// a missed log acts as a barrier, preventing searching further back
 		let startIndex = -1;
 		for (let i = index - 1; i >= 0; i--) {
-			if (arr[i]?.filled) {
+			if (arr[i]?.filled && arr[i]?.odometer !== null) {
 				startIndex = i;
 				break;
 			}
@@ -58,12 +71,16 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 		}
 
 		const startLog = arr[startIndex]!;
-		const distance = log.odometer - startLog.odometer;
+		const distance = log.odometer - startLog.odometer!;
 
 		// sum all fuel added after the starting log (accounts for partial fills)
+		// skip logs with null fuel amounts
 		let totalFuel = 0;
 		for (let i = startIndex + 1; i <= index; i++) {
-			totalFuel += arr[i]!.fuelAmount;
+			const fuelAmount = arr[i]!.fuelAmount;
+			if (fuelAmount !== null) {
+				totalFuel += fuelAmount;
+			}
 		}
 
 		// avoid division by zero and ensure distance is positive
@@ -71,7 +88,16 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 			return { ...log, mileage: null };
 		}
 
-		const mileage = distance / totalFuel;
+		// Calculate mileage based on format
+		let mileage: number;
+		if (mileageFormat === 'fuel-per-distance') {
+			// Fuel per 100 distance units (e.g., L/100km, gal/100mi)
+			mileage = (totalFuel / distance) * 100;
+		} else {
+			// Distance per fuel unit (e.g., km/L, mpg) - default
+			mileage = distance / totalFuel;
+		}
+
 		return { ...log, mileage: parseFloat(mileage.toFixed(2)) };
 	});
 	return {

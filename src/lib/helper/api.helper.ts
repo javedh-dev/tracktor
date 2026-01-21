@@ -1,7 +1,8 @@
 import { HttpClient } from './http.helper';
+import { withBase } from '$lib/utils';
 
 export const apiClient = new HttpClient({
-	baseURL: `/api`,
+	baseURL: withBase('/api'),
 	headers: {
 		'Content-Type': 'application/json'
 	},

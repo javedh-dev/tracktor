@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { withBase } from '$lib/utils';
 	import * as Form from '$ui/form/index.js';
 	import FormLabel from '$appui/FormLabel.svelte';
 	import Input from '$appui/input.svelte';
@@ -17,7 +18,8 @@
 	import { saveMaintenanceLogWithAttachment } from '$lib/services/maintenance.service';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
-	import { FileDropZone } from '$lib/components/app';
+	import { FileDropZone, AutocompleteInput } from '$lib/components/app';
+	import { getServiceCenterSuggestions } from '$lib/services/autocomplete.service';
 	import * as m from '$lib/paraglide/messages';
 
 	let { data } = $props();
@@ -25,10 +27,12 @@
 	let attachment = $state<File>();
 	let removeExistingAttachment = $state(false);
 	let processing = $state(false);
+	let serviceCenterSuggestions = $state<string[]>([]);
+	let loadingSuggestions = $state(false);
 
 	// For showing existing attachment when editing
 	const existingAttachmentUrl = $derived(
-		data?.attachment ? `/api/files/${data.attachment}` : undefined
+		data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
 	);
 
 	const form = superForm(defaults(zod4(maintenanceSchema)), {
@@ -71,6 +75,15 @@
 				...fd,
 				vehicleId: vehicleStore.selectedId || ''
 			};
+		});
+	});
+
+	// Load autocomplete suggestions
+	$effect(() => {
+		loadingSuggestions = true;
+		getServiceCenterSuggestions().then((suggestions) => {
+			serviceCenterSuggestions = suggestions;
+			loadingSuggestions = false;
 		});
 	});
 </script>
@@ -122,7 +135,13 @@
 					<FormLabel description={m.maintenance_form_service_center_desc()}>
 						{m.maintenance_form_service_center_label()}
 					</FormLabel>
-					<Input {...props} bind:value={$formData.serviceCenter} icon={Hammer} />
+					<AutocompleteInput
+						{...props}
+						bind:value={$formData.serviceCenter}
+						icon={Hammer}
+						suggestions={serviceCenterSuggestions}
+						loading={loadingSuggestions}
+					/>
 				{/snippet}
 			</Form.Control>
 			<!-- <Form.Description>Model of the vehicle</Form.Description> -->
