@@ -72,13 +72,12 @@ const calculateOverallMileage = async (vehicleId: string) => {
 		const startLog = arr[actualStartIndex];
 		if (!startLog) return;
 
-		const distance = log.odometer - startLog.odometer;
+		const distance = (log.odometer || 0) - (startLog.odometer || 0);
 
 		// Sum fuel from start to current log
 		const totalFuel = arr
 			.slice(actualStartIndex + 1, index + 1)
-			.reduce((sum, fuelLog) => sum + fuelLog.fuelAmount, 0);
-
+			.reduce((sum, fuelLog) => sum + (fuelLog.fuelAmount || 0), 0);
 		if (totalFuel > 0 && distance > 0) {
 			validMileages.push(distance / totalFuel);
 		}

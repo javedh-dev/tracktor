@@ -57,6 +57,6 @@ export async function getVehicleMakeSuggestions(): Promise<string[]> {
  * Get unique vehicle models, optionally filtered by make
  */
 export async function getVehicleModelSuggestions(make?: string): Promise<string[]> {
-	const params = make ? { make } : {};
+	const params = make ? { make } : { make: '' };
 	return fetchAutocompleteSuggestions('vehicleModel', params);
 }
