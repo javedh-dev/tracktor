@@ -15,6 +15,11 @@ import { initializeDatabase } from '$server/db/init';
 import { appAsciiArt, logger } from '$server/config';
 import { env } from '$lib/config/env.server';
 import { ensureAppDirectories } from '$server/utils/fs';
+import { cronJobManager } from '$server/services/cronService';
+import {
+	handleDailyReminderTrigger,
+	handleWeeklyMaintenanceCheck
+} from '$server/jobs/reminderTriggerJob';
 
 const middlewareChain = new MiddlewareChain();
 
@@ -34,6 +39,36 @@ const logEnvSnapshot = () => {
 };
 
 let dbInitialized = false;
+
+const initializeCronJobs = () => {
+	try {
+		logger.info('Initializing cron jobs...');
+		cronJobManager.initialize();
+
+		// Register reminder trigger job - runs every day at 8:00 AM
+		cronJobManager.registerJob({
+			name: 'daily-reminder-trigger',
+			schedule: '0 8 * * *', // 8:00 AM every day
+			timezone: env.TZ,
+			handler: handleDailyReminderTrigger,
+			runOnInit: false // Set to true to run immediately on startup for testing
+		});
+
+		// Register weekly maintenance check - runs every Monday at 9:00 AM
+		cronJobManager.registerJob({
+			name: 'weekly-maintenance-check',
+			schedule: '0 9 * * 1', // Monday 9:00 AM
+			timezone: env.TZ,
+			handler: handleWeeklyMaintenanceCheck,
+			runOnInit: false
+		});
+
+		logger.info('Cron jobs initialized successfully');
+	} catch (error) {
+		logger.error('Error initializing cron jobs:', error);
+		throw error;
+	}
+};
 
 const initPromise = (async () => {
 	if (dbInitialized) return;
@@ -65,6 +100,18 @@ const initPromise = (async () => {
 		logger.error('Failed to initialize database', error);
 
 		const wrapped = new Error('Failed to initialize database');
+
+		(wrapped as any).cause = error;
+
+		throw wrapped;
+	}
+
+	try {
+		initializeCronJobs();
+	} catch (error) {
+		logger.error('Failed to initialize cron jobs', error);
+
+		const wrapped = new Error('Failed to initialize cron jobs');
 
 		(wrapped as any).cause = error;
 
@@ -105,7 +152,7 @@ const originalHandle: Handle = async ({ event, resolve }) => {
 };
 
 const handleParaglide: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, ({ request, locale }) => {
+	paraglideMiddleware(event.request, ({ request, locale }: any) => {
 		event.request = request;
 
 		return resolve(event, {
@@ -121,3 +168,18 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 	});
 
 export const handle = sequence(originalHandle, handleParaglide);
+
+// Graceful shutdown handler
+if (typeof process !== 'undefined') {
+	process.on('SIGTERM', () => {
+		logger.info('SIGTERM signal received: closing HTTP server and cron jobs');
+		cronJobManager.destroyAll();
+		process.exit(0);
+	});
+
+	process.on('SIGINT', () => {
+		logger.info('SIGINT signal received: closing HTTP server and cron jobs');
+		cronJobManager.destroyAll();
+		process.exit(0);
+	});
+}

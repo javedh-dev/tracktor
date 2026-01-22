@@ -18,7 +18,8 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:seed": "tsx scripts/seed.ts",
-		"start": "node build"
+		"start": "node build",
+		"paraglide:compile": "paraglide-js compile --outdir ./src/lib/paraglide"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.2",
@@ -34,6 +35,7 @@
 		"@tanstack/table-core": "^8.21.3",
 		"@testing-library/svelte": "^5.3.1",
 		"@types/node": "^25.0.9",
+		"@types/node-cron": "^3.0.11",
 		"@types/supertest": "^6.0.3",
 		"@typescript-eslint/eslint-plugin": "^8.53.1",
 		"@typescript-eslint/parser": "^8.53.1",
@@ -94,6 +96,7 @@
 		"helmet": "^8.1.0",
 		"mode-watcher": "^1.1.0",
 		"multer": "^2.0.2",
+		"node-cron": "^4.2.1",
 		"winston": "^3.19.0",
 		"zod": "^4.3.5"
 	}

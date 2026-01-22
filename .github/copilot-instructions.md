@@ -58,3 +58,16 @@
 ---
 
 For more, see the linked documentation files. Keep changes consistent with the above structure and conventions.
+
+## Code Style Guidelines
+
+- Follow existing code patterns for consistency.
+- Use descriptive names for variables, functions, and components.
+- Write modular, reusable code.
+- Document complex logic with comments.
+- Adhere to Svelte and TypeScript best practices.
+- Ensure accessibility (a11y) in UI components.
+- Follow software craftsmanship principles.
+- Don't create any summary or conclusion sections.
+- Maintain clear commit messages and PR descriptions.
+- Regularly update documentation with code changes.
