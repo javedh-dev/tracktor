@@ -7,6 +7,12 @@
   <h1 style="display:inline; font-size: 2.5rem; vertical-align: middle;">Tracktor</h1>
 </div>
 
+![GitHub License](https://img.shields.io/github/license/javedh-dev/tracktor?label=License)
+[![Demo Instance](https://img.shields.io/website?url=https://tracktor.bytedge.in&label=Demo&logo=rocket&logoColor=white)](https://tracktor.bytedge.in)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/javedh-dev/tracktor/ci.yml?logo=githubactions&logoColor=white&label=Build)](https://github.com/javedh-dev/tracktor/actions/workflows/ci.yml)
+[![GitHub Tag](https://img.shields.io/github/v/tag/javedh-dev/tracktor?logo=docker&logoColor=white&label=Tag)](https://github.com/javedh-dev/tracktor/releases/latest)
+[![GitHub Sponsor](https://img.shields.io/github/sponsors/javedh-dev?label=Sponsor&logo=githubsponsors)](https://github.com/sponsors/javedh-dev)
+
 <p align="center" style="font-size: 1.2rem;">
   <b>Tracktor</b> is an open-source web application for <b>comprehensive vehicle management</b>.<br>
   Easily track <span style="color:#4ade80;">⛽ fuel</span> consumption, <span style="color:#fbbf24;">🛠️ maintenance</span>, <span style="color:#60a5fa;">🛡️ insurance</span>, and <span style="color:#a78bfa;">📄 regulatory documents</span> for all your vehicles in one place.
