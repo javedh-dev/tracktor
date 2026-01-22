@@ -16,10 +16,7 @@ import { appAsciiArt, logger } from '$server/config';
 import { env } from '$lib/config/env.server';
 import { ensureAppDirectories } from '$server/utils/fs';
 import { cronJobManager } from '$server/services/cronService';
-import {
-	handleDailyReminderTrigger,
-	handleWeeklyMaintenanceCheck
-} from '$server/jobs/reminderTriggerJob';
+import { handleDailyReminderTrigger, handleWeeklyMaintenanceCheck } from '$server/jobs/reminderJob';
 
 const middlewareChain = new MiddlewareChain();
 

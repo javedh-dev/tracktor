@@ -14,7 +14,7 @@ src/
 │   ├── services/
 │   │   └── cronService.ts          # Cron job manager
 │   └── jobs/
-│       └── reminderTriggerJob.ts    # Scheduled job handlers
+│   │   └── reminderJob.ts           # Scheduled job handlers
 └── hooks.server.ts                 # Server initialization (includes cron setup)
 ```
 
@@ -65,7 +65,7 @@ Cron expressions use the standard format with 5 fields:
 
 ### Step 1: Create the Job Handler
 
-Create a new handler function in `src/server/jobs/reminderTriggerJob.ts` (or a separate file):
+Create a new handler function in `src/server/jobs/reminderJob.ts` (or a separate file):
 
 ```typescript
 import { logger } from '$server/config';
@@ -284,7 +284,7 @@ No additional configuration is needed.
 
 Here's a complete example of adding a database cleanup job:
 
-**src/server/jobs/reminderTriggerJob.ts:**
+**src/server/jobs/reminderJob.ts:**
 
 ```typescript
 export async function handleDailyDatabaseCleanup(): Promise<void> {
@@ -335,7 +335,7 @@ cronJobManager.registerJob({
 Test a job manually:
 
 ```typescript
-import { handleDailyReminderTrigger } from '$server/jobs/reminderTriggerJob';
+import { handleDailyReminderTrigger } from '$server/jobs/reminderJob';
 
 // In your test or API endpoint
 await handleDailyReminderTrigger();

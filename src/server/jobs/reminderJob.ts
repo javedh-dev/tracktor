@@ -1,7 +1,7 @@
 import { logger } from '$server/config';
 import { db } from '$server/db/index';
 import * as schema from '$server/db/schema/index';
-import { lte, and, eq } from 'drizzle-orm';
+import { lte, and, eq, gte, isNotNull } from 'drizzle-orm';
 import { calculateNextDueDate, hasRecurrenceEnded } from '$server/services/reminderService';
 
 type Reminder = typeof schema.reminderTable.$inferSelect;
@@ -179,17 +179,98 @@ export async function handleWeeklyMaintenanceCheck(): Promise<void> {
 	try {
 		logger.info('[MaintenanceCheckJob] Running weekly maintenance status check...');
 
+		// Calculate date range: today and one month from now
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		const oneMonthFromNow = new Date(today);
+		oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+
+		const todayISO = today.toISOString();
+		const oneMonthFromNowISO = oneMonthFromNow.toISOString();
+
 		// Get all vehicles
 		const vehicles = await db.query.vehicleTable.findMany();
-
 		logger.info(`[MaintenanceCheckJob] Checking ${vehicles.length} vehicle(s)`);
 
-		// TODO: Implement maintenance checks
-		// Examples:
-		// - Check if maintenance is overdue
-		// - Analyze fuel efficiency trends
-		// - Validate insurance expiry dates
-		// - Check pollution certificate status
+		// Check for expiring insurance policies (with vehicle details via join)
+		const expiringInsurances = await db
+			.select({
+				insuranceId: schema.insuranceTable.id,
+				vehicleId: schema.insuranceTable.vehicleId,
+				provider: schema.insuranceTable.provider,
+				policyNumber: schema.insuranceTable.policyNumber,
+				endDate: schema.insuranceTable.endDate,
+				vehicleMake: schema.vehicleTable.make,
+				vehicleModel: schema.vehicleTable.model,
+				licensePlate: schema.vehicleTable.licensePlate
+			})
+			.from(schema.insuranceTable)
+			.innerJoin(schema.vehicleTable, eq(schema.insuranceTable.vehicleId, schema.vehicleTable.id))
+			.where(
+				and(
+					isNotNull(schema.insuranceTable.endDate),
+					gte(schema.insuranceTable.endDate, todayISO),
+					lte(schema.insuranceTable.endDate, oneMonthFromNowISO)
+				)
+			);
+
+		if (expiringInsurances.length > 0) {
+			logger.info(`[MaintenanceCheckJob] Found ${expiringInsurances.length} expiring insurance(s)`);
+			for (const ins of expiringInsurances) {
+				const vehicleDisplay = `${ins.vehicleMake} ${ins.vehicleModel}${ins.licensePlate ? ` (${ins.licensePlate})` : ''}`;
+				logger.warn(
+					`[MaintenanceCheckJob] Insurance expiring soon - Vehicle: ${vehicleDisplay}, ` +
+						`Policy: ${ins.policyNumber}, Provider: ${ins.provider}, ` +
+						`Expiry Date: ${ins.endDate}`
+				);
+				// TODO: Send notification (email, push, webhook, etc.)
+			}
+		} else {
+			logger.info('[MaintenanceCheckJob] No expiring insurance policies found');
+		}
+
+		// Check for expiring pollution certificates (with vehicle details via join)
+		const expiringPollutionCerts = await db
+			.select({
+				certificateId: schema.pollutionCertificateTable.id,
+				vehicleId: schema.pollutionCertificateTable.vehicleId,
+				certificateNumber: schema.pollutionCertificateTable.certificateNumber,
+				expiryDate: schema.pollutionCertificateTable.expiryDate,
+				testingCenter: schema.pollutionCertificateTable.testingCenter,
+				vehicleMake: schema.vehicleTable.make,
+				vehicleModel: schema.vehicleTable.model,
+				licensePlate: schema.vehicleTable.licensePlate
+			})
+			.from(schema.pollutionCertificateTable)
+			.innerJoin(
+				schema.vehicleTable,
+				eq(schema.pollutionCertificateTable.vehicleId, schema.vehicleTable.id)
+			)
+			.where(
+				and(
+					isNotNull(schema.pollutionCertificateTable.expiryDate),
+					gte(schema.pollutionCertificateTable.expiryDate, todayISO),
+					lte(schema.pollutionCertificateTable.expiryDate, oneMonthFromNowISO)
+				)
+			);
+
+		if (expiringPollutionCerts.length > 0) {
+			logger.info(
+				`[MaintenanceCheckJob] Found ${expiringPollutionCerts.length} expiring pollution certificate(s)`
+			);
+			for (const cert of expiringPollutionCerts) {
+				const vehicleDisplay = `${cert.vehicleMake} ${cert.vehicleModel}${cert.licensePlate ? ` (${cert.licensePlate})` : ''}`;
+				logger.warn(
+					`[MaintenanceCheckJob] Pollution certificate expiring soon - Vehicle: ${vehicleDisplay}, ` +
+						`Certificate: ${cert.certificateNumber}, Testing Center: ${cert.testingCenter}, ` +
+						`Expiry Date: ${cert.expiryDate}`
+				);
+				// TODO: Send notification (email, push, webhook, etc.)
+			}
+		} else {
+			logger.info('[MaintenanceCheckJob] No expiring pollution certificates found');
+		}
 
 		logger.info('[MaintenanceCheckJob] Weekly maintenance check completed');
 	} catch (error) {
