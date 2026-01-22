@@ -48,7 +48,7 @@ const initializeCronJobs = () => {
 		// Register reminder trigger job - runs every day at 8:00 AM
 		cronJobManager.registerJob({
 			name: 'daily-reminder-trigger',
-			schedule: '0 8 * * *', // 8:00 AM every day
+			schedule: '0 8 * * *', // daily at 8:00 AM
 			timezone: env.TZ,
 			handler: handleDailyReminderTrigger,
 			runOnInit: false // Set to true to run immediately on startup for testing
@@ -60,7 +60,7 @@ const initializeCronJobs = () => {
 			schedule: '0 9 * * 1', // Monday 9:00 AM
 			timezone: env.TZ,
 			handler: handleWeeklyMaintenanceCheck,
-			runOnInit: false
+			runOnInit: true
 		});
 
 		logger.info('Cron jobs initialized successfully');
@@ -110,11 +110,8 @@ const initPromise = (async () => {
 		initializeCronJobs();
 	} catch (error) {
 		logger.error('Failed to initialize cron jobs', error);
-
 		const wrapped = new Error('Failed to initialize cron jobs');
-
 		(wrapped as any).cause = error;
-
 		throw wrapped;
 	}
 })();

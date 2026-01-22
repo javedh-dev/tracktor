@@ -34,10 +34,6 @@ class CronJobManager {
 		logger.info('CronJobManager initialized');
 	}
 
-	/**
-	 * Register a new cron job
-	 * @param config - Cron job configuration
-	 */
 	public registerJob(config: CronJobConfig): void {
 		if (!this.initialized) {
 			throw new Error('CronJobManager must be initialized before registering jobs');
@@ -119,25 +115,14 @@ class CronJobManager {
 		}
 	}
 
-	/**
-	 * Get a registered job by name
-	 * @param name - Job name
-	 */
 	public getJob(name: string): RegisteredCronJob | undefined {
 		return this.jobs.get(name);
 	}
 
-	/**
-	 * Get all registered jobs
-	 */
 	public getAllJobs(): RegisteredCronJob[] {
 		return Array.from(this.jobs.values());
 	}
 
-	/**
-	 * Stop a specific cron job
-	 * @param name - Job name
-	 */
 	public stopJob(name: string): boolean {
 		const job = this.jobs.get(name);
 		if (!job) {
@@ -150,10 +135,6 @@ class CronJobManager {
 		return true;
 	}
 
-	/**
-	 * Start a previously stopped cron job
-	 * @param name - Job name
-	 */
 	public startJob(name: string): boolean {
 		const job = this.jobs.get(name);
 		if (!job) {
@@ -166,10 +147,6 @@ class CronJobManager {
 		return true;
 	}
 
-	/**
-	 * Unregister and stop a cron job
-	 * @param name - Job name
-	 */
 	public unregisterJob(name: string): boolean {
 		const job = this.jobs.get(name);
 		if (!job) {
@@ -184,9 +161,6 @@ class CronJobManager {
 		return true;
 	}
 
-	/**
-	 * Stop all cron jobs (typically called on server shutdown)
-	 */
 	public stopAll(): void {
 		logger.info('[CronJob] Stopping all cron jobs...');
 		for (const [name, job] of this.jobs) {
@@ -196,9 +170,6 @@ class CronJobManager {
 		logger.info('[CronJob] All cron jobs stopped');
 	}
 
-	/**
-	 * Destroy all cron jobs and clear registry
-	 */
 	public destroyAll(): void {
 		logger.info('[CronJob] Destroying all cron jobs...');
 		for (const [name, job] of this.jobs) {
@@ -210,9 +181,6 @@ class CronJobManager {
 		logger.info('[CronJob] All cron jobs destroyed');
 	}
 
-	/**
-	 * Get job statistics
-	 */
 	public getStats() {
 		return {
 			totalJobs: this.jobs.size,
@@ -225,7 +193,6 @@ class CronJobManager {
 	}
 }
 
-// Export singleton instance
 export const cronJobManager = new CronJobManager();
 
 export type { CronJobConfig };

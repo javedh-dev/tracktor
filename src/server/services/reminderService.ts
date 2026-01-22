@@ -128,3 +128,46 @@ export const updateReminder = async (
 export const deleteReminder = async (id: string): Promise<ApiResponse> => {
 	return performDelete(schema.reminderTable, id, 'Reminder');
 };
+
+/**
+ * Calculate the next due date for a recurring reminder based on recurrence type and interval
+ */
+export function calculateNextDueDate(
+	currentDueDate: string,
+	recurrenceType: string,
+	recurrenceInterval: number
+): Date {
+	const current = new Date(currentDueDate);
+
+	switch (recurrenceType) {
+		case 'daily':
+			current.setDate(current.getDate() + recurrenceInterval);
+			break;
+		case 'weekly':
+			current.setDate(current.getDate() + recurrenceInterval * 7);
+			break;
+		case 'monthly':
+			current.setMonth(current.getMonth() + recurrenceInterval);
+			break;
+		case 'yearly':
+			current.setFullYear(current.getFullYear() + recurrenceInterval);
+			break;
+		default:
+			// For 'none' or unknown types, don't calculate next date
+			throw new Error(`Cannot calculate next date for recurrence type: ${recurrenceType}`);
+	}
+
+	return current;
+}
+
+/**
+ * Check if a reminder's recurrence has ended
+ */
+export function hasRecurrenceEnded(nextDueDate: Date, recurrenceEndDate: string | null): boolean {
+	if (!recurrenceEndDate) {
+		return false; // No end date means it continues indefinitely
+	}
+
+	const endDate = new Date(recurrenceEndDate);
+	return nextDueDate > endDate;
+}
