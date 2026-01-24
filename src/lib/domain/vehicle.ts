@@ -62,11 +62,13 @@ export const vehicleSchema = z.object({
 		.string()
 		.min(2, 'It must be more than 1 character.')
 		.max(50, 'It must be less than 50 characters.')
+		.transform((val) => val.toUpperCase())
 		.nullable(),
 	vin: z
 		.string()
 		.min(2, 'It must be more than 1 character.')
 		.max(50, 'It must be less than 50 characters.')
+		.transform((val) => val.toUpperCase())
 		.nullable(),
 	color: z
 		.string()
