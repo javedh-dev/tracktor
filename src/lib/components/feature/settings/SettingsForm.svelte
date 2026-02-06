@@ -190,7 +190,8 @@
 		fr: 'Français',
 		de: 'Deutsch',
 		it: 'Italiano',
-		hu: 'Magyar'
+		hu: 'Magyar',
+		fi: 'Suomi'
 	};
 	const localeOptions = locales.map((code) => ({
 		value: code,
