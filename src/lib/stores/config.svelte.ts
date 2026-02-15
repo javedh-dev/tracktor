@@ -19,7 +19,16 @@ class ConfigStore {
 		featurePucc: true,
 		featureReminders: true,
 		featureInsurance: true,
-		featureOverview: true
+		featureOverview: true,
+		cronJobsEnabled: true,
+		cronRemindersEnabled: true,
+		cronRemindersSchedule: '0 * * * *',
+		cronInsuranceEnabled: true,
+		cronInsuranceSchedule: '0 8 * * *',
+		cronPuccEnabled: true,
+		cronPuccSchedule: '30 8 * * *',
+		cronCleanupEnabled: true,
+		cronCleanupSchedule: '0 2 * * *'
 	});
 	rawConfig = $state<Config[]>([]);
 	processing = $state(false);
@@ -104,6 +113,33 @@ class ConfigStore {
 							break;
 						case 'featureOverview':
 							this.configs.featureOverview = item.value === 'true';
+							break;
+						case 'cronJobsEnabled':
+							this.configs.cronJobsEnabled = item.value === 'true';
+							break;
+						case 'cronRemindersEnabled':
+							this.configs.cronRemindersEnabled = item.value === 'true';
+							break;
+						case 'cronRemindersSchedule':
+							this.configs.cronRemindersSchedule = item.value || this.configs.cronRemindersSchedule;
+							break;
+						case 'cronInsuranceEnabled':
+							this.configs.cronInsuranceEnabled = item.value === 'true';
+							break;
+						case 'cronInsuranceSchedule':
+							this.configs.cronInsuranceSchedule = item.value || this.configs.cronInsuranceSchedule;
+							break;
+						case 'cronPuccEnabled':
+							this.configs.cronPuccEnabled = item.value === 'true';
+							break;
+						case 'cronPuccSchedule':
+							this.configs.cronPuccSchedule = item.value || this.configs.cronPuccSchedule;
+							break;
+						case 'cronCleanupEnabled':
+							this.configs.cronCleanupEnabled = item.value === 'true';
+							break;
+						case 'cronCleanupSchedule':
+							this.configs.cronCleanupSchedule = item.value || this.configs.cronCleanupSchedule;
 							break;
 					}
 				});

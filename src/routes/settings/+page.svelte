@@ -5,6 +5,7 @@
 	import SettingsSelectField from '$feature/settings/SettingsSelectField.svelte';
 	import SettingsFeatureToggle from '$feature/settings/SettingsFeatureToggle.svelte';
 	import SettingsSectionHeader from '$feature/settings/SettingsSectionHeader.svelte';
+	import CronInput from '$feature/settings/CronInput.svelte';
 	import { configStore } from '$stores/config.svelte';
 	import { themeStore } from '$lib/stores/theme.svelte';
 	import { themes } from '$lib/config/themes';
@@ -39,6 +40,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import Gauge from '@lucide/svelte/icons/gauge';
 	import ToggleLeft from '@lucide/svelte/icons/toggle-left';
+	import Clock from '@lucide/svelte/icons/clock';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
@@ -70,7 +72,16 @@
 		featurePucc: z.boolean().default(true),
 		featureReminders: z.boolean().default(true),
 		featureInsurance: z.boolean().default(true),
-		featureOverview: z.boolean().default(true)
+		featureOverview: z.boolean().default(true),
+		cronJobsEnabled: z.boolean().default(true),
+		cronRemindersEnabled: z.boolean().default(true),
+		cronRemindersSchedule: z.string().default('0 * * * *'),
+		cronInsuranceEnabled: z.boolean().default(true),
+		cronInsuranceSchedule: z.string().default('0 8 * * *'),
+		cronPuccEnabled: z.boolean().default(true),
+		cronPuccSchedule: z.string().default('30 8 * * *'),
+		cronCleanupEnabled: z.boolean().default(true),
+		cronCleanupSchedule: z.string().default('0 2 * * *')
 	});
 
 	const form = superForm(defaults(zod4(configSchema)), {
@@ -105,6 +116,19 @@
 
 				// Persist configuration before applying a locale change
 				await saveConfig(updatedConfig);
+
+				// If any cron settings changed, reload cron jobs
+				const cronKeys = Object.keys(f.data).filter((key) => key.startsWith('cron'));
+				if (cronKeys.length > 0) {
+					try {
+						const reloadResponse = await fetch('/api/cron/reload', { method: 'POST' });
+						if (reloadResponse.ok) {
+							console.log('Cron jobs reloaded successfully');
+						}
+					} catch (error) {
+						console.error('Failed to reload cron jobs:', error);
+					}
+				}
 
 				// If locale changed, update Paraglide (triggers reload by default)
 				if (f.data.locale && f.data.locale !== getLocale()) {
@@ -142,7 +166,16 @@
 		featurePucc: 'features',
 		featureReminders: 'features',
 		featureInsurance: 'features',
-		featureOverview: 'features'
+		featureOverview: 'features',
+		cronJobsEnabled: 'automatedJobs',
+		cronRemindersEnabled: 'automatedJobs',
+		cronRemindersSchedule: 'automatedJobs',
+		cronInsuranceEnabled: 'automatedJobs',
+		cronInsuranceSchedule: 'automatedJobs',
+		cronPuccEnabled: 'automatedJobs',
+		cronPuccSchedule: 'automatedJobs',
+		cronCleanupEnabled: 'automatedJobs',
+		cronCleanupSchedule: 'automatedJobs'
 	};
 
 	// Navigate to the first section with errors
@@ -172,6 +205,11 @@
 			id: 'features',
 			label: m.settings_tab_features(),
 			icon: ToggleLeft
+		},
+		{
+			id: 'automatedJobs',
+			label: 'Automated Jobs',
+			icon: Clock
 		}
 	];
 
@@ -224,8 +262,11 @@
 		if (localConfig.length > 0) {
 			const configData: any = {};
 			localConfig.forEach((item) => {
-				// Handle boolean values for feature toggles
-				if (item.key.startsWith('feature')) {
+				// Handle boolean values for feature toggles and cron settings
+				if (
+					item.key.startsWith('feature') ||
+					(item.key.startsWith('cron') && item.key.includes('Enabled'))
+				) {
 					configData[item.key] = item.value === 'true';
 				} else {
 					configData[item.key] = item.value || '';
@@ -291,113 +332,140 @@
 									description="Customize your experience with themes, languages, and formats."
 								/>
 
-								<fieldset class="grid gap-6 md:grid-cols-3" disabled={processing}>
-									<!-- Theme -->
-									<SettingsSelectField
-										{form}
-										name="theme"
-										label={m.settings_label_theme()}
-										description={m.settings_desc_theme()}
-										icon={Palette}
-										bind:value={$formData.theme}
-										options={Object.values(themes).map((theme) => ({
-											value: theme.name,
-											label: theme.label,
-											colorPreview: theme.colors?.primary || '#000'
-										}))}
-										placeholder={m.settings_select_theme()}
-										disabled={processing}
-									/>
+								<fieldset class="space-y-6" disabled={processing}>
+									<!-- Appearance Settings -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Appearance</h3>
+										<p class="text-muted-foreground text-xs">
+											Customize the look and feel of your application
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Theme -->
+											<SettingsSelectField
+												{form}
+												name="theme"
+												label={m.settings_label_theme()}
+												description={m.settings_desc_theme()}
+												icon={Palette}
+												bind:value={$formData.theme}
+												options={Object.values(themes).map((theme) => ({
+													value: theme.name,
+													label: theme.label,
+													colorPreview: theme.colors?.primary || '#000'
+												}))}
+												placeholder={m.settings_select_theme()}
+												disabled={processing}
+											/>
 
-									<!-- Locale -->
-									<SettingsSelectField
-										{form}
-										name="locale"
-										label={m.settings_label_locale()}
-										description={m.settings_desc_locale()}
-										icon={Languages}
-										bind:value={$formData.locale}
-										options={localeOptions}
-										placeholder={m.settings_select_language()}
-										disabled={processing}
-									/>
+											<!-- Custom CSS -->
+											<Form.Field {form} name="customCss" class="w-full md:col-span-2">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_custom_css()}
+															>{m.settings_label_custom_css()}</FormLabel
+														>
+														<Textarea
+															{...props}
+															placeholder="Add your custom CSS here..."
+															class="mono h-36 resize-none"
+															bind:value={$formData.customCss}
+														/>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+										</div>
+									</div>
 
-									<!-- Timezone -->
-									<Form.Field {form} name="timezone" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_timezone()}
-													>{m.settings_label_timezone()}</FormLabel
-												>
-												<SearchableSelect
-													bind:value={$formData.timezone}
-													options={getTimezoneOptions()}
-													icon={Earth}
-													{...props}
-												/>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
+									<!-- Localization Settings -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Localization</h3>
+										<p class="text-muted-foreground text-xs">
+											Set your preferred language and timezone
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Locale -->
+											<SettingsSelectField
+												{form}
+												name="locale"
+												label={m.settings_label_locale()}
+												description={m.settings_desc_locale()}
+												icon={Languages}
+												bind:value={$formData.locale}
+												options={localeOptions}
+												placeholder={m.settings_select_language()}
+												disabled={processing}
+											/>
 
-									<!-- Currency -->
-									<Form.Field {form} name="currency" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_currency()}
-													>{m.settings_label_currency()}</FormLabel
-												>
-												<SearchableSelect
-													bind:value={$formData.currency}
-													icon={Currency}
-													options={currencyOptions}
-													{...props}
-												/>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
+											<!-- Timezone -->
+											<Form.Field {form} name="timezone" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_timezone()}
+															>{m.settings_label_timezone()}</FormLabel
+														>
+														<SearchableSelect
+															bind:value={$formData.timezone}
+															options={getTimezoneOptions()}
+															icon={Earth}
+															{...props}
+														/>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+										</div>
+									</div>
 
-									<!-- Date Format -->
-									<Form.Field {form} name="dateFormat" class="w-full">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_date_format()}
-													>{m.settings_label_date_format()}</FormLabel
-												>
-												<Input
-													{...props}
-													bind:value={$formData.dateFormat}
-													icon={Calendar}
-													type="text"
-													class="mono"
-												/>
-												<Form.Description>
-													{m.common_example_prefix()}
-													{isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
-												</Form.Description>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
+									<!-- Format Settings -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Formats</h3>
+										<p class="text-muted-foreground text-xs">
+											Configure how currency and dates are displayed
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Currency -->
+											<Form.Field {form} name="currency" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_currency()}
+															>{m.settings_label_currency()}</FormLabel
+														>
+														<SearchableSelect
+															bind:value={$formData.currency}
+															icon={Currency}
+															options={currencyOptions}
+															{...props}
+														/>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
 
-									<!-- Custom CSS -->
-									<Form.Field {form} name="customCss" class="w-full md:col-span-3">
-										<Form.Control>
-											{#snippet children({ props })}
-												<FormLabel description={m.settings_desc_custom_css()}
-													>{m.settings_label_custom_css()}</FormLabel
-												>
-												<Textarea
-													{...props}
-													placeholder="Add your custom CSS here..."
-													class="mono h-36 resize-none"
-													bind:value={$formData.customCss}
-												/>
-											{/snippet}
-										</Form.Control>
-										<Form.FieldErrors />
-									</Form.Field>
+											<!-- Date Format -->
+											<Form.Field {form} name="dateFormat" class="w-full">
+												<Form.Control>
+													{#snippet children({ props })}
+														<FormLabel description={m.settings_desc_date_format()}
+															>{m.settings_label_date_format()}</FormLabel
+														>
+														<Input
+															{...props}
+															bind:value={$formData.dateFormat}
+															icon={Calendar}
+															type="text"
+															class="mono"
+														/>
+														<Form.Description>
+															{m.common_example_prefix()}
+															{isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
+														</Form.Description>
+													{/snippet}
+												</Form.Control>
+												<Form.FieldErrors />
+											</Form.Field>
+										</div>
+									</div>
 								</fieldset>
 							</div>
 						{/if}
@@ -410,71 +478,99 @@
 									description="Configure measurement units for distance, volume, and fuel types."
 								/>
 
-								<fieldset class="grid gap-6 md:grid-cols-3" disabled={processing}>
-									<!-- Unit of Distance -->
-									<SettingsSelectField
-										{form}
-										name="unitOfDistance"
-										label={m.settings_label_unit_distance()}
-										description={m.settings_desc_unit_distance()}
-										icon={RulerDimensionLine}
-										bind:value={$formData.unitOfDistance}
-										options={uodOptions}
-										placeholder={m.settings_select_unit_system()}
-										disabled={processing}
-									/>
+								<fieldset class="space-y-6" disabled={processing}>
+									<!-- Distance and Mileage Settings -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Distance & Mileage</h3>
+										<p class="text-muted-foreground text-xs">
+											Choose your preferred units for distance and mileage calculations
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Unit of Distance -->
+											<SettingsSelectField
+												{form}
+												name="unitOfDistance"
+												label={m.settings_label_unit_distance()}
+												description={m.settings_desc_unit_distance()}
+												icon={RulerDimensionLine}
+												bind:value={$formData.unitOfDistance}
+												options={uodOptions}
+												placeholder={m.settings_select_unit_system()}
+												disabled={processing}
+											/>
 
-									<!-- Mileage Unit Format -->
-									<SettingsSelectField
-										{form}
-										name="mileageUnitFormat"
-										label={m.settings_label_mileage_format()}
-										description={m.settings_desc_mileage_format()}
-										icon={Rabbit}
-										bind:value={$formData.mileageUnitFormat}
-										options={mileageUnitFormatOptions}
-										placeholder={m.settings_select_unit_system()}
-										disabled={processing}
-									/>
+											<!-- Mileage Unit Format -->
+											<SettingsSelectField
+												{form}
+												name="mileageUnitFormat"
+												label={m.settings_label_mileage_format()}
+												description={m.settings_desc_mileage_format()}
+												icon={Rabbit}
+												bind:value={$formData.mileageUnitFormat}
+												options={mileageUnitFormatOptions}
+												placeholder={m.settings_select_unit_system()}
+												disabled={processing}
+											/>
+										</div>
+									</div>
 
-									<!-- Petrol/Diesel -->
-									<SettingsSelectField
-										{form}
-										name="unitOfVolume"
-										label="Petrol/Diesel"
-										description={m.settings_desc_unit_volume()}
-										icon={Currency}
-										bind:value={$formData.unitOfVolume}
-										options={uovOptions}
-										placeholder={m.settings_select_unit_system()}
-										disabled={processing}
-									/>
+									<!-- Fuel Volume Settings -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Fuel Volume Units</h3>
+										<p class="text-muted-foreground text-xs">
+											Select units for different fuel types (petrol, diesel, LPG, CNG)
+										</p>
+										<div class="grid gap-4 md:grid-cols-3">
+											<!-- Petrol/Diesel -->
+											<SettingsSelectField
+												{form}
+												name="unitOfVolume"
+												label="Petrol/Diesel"
+												description={m.settings_desc_unit_volume()}
+												icon={Fuel}
+												bind:value={$formData.unitOfVolume}
+												options={uovOptions}
+												placeholder={m.settings_select_unit_system()}
+												disabled={processing}
+											/>
 
-									<!-- LPG -->
-									<SettingsSelectField
-										{form}
-										name="unitOfLpg"
-										label="LPG"
-										description={m.settings_desc_unit_volume()}
-										icon={Fuel}
-										bind:value={$formData.unitOfLpg}
-										options={gasUnitOptions}
-										placeholder={m.settings_select_unit_system()}
-										disabled={processing}
-									/>
+											<!-- LPG -->
+											<SettingsSelectField
+												{form}
+												name="unitOfLpg"
+												label="LPG"
+												description={m.settings_desc_unit_volume()}
+												icon={Fuel}
+												bind:value={$formData.unitOfLpg}
+												options={gasUnitOptions}
+												placeholder={m.settings_select_unit_system()}
+												disabled={processing}
+											/>
 
-									<!-- CNG -->
-									<SettingsSelectField
-										{form}
-										name="unitOfCng"
-										label="CNG"
-										description={m.settings_desc_unit_volume()}
-										icon={Fuel}
-										bind:value={$formData.unitOfCng}
-										options={gasUnitOptions}
-										placeholder={m.settings_select_unit_system()}
-										disabled={processing}
-									/>
+											<!-- CNG -->
+											<SettingsSelectField
+												{form}
+												name="unitOfCng"
+												label="CNG"
+												description={m.settings_desc_unit_volume()}
+												icon={Fuel}
+												bind:value={$formData.unitOfCng}
+												options={gasUnitOptions}
+												placeholder={m.settings_select_unit_system()}
+												disabled={processing}
+											/>
+										</div>
+									</div>
+
+									<!-- Info Box -->
+									<div class="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30">
+										<p class="font-medium">About Units:</p>
+										<p class="text-muted-foreground mt-1">
+											These settings affect how measurements are displayed throughout the
+											application. All calculations will be converted automatically based on your
+											selected units.
+										</p>
+									</div>
 								</fieldset>
 							</div>
 						{/if}
@@ -487,66 +583,277 @@
 									description={m.settings_features_intro()}
 								/>
 
-								<fieldset class="grid gap-6 md:grid-cols-3" disabled={processing}>
-									<!-- Fuel Log Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featureFuelLog"
-										label={m.feature_label_fuel()}
-										description={m.feature_desc_fuel()}
-										bind:checked={$formData.featureFuelLog}
-										disabled={processing}
-									/>
+								<fieldset class="space-y-6" disabled={processing}>
+									<!-- Data Tracking Features -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Data Tracking</h3>
+										<p class="text-muted-foreground text-xs">
+											Enable or disable fuel and maintenance tracking features
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Fuel Log Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featureFuelLog"
+												label={m.feature_label_fuel()}
+												description={m.feature_desc_fuel()}
+												bind:checked={$formData.featureFuelLog}
+												disabled={processing}
+											/>
 
-									<!-- Maintenance Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featureMaintenance"
-										label={m.feature_label_maintenance()}
-										description={m.feature_desc_maintenance()}
-										bind:checked={$formData.featureMaintenance}
-										disabled={processing}
-									/>
+											<!-- Maintenance Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featureMaintenance"
+												label={m.feature_label_maintenance()}
+												description={m.feature_desc_maintenance()}
+												bind:checked={$formData.featureMaintenance}
+												disabled={processing}
+											/>
+										</div>
+									</div>
 
-									<!-- PUCC Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featurePucc"
-										label={m.feature_label_pollution()}
-										description={m.feature_desc_pollution()}
-										bind:checked={$formData.featurePucc}
-										disabled={processing}
-									/>
+									<!-- Document Management Features -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Document Management</h3>
+										<p class="text-muted-foreground text-xs">
+											Manage pollution certificates and insurance policies
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- PUCC Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featurePucc"
+												label={m.feature_label_pollution()}
+												description={m.feature_desc_pollution()}
+												bind:checked={$formData.featurePucc}
+												disabled={processing}
+											/>
 
-									<!-- Reminders Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featureReminders"
-										label={m.feature_label_reminders()}
-										description={m.feature_desc_reminders()}
-										bind:checked={$formData.featureReminders}
-										disabled={processing}
-									/>
+											<!-- Insurance Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featureInsurance"
+												label={m.feature_label_insurance()}
+												description={m.feature_desc_insurance()}
+												bind:checked={$formData.featureInsurance}
+												disabled={processing}
+											/>
+										</div>
+									</div>
 
-									<!-- Insurance Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featureInsurance"
-										label={m.feature_label_insurance()}
-										description={m.feature_desc_insurance()}
-										bind:checked={$formData.featureInsurance}
-										disabled={processing}
-									/>
+									<!-- Additional Features -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<h3 class="text-sm font-semibold">Additional Features</h3>
+										<p class="text-muted-foreground text-xs">
+											Configure reminders and overview dashboard features
+										</p>
+										<div class="grid gap-4 md:grid-cols-2">
+											<!-- Reminders Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featureReminders"
+												label={m.feature_label_reminders()}
+												description={m.feature_desc_reminders()}
+												bind:checked={$formData.featureReminders}
+												disabled={processing}
+											/>
 
-									<!-- Overview Feature -->
-									<SettingsFeatureToggle
-										{form}
-										name="featureOverview"
-										label={m.feature_label_overview()}
-										description={m.feature_desc_overview()}
-										bind:checked={$formData.featureOverview}
-										disabled={processing}
-									/>
+											<!-- Overview Feature -->
+											<SettingsFeatureToggle
+												{form}
+												name="featureOverview"
+												label={m.feature_label_overview()}
+												description={m.feature_desc_overview()}
+												bind:checked={$formData.featureOverview}
+												disabled={processing}
+											/>
+										</div>
+									</div>
+
+									<!-- Info Box -->
+									<div class="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30">
+										<p class="font-medium">About Feature Toggles:</p>
+										<p class="text-muted-foreground mt-1">
+											Disabling a feature will hide it from the navigation menu and prevent access
+											to its pages. All existing data will be preserved and can be accessed again
+											when the feature is re-enabled.
+										</p>
+									</div>
+								</fieldset>
+							</div>
+						{/if}
+
+						<!-- Automated Jobs Section -->
+						{#if activeSection === 'automatedJobs'}
+							<div class="space-y-6">
+								<SettingsSectionHeader
+									title="Automated Jobs"
+									description="Configure scheduled jobs for automated notifications and maintenance tasks."
+								/>
+
+								<!-- Global Enable/Disable -->
+								<fieldset class="space-y-6" disabled={processing}>
+									<div class="border-border bg-muted/50 rounded-lg border p-4">
+										<SettingsFeatureToggle
+											{form}
+											name="cronJobsEnabled"
+											label="Enable Automated Jobs"
+											description="Master switch to enable or disable all automated background jobs"
+											bind:checked={$formData.cronJobsEnabled}
+											disabled={processing}
+										/>
+									</div>
+
+									<!-- Reminder Processing Job -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div class="flex items-center justify-between">
+											<div>
+												<h3 class="text-sm font-semibold">Reminder Processing</h3>
+												<p class="text-muted-foreground text-xs">
+													Automatically generate notifications from active reminders
+												</p>
+											</div>
+											<SettingsFeatureToggle
+												{form}
+												name="cronRemindersEnabled"
+												label=""
+												description=""
+												bind:checked={$formData.cronRemindersEnabled}
+												disabled={processing || !$formData.cronJobsEnabled}
+											/>
+										</div>
+										<Form.Field {form} name="cronRemindersSchedule" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Schedule</FormLabel>
+													<CronInput
+														bind:value={$formData.cronRemindersSchedule}
+														disabled={processing || !$formData.cronRemindersEnabled}
+														placeholder="0 * * * *"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+									</div>
+
+									<!-- Insurance Expiry Job -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div class="flex items-center justify-between">
+											<div>
+												<h3 class="text-sm font-semibold">Insurance Expiry Notifications</h3>
+												<p class="text-muted-foreground text-xs">
+													Generate notifications for insurance policies expiring within 30 days
+												</p>
+											</div>
+											<SettingsFeatureToggle
+												{form}
+												name="cronInsuranceEnabled"
+												label=""
+												description=""
+												bind:checked={$formData.cronInsuranceEnabled}
+												disabled={processing || !$formData.cronJobsEnabled}
+											/>
+										</div>
+										<Form.Field {form} name="cronInsuranceSchedule" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Schedule</FormLabel>
+													<CronInput
+														bind:value={$formData.cronInsuranceSchedule}
+														disabled={processing || !$formData.cronInsuranceEnabled}
+														placeholder="0 8 * * *"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+									</div>
+
+									<!-- PUCC Expiry Job -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div class="flex items-center justify-between">
+											<div>
+												<h3 class="text-sm font-semibold">PUCC Expiry Notifications</h3>
+												<p class="text-muted-foreground text-xs">
+													Generate notifications for pollution certificates expiring within 30 days
+												</p>
+											</div>
+											<SettingsFeatureToggle
+												{form}
+												name="cronPuccEnabled"
+												label=""
+												description=""
+												bind:checked={$formData.cronPuccEnabled}
+												disabled={processing || !$formData.cronJobsEnabled}
+											/>
+										</div>
+										<Form.Field {form} name="cronPuccSchedule" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Schedule</FormLabel>
+													<CronInput
+														bind:value={$formData.cronPuccSchedule}
+														disabled={processing || !$formData.cronPuccEnabled}
+														placeholder="30 8 * * *"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+									</div>
+
+									<!-- Cleanup Job -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div class="flex items-center justify-between">
+											<div>
+												<h3 class="text-sm font-semibold">Notification Cleanup</h3>
+												<p class="text-muted-foreground text-xs">
+													Automatically delete read notifications older than 30 days
+												</p>
+											</div>
+											<SettingsFeatureToggle
+												{form}
+												name="cronCleanupEnabled"
+												label=""
+												description=""
+												bind:checked={$formData.cronCleanupEnabled}
+												disabled={processing || !$formData.cronJobsEnabled}
+											/>
+										</div>
+										<Form.Field {form} name="cronCleanupSchedule" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Schedule</FormLabel>
+													<CronInput
+														bind:value={$formData.cronCleanupSchedule}
+														disabled={processing || !$formData.cronCleanupEnabled}
+														placeholder="0 2 * * *"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+									</div>
+
+									<!-- Info Box -->
+									<div class="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30">
+										<p class="font-medium">Cron Expression Format:</p>
+										<p class="text-muted-foreground mt-1">
+											<code class="bg-muted rounded px-1 py-0.5">* * * * *</code>
+											= minute (0-59) | hour (0-23) | day (1-31) | month (1-12) | weekday (0-6)
+										</p>
+										<p class="text-muted-foreground mt-2">
+											Examples:
+											<br />
+											<code class="bg-muted rounded px-1 py-0.5">0 * * * *</code> - Every hour
+											<br />
+											<code class="bg-muted rounded px-1 py-0.5">0 8 * * *</code> - Daily at 8:00 AM
+											<br />
+											<code class="bg-muted rounded px-1 py-0.5">*/30 * * * *</code> - Every 30 minutes
+										</p>
+									</div>
 								</fieldset>
 							</div>
 						{/if}

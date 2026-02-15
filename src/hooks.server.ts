@@ -74,7 +74,7 @@ const initPromise = (async () => {
 
 	if (env.ENABLE_CRON_JOBS) {
 		try {
-			initializeCronJobs();
+			await initializeCronJobs();
 			logger.info('Cron jobs initialization completed');
 		} catch (error) {
 			logger.error('Failed to initialize cron jobs', error);

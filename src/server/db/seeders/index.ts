@@ -4,7 +4,8 @@ import {
 	maintenanceLogTable,
 	pollutionCertificateTable,
 	vehicleTable,
-	notificationTable
+	notificationTable,
+	configTable
 } from '$server/db/schema/index';
 import { createOrUpdateUser } from '$server/services/authService';
 import { db } from '$server/db/index';
@@ -18,7 +19,74 @@ export const seedData = async () => {
 		DEMO_MODE: env.DEMO_MODE
 	});
 
+	// Always seed default config values
+	await seedDefaultConfig();
+
 	if (env.DEMO_MODE && env.NODE_ENV !== 'test') await seedDemoData(env.FORCE_DATA_SEED);
+};
+
+const seedDefaultConfig = async () => {
+	const defaultConfigs = [
+		{ key: 'cronJobsEnabled', value: 'true', description: 'Enable/disable all cron jobs globally' },
+		{
+			key: 'cronRemindersEnabled',
+			value: 'true',
+			description: 'Enable/disable reminder processing cron job'
+		},
+		{
+			key: 'cronRemindersSchedule',
+			value: '0 * * * *',
+			description: 'Cron schedule for reminder processing (every hour)'
+		},
+		{
+			key: 'cronInsuranceEnabled',
+			value: 'true',
+			description: 'Enable/disable insurance expiry cron job'
+		},
+		{
+			key: 'cronInsuranceSchedule',
+			value: '0 8 * * *',
+			description: 'Cron schedule for insurance expiry (daily at 8:00 AM)'
+		},
+		{
+			key: 'cronPuccEnabled',
+			value: 'true',
+			description: 'Enable/disable PUCC expiry cron job'
+		},
+		{
+			key: 'cronPuccSchedule',
+			value: '30 8 * * *',
+			description: 'Cron schedule for PUCC expiry (daily at 8:30 AM)'
+		},
+		{
+			key: 'cronCleanupEnabled',
+			value: 'true',
+			description: 'Enable/disable notification cleanup cron job'
+		},
+		{
+			key: 'cronCleanupSchedule',
+			value: '0 2 * * *',
+			description: 'Cron schedule for notification cleanup (daily at 2:00 AM)'
+		}
+	];
+
+	for (const config of defaultConfigs) {
+		try {
+			// Check if config already exists
+			const existing = await db.query.configTable.findFirst({
+				where: (c, { eq }) => eq(c.key, config.key)
+			});
+
+			if (!existing) {
+				await db.insert(configTable).values(config);
+				logger.debug(`Seeded default config: ${config.key}`);
+			}
+		} catch (error) {
+			logger.error(`Failed to seed config ${config.key}:`, error);
+		}
+	}
+
+	logger.info('Default config values seeded');
 };
 
 const seedDefaultUser = async () => {

@@ -1,9 +1,37 @@
-import cron from 'node-cron';
+import cron, { type ScheduledTask } from 'node-cron';
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
 import { createNotification, findExistingNotification } from './notificationService';
+import { getAppConfigByKey } from './configService';
 import logger from '$server/config/logger';
 import { eq } from 'drizzle-orm';
+
+// Store active cron jobs for dynamic management
+const activeCronJobs: Map<string, ScheduledTask> = new Map();
+
+/**
+ * Get cron configuration from database
+ */
+async function getCronConfig(
+	key: string,
+	defaultValue: string | boolean
+): Promise<string | boolean> {
+	try {
+		const result = await getAppConfigByKey(key);
+		if (result.success && result.data) {
+			const value = result.data.value;
+			// Handle boolean values
+			if (typeof defaultValue === 'boolean') {
+				return value === 'true';
+			}
+			return value || defaultValue;
+		}
+		return defaultValue;
+	} catch (error) {
+		logger.error(`Error fetching config for ${key}, using default:`, error);
+		return defaultValue;
+	}
+}
 
 /**
  * Calculate the notification date based on reminder schedule
@@ -300,13 +328,11 @@ async function cleanupOldNotifications() {
 
 		const thirtyDaysAgo = new Date();
 		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-		const thirtyDaysAgoIso = thirtyDaysAgo.toISOString();
 
 		const deleted = await db
 			.delete(schema.notificationTable)
 			.where(
 				// Delete notifications that are read AND older than 30 days
-				// Using raw SQL for better compatibility
 				eq(schema.notificationTable.isRead, 1)
 			)
 			.returning();
@@ -321,43 +347,103 @@ async function cleanupOldNotifications() {
 }
 
 /**
- * Initialize and start all cron jobs
+ * Schedule or reschedule a specific cron job
  */
-export function initializeCronJobs() {
-	logger.info('Initializing cron jobs for notification system');
+function scheduleCronJob(
+	name: string,
+	schedule: string,
+	task: () => Promise<void>,
+	enabled: boolean
+) {
+	// Stop existing job if any
+	if (activeCronJobs.has(name)) {
+		activeCronJobs.get(name)?.stop();
+		activeCronJobs.delete(name);
+		logger.info(`Stopped existing cron job: ${name}`);
+	}
 
-	// Process reminders every hour at minute 0
-	// Runs: 00:00, 01:00, 02:00, etc.
-	cron.schedule('0 * * * *', async () => {
-		logger.info('Running scheduled reminder processing job');
-		await processReminders();
-	});
+	// Schedule new job if enabled
+	if (enabled) {
+		try {
+			if (!cron.validate(schedule)) {
+				logger.error(`Invalid cron schedule for ${name}: ${schedule}`);
+				return;
+			}
 
-	// Process insurance expiry every day at 8:00 AM
-	cron.schedule('0 8 * * *', async () => {
-		logger.info('Running scheduled insurance expiry processing job');
-		await processInsuranceExpiry();
-	});
-
-	// Process PUCC expiry every day at 8:30 AM
-	cron.schedule('30 8 * * *', async () => {
-		logger.info('Running scheduled PUCC expiry processing job');
-		await processPuccExpiry();
-	});
-
-	// Clean up old notifications every day at 2:00 AM
-	cron.schedule('0 2 * * *', async () => {
-		logger.info('Running scheduled notification cleanup job');
-		await cleanupOldNotifications();
-	});
-
-	logger.info('Cron jobs initialized successfully');
-	logger.info('Schedule:');
-	logger.info('  - Reminders: Every hour');
-	logger.info('  - Insurance expiry: Daily at 8:00 AM');
-	logger.info('  - PUCC expiry: Daily at 8:30 AM');
-	logger.info('  - Cleanup: Daily at 2:00 AM');
+			const job = cron.schedule(schedule, task);
+			activeCronJobs.set(name, job);
+			logger.info(`Scheduled cron job: ${name} with schedule: ${schedule}`);
+		} catch (error) {
+			logger.error(`Failed to schedule cron job ${name}:`, error);
+		}
+	} else {
+		logger.info(`Cron job disabled: ${name}`);
+	}
 }
 
-// Export individual functions for testing purposes
+/**
+ * Initialize and start all cron jobs based on database configuration
+ */
+export async function initializeCronJobs() {
+	logger.info('Initializing cron jobs for notification system');
+
+	try {
+		// Get configuration from database
+		const cronJobsEnabled = (await getCronConfig('cronJobsEnabled', true)) as boolean;
+
+		if (!cronJobsEnabled) {
+			logger.info('Cron jobs are disabled globally');
+			return;
+		}
+
+		// Get individual job configurations
+		const remindersEnabled = (await getCronConfig('cronRemindersEnabled', true)) as boolean;
+		const remindersSchedule = (await getCronConfig('cronRemindersSchedule', '0 * * * *')) as string;
+
+		const insuranceEnabled = (await getCronConfig('cronInsuranceEnabled', true)) as boolean;
+		const insuranceSchedule = (await getCronConfig('cronInsuranceSchedule', '0 8 * * *')) as string;
+
+		const puccEnabled = (await getCronConfig('cronPuccEnabled', true)) as boolean;
+		const puccSchedule = (await getCronConfig('cronPuccSchedule', '30 8 * * *')) as string;
+
+		const cleanupEnabled = (await getCronConfig('cronCleanupEnabled', true)) as boolean;
+		const cleanupSchedule = (await getCronConfig('cronCleanupSchedule', '0 2 * * *')) as string;
+
+		// Schedule all jobs
+		scheduleCronJob('reminders', remindersSchedule, processReminders, remindersEnabled);
+		scheduleCronJob('insurance', insuranceSchedule, processInsuranceExpiry, insuranceEnabled);
+		scheduleCronJob('pucc', puccSchedule, processPuccExpiry, puccEnabled);
+		scheduleCronJob('cleanup', cleanupSchedule, cleanupOldNotifications, cleanupEnabled);
+
+		logger.info('Cron jobs initialization completed');
+		logger.info('Active jobs:');
+		activeCronJobs.forEach((_, name) => {
+			logger.info(`  - ${name}`);
+		});
+	} catch (error) {
+		logger.error('Error initializing cron jobs:', error);
+	}
+}
+
+/**
+ * Reload cron jobs (useful when configuration changes)
+ */
+export async function reloadCronJobs() {
+	logger.info('Reloading cron jobs with updated configuration');
+	await initializeCronJobs();
+}
+
+/**
+ * Stop all cron jobs
+ */
+export function stopAllCronJobs() {
+	logger.info('Stopping all cron jobs');
+	activeCronJobs.forEach((job, name) => {
+		job.stop();
+		logger.info(`Stopped cron job: ${name}`);
+	});
+	activeCronJobs.clear();
+}
+
+// Export individual functions for testing and manual execution
 export { processReminders, processInsuranceExpiry, processPuccExpiry, cleanupOldNotifications };
