@@ -203,6 +203,8 @@
 	"notifications_section_alerts": "Compliance Alerts",
 	"notifications_mark_done_title": "Mark reminder as done",
 	"notifications_mark_done_aria": "Mark {type} reminder as done",
+	"notifications_mark_all_read_title": "Mark all as read",
+	"notifications_mark_all_read_aria": "Mark all notifications as read",
 	"notifications_overdue_days": "{days} day{plural} overdue",
 	"notifications_due_today": "Due today",
 	"notifications_due_tomorrow": "Due tomorrow",

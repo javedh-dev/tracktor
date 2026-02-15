@@ -99,6 +99,13 @@
 			"when": 1768936100461,
 			"tag": "20260120190820_config_changes",
 			"breakpoints": true
+		},
+		{
+			"idx": 14,
+			"version": "6",
+			"when": 1771153206607,
+			"tag": "20260215110006_add_notification_table",
+			"breakpoints": true
 		}
 	]
 }

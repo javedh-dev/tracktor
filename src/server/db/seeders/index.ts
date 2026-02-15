@@ -3,7 +3,8 @@ import {
 	insuranceTable,
 	maintenanceLogTable,
 	pollutionCertificateTable,
-	vehicleTable
+	vehicleTable,
+	notificationTable
 } from '$server/db/schema/index';
 import { createOrUpdateUser } from '$server/services/authService';
 import { db } from '$server/db/index';
@@ -26,6 +27,7 @@ const seedDefaultUser = async () => {
 };
 
 export const clearDb = async () => {
+	await db.delete(notificationTable);
 	await db.delete(pollutionCertificateTable);
 	await db.delete(maintenanceLogTable);
 	await db.delete(fuelLogTable);
@@ -145,6 +147,58 @@ const seedDemoData = async (enforce: boolean = false) => {
 			});
 		}
 		await db.insert(fuelLogTable).values(fuelLogs);
+	});
+
+	// Seed notifications for demo mode
+	vehicles.forEach(async (vehicle) => {
+		const notifications = [];
+		const notificationTypes = ['reminder', 'alert', 'maintenance', 'insurance', 'pollution'];
+		const sources = ['system', 'auto'];
+
+		// Create 5-8 notifications per vehicle with varying read states and due dates
+		const notificationCount = faker.number.int({ min: 5, max: 8 });
+
+		for (let i = 0; i < notificationCount; i++) {
+			const type = faker.helpers.arrayElement(notificationTypes);
+			const daysOffset = faker.number.int({ min: -15, max: 30 }); // Past overdue to future
+			const dueDate = new Date();
+			dueDate.setDate(dueDate.getDate() + daysOffset);
+
+			let message = '';
+			switch (type) {
+				case 'reminder':
+					message = `Reminder: ${faker.helpers.arrayElement(['Oil change', 'Tire rotation', 'Brake inspection', 'Filter replacement'])} due`;
+					break;
+				case 'maintenance':
+					message = `Scheduled maintenance: ${faker.helpers.arrayElement(['Annual service', 'Engine checkup', 'Transmission service', 'Coolant flush'])}`;
+					break;
+				case 'insurance':
+					message = `Insurance renewal due for policy ${faker.string.alphanumeric({ length: 8, casing: 'upper' })}`;
+					break;
+				case 'pollution':
+					message = `Pollution certificate expiring soon - visit testing center`;
+					break;
+				case 'alert':
+					message = faker.helpers.arrayElement([
+						'Vehicle registration renewal required',
+						'Safety inspection overdue',
+						'Tax payment reminder',
+						'Document verification pending'
+					]);
+					break;
+			}
+
+			notifications.push({
+				vehicleId: vehicle.id,
+				type,
+				message,
+				source: faker.helpers.arrayElement(sources),
+				dueDate: dueDate.toISOString(),
+				isRead: faker.datatype.boolean({ probability: 0.3 }) ? 1 : 0 // 30% chance of being read
+			});
+		}
+
+		await db.insert(notificationTable).values(notifications);
 	});
 
 	logger.info('Demo data seeded successfully');
