@@ -34,6 +34,7 @@
 		"@tanstack/table-core": "^8.21.3",
 		"@testing-library/svelte": "^5.3.1",
 		"@types/node": "^25.0.9",
+		"@types/node-cron": "^3.0.11",
 		"@types/supertest": "^6.0.3",
 		"@typescript-eslint/eslint-plugin": "^8.53.1",
 		"@typescript-eslint/parser": "^8.53.1",
@@ -94,6 +95,7 @@
 		"helmet": "^8.1.0",
 		"mode-watcher": "^1.1.0",
 		"multer": "^2.0.2",
+		"node-cron": "^4.2.1",
 		"winston": "^3.19.0",
 		"zod": "^4.3.5"
 	}

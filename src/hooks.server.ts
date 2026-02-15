@@ -15,6 +15,7 @@ import { initializeDatabase } from '$server/db/init';
 import { appAsciiArt, logger } from '$server/config';
 import { env } from '$lib/config/env.server';
 import { ensureAppDirectories } from '$server/utils/fs';
+import { initializeCronJobs } from '$server/services/cronService';
 
 const middlewareChain = new MiddlewareChain();
 
@@ -69,6 +70,18 @@ const initPromise = (async () => {
 		(wrapped as any).cause = error;
 
 		throw wrapped;
+	}
+
+	if (env.ENABLE_CRON_JOBS) {
+		try {
+			initializeCronJobs();
+			logger.info('Cron jobs initialization completed');
+		} catch (error) {
+			logger.error('Failed to initialize cron jobs', error);
+			// Don't throw - cron jobs are not critical for app startup
+		}
+	} else {
+		logger.info('Cron jobs are disabled via ENABLE_CRON_JOBS environment variable');
 	}
 })();
 
