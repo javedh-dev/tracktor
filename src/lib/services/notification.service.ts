@@ -44,3 +44,20 @@ export const markAllNotificationsAsRead = async (
 	}
 	return res;
 };
+
+export const deleteNotification = async (
+	vehicleId: string,
+	notificationId: string
+): Promise<Response<Notification>> => {
+	const res: Response<Notification> = { status: 'OK' };
+	try {
+		const response = await apiClient.delete(
+			`/vehicles/${vehicleId}/notifications/${notificationId}`
+		);
+		res.data = response.data.data || response.data;
+	} catch (e: any) {
+		res.status = 'ERROR';
+		res.error = e.response?.data?.message || 'Failed to delete notification.';
+	}
+	return res;
+};

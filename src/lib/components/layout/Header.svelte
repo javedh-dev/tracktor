@@ -10,6 +10,7 @@
 	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import { sheetStore } from '$stores/sheet.svelte';
+	import { vehicleStore } from '$stores/vehicle.svelte';
 	import DataExportImport from '../feature/data-export-import/DataExportImport.svelte';
 	import ProfileForm from '../feature/auth/profile-form.svelte';
 	import { env } from '$lib/config/env';
@@ -18,6 +19,14 @@
 	import Button from '../ui/button/button.svelte';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
+	// Show notifications only on dashboard routes when a vehicle is selected
+	const showNotifications = $derived(
+		authStore.isLoggedIn &&
+			vehicleStore.selectedId !== undefined &&
+			$page.url.pathname.startsWith('/dashboard')
+	);
 </script>
 
 <header
@@ -42,8 +51,10 @@
 		<div id="header-actions" class="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
 			<div class="header-toolbar flex items-center gap-2">
 				<ThemeToggle />
-				{#if authStore.isLoggedIn}
+				{#if showNotifications}
 					<Notifications />
+				{/if}
+				{#if authStore.isLoggedIn}
 					<Button
 						variant="ghost"
 						size="icon"
