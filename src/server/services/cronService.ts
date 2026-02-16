@@ -2,6 +2,7 @@ import cron, { type ScheduledTask } from 'node-cron';
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
 import { createNotification, findExistingNotification } from './notificationService';
+import { sendNotificationDigest } from './notificationDigestService';
 import { getAppConfigByKey } from './configService';
 import logger from '$server/config/logger';
 import { eq } from 'drizzle-orm';
@@ -92,7 +93,7 @@ async function processReminders() {
 
 		logger.info(`Found ${reminders.length} active reminders to process`);
 
-		let notificationsCreated = 0;
+		let notificationsCreatedOrUpdated = 0;
 
 		for (const reminder of reminders) {
 			try {
@@ -113,7 +114,20 @@ async function processReminders() {
 				);
 
 				if (existing) {
-					logger.debug(`Notification already exists for reminder ${reminder.id}`);
+					logger.debug(
+						`Notification already exists for reminder ${reminder.id}. Marking as non read.`
+					);
+					// Mark existing notification as unread if it was read
+					if (existing.isRead) {
+						await db
+							.update(schema.notificationTable)
+							.set({ isRead: 0 })
+							.where(eq(schema.notificationTable.id, existing.id));
+						logger.info(
+							`Marked existing notification ${existing.id} as unread for reminder ${reminder.id}`
+						);
+						notificationsCreatedOrUpdated++;
+					}
 					continue;
 				}
 
@@ -142,14 +156,16 @@ async function processReminders() {
 					isRead: 0
 				});
 
-				notificationsCreated++;
+				notificationsCreatedOrUpdated++;
 				logger.info(`Created notification for reminder ${reminder.id}`);
 			} catch (error) {
 				logger.error(`Error processing reminder ${reminder.id}:`, error);
 			}
 		}
 
-		logger.info(`Reminder processing completed. Created ${notificationsCreated} notifications`);
+		logger.info(
+			`Reminder processing completed. Created/Updated ${notificationsCreatedOrUpdated} notifications`
+		);
 	} catch (error) {
 		logger.error('Error in processReminders:', error);
 	}
@@ -347,6 +363,25 @@ async function cleanupOldNotifications() {
 }
 
 /**
+ * Send email digest of pending notifications
+ */
+async function processEmailDigest() {
+	try {
+		logger.info('Starting email digest job');
+
+		const result = await sendNotificationDigest();
+
+		if (result.success) {
+			logger.info(`Email digest sent successfully with ${result.notificationCount} notifications`);
+		} else {
+			logger.error(`Failed to send email digest: ${result.error}`);
+		}
+	} catch (error) {
+		logger.error('Error in processEmailDigest:', error);
+	}
+}
+
+/**
  * Schedule or reschedule a specific cron job
  */
 function scheduleCronJob(
@@ -409,17 +444,34 @@ export async function initializeCronJobs() {
 		const cleanupEnabled = (await getCronConfig('cronCleanupEnabled', true)) as boolean;
 		const cleanupSchedule = (await getCronConfig('cronCleanupSchedule', '0 2 * * *')) as string;
 
+		const emailDigestEnabled = (await getCronConfig('cronEmailDigestEnabled', true)) as boolean;
+		const emailDigestSchedule = (await getCronConfig(
+			'cronEmailDigestSchedule',
+			'0 9 * * *'
+		)) as string; // Default: daily at 9 AM
+		const emailDigestOnStartup = (await getCronConfig('cronEmailDigestOnStartup', true)) as boolean; // Default: run on startup
+
 		// Schedule all jobs
 		scheduleCronJob('reminders', remindersSchedule, processReminders, remindersEnabled);
 		scheduleCronJob('insurance', insuranceSchedule, processInsuranceExpiry, insuranceEnabled);
 		scheduleCronJob('pucc', puccSchedule, processPuccExpiry, puccEnabled);
 		scheduleCronJob('cleanup', cleanupSchedule, cleanupOldNotifications, cleanupEnabled);
+		scheduleCronJob('emailDigest', emailDigestSchedule, processEmailDigest, emailDigestEnabled);
 
 		logger.info('Cron jobs initialization completed');
 		logger.info('Active jobs:');
 		activeCronJobs.forEach((_, name) => {
 			logger.info(`  - ${name}`);
 		});
+
+		// Run email digest on startup if enabled
+		if (emailDigestEnabled && emailDigestOnStartup) {
+			logger.info('Running email digest on startup as configured');
+			// Run asynchronously without blocking startup
+			processEmailDigest().catch((err) => {
+				logger.error('Error running email digest on startup:', err);
+			});
+		}
 	} catch (error) {
 		logger.error('Error initializing cron jobs:', error);
 	}
@@ -446,4 +498,10 @@ export function stopAllCronJobs() {
 }
 
 // Export individual functions for testing and manual execution
-export { processReminders, processInsuranceExpiry, processPuccExpiry, cleanupOldNotifications };
+export {
+	processReminders,
+	processInsuranceExpiry,
+	processPuccExpiry,
+	cleanupOldNotifications,
+	processEmailDigest
+};

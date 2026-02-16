@@ -35,6 +35,7 @@
 		"@testing-library/svelte": "^5.3.1",
 		"@types/node": "^25.0.9",
 		"@types/node-cron": "^3.0.11",
+		"@types/nodemailer": "^7.0.10",
 		"@types/supertest": "^6.0.3",
 		"@typescript-eslint/eslint-plugin": "^8.53.1",
 		"@typescript-eslint/parser": "^8.53.1",

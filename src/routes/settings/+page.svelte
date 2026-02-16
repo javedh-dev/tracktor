@@ -41,6 +41,8 @@
 	import Gauge from '@lucide/svelte/icons/gauge';
 	import ToggleLeft from '@lucide/svelte/icons/toggle-left';
 	import Clock from '@lucide/svelte/icons/clock';
+	import Bell from '@lucide/svelte/icons/bell';
+	import NotificationProvidersSettings from '$feature/settings/NotificationProvidersSettings.svelte';
 
 	let localConfig: Config[] = $state([]);
 	let processing = $state(false);
@@ -81,7 +83,11 @@
 		cronPuccEnabled: z.boolean().default(true),
 		cronPuccSchedule: z.string().default('30 8 * * *'),
 		cronCleanupEnabled: z.boolean().default(true),
-		cronCleanupSchedule: z.string().default('0 2 * * *')
+		cronCleanupSchedule: z.string().default('0 2 * * *'),
+		cronEmailDigestEnabled: z.boolean().default(true),
+		cronEmailDigestSchedule: z.string().default('0 9 * * *'),
+		cronEmailDigestOnStartup: z.boolean().default(true),
+		notificationEmail: z.string().email('Invalid email address').optional().or(z.literal(''))
 	});
 
 	const form = superForm(defaults(zod4(configSchema)), {
@@ -210,6 +216,11 @@
 			id: 'automatedJobs',
 			label: 'Automated Jobs',
 			icon: Clock
+		},
+		{
+			id: 'notifications',
+			label: 'Notifications',
+			icon: Bell
 		}
 	];
 
@@ -837,6 +848,51 @@
 										</Form.Field>
 									</div>
 
+									<!-- Email Digest Job -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div class="flex items-center justify-between">
+											<div>
+												<h3 class="text-sm font-semibold">Email Notification Digest</h3>
+												<p class="text-muted-foreground text-xs">
+													Send a cumulated email digest of all pending notifications
+												</p>
+											</div>
+											<SettingsFeatureToggle
+												{form}
+												name="cronEmailDigestEnabled"
+												label=""
+												description=""
+												bind:checked={$formData.cronEmailDigestEnabled}
+												disabled={processing || !$formData.cronJobsEnabled}
+											/>
+										</div>
+										<Form.Field {form} name="cronEmailDigestSchedule" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Schedule</FormLabel>
+													<CronInput
+														bind:value={$formData.cronEmailDigestSchedule}
+														disabled={processing || !$formData.cronEmailDigestEnabled}
+														placeholder="0 9 * * *"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.FieldErrors />
+										</Form.Field>
+
+										<!-- Run on Startup Toggle -->
+										<div class="border-border border-t pt-4">
+											<SettingsFeatureToggle
+												{form}
+												name="cronEmailDigestOnStartup"
+												label="Run on Server Startup"
+												description="Execute email digest once when the server starts to send any pending notifications immediately"
+												bind:checked={$formData.cronEmailDigestOnStartup}
+												disabled={processing || !$formData.cronEmailDigestEnabled}
+											/>
+										</div>
+									</div>
+
 									<!-- Info Box -->
 									<div class="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30">
 										<p class="font-medium">Cron Expression Format:</p>
@@ -854,6 +910,49 @@
 											<code class="bg-muted rounded px-1 py-0.5">*/30 * * * *</code> - Every 30 minutes
 										</p>
 									</div>
+								</fieldset>
+							</div>
+						{/if}
+
+						<!-- Notifications Section -->
+						{#if activeSection === 'notifications'}
+							<div class="space-y-6">
+								<SettingsSectionHeader
+									title="Notifications"
+									description="Configure notification providers and email preferences for alerts and reminders."
+								/>
+
+								<fieldset class="space-y-6" disabled={processing}>
+									<!-- Notification Email Configuration -->
+									<div class="border-border space-y-4 rounded-lg border p-4">
+										<div>
+											<h3 class="text-sm font-semibold">Email Address for Notifications</h3>
+											<p class="text-muted-foreground text-xs">
+												Enter your email address to receive notification digests
+											</p>
+										</div>
+										<Form.Field {form} name="notificationEmail" class="w-full">
+											<Form.Control>
+												{#snippet children()}
+													<FormLabel>Email Address</FormLabel>
+													<Input
+														bind:value={$formData.notificationEmail}
+														disabled={processing}
+														type="email"
+														placeholder="your@email.com"
+													/>
+												{/snippet}
+											</Form.Control>
+											<Form.Description>
+												This email will receive cumulated notification digests based on the schedule
+												configured in Automated Jobs.
+											</Form.Description>
+											<Form.FieldErrors />
+										</Form.Field>
+									</div>
+
+									<!-- Notification Providers -->
+									<NotificationProvidersSettings />
 								</fieldset>
 							</div>
 						{/if}

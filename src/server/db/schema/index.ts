@@ -7,6 +7,7 @@ import { vehicleTable } from './vehicle';
 import { pollutionCertificateTable } from './pucc';
 import { reminderTable } from './reminder';
 import { notificationTable } from './notification';
+import { notificationProviderTable } from './notification-provider';
 
 export {
 	authTable,
@@ -19,5 +20,6 @@ export {
 	pollutionCertificateTable,
 	vehicleTable,
 	reminderTable,
-	notificationTable
+	notificationTable,
+	notificationProviderTable
 };
