@@ -16,7 +16,11 @@ class FuelLogStore {
 			.get<ApiResponse>(`/vehicles/${vehicleStore.selectedId}/fuel-logs`)
 			.then(({ data: res }) => {
 				const logs: FuelLog[] = res.data;
-				logs.sort((a, b) => compareDesc(a.date, b.date));
+				logs.sort((a, b) => {
+					const dateDiff = compareDesc(a.date, b.date);
+					if (dateDiff !== 0) return dateDiff;
+					return (b.odometer ?? 0) - (a.odometer ?? 0);
+				});
 				this.fuelLogs = logs;
 				this.error = undefined;
 			})
