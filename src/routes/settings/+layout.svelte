@@ -13,6 +13,6 @@
   });
 </script>
 
-<main id="settings-layout-main" class="mx-auto p-4 lg:container lg:p-6">
+<main id="settings-layout-main" class="mx-auto w-full p-6 sm:container">
   {@render children()}
 </main>

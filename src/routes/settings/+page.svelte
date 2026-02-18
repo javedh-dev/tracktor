@@ -31,9 +31,9 @@
     isValidFormat,
     isValidTimezone
   } from '$lib/helper/format.helper';
-  import type { Config } from '$lib/domain/config';
   import * as m from '$lib/paraglide/messages';
   import { saveConfig } from '$lib/services/config.service';
+  import { rawConfigToFormData, formDataToConfigs } from '$helper/config.helper';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { Textarea } from '$lib/components/ui/textarea';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
@@ -47,15 +47,22 @@
   import { goto } from '$app/navigation';
   import SettingFormSection from '$lib/components/feature/settings/SettingFormSection.svelte';
 
-  let localConfig: Config[] = $state([]);
   let processing = $state(false);
   let activeSection = $state('personalization');
 
-  $effect(() => {
-    localConfig = JSON.parse(JSON.stringify(configStore.rawConfig));
-  });
-
   // Create a dynamic schema based on config items
+  // Cron validation helper
+  function validateCronExpression(expr: string): boolean {
+    if (!expr || expr.trim() === '') return false;
+
+    const parts = expr.trim().split(/\s+/);
+    if (parts.length !== 5) return false;
+
+    // Check if parts contain valid characters (digits, *, /, -, ,)
+    const validPattern = /^[\d*/,-]+$/;
+    return parts.every((part) => validPattern.test(part));
+  }
+
   const configSchema = z.object({
     dateFormat: z.string().refine((fmt) => {
       return isValidFormat(fmt).valid;
@@ -80,17 +87,31 @@
     featureOverview: z.boolean().default(true),
     cronJobsEnabled: z.boolean().default(true),
     cronRemindersEnabled: z.boolean().default(true),
-    cronRemindersSchedule: z.string().default('0 * * * *'),
+    cronRemindersSchedule: z
+      .string()
+      .default('0 * * * *')
+      .refine(validateCronExpression, 'Invalid cron expression'),
     cronInsuranceEnabled: z.boolean().default(true),
-    cronInsuranceSchedule: z.string().default('0 8 * * *'),
+    cronInsuranceSchedule: z
+      .string()
+      .default('0 8 * * *')
+      .refine(validateCronExpression, 'Invalid cron expression'),
     cronPuccEnabled: z.boolean().default(true),
-    cronPuccSchedule: z.string().default('30 8 * * *'),
+    cronPuccSchedule: z
+      .string()
+      .default('30 8 * * *')
+      .refine(validateCronExpression, 'Invalid cron expression'),
     cronCleanupEnabled: z.boolean().default(true),
-    cronCleanupSchedule: z.string().default('0 2 * * *'),
+    cronCleanupSchedule: z
+      .string()
+      .default('0 2 * * *')
+      .refine(validateCronExpression, 'Invalid cron expression'),
     cronEmailDigestEnabled: z.boolean().default(true),
-    cronEmailDigestSchedule: z.string().default('0 9 * * *'),
-    cronEmailDigestOnStartup: z.boolean().default(true),
-    notificationEmail: z.string().email('Invalid email address').optional().or(z.literal(''))
+    cronEmailDigestSchedule: z
+      .string()
+      .default('0 9 * * *')
+      .refine(validateCronExpression, 'Invalid cron expression'),
+    cronEmailDigestOnStartup: z.boolean().default(true)
   });
 
   const form = superForm(defaults(zod4(configSchema)), {
@@ -106,22 +127,10 @@
           themeStore.setTheme(f.data.theme as any);
         }
 
-        const configMap = new Map<string, Config>();
-        localConfig.forEach((item) => configMap.set(item.key, item));
-
-        Object.entries(f.data).forEach(([key, value]) => {
-          if (key === 'theme') return;
-          const stringValue =
-            typeof value === 'boolean' ? String(value) : ((value || '') as string);
-          const existing = configMap.get(key);
-          if (existing) {
-            configMap.set(key, { ...existing, value: stringValue });
-          } else {
-            configMap.set(key, { key, value: stringValue });
-          }
-        });
-
-        const updatedConfig = Array.from(configMap.values());
+        const updatedConfig = formDataToConfigs(
+          f.data as Record<string, unknown>,
+          configStore.rawConfig
+        );
 
         // Persist configuration before applying a locale change
         await saveConfig(updatedConfig);
@@ -156,47 +165,6 @@
     }
   });
   const { form: formData, enhance, errors } = form;
-
-  // Map fields to their respective sections
-  const fieldToSection: Record<string, string> = {
-    dateFormat: 'personalization',
-    locale: 'personalization',
-    unitOfDistance: 'units',
-    unitOfVolume: 'units',
-    unitOfLpg: 'units',
-    unitOfCng: 'units',
-    mileageUnitFormat: 'units',
-    timezone: 'personalization',
-    currency: 'personalization',
-    theme: 'personalization',
-    customCss: 'personalization',
-    featureFuelLog: 'features',
-    featureMaintenance: 'features',
-    featurePucc: 'features',
-    featureReminders: 'features',
-    featureInsurance: 'features',
-    featureOverview: 'features',
-    cronJobsEnabled: 'automatedJobs',
-    cronRemindersEnabled: 'automatedJobs',
-    cronRemindersSchedule: 'automatedJobs',
-    cronInsuranceEnabled: 'automatedJobs',
-    cronInsuranceSchedule: 'automatedJobs',
-    cronPuccEnabled: 'automatedJobs',
-    cronPuccSchedule: 'automatedJobs',
-    cronCleanupEnabled: 'automatedJobs',
-    cronCleanupSchedule: 'automatedJobs'
-  };
-
-  // Navigate to the first section with errors
-  $effect(() => {
-    const errorFields = Object.keys($errors);
-    if (errorFields.length > 0) {
-      const firstErrorField = errorFields[0];
-      if (firstErrorField && fieldToSection[firstErrorField]) {
-        activeSection = fieldToSection[firstErrorField];
-      }
-    }
-  });
 
   // Sidebar navigation items
   const sidebarItems = [
@@ -272,37 +240,24 @@
     label: localeLabels[code] || code.toUpperCase()
   }));
 
+  // Load configs on mount
   $effect(() => {
-    if (localConfig.length > 0) {
-      const configData: any = {};
-      localConfig.forEach((item) => {
-        // Handle boolean values for feature toggles and cron settings
-        if (
-          item.key.startsWith('feature') ||
-          (item.key.startsWith('cron') && item.key.includes('Enabled'))
-        ) {
-          configData[item.key] = item.value === 'true';
-        } else {
-          configData[item.key] = item.value || '';
-        }
-      });
-      const fallbackConfigs = configStore.configs as unknown as Record<string, unknown>;
-      ['unitOfLpg', 'unitOfCng', 'unitOfVolume', 'unitOfDistance', 'mileageUnitFormat'].forEach(
-        (key) => {
-          if (configData[key] === undefined) {
-            configData[key] = fallbackConfigs[key] as string;
-          }
-        }
-      );
-      // Add current theme to form data
+    configStore.refreshConfigs();
+  });
+
+  // Populate form when configs are loaded
+  $effect(() => {
+    if (configStore.rawConfig.length > 0) {
+      const configData = rawConfigToFormData(configStore.rawConfig, configStore.configs);
+      // Add current theme to form data (theme is client-side only)
       configData.theme = themeStore.theme;
-      formData.set(configData);
+      formData.set(configData as typeof $formData);
     }
   });
 </script>
 
-<div id="settings-page" class="mx-auto flex h-full w-full flex-col">
-  <div id="dashboard-header" class="mb-2 flex items-center justify-start gap-2">
+<div id="settings-page" class="flex h-full w-full flex-col">
+  <div id="dashboard-header" class="mb-2 flex w-full items-center justify-start gap-2">
     <Button
       variant="outline"
       size="icon"
@@ -319,24 +274,28 @@
   </div>
 
   <!-- Settings Layout with Sidebar -->
-  <div class="bg-card my-4 flex min-h-0 flex-1 flex-col gap-6 rounded-lg border p-6 lg:flex-row">
+  <div
+    class="bg-card my-4 flex min-h-0 flex-1 flex-col gap-6 rounded-lg px-6 py-2 sm:flex-row sm:border sm:py-6"
+  >
     <!-- Sidebar Navigation -->
-    <aside class="border-accent w-full border-r-2 py-4 pe-2 lg:w-64 lg:shrink-0">
+    <aside
+      class="border-accent w-full border-b-2 py-2 pe-2 sm:w-48 sm:border-r-2 sm:border-b-0 md:w-56 lg:shrink-0"
+    >
       <!-- <Card.Root class="h-auto">
         <Card.Content class="p-2"> -->
-      <nav class="space-y-1">
+      <nav class="flex flex-row gap-4 space-y-1 sm:flex-col sm:gap-0">
         {#each sidebarItems as item (item.id)}
           {@const Icon = item.icon}
           <button
             type="button"
             onclick={() => (activeSection = item.id)}
-            class="flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium transition-colors lg:h-12 {activeSection ===
+            class="flex items-center gap-3 rounded-lg p-3 text-sm font-medium transition-colors sm:w-full sm:p-4 lg:h-12 {activeSection ===
             item.id
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
           >
             <Icon class="h-5 w-5" />
-            {item.label}
+            <span class="hidden sm:block">{item.label}</span>
           </button>
         {/each}
       </nav>
@@ -881,22 +840,41 @@
             description="Configure notification providers and email preferences for alerts and reminders."
           >
             <fieldset class="space-y-6" disabled={processing}>
-              <!-- Notification Providers -->
-              <!-- <SettingFormSection
-                title="Notification Providers"
-                subtitle="Configure external notification services for alerts and reminders"
-              > -->
               <NotificationProvidersSettings />
-              <!-- </SettingFormSection> -->
             </fieldset>
           </SettingsSection>
         {/if}
 
         <!-- Submit Button (always visible at bottom) -->
-        <div class="mt-6 flex justify-end pt-6">
-          <SubmitButton {processing} class="w-full sm:w-auto">
-            {m.settings_update_button()}
-          </SubmitButton>
+        <div class="mt-6 flex flex-col gap-4 pt-6">
+          <!-- Error Summary -->
+          {#if Object.values($errors).some((err) => err && err.length > 0)}
+            <div class="bg-destructive/10 border-destructive/50 rounded-lg border p-4">
+              <h3 class="text-destructive mb-2 text-sm font-semibold">
+                Please fix the following errors:
+              </h3>
+              <ul class="text-destructive list-inside list-disc space-y-1 text-sm">
+                {#each Object.entries($errors) as [field, errorArray]}
+                  {#if errorArray && errorArray.length > 0}
+                    <li>
+                      <span class="font-medium capitalize"
+                        >{field.replace(/([A-Z])/g, ' $1').trim()}:</span
+                      >
+                      {errorArray.join(', ')}
+                    </li>
+                  {/if}
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if activeSection != 'notifications'}
+            <div class="flex justify-end">
+              <SubmitButton {processing} class="w-full sm:w-auto">
+                {m.settings_update_button()}
+              </SubmitButton>
+            </div>
+          {/if}
         </div>
       </form>
       <!-- </Card.Content>
