@@ -51,7 +51,8 @@ export const serverEnv = {
 	HTTP_MODE: privateEnv.HTTP_MODE || 'http',
 	APP_VERSION: privateEnv.APP_VERSION,
 	BASE_URL: privateEnv.BASE_URL || '',
-	ENABLE_CRON_JOBS: !privateEnv.ENABLE_CRON_JOBS || privateEnv.ENABLE_CRON_JOBS === 'true'
+	ENABLE_CRON_JOBS: !privateEnv.ENABLE_CRON_JOBS || privateEnv.ENABLE_CRON_JOBS === 'true',
+	APP_SECRET: privateEnv.APP_SECRET || ''
 } as const;
 
 /**

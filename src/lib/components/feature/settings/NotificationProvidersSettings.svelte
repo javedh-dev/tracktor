@@ -14,19 +14,19 @@
 	} from '$lib/domain/notification-provider';
 	import * as providerService from '$lib/services/notification-provider.service';
 	import Mail from '@lucide/svelte/icons/mail';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Edit from '@lucide/svelte/icons/edit';
 	import Plus from '@lucide/svelte/icons/plus';
-	import Check from '@lucide/svelte/icons/check';
-	import X from '@lucide/svelte/icons/x';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import ProviderCard from './ProviderCard.svelte';
+	import TestProviderDialog from './TestProviderDialog.svelte';
 
 	let providers = $state<NotificationProviderWithParsedConfig[]>([]);
 	let loading = $state(true);
 	let dialogOpen = $state(false);
 	let editingProvider = $state<NotificationProviderWithParsedConfig | null>(null);
 	let processing = $state(false);
-	let testingEmail = $state(false);
+	let testDialogOpen = $state(false);
+	let testingProvider = $state<NotificationProviderWithParsedConfig | null>(null);
+	let testingProviderId = $state<string | null>(null);
 
 	// Form state
 	let formName = $state('');
@@ -37,9 +37,9 @@
 	let formPassword = $state('');
 	let formFrom = $state('');
 	let formFromName = $state('');
+	let formReplyTo = $state('');
 	let formIsEnabled = $state(true);
 	let formIsDefault = $state(false);
-	let testEmail = $state('');
 
 	onMount(async () => {
 		await loadProviders();
@@ -76,9 +76,9 @@
 		formPassword = ''; // Don't pre-fill password for security
 		formFrom = config.from;
 		formFromName = config.fromName || '';
+		formReplyTo = config.replyTo || '';
 		formIsEnabled = provider.isEnabled;
 		formIsDefault = provider.isDefault;
-		testEmail = config.auth.user;
 		dialogOpen = true;
 	}
 
@@ -91,9 +91,9 @@
 		formPassword = '';
 		formFrom = '';
 		formFromName = '';
+		formReplyTo = '';
 		formIsEnabled = true;
 		formIsDefault = false;
-		testEmail = '';
 	}
 
 	async function handleSave() {
@@ -109,7 +109,8 @@
 					pass: formPassword
 				},
 				from: formFrom,
-				fromName: formFromName || undefined
+				fromName: formFromName || undefined,
+				replyTo: formReplyTo || undefined
 			};
 
 			const providerData: CreateNotificationProvider = {
@@ -165,40 +166,9 @@
 		}
 	}
 
-	async function handleTestEmail() {
-		if (!testEmail) {
-			toast.error('Please enter a test email address');
-			return;
-		}
-
-		try {
-			testingEmail = true;
-
-			const config: EmailProviderConfig = {
-				host: formHost,
-				port: formPort,
-				secure: formSecure,
-				auth: {
-					user: formUsername,
-					pass: formPassword
-				},
-				from: formFrom,
-				fromName: formFromName || undefined
-			};
-
-			const result = await providerService.testEmailProvider(config, testEmail);
-
-			if (result.success) {
-				toast.success('Test email sent successfully!');
-			} else {
-				toast.error(`Failed to send test email: ${result.error}`);
-			}
-		} catch (error: any) {
-			toast.error(error.message || 'Failed to send test email');
-			console.error(error);
-		} finally {
-			testingEmail = false;
-		}
+	function handleTest(provider: NotificationProviderWithParsedConfig) {
+		testingProvider = provider;
+		testDialogOpen = true;
 	}
 </script>
 
@@ -234,71 +204,21 @@
 			</Card.Content>
 		</Card.Root>
 	{:else}
-		<div class="grid gap-4 md:grid-cols-2">
+		<div class="grid gap-3">
 			{#each providers as provider (provider.id)}
-				{@const config = provider.config as EmailProviderConfig}
-				<Card.Root>
-					<Card.Header>
-						<div class="flex items-start justify-between">
-							<div class="flex items-center gap-2">
-								<Mail class="h-5 w-5" />
-								<div>
-									<Card.Title class="text-base">{provider.name}</Card.Title>
-									<Card.Description class="text-xs">
-										{config.host}:{config.port}
-									</Card.Description>
-								</div>
-							</div>
-							<div class="flex gap-2">
-								{#if provider.isDefault}
-									<span
-										class="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400"
-									>
-										Default
-									</span>
-								{/if}
-								{#if provider.isEnabled}
-									<Check class="h-5 w-5 text-green-600" />
-								{:else}
-									<X class="h-5 w-5 text-red-600" />
-								{/if}
-							</div>
-						</div>
-					</Card.Header>
-					<Card.Content>
-						<div class="space-y-2 text-sm">
-							<div>
-								<span class="text-muted-foreground">From:</span>
-								<span class="ml-2 font-medium">
-									{config.fromName ? `${config.fromName} <${config.from}>` : config.from}
-								</span>
-							</div>
-							<div>
-								<span class="text-muted-foreground">Username:</span>
-								<span class="ml-2 font-medium">{config.auth.user}</span>
-							</div>
-							<div>
-								<span class="text-muted-foreground">Security:</span>
-								<span class="ml-2 font-medium">{config.secure ? 'SSL/TLS' : 'None'}</span>
-							</div>
-						</div>
-					</Card.Content>
-					<Card.Footer class="flex justify-end gap-2">
-						<Button variant="outline" size="sm" onclick={() => openEditDialog(provider)}>
-							<Edit class="mr-2 h-4 w-4" />
-							Edit
-						</Button>
-						<Button variant="destructive" size="sm" onclick={() => handleDelete(provider)}>
-							<Trash2 class="mr-2 h-4 w-4" />
-							Delete
-						</Button>
-					</Card.Footer>
-				</Card.Root>
+				<ProviderCard
+					{provider}
+					onEdit={openEditDialog}
+					onDelete={handleDelete}
+					onTest={handleTest}
+					testing={testingProviderId === provider.id}
+				/>
 			{/each}
 		</div>
 	{/if}
 </div>
 
+<!-- Add/Edit Provider Dialog -->
 <Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-150">
 		<Dialog.Header>
@@ -370,6 +290,12 @@
 					<Label>From Name (Optional)</Label>
 					<Input bind:value={formFromName} placeholder="Tracktor Notifications" />
 				</div>
+
+				<div class="space-y-2">
+					<Label>Reply-To Email (Optional)</Label>
+					<Input bind:value={formReplyTo} type="email" placeholder="support@example.com" />
+					<p class="text-muted-foreground text-xs">Email address for recipients to reply to</p>
+				</div>
 			</div>
 
 			<!-- Provider Settings -->
@@ -390,36 +316,6 @@
 					<Checkbox bind:checked={formIsDefault} />
 				</div>
 			</div>
-
-			<!-- Test Email -->
-			<div class="border-border space-y-4 rounded-lg border p-4">
-				<h4 class="text-sm font-semibold">Test Configuration</h4>
-				<div class="space-y-2">
-					<Label>Test Email Address</Label>
-					<div class="flex gap-2">
-						<Input
-							bind:value={testEmail}
-							type="email"
-							placeholder="test@example.com"
-							class="flex-1"
-						/>
-						<Button
-							onclick={handleTestEmail}
-							variant="outline"
-							disabled={testingEmail || !testEmail}
-						>
-							{#if testingEmail}
-								<Loader2 class="h-4 w-4 animate-spin" />
-							{:else}
-								Send Test
-							{/if}
-						</Button>
-					</div>
-					<p class="text-muted-foreground text-xs">
-						Send a test email to verify your configuration
-					</p>
-				</div>
-			</div>
 		</div>
 
 		<Dialog.Footer>
@@ -435,3 +331,10 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<!-- Test Provider Dialog -->
+<TestProviderDialog
+	provider={testingProvider}
+	bind:open={testDialogOpen}
+	onOpenChange={(open) => (testDialogOpen = open)}
+/>

@@ -1,0 +1,113 @@
+<script lang="ts">
+	import * as Dialog from '$ui/dialog';
+	import Button from '$ui/button/button.svelte';
+	import Input from '$appui/input.svelte';
+	import { Label } from '$ui/label';
+	import { toast } from 'svelte-sonner';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import Mail from '@lucide/svelte/icons/mail';
+	import type { NotificationProviderWithParsedConfig } from '$lib/domain/notification-provider';
+	import * as providerService from '$lib/services/notification-provider.service';
+
+	interface Props {
+		provider: NotificationProviderWithParsedConfig | null;
+		open: boolean;
+		onOpenChange: (open: boolean) => void;
+	}
+
+	let { provider, open = $bindable(false), onOpenChange }: Props = $props();
+
+	let testEmail = $state('');
+	let testing = $state(false);
+
+	// Reset form when dialog closes
+	$effect(() => {
+		if (!open) {
+			testEmail = '';
+			testing = false;
+		}
+	});
+
+	async function handleTest() {
+		if (!provider) return;
+
+		if (!testEmail) {
+			toast.error('Please enter a test email address');
+			return;
+		}
+
+		try {
+			testing = true;
+
+			const result = await providerService.testProvider(provider.id, testEmail);
+
+			if (result.success) {
+				toast.success('Test notification sent successfully!');
+				onOpenChange(false);
+			} else {
+				toast.error(`Failed to send test: ${result.error}`);
+			}
+		} catch (error: any) {
+			toast.error(error.message || 'Failed to send test notification');
+			console.error(error);
+		} finally {
+			testing = false;
+		}
+	}
+</script>
+
+<Dialog.Root {open} {onOpenChange}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>Test Provider</Dialog.Title>
+			<Dialog.Description>
+				{#if provider}
+					Send a test notification using <strong>{provider.name}</strong>
+				{/if}
+			</Dialog.Description>
+		</Dialog.Header>
+
+		<div class="space-y-4 py-4">
+			{#if provider}
+				<div class="border-border flex items-center gap-3 rounded-lg border p-3">
+					<div class="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+						<Mail class="h-5 w-5" />
+					</div>
+					<div>
+						<p class="font-medium">{provider.name}</p>
+						<p class="text-muted-foreground text-xs">
+							{provider.type.charAt(0).toUpperCase() + provider.type.slice(1)} Provider
+						</p>
+					</div>
+				</div>
+
+				<div class="space-y-2">
+					<Label>
+						{provider.config.type === 'email' ? 'Recipient Email' : 'Test Recipient'}
+					</Label>
+					<Input
+						bind:value={testEmail}
+						type="email"
+						placeholder="your@email.com"
+						disabled={testing}
+					/>
+					<p class="text-muted-foreground text-xs">
+						Enter an email address to receive the test notification
+					</p>
+				</div>
+			{/if}
+		</div>
+
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => onOpenChange(false)} disabled={testing}>
+				Cancel
+			</Button>
+			<Button onclick={handleTest} disabled={testing || !testEmail}>
+				{#if testing}
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				Send Test
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

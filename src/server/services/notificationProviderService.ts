@@ -14,10 +14,12 @@ import {
 	notificationProviderConfigSchema
 } from '$lib/domain/notification-provider';
 import logger from '$server/config/logger';
+import { encrypt, decrypt } from '$server/utils/encryption';
 
 const parseProviderConfig = (provider: any): NotificationProviderWithParsedConfig => {
 	try {
-		const config = JSON.parse(provider.config);
+		// Decrypt the config
+		const config = decrypt(provider.config);
 		return {
 			...provider,
 			config
@@ -81,7 +83,7 @@ export const addProvider = async (
 		.values({
 			name: validated.name,
 			type: validated.type,
-			config: JSON.stringify(validatedConfig),
+			config: encrypt(validatedConfig),
 			isEnabled: validated.isEnabled,
 			isDefault: validated.isDefault
 		})
@@ -130,7 +132,7 @@ export const updateProvider = async (
 
 	if (validated.config !== undefined) {
 		const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
-		updateData.config = JSON.stringify(validatedConfig);
+		updateData.config = encrypt(validatedConfig);
 	}
 
 	const [updatedProvider] = await db

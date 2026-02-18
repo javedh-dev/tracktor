@@ -77,3 +77,18 @@ export const testEmailProvider = async (
 		throw error;
 	}
 };
+
+export const testProvider = async (
+	providerId: string,
+	testEmail: string
+): Promise<{ success: boolean; error?: string }> => {
+	try {
+		const response = await apiClient.post(`/notification-providers/${providerId}/test`, {
+			testEmail
+		});
+		return response.data.data;
+	} catch (error) {
+		console.error('Failed to test provider:', error);
+		throw error;
+	}
+};
