@@ -1,6 +1,7 @@
 import type { FuelLog, MaintenanceLog } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '$lib/response';
+import { compareDesc } from 'date-fns';
 import { vehicleStore } from './vehicle.svelte';
 
 class MaintenanceStore {
@@ -15,6 +16,11 @@ class MaintenanceStore {
 			.get<ApiResponse>(`/vehicles/${vehicleStore.selectedId}/maintenance-logs`)
 			.then(({ data: res }) => {
 				const logs: MaintenanceLog[] = res.data;
+				logs.sort((a, b) => {
+					const dateDiff = compareDesc(a.date, b.date);
+					if (dateDiff !== 0) return dateDiff;
+					return b.odometer - a.odometer;
+				});
 				this.maintenanceLogs = logs;
 				this.error = undefined;
 			})
