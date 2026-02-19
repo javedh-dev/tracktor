@@ -9,7 +9,8 @@
 		REMINDER_RECURRENCE_TYPES,
 		reminderSchema,
 		getReminderScheduleLabel,
-		getRecurrenceTypeLabel
+		getRecurrenceTypeLabel,
+		getReminderTypeLabel
 	} from '$lib/domain/reminder';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import Repeat from '@lucide/svelte/icons/repeat';
@@ -115,14 +116,15 @@
 							<div class="flex items-center gap-2">
 								<Layers class="h-4 w-4" />
 								<span
-									>{REMINDER_TYPES[$formData.type as keyof typeof REMINDER_TYPES] ||
-										'Select type'}</span
+									>{$formData.type
+										? getReminderTypeLabel($formData.type, m)
+										: m.reminder_form_type_desc()}</span
 								>
 							</div>
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(REMINDER_TYPES) as [value, label]}
-								<Select.Item {value}>{label}</Select.Item>
+							{#each Object.keys(REMINDER_TYPES) as value}
+								<Select.Item {value}>{getReminderTypeLabel(value, m)}</Select.Item>
 							{/each}
 						</Select.Content>
 					</Select.Root>
@@ -144,7 +146,7 @@
 								<span>
 									{$formData.remindSchedule
 										? getReminderScheduleLabel($formData.remindSchedule, m)
-										: 'Reminder timing'}
+										: m.reminder_form_schedule_desc()}
 								</span>
 							</div>
 						</Select.Trigger>
@@ -172,7 +174,7 @@
 								<span>
 									{$formData.recurrenceType
 										? getRecurrenceTypeLabel($formData.recurrenceType, m)
-										: 'Select recurrence'}
+										: m.reminder_form_recurrence_type_desc()}
 								</span>
 							</div>
 						</Select.Trigger>
@@ -192,14 +194,15 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<FormLabel description={m.reminder_form_recurrence_interval_desc()}>
-							Repeat every {$formData.recurrenceInterval || 1}
+							{m.recurrence_every()}
+							{$formData.recurrenceInterval || 1}
 							{$formData.recurrenceType === 'yearly'
-								? 'year(s)'
+								? m.recurrence_interval_years()
 								: $formData.recurrenceType === 'monthly'
-									? 'month(s)'
+									? m.recurrence_interval_months()
 									: $formData.recurrenceType === 'weekly'
-										? 'week(s)'
-										: 'day(s)'}
+										? m.recurrence_interval_weeks()
+										: m.recurrence_interval_days()}
 						</FormLabel>
 						<Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
 					{/snippet}

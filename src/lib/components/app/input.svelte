@@ -6,6 +6,7 @@
 	import * as Popover from '$ui/popover';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 	import { formatDateForCalendar } from '$lib/helper/format.helper';
+	import * as m from '$lib/paraglide/messages';
 
 	type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
@@ -68,7 +69,7 @@
 			<ColorPicker
 				position="responsive"
 				bind:hex={value}
-				label={value?.toUpperCase()}
+				label={value?.toUpperCase() || m.color_picker_label()}
 				isAlpha={false}
 				--slider-width="18px"
 				--input-size="18px"
@@ -91,7 +92,7 @@
 					!value && 'text-muted-foreground'
 				)}
 			>
-				{value || 'Pick a date'}
+				{value || m.input_date_placeholder()}
 			</Popover.Trigger>
 			<Popover.Content id="calendar-input-popover" class="w-auto p-0">
 				<Calendar

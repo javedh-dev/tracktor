@@ -49,10 +49,10 @@
 	const configSchema = z.object({
 		dateFormat: z.string().refine((fmt) => {
 			return isValidFormat(fmt).valid;
-		}, 'Format not valid'),
+		}, m.settings_error_format_not_valid()),
 		locale: z.string().min(2),
-		timezone: z.string().min(3).refine(isValidTimezone, 'Invalid timzone value.'),
-		currency: z.string().min(1, 'Currency is required'),
+		timezone: z.string().min(3).refine(isValidTimezone, m.settings_error_timezone_invalid()),
+		currency: z.string().min(1, m.settings_error_currency_required()),
 		unitOfDistance: z.enum(['kilometer', 'mile']),
 		unitOfVolume: z.enum(['liter', 'gallon']),
 		unitOfLpg: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('liter'),
@@ -173,8 +173,8 @@
 	const gasUnitOptions = [
 		{ value: 'liter', label: m.common_litre() },
 		{ value: 'gallon', label: m.common_gallon() },
-		{ value: 'kilogram', label: 'Kilogram (kg)' },
-		{ value: 'pound', label: 'Pound (lb)' }
+		{ value: 'kilogram', label: m.common_kilogram_unit() },
+		{ value: 'pound', label: m.common_pound_unit() }
 	];
 
 	const mileageUnitFormatOptions = [
@@ -363,7 +363,7 @@
 									>
 									<Textarea
 										{...props}
-										placeholder="Add your custom CSS here..."
+										placeholder={m.settings_custom_css_placeholder()}
 										class="mono h-40 resize-none"
 										bind:value={$formData.customCss}
 									/>
@@ -433,8 +433,8 @@
 						</Form.Field>
 						<div class="space-y-3">
 							<div class="space-y-1">
-								<p class="text-sm font-medium">Fuel types</p>
-								<p class="text-muted-foreground text-xs">Choose the measurement for each fuel.</p>
+								<p class="text-sm font-medium">{m.settings_section_fuel_types()}</p>
+								<p class="text-muted-foreground text-xs">{m.settings_section_fuel_types_desc()}</p>
 							</div>
 							<div class="flex flex-col gap-4">
 								<!-- Petrol/Diesel -->
@@ -442,7 +442,7 @@
 									<Form.Control>
 										{#snippet children({ props })}
 											<FormLabel description={m.settings_desc_unit_volume()}
-												>Petrol/Diesel</FormLabel
+												>{m.fuel_type_petrol_diesel()}</FormLabel
 											>
 											<Select.Root bind:value={$formData.unitOfVolume} type="single">
 												<Select.Trigger {...props} class="w-full">
@@ -468,7 +468,9 @@
 								<Form.Field {form} name="unitOfLpg" class="w-full">
 									<Form.Control>
 										{#snippet children({ props })}
-											<FormLabel description={m.settings_desc_unit_volume()}>LPG</FormLabel>
+											<FormLabel description={m.settings_desc_unit_volume()}
+												>{m.fuel_type_lpg()}</FormLabel
+											>
 											<Select.Root bind:value={$formData.unitOfLpg} type="single">
 												<Select.Trigger {...props} class="w-full">
 													<div class="flex items-center justify-start">
@@ -493,7 +495,9 @@
 								<Form.Field {form} name="unitOfCng" class="w-full">
 									<Form.Control>
 										{#snippet children({ props })}
-											<FormLabel description={m.settings_desc_unit_volume()}>CNG</FormLabel>
+											<FormLabel description={m.settings_desc_unit_volume()}
+												>{m.fuel_type_cng()}</FormLabel
+											>
 											<Select.Root bind:value={$formData.unitOfCng} type="single">
 												<Select.Trigger {...props} class="w-full">
 													<div class="flex items-center justify-start">

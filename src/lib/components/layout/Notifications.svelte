@@ -8,7 +8,8 @@
 	import BadgeInfo from '@lucide/svelte/icons/badge-info';
 
 	import { browser } from '$app/environment';
-	import { REMINDER_TYPES } from '$lib/domain/reminder';
+	import { getReminderTypeLabel } from '$lib/domain/reminder';
+	import * as m from '$lib/paraglide/messages';
 	import type { Reminder } from '$lib/domain';
 	import { reminderStore } from '$stores/reminder.svelte';
 	import { insuranceStore } from '$stores/insurance.svelte';
@@ -220,7 +221,7 @@
 
 	const alertNotifications = $derived<VehicleAlert[]>(
 		vehicleStore.selectedId
-			? calculateVehicleAlerts(insuranceStore.insurances, puccStore.pollutionCerts).filter(
+			? calculateVehicleAlerts(insuranceStore.insurances, puccStore.pollutionCerts, m).filter(
 					(alert) =>
 						alert.status === 'expired' || alert.status === 'expiring' || alert.status === 'missing'
 				)
@@ -328,7 +329,7 @@
 								<div class="flex-1">
 									<div class="flex items-center justify-between gap-2">
 										<p class="text-sm font-semibold">
-											{REMINDER_TYPES[reminder.type]}
+											{getReminderTypeLabel(reminder.type, m)}
 										</p>
 										<div class="flex items-center gap-2">
 											<span
@@ -343,7 +344,7 @@
 												size="sm"
 												title={notifications_mark_done_title()}
 												aria-label={notifications_mark_done_aria({
-													type: REMINDER_TYPES[reminder.type]
+													type: getReminderTypeLabel(reminder.type, m)
 												})}
 												onclick={() => markReminderComplete(reminder)}
 												disabled={!reminder.id || isReminderCompleting(reminder.id)}

@@ -2,6 +2,7 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { cn, type WithElementRef } from '$lib/utils.js';
 	import type { Component } from 'svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	type Props = WithElementRef<
 		HTMLInputAttributes & {
@@ -18,7 +19,7 @@
 		suggestions = [],
 		loading = false,
 		class: className,
-		placeholder = 'Type or select...',
+		placeholder = m.autocomplete_placeholder(),
 		...restProps
 	}: Props = $props();
 
@@ -104,7 +105,7 @@
 			class="bg-popover text-popover-foreground absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-md"
 		>
 			{#if loading}
-				<div class="p-2 text-center text-sm">Loading suggestions...</div>
+				<div class="p-2 text-center text-sm">{m.autocomplete_loading()}</div>
 			{:else if filteredSuggestions.length > 0}
 				<div class="p-1">
 					{#each filteredSuggestions as suggestion (suggestion)}
@@ -122,7 +123,7 @@
 				</div>
 			{:else}
 				<div class="text-muted-foreground p-2 text-center text-sm">
-					No suggestions found. You can type a new value.
+					{m.autocomplete_no_results()}
 				</div>
 			{/if}
 		</div>

@@ -8,6 +8,7 @@
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { cn } from '$lib/utils';
 	import { scale } from 'svelte/transition';
+	import * as m from '$lib/paraglide/messages';
 
 	let {
 		open = $bindable(false),
@@ -87,7 +88,7 @@
 						download={fileName}
 					>
 						<Download class={cn('h-4 w-4', isViewable ? 'drop-shadow-md' : '')} />
-						<span class="sr-only">Download</span>
+						<span class="sr-only">{m.file_preview_aria_download()}</span>
 					</Button>
 					<Button
 						id="file-preview-close"
@@ -97,7 +98,7 @@
 						class={cn('h-8 w-8 hover:bg-white/20', isViewable ? 'text-white hover:text-white' : '')}
 					>
 						<X class={cn('h-4 w-4', isViewable ? 'drop-shadow-md' : '')} />
-						<span class="sr-only">Close</span>
+						<span class="sr-only">{m.file_preview_aria_close()}</span>
 					</Button>
 				</div>
 			</div>
@@ -137,14 +138,14 @@
 							<ExternalLink class="text-muted-foreground h-12 w-12" />
 						</div>
 						<div class="space-y-2">
-							<h3 class="text-lg font-semibold">Preview not available</h3>
+							<h3 class="text-lg font-semibold">{m.file_preview_not_available()}</h3>
 							<p class="text-muted-foreground max-w-xs text-sm">
-								This file type cannot be previewed directly. Please download it to view.
+								{m.file_preview_download_hint()}
 							</p>
 						</div>
 						<Button href={fileUrl} download={fileName} class="mt-2">
 							<Download class="mr-2 h-4 w-4" />
-							Download File
+							{m.file_preview_download_button()}
 						</Button>
 					</div>
 				{/if}

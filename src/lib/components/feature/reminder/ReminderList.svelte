@@ -5,9 +5,9 @@
 	import { reminderStore } from '$stores/reminder.svelte';
 	import { vehicleStore } from '$stores/vehicle.svelte';
 	import {
-		REMINDER_TYPES,
 		getReminderScheduleLabel,
-		getRecurrenceTypeLabel
+		getRecurrenceTypeLabel,
+		getReminderTypeLabel
 	} from '$lib/domain/reminder';
 	import { formatDate } from '$lib/helper/format.helper';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
@@ -77,7 +77,7 @@
 					<div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
 						<BellRing class="h-6 w-6" />
 						<span class="line-clamp-1 text-lg font-bold lg:text-xl">
-							{REMINDER_TYPES[reminder.type]}
+							{getReminderTypeLabel(reminder.type, m)}
 						</span>
 					</div>
 					<div class="flex flex-wrap items-center gap-2">

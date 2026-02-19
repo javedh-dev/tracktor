@@ -8,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	import { sheetStore } from '$stores/sheet.svelte';
 	import FuelLogForm from './FuelLogForm.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
 	let showDeleteDialog = $state(false);
@@ -16,10 +17,10 @@
 		deleteFuelLog(fuelLog).then((res) => {
 			if (res.status === 'OK') {
 				showDeleteDialog = false;
-				toast.success('Deleted Fuel Log');
+				toast.success(m.fuel_log_delete_success());
 				onaction();
 			} else {
-				toast.error(res.error || 'Some error occurred while deleting vehicle.');
+				toast.error(res.error || m.fuel_log_delete_error());
 			}
 		});
 	};
@@ -34,7 +35,7 @@
 			{#snippet child({ props })}
 				<Button variant="ghost" size="icon" {...props}>
 					<EllipsisVertical />
-					<span class="sr-only">Open menu</span>
+					<span class="sr-only">{m.fuel_log_menu_open()}</span>
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
@@ -42,17 +43,17 @@
 			<DropdownMenu.Item
 				id="fuel-log-menu-edit"
 				onclick={() => {
-					sheetStore.openSheet(FuelLogForm, 'Update Fuel Log', '', fuelLog);
+					sheetStore.openSheet(FuelLogForm, m.fuel_log_menu_sheet_title(), '', fuelLog);
 				}}
 			>
-				Edit
+				{m.fuel_log_edit()}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				id="fuel-log-menu-delete"
 				variant="destructive"
 				onclick={() => (showDeleteDialog = true)}
 			>
-				Delete
+				{m.fuel_log_delete()}
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>

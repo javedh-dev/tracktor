@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SunIcon from '@lucide/svelte/icons/sun';
 	import MoonIcon from '@lucide/svelte/icons/moon';
+	import * as m from '$lib/paraglide/messages';
 
 	import { toggleMode } from 'mode-watcher';
 	import { Button } from '$ui/button';
@@ -15,5 +16,5 @@
 		id="theme-toggle-moon"
 		class="text-primary absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all! dark:scale-100 dark:rotate-0"
 	/>
-	<span class="sr-only">Toggle theme</span>
+	<span class="sr-only">{m.theme_toggle_label()}</span>
 </Button>
