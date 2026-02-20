@@ -14,6 +14,7 @@
 	import { configStore } from '$lib/stores/config.svelte';
 	import { themeStore } from '$lib/stores/theme.svelte';
 	import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
+	import { app_new_update_available } from '$lib/paraglide/messages';
 
 	let { children } = $props();
 	let demoMode = env.DEMO_MODE;
@@ -35,7 +36,7 @@
 
 			newSW?.addEventListener('statechange', () => {
 				if (newSW.state === 'installed') {
-					toast.info('New Update is available. Reloading..!');
+					toast.info(app_new_update_available());
 
 					setTimeout(() => {
 						newSW.postMessage({ type: 'SKIP_WAITING' });

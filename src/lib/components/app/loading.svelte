@@ -4,7 +4,9 @@
 		size?: 'sm' | 'md' | 'lg';
 	}
 
-	let { message = 'Loading...', size = 'md' }: Props = $props();
+	import * as m from '$lib/paraglide/messages';
+
+	let { message = m.loading_default_message(), size = 'md' }: Props = $props();
 
 	const sizeClasses = {
 		sm: 'h-4 w-4',

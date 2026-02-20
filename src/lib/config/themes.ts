@@ -1,9 +1,12 @@
 import type { ThemeConfig } from '$lib/types/theme';
+import * as m from '$lib/paraglide/messages';
 
 export const themes: Record<string, ThemeConfig> = {
 	slate: {
 		name: 'slate',
-		label: 'Slate',
+		get label() {
+			return m.theme_slate();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.356 0.011 252.894)',
@@ -18,7 +21,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	stone: {
 		name: 'stone',
-		label: 'Stone',
+		get label() {
+			return m.theme_stone();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.38 0.005 60)',
@@ -33,7 +38,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	red: {
 		name: 'red',
-		label: 'Red',
+		get label() {
+			return m.theme_red();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.577 0.245 27.325)',
@@ -48,7 +55,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	rose: {
 		name: 'rose',
-		label: 'Rose',
+		get label() {
+			return m.theme_rose();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.643 0.181 19.301)',
@@ -63,7 +72,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	blue: {
 		name: 'blue',
-		label: 'Blue',
+		get label() {
+			return m.theme_blue();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.488 0.243 264.376)',
@@ -78,7 +89,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	green: {
 		name: 'green',
-		label: 'Green',
+		get label() {
+			return m.theme_green();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.54 0.194 142.495)',
@@ -93,7 +106,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	purple: {
 		name: 'purple',
-		label: 'Purple',
+		get label() {
+			return m.theme_purple();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.589 0.25 292.514)',
@@ -108,7 +123,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	orange: {
 		name: 'orange',
-		label: 'Orange',
+		get label() {
+			return m.theme_orange();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.662 0.218 46.415)',
@@ -123,7 +140,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	yellow: {
 		name: 'yellow',
-		label: 'Yellow',
+		get label() {
+			return m.theme_yellow();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.776 0.173 91.935)',
@@ -138,7 +157,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	teal: {
 		name: 'teal',
-		label: 'Teal',
+		get label() {
+			return m.theme_teal();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.559 0.151 180.735)',
@@ -153,7 +174,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	indigo: {
 		name: 'indigo',
-		label: 'Indigo',
+		get label() {
+			return m.theme_indigo();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.482 0.198 272.314)',
@@ -168,7 +191,9 @@ export const themes: Record<string, ThemeConfig> = {
 	},
 	pink: {
 		name: 'pink',
-		label: 'Pink',
+		get label() {
+			return m.theme_pink();
+		},
 		active: false,
 		colors: {
 			primary: 'oklch(0.671 0.221 349.761)',

@@ -13,6 +13,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Image from '@lucide/svelte/icons/image';
+	import * as m from '$lib/paraglide/messages';
 
 	import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
 
@@ -61,10 +62,10 @@
 	const effectivePlaceholder = $derived(
 		placeholder ||
 			(variant === 'image'
-				? 'Click or drag image to upload'
+				? m.dropzone_placeholder_image()
 				: variant === 'attachment'
-					? 'Drop file here, or click to select'
-					: 'Click or drag files to upload')
+					? m.dropzone_placeholder_attachment()
+					: m.dropzone_placeholder_default())
 	);
 
 	$effect(() => {
@@ -108,7 +109,7 @@
 		const droppedFiles = Array.from(e.dataTransfer?.files ?? []);
 
 		if (droppedFiles.length > 1) {
-			toast.error('Please upload only one file.');
+			toast.error(m.dropzone_error_single_file());
 			return;
 		}
 
@@ -123,7 +124,7 @@
 		const selectedFiles = e.currentTarget.files;
 
 		if (!selectedFiles || selectedFiles.length !== 1 || selectedFiles.item(0) === null) {
-			toast.error('Please upload only one file.');
+			toast.error(m.dropzone_error_single_file());
 			return;
 		} else {
 			await upload(selectedFiles.item(0));
@@ -136,7 +137,7 @@
 	const shouldAcceptFile = (file: File): boolean => {
 		// Check file size
 		if (maxFileSize && file.size > maxFileSize) {
-			toast.error(`File size exceeds the maximum limit of ${displaySize(maxFileSize)}.`);
+			toast.error(m.dropzone_error_file_size({ size: displaySize(maxFileSize) }));
 			return false;
 		}
 
@@ -162,7 +163,7 @@
 		});
 
 		if (!isAcceptable) {
-			toast.error('File type not allowed. Please upload a supported file type.');
+			toast.error(m.dropzone_error_file_type());
 			return false;
 		}
 
@@ -211,7 +212,7 @@
 		file
 			? file.name
 			: effectiveExistingUrl && !removeExisting
-				? effectiveExistingUrl.split('/').pop() || 'Unknown file'
+				? effectiveExistingUrl.split('/').pop() || m.dropzone_unknown_file()
 				: null
 	);
 
@@ -267,7 +268,7 @@
 							</span>
 						</AttachmentLink>
 						<p id="existing-file-note" class="text-muted-foreground text-xs">
-							Existing attachment (Click to view)
+							{m.file_drop_existing_note()}
 						</p>
 					</div>
 				{/if}
@@ -313,7 +314,10 @@
 							{effectivePlaceholder}
 						</span>
 						<span id="file-drop-zone-details" class="text-muted-foreground/75 truncate text-xs">
-							{accept.replace(/,/g, ', ')} up to {displaySize(maxFileSize)}
+							{m.dropzone_hint_accept_limit({
+								types: accept.replace(/,/g, ', '),
+								size: displaySize(maxFileSize)
+							})}
 						</span>
 					</div>
 				</div>
@@ -328,17 +332,17 @@
 							id="file-upload-spinner"
 							class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"
 						></div>
-						<p id="file-uploading-text" class="text-sm">Uploading...</p>
+						<p id="file-uploading-text" class="text-sm">{m.dropzone_uploading()}</p>
 					{:else}
 						<Upload class="mb-2 h-4 w-4" />
 						<p id="file-drop-zone-instruction" class="truncate text-sm">{effectivePlaceholder}</p>
 						{#if variant !== 'image'}
 							<p id="file-accepted-types" class="text-muted-foreground truncate text-xs">
-								Supports: {accept.replace(/,/g, ', ')}
+								{m.dropzone_supports({ types: accept.replace(/,/g, ', ') })}
 							</p>
 							{#if maxFileSize}
 								<p id="file-max-size" class="text-muted-foreground text-xs">
-									Max size: {displaySize(maxFileSize)}
+									{m.dropzone_max_size({ size: displaySize(maxFileSize) })}
 								</p>
 							{/if}
 						{/if}

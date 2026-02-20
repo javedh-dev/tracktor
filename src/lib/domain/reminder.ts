@@ -2,12 +2,12 @@ import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
 
 export const REMINDER_TYPES = {
-	maintenance: 'Maintenance',
-	insurance: 'Insurance Renewal',
-	pollution: 'Emission / PUCC',
-	registration: 'Registration / Tax',
-	inspection: 'Inspection',
-	custom: 'Custom'
+	maintenance: 'maintenance',
+	insurance: 'insurance',
+	pollution: 'pollution',
+	registration: 'registration',
+	inspection: 'inspection',
+	custom: 'custom'
 } as const;
 
 export const REMINDER_SCHEDULES = {
@@ -59,6 +59,26 @@ export function getRecurrenceTypeLabel(type: string, m: any): string {
 			return m.recurrence_type_yearly();
 		default:
 			return m.recurrence_type_none();
+	}
+}
+
+// Helper function to get localized reminder type label
+export function getReminderTypeLabel(type: string, m: any): string {
+	switch (type) {
+		case 'maintenance':
+			return m.reminder_type_maintenance();
+		case 'insurance':
+			return m.reminder_type_insurance();
+		case 'pollution':
+			return m.reminder_type_pollution();
+		case 'registration':
+			return m.reminder_type_registration();
+		case 'inspection':
+			return m.reminder_type_inspection();
+		case 'custom':
+			return m.reminder_type_custom();
+		default:
+			return m.reminder_type_custom();
 	}
 }
 
