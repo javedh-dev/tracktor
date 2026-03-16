@@ -22,20 +22,11 @@
     onEdit?: (provider: ProviderWithChannels) => void;
     onDelete?: (provider: ProviderWithChannels) => void;
     onTest?: (provider: ProviderWithChannels) => void;
-    onToggleEnabled?: (provider: ProviderWithChannels, enabled: boolean) => void;
     toggling?: boolean;
     testing?: boolean;
   }
 
-  let {
-    provider,
-    onEdit,
-    onDelete,
-    onTest,
-    onToggleEnabled,
-    toggling = false,
-    testing = false
-  }: Props = $props();
+  let { provider, onEdit, onDelete, onTest, toggling = false, testing = false }: Props = $props();
 
   const channelLabelMap = {
     reminder: 'Reminder',
