@@ -308,6 +308,23 @@ export const getPendingNotificationsForChannels = async (
   };
 };
 
+export const getActiveNotificationsForChannels = async (
+  channels: NotificationChannel[]
+): Promise<ApiResponse> => {
+  await syncAllNotifications();
+
+  const notifications = await db.query.notificationTable.findMany({
+    where: (notification, { and, inArray, isNull }) =>
+      and(inArray(notification.channel, channels), isNull(notification.clearedAt)),
+    orderBy: (notification, { asc }) => [asc(notification.dueDate), asc(notification.created_at)]
+  });
+
+  return {
+    data: notifications,
+    success: true
+  };
+};
+
 export const clearNotification = async (notificationId: string): Promise<ApiResponse> => {
   const existingNotification = await db.query.notificationTable.findFirst({
     where: (notification, { eq }) => eq(notification.id, notificationId)

@@ -76,3 +76,25 @@ export const testProvider = async (
     throw error;
   }
 };
+
+export const sendAllNotificationsToEnabledProviders = async (): Promise<{
+  success: boolean;
+  notificationCount: number;
+  providerCount: number;
+  results: Array<{
+    providerId: string;
+    providerName: string;
+    providerType: string;
+    success: boolean;
+    error?: string;
+    notificationCount: number;
+  }>;
+}> => {
+  try {
+    const response = await apiClient.post('/notifications/test-enabled-providers');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to send notifications to enabled providers:', error);
+    throw error;
+  }
+};

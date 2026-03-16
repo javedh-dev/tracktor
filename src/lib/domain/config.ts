@@ -32,4 +32,7 @@ export interface Configs {
   featureInsurance?: boolean;
   featureOverview?: boolean;
   notificationProcessingSchedule?: string;
+  notificationEmailSubjectTemplate?: string;
+  notificationEmailTextTemplate?: string;
+  notificationEmailHtmlTemplate?: string;
 }

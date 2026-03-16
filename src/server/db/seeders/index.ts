@@ -31,6 +31,23 @@ const seedDefaultConfig = async () => {
       key: 'notificationProcessingSchedule',
       value: '0 9 * * *',
       description: 'Cron schedule for processing queued provider notifications'
+    },
+    {
+      key: 'notificationEmailSubjectTemplate',
+      value: 'Tracktor: {{total_count}} pending notification{{plural_suffix}}',
+      description: 'Subject template for notification emails'
+    },
+    {
+      key: 'notificationEmailTextTemplate',
+      value:
+        'Tracktor Notification Summary\n=====================================\n\n{{summary_sentence}}\n\n{{notification_groups_text}}\nReview details in Tracktor to manage your notifications.',
+      description: 'Plain text template for notification emails'
+    },
+    {
+      key: 'notificationEmailHtmlTemplate',
+      value:
+        '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>{{email_title}}</title>\n</head>\n<body style="margin:0;padding:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;color:#101828;">\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f4;">\n<tr><td align="center" style="padding:40px 20px;">\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e4e7ec;border-radius:20px;overflow:hidden;">\n<tr><td style="padding:36px 32px 18px 32px;">\n<div style="font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#667085;font-weight:600;margin-bottom:14px;">Tracktor</div>\n<h1 style="margin:0;font-size:28px;line-height:1.2;color:#101828;font-weight:700;">Notification Summary</h1>\n<p style="margin:12px 0 0 0;font-size:15px;line-height:1.7;color:#475467;">{{summary_sentence}}</p>\n</td></tr>\n<tr><td style="padding:0 32px 32px 32px;">\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fafaf9;border:1px solid #eaecf0;border-radius:16px;margin-top:18px;">\n<tr><td style="padding:20px 22px;text-align:center;">\n<div style="font-size:34px;line-height:1;font-weight:700;color:#101828;margin-bottom:6px;">{{total_count}}</div>\n<p style="font-size:14px;line-height:1.5;color:#475467;margin:0;font-weight:500;">Pending Notification{{plural_suffix}}</p>\n</td></tr>\n</table>\n{{notification_groups_html}}\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:36px;border-top:1px solid #eaecf0;">\n<tr><td style="padding-top:20px;text-align:left;">\n<p style="margin:0;font-size:13px;line-height:1.7;color:#667085;">Open Tracktor to review details, mark items as read, and manage your vehicles.</p>\n</td></tr>\n</table>\n</td></tr>\n</table>\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin-top:24px;">\n<tr><td style="text-align:center;padding:0 20px;">\n<p style="font-size:12px;line-height:1.6;color:#98a2b3;margin:0 0 4px 0;">This is an automated message from Tracktor</p>\n<p style="font-size:11px;line-height:1.6;color:#98a2b3;margin:0;">Please do not reply to this email</p>\n</td></tr>\n</table>\n</td></tr>\n</table>\n</body>\n</html>',
+      description: 'HTML template for notification emails'
     }
   ];
 

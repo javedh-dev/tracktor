@@ -5,12 +5,14 @@
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Mail from '@lucide/svelte/icons/mail';
   import Plus from '@lucide/svelte/icons/plus';
+  import Send from '@lucide/svelte/icons/send';
   import Webhook from '@lucide/svelte/icons/webhook';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
 
   import CronInput from '$feature/settings/CronInput.svelte';
   import Input from '$appui/input.svelte';
+  import { env } from '$lib/config/env';
   import type {
     EmailProviderConfig,
     GotifyProviderConfig,
@@ -71,6 +73,7 @@
   let dialogOpen = $state(false);
   let editingProvider = $state<ProviderWithChannels | null>(null);
   let savingProvider = $state(false);
+  let sendingNotifications = $state(false);
   let testDialogOpen = $state(false);
   let testingProvider = $state<ProviderWithChannels | null>(null);
 
@@ -220,6 +223,23 @@
     testingProvider = provider;
     testDialogOpen = true;
   }
+
+  async function handleSendAllNotifications() {
+    try {
+      sendingNotifications = true;
+      const result = await providerService.sendAllNotificationsToEnabledProviders();
+      const successCount = result.results.filter((entry) => entry.success).length;
+
+      toast.success(
+        `Sent ${result.notificationCount} notifications to ${successCount}/${result.providerCount} enabled provider${result.providerCount === 1 ? '' : 's'}`
+      );
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err.message || 'Failed to send notifications');
+    } finally {
+      sendingNotifications = false;
+    }
+  }
 </script>
 
 <div class="space-y-6">
@@ -240,6 +260,23 @@
       <Label for="notification-processing-schedule">Processing schedule</Label>
       <CronInput bind:value={processingSchedule} {disabled} placeholder="0 9 * * *" />
     </div>
+
+    {#if env.DEMO_MODE}
+      <div class="flex justify-end">
+        <Button
+          variant="outline"
+          onclick={handleSendAllNotifications}
+          disabled={disabled || sendingNotifications}
+        >
+          {#if sendingNotifications}
+            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+          {:else}
+            <Send class="mr-2 h-4 w-4" />
+          {/if}
+          Send All Notifications Now
+        </Button>
+      </div>
+    {/if}
   </div>
 
   <div class="flex items-center justify-between gap-4">

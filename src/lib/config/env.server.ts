@@ -50,6 +50,7 @@ export const serverEnv = {
   LOG_DIR: privateEnv.LOG_DIR || './logs',
   HTTP_MODE: privateEnv.HTTP_MODE || 'http',
   APP_VERSION: privateEnv.APP_VERSION,
+  APP_URL: privateEnv.APP_URL || '',
   BASE_URL: privateEnv.BASE_URL || '',
   APP_SECRET: privateEnv.APP_SECRET || ''
 } as const;

@@ -14,7 +14,10 @@ import {
 } from './emailTemplateService';
 import { sendEmail } from './emailNotificationService';
 import { getEnabledProvidersForChannels } from './notificationProviderService';
-import { getPendingNotificationsForChannels } from './notificationService';
+import {
+  getActiveNotificationsForChannels,
+  getPendingNotificationsForChannels
+} from './notificationService';
 
 type DispatchResult = {
   providerId: string;
@@ -194,7 +197,7 @@ async function sendNotificationsToProvider(
   };
 }
 
-export async function dispatchScheduledNotifications(): Promise<{
+async function dispatchNotifications(useAllNotifications: boolean): Promise<{
   success: boolean;
   notificationCount: number;
   providerCount: number;
@@ -216,8 +219,10 @@ export async function dispatchScheduledNotifications(): Promise<{
   }
 
   const channels = Array.from(new Set(providers.flatMap((provider) => provider.channels)));
-  const pendingResult = await getPendingNotificationsForChannels(channels);
-  const allNotifications = (pendingResult.data ?? []) as Notification[];
+  const notificationResult = useAllNotifications
+    ? await getActiveNotificationsForChannels(channels)
+    : await getPendingNotificationsForChannels(channels);
+  const allNotifications = (notificationResult.data ?? []) as Notification[];
 
   const results = await Promise.all(
     providers.map((provider) => {
@@ -243,4 +248,22 @@ export async function dispatchScheduledNotifications(): Promise<{
     providerCount: providers.length,
     results
   };
+}
+
+export async function dispatchScheduledNotifications(): Promise<{
+  success: boolean;
+  notificationCount: number;
+  providerCount: number;
+  results: DispatchResult[];
+}> {
+  return dispatchNotifications(false);
+}
+
+export async function dispatchAllNotificationsToEnabledProviders(): Promise<{
+  success: boolean;
+  notificationCount: number;
+  providerCount: number;
+  results: DispatchResult[];
+}> {
+  return dispatchNotifications(true);
 }
