@@ -9,6 +9,7 @@
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
 
+  import CronInput from '$feature/settings/CronInput.svelte';
   import Input from '$appui/input.svelte';
   import type {
     EmailProviderConfig,
@@ -37,16 +38,11 @@
   };
 
   interface Props {
-    processingTime: string;
-    onProcessingTimeChange: (value: string) => void;
+    processingSchedule: string;
     disabled?: boolean;
   }
 
-  let {
-    processingTime = $bindable('09:00'),
-    onProcessingTimeChange,
-    disabled = false
-  }: Props = $props();
+  let { processingSchedule = $bindable('0 9 * * *'), disabled = false }: Props = $props();
 
   const channelOptions: Array<{
     value: ProviderChannel;
@@ -227,38 +223,24 @@
 </script>
 
 <div class="space-y-6">
-  <Card.Root>
-    <Card.Content class="space-y-4 pt-6">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-lg font-semibold">Scheduled delivery</h3>
-          <p class="text-muted-foreground text-sm">
-            Tracktor checks pending notifications at this time and sends them to subscribed
-            providers.
-          </p>
-        </div>
-        <div
-          class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg"
-        >
-          <Clock3 class="h-5 w-5" />
-        </div>
-      </div>
-
-      <div class="max-w-xs space-y-2">
-        <Label for="notification-processing-time">Processing time</Label>
-        <Input
-          id="notification-processing-time"
-          type="time"
-          bind:value={processingTime}
-          {disabled}
-          oninput={() => onProcessingTimeChange(processingTime)}
-        />
-        <p class="text-muted-foreground text-xs">
-          In-app notifications stay real-time. This time only affects provider delivery.
+  <div class="space-y-3 rounded-lg border p-4">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold">Scheduled delivery</h3>
+        <p class="text-muted-foreground text-sm">
+          In-app notifications stay real-time. This schedule only controls provider delivery.
         </p>
       </div>
-    </Card.Content>
-  </Card.Root>
+      <div class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+        <Clock3 class="h-5 w-5" />
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <Label for="notification-processing-schedule">Processing schedule</Label>
+      <CronInput bind:value={processingSchedule} {disabled} placeholder="0 9 * * *" />
+    </div>
+  </div>
 
   <div class="flex items-center justify-between gap-4">
     <div>

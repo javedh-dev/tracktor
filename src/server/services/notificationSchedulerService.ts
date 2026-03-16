@@ -7,26 +7,9 @@ import { dispatchScheduledNotifications } from './notificationDispatchService';
 
 let scheduledTask: ScheduledTask | null = null;
 
-function toCronExpression(time: string): string {
-  const [hours, minutes] = time.split(':').map((value) => Number.parseInt(value, 10));
-
-  if (
-    Number.isNaN(hours) ||
-    Number.isNaN(minutes) ||
-    hours < 0 ||
-    hours > 23 ||
-    minutes < 0 ||
-    minutes > 59
-  ) {
-    return '0 9 * * *';
-  }
-
-  return `${minutes} ${hours} * * *`;
-}
-
-async function getNotificationProcessingTime(): Promise<string> {
+async function getNotificationProcessingSchedule(): Promise<string> {
   try {
-    const result = await getAppConfigByKey('notificationProcessingTime');
+    const result = await getAppConfigByKey('notificationProcessingSchedule');
     if (result.success && result.data?.value) {
       return result.data.value;
     }
@@ -34,7 +17,7 @@ async function getNotificationProcessingTime(): Promise<string> {
     // Fallback to default below.
   }
 
-  return '09:00';
+  return '0 9 * * *';
 }
 
 export async function processScheduledNotifications(): Promise<void> {
@@ -54,8 +37,7 @@ export async function processScheduledNotifications(): Promise<void> {
 }
 
 export async function initializeNotificationScheduler(): Promise<void> {
-  const time = await getNotificationProcessingTime();
-  const schedule = toCronExpression(time);
+  const schedule = await getNotificationProcessingSchedule();
 
   if (scheduledTask) {
     scheduledTask.stop();
@@ -64,7 +46,6 @@ export async function initializeNotificationScheduler(): Promise<void> {
 
   if (!cron.validate(schedule)) {
     logger.error('Invalid notification schedule expression', {
-      time,
       schedule
     });
     return;
@@ -76,7 +57,7 @@ export async function initializeNotificationScheduler(): Promise<void> {
     });
   });
 
-  logger.info('Notification scheduler initialized', { time, schedule });
+  logger.info('Notification scheduler initialized', { schedule });
 }
 
 export async function reloadNotificationScheduler(): Promise<void> {

@@ -13,7 +13,7 @@ CREATE TABLE `notifications` (
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles`(`id`) ON UPDATE no action ON DELETE cascade
 );
-
+--> statement-breakpoint
 CREATE TABLE `notification_providers` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,

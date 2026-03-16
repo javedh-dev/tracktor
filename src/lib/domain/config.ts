@@ -31,5 +31,5 @@ export interface Configs {
   featureReminders?: boolean;
   featureInsurance?: boolean;
   featureOverview?: boolean;
-  notificationProcessingTime?: string;
+  notificationProcessingSchedule?: string;
 }

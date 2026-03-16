@@ -28,9 +28,9 @@ export const seedData = async () => {
 const seedDefaultConfig = async () => {
   const defaultConfigs = [
     {
-      key: 'notificationProcessingTime',
-      value: '09:00',
-      description: 'Time of day when Tracktor processes queued provider notifications'
+      key: 'notificationProcessingSchedule',
+      value: '0 9 * * *',
+      description: 'Cron schedule for processing queued provider notifications'
     }
   ];
 

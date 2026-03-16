@@ -21,7 +21,7 @@ const DEFAULT_CONFIGS: Configs = {
   featureReminders: true,
   featureInsurance: true,
   featureOverview: true,
-  notificationProcessingTime: '09:00'
+  notificationProcessingSchedule: '0 9 * * *'
 };
 
 /**

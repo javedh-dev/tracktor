@@ -70,10 +70,10 @@
     featureReminders: z.boolean().default(true),
     featureInsurance: z.boolean().default(true),
     featureOverview: z.boolean().default(true),
-    notificationProcessingTime: z
+    notificationProcessingSchedule: z
       .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format')
-      .default('09:00')
+      .refine((expr) => expr.trim().split(/\s+/).length === 5, 'Invalid cron expression')
+      .default('0 9 * * *')
   });
 
   const form = superForm(defaults(zod4(configSchema)), {
@@ -598,10 +598,7 @@
           >
             <fieldset class="space-y-6" disabled={processing}>
               <NotificationProvidersSettings
-                bind:processingTime={$formData.notificationProcessingTime}
-                onProcessingTimeChange={(value) => {
-                  $formData.notificationProcessingTime = value;
-                }}
+                bind:processingSchedule={$formData.notificationProcessingSchedule}
                 disabled={processing}
               />
 
