@@ -99,6 +99,7 @@ async function sendGotifyNotification(
   notifications: Notification[]
 ): Promise<DispatchResult> {
   const config = provider.config as GotifyProviderConfig;
+  const groups = groupNotifications(notifications);
 
   try {
     const response = await fetch(`${config.serverUrl}/message?token=${config.appToken}`, {
@@ -107,10 +108,8 @@ async function sendGotifyNotification(
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        title: `Tracktor: ${notifications.length} pending notification${
-          notifications.length === 1 ? '' : 's'
-        }`,
-        message: notifications.map((notification) => `- ${notification.message}`).join('\n'),
+        title: `Tracktor Notification Summary`,
+        message: generatePlainTextDigest(groups, notifications.length),
         priority: config.priority
       })
     });

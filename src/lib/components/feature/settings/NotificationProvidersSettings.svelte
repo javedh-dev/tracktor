@@ -74,6 +74,7 @@
   let editingProvider = $state<ProviderWithChannels | null>(null);
   let savingProvider = $state(false);
   let sendingNotifications = $state(false);
+  let togglingProviderId = $state<string | null>(null);
   let testDialogOpen = $state(false);
   let testingProvider = $state<ProviderWithChannels | null>(null);
 
@@ -224,6 +225,21 @@
     testDialogOpen = true;
   }
 
+  async function handleToggleProvider(provider: ProviderWithChannels, enabled: boolean) {
+    try {
+      togglingProviderId = provider.id;
+      await providerService.updateProvider(provider.id, { isEnabled: enabled } as any);
+      providers = providers.map((entry) =>
+        entry.id === provider.id ? { ...entry, isEnabled: enabled } : entry
+      );
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err.message || 'Failed to update provider');
+    } finally {
+      togglingProviderId = null;
+    }
+  }
+
   async function handleSendAllNotifications() {
     try {
       sendingNotifications = true;
@@ -309,13 +325,16 @@
       </Card.Content>
     </Card.Root>
   {:else}
-    <div class="grid gap-3">
+    <div class="grid gap-3 md:grid-cols-2">
       {#each providers as provider (provider.id)}
         <ProviderCard
           {provider}
           onEdit={openEditDialog}
           onDelete={handleDelete}
           onTest={handleTest}
+          onToggleEnabled={handleToggleProvider}
+          toggling={togglingProviderId === provider.id}
+          testing={testDialogOpen && testingProvider?.id === provider.id}
         />
       {/each}
     </div>
@@ -464,5 +483,10 @@
 <TestProviderDialog
   provider={testingProvider}
   bind:open={testDialogOpen}
-  onOpenChange={(open) => (testDialogOpen = open)}
+  onOpenChange={(open) => {
+    testDialogOpen = open;
+    if (!open) {
+      testingProvider = null;
+    }
+  }}
 />
