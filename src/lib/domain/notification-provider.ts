@@ -119,6 +119,12 @@ const emailProviderConfigUpdateSchema = z.object({
   recepient: z.email('Valid reply-to email is required').optional()
 });
 
+const gotifyProviderConfigUpdateSchema = z.object({
+  serverUrl: z.string().url('Valid Gotify server URL is required'),
+  appToken: z.string(),
+  priority: z.number().int().min(0).max(10).default(5)
+});
+
 const notificationProviderConfigUpdateSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('email'),
@@ -130,7 +136,7 @@ const notificationProviderConfigUpdateSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('gotify'),
-    ...gotifyProviderConfigSchema.shape
+    ...gotifyProviderConfigUpdateSchema.shape
   })
 ]);
 

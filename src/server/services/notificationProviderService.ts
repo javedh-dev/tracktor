@@ -71,6 +71,62 @@ function resolveUpdatedConfig(
     };
   }
 
+  if (
+    incomingConfig.type === 'gotify' &&
+    existingConfig.type === 'gotify' &&
+    incomingConfig.appToken.trim().length === 0
+  ) {
+    return {
+      ...incomingConfig,
+      appToken: existingConfig.appToken
+    };
+  }
+
+  if (incomingConfig.type === 'webhook' && existingConfig.type === 'webhook') {
+    if (
+      incomingConfig.authType === 'basic' &&
+      existingConfig.authType === 'basic' &&
+      incomingConfig.authCredentials?.username &&
+      incomingConfig.authCredentials.password?.trim().length === 0
+    ) {
+      return {
+        ...incomingConfig,
+        authCredentials: {
+          ...incomingConfig.authCredentials,
+          password: existingConfig.authCredentials?.password
+        }
+      };
+    }
+
+    if (
+      incomingConfig.authType === 'bearer' &&
+      existingConfig.authType === 'bearer' &&
+      incomingConfig.authCredentials?.token?.trim().length === 0
+    ) {
+      return {
+        ...incomingConfig,
+        authCredentials: {
+          ...incomingConfig.authCredentials,
+          token: existingConfig.authCredentials?.token
+        }
+      };
+    }
+
+    if (
+      incomingConfig.authType === 'api-key' &&
+      existingConfig.authType === 'api-key' &&
+      incomingConfig.authCredentials?.apiKey?.trim().length === 0
+    ) {
+      return {
+        ...incomingConfig,
+        authCredentials: {
+          ...incomingConfig.authCredentials,
+          apiKey: existingConfig.authCredentials?.apiKey
+        }
+      };
+    }
+  }
+
   return incomingConfig;
 }
 
