@@ -10,16 +10,16 @@ import { notificationTable } from './notification';
 import { notificationProviderTable } from './notification-provider';
 
 export {
-	authTable,
-	usersTable,
-	sessionsTable,
-	configTable,
-	fuelLogTable,
-	insuranceTable,
-	maintenanceLogTable,
-	pollutionCertificateTable,
-	vehicleTable,
-	reminderTable,
-	notificationTable,
-	notificationProviderTable
+  authTable,
+  usersTable,
+  sessionsTable,
+  configTable,
+  fuelLogTable,
+  insuranceTable,
+  maintenanceLogTable,
+  pollutionCertificateTable,
+  vehicleTable,
+  reminderTable,
+  notificationTable,
+  notificationProviderTable
 };

@@ -1,171 +1,182 @@
 import type { Notification } from '$lib/domain/notification';
 
 export interface NotificationGroup {
-	type: string;
-	notifications: Notification[];
-	label: string;
-	icon: string;
-	color: string;
-	bgColor: string;
+  type: string;
+  notifications: Notification[];
+  label: string;
+  icon: string;
+  color: string;
+  bgColor: string;
 }
 
 /**
  * Group notifications by type
  */
 export function groupNotifications(notifications: Notification[]): NotificationGroup[] {
-	const groups: Record<string, Notification[]> = {};
+  const groups: Record<string, Notification[]> = {};
 
-	notifications.forEach((notification) => {
-		if (!groups[notification.type]) {
-			groups[notification.type] = [];
-		}
-		groups[notification.type].push(notification);
-	});
+  notifications.forEach((notification) => {
+    if (!groups[notification.type]) {
+      groups[notification.type] = [];
+    }
+    groups[notification.type].push(notification);
+  });
 
-	return Object.entries(groups).map(([type, notifs]) => ({
-		type,
-		notifications: notifs,
-		...getTypeMetadata(type)
-	}));
+  return Object.entries(groups).map(([type, notifs]) => ({
+    type,
+    notifications: notifs,
+    ...getTypeMetadata(type)
+  }));
 }
 
 /**
  * Get metadata for notification type (label, icon, colors)
  */
 function getTypeMetadata(type: string): {
-	label: string;
-	icon: string;
-	color: string;
-	bgColor: string;
+  label: string;
+  icon: string;
+  color: string;
+  bgColor: string;
 } {
-	const metadata: Record<string, { label: string; icon: string; color: string; bgColor: string }> =
-		{
-			reminder: {
-				label: 'Reminders',
-				icon: '🔔',
-				color: '#2563eb',
-				bgColor: '#eff6ff'
-			},
-			alert: {
-				label: 'Alerts',
-				icon: '⚠️',
-				color: '#dc2626',
-				bgColor: '#fef2f2'
-			},
-			maintenance: {
-				label: 'Maintenance',
-				icon: '🔧',
-				color: '#7c3aed',
-				bgColor: '#faf5ff'
-			},
-			insurance: {
-				label: 'Insurance',
-				icon: '🛡️',
-				color: '#059669',
-				bgColor: '#f0fdf4'
-			},
-			pollution: {
-				label: 'Pollution Certificate',
-				icon: '🌿',
-				color: '#0891b2',
-				bgColor: '#ecfeff'
-			},
-			registration: {
-				label: 'Registration',
-				icon: '📋',
-				color: '#ea580c',
-				bgColor: '#fff7ed'
-			}
-		};
+  const metadata: Record<string, { label: string; icon: string; color: string; bgColor: string }> =
+    {
+      reminder: {
+        label: 'Reminders',
+        icon: '🔔',
+        color: '#2563eb',
+        bgColor: '#eff6ff'
+      },
+      alert: {
+        label: 'Alerts',
+        icon: '⚠️',
+        color: '#dc2626',
+        bgColor: '#fef2f2'
+      },
+      information: {
+        label: 'Information',
+        icon: 'ℹ️',
+        color: '#0284c7',
+        bgColor: '#f0f9ff'
+      },
+      maintenance: {
+        label: 'Maintenance',
+        icon: '🔧',
+        color: '#7c3aed',
+        bgColor: '#faf5ff'
+      },
+      insurance: {
+        label: 'Insurance',
+        icon: '🛡️',
+        color: '#059669',
+        bgColor: '#f0fdf4'
+      },
+      pollution: {
+        label: 'Pollution Certificate',
+        icon: '🌿',
+        color: '#0891b2',
+        bgColor: '#ecfeff'
+      },
+      registration: {
+        label: 'Registration',
+        icon: '📋',
+        color: '#ea580c',
+        bgColor: '#fff7ed'
+      }
+    };
 
-	return (
-		metadata[type] || {
-			label: type.charAt(0).toUpperCase() + type.slice(1),
-			icon: '📌',
-			color: '#6b7280',
-			bgColor: '#f9fafb'
-		}
-	);
+  return (
+    metadata[type] || {
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+      icon: '📌',
+      color: '#6b7280',
+      bgColor: '#f9fafb'
+    }
+  );
 }
 
 /**
  * Format a date in a human-readable format
  */
 function formatDate(dateString: string | Date): string {
-	const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric'
-	});
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 }
 
 /**
  * Calculate days until due date
  */
-function getDaysUntilDue(dueDate: string | Date): { days: number; label: string; urgent: boolean } {
-	const due = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
-	const now = new Date();
-	const diffTime = due.getTime() - now.getTime();
-	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+function getDaysUntilDue(dueDate: string | Date): {
+  days: number;
+  label: string;
+  urgent: boolean;
+} {
+  const due = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
+  const now = new Date();
+  const diffTime = due.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-	let label = '';
-	let urgent = false;
+  if (diffDays < 0) {
+    return {
+      days: diffDays,
+      label: `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`,
+      urgent: true
+    };
+  }
 
-	if (diffDays < 0) {
-		label = `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`;
-		urgent = true;
-	} else if (diffDays === 0) {
-		label = 'Due today';
-		urgent = true;
-	} else if (diffDays === 1) {
-		label = 'Due tomorrow';
-		urgent = true;
-	} else if (diffDays <= 7) {
-		label = `${diffDays} days remaining`;
-		urgent = true;
-	} else if (diffDays <= 30) {
-		label = `${diffDays} days remaining`;
-		urgent = false;
-	} else {
-		label = `${diffDays} days remaining`;
-		urgent = false;
-	}
+  if (diffDays === 0) {
+    return { days: diffDays, label: 'Due today', urgent: true };
+  }
 
-	return { days: diffDays, label, urgent };
+  if (diffDays === 1) {
+    return { days: diffDays, label: 'Due tomorrow', urgent: true };
+  }
+
+  if (diffDays <= 7) {
+    return {
+      days: diffDays,
+      label: `${diffDays} days remaining`,
+      urgent: true
+    };
+  }
+
+  return { days: diffDays, label: `${diffDays} days remaining`, urgent: false };
 }
 
 /**
  * Generate plain text email content for notification digest
  */
 export function generatePlainTextDigest(
-	notificationGroups: NotificationGroup[],
-	totalCount: number
+  notificationGroups: NotificationGroup[],
+  totalCount: number
 ): string {
-	let text = `Tracktor Notification Summary\n`;
-	text += `=====================================\n\n`;
-	text += `You have ${totalCount} pending notification${totalCount !== 1 ? 's' : ''}.\n\n`;
+  let text = `Tracktor Notification Summary\n`;
+  text += `=====================================\n\n`;
+  text += `You have ${totalCount} pending notification${totalCount !== 1 ? 's' : ''}.\n\n`;
 
-	notificationGroups.forEach((group) => {
-		text += `${group.icon} ${group.label} (${group.notifications.length})\n`;
-		text += `-`.repeat(40) + '\n';
+  notificationGroups.forEach((group) => {
+    text += `${group.icon} ${group.label} (${group.notifications.length})\n`;
+    text += `-`.repeat(40) + '\n';
 
-		group.notifications.forEach((notification, index) => {
-			const daysInfo = getDaysUntilDue(notification.dueDate);
-			text += `${index + 1}. ${notification.message}\n`;
-			text += `   Due: ${formatDate(notification.dueDate)} (${daysInfo.label})\n`;
-			if (index < group.notifications.length - 1) {
-				text += '\n';
-			}
-		});
+    group.notifications.forEach((notification, index) => {
+      const daysInfo = getDaysUntilDue(notification.dueDate);
+      text += `${index + 1}. ${notification.message}\n`;
+      text += `   Due: ${formatDate(notification.dueDate)} (${daysInfo.label})\n`;
+      if (index < group.notifications.length - 1) {
+        text += '\n';
+      }
+    });
 
-		text += '\n\n';
-	});
+    text += '\n\n';
+  });
 
-	text += `=====================================\n`;
-	text += `Log in to Tracktor to view more details and manage your notifications.\n`;
+  text += `=====================================\n`;
+  text += `Log in to Tracktor to view more details and manage your notifications.\n`;
 
-	return text;
+  return text;
 }
 
 /**
@@ -173,19 +184,19 @@ export function generatePlainTextDigest(
  * Optimized for mobile email clients (Gmail, Outlook, Apple Mail, etc.)
  */
 export function generateHtmlDigest(
-	notificationGroups: NotificationGroup[],
-	totalCount: number
+  notificationGroups: NotificationGroup[],
+  totalCount: number
 ): string {
-	const groupsHtml = notificationGroups
-		.map((group) => {
-			const notificationsHtml = group.notifications
-				.map((notification) => {
-					const daysInfo = getDaysUntilDue(notification.dueDate);
-					const urgentBadge = daysInfo.urgent
-						? `<span style="display: inline-block; background-color: #fef2f2; color: #dc2626; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Urgent</span>`
-						: '';
+  const groupsHtml = notificationGroups
+    .map((group) => {
+      const notificationsHtml = group.notifications
+        .map((notification) => {
+          const daysInfo = getDaysUntilDue(notification.dueDate);
+          const urgentBadge = daysInfo.urgent
+            ? `<span style="display: inline-block; background-color: #fef2f2; color: #dc2626; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Urgent</span>`
+            : '';
 
-					return `
+          return `
 				<tr>
 					<td style="padding: 16px; border-bottom: 1px solid #f3f4f6;">
 						<table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -209,10 +220,10 @@ export function generateHtmlDigest(
 					</td>
 				</tr>
 			`;
-				})
-				.join('');
+        })
+        .join('');
 
-			return `
+      return `
 			<!--[if mso]>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0">
 				<tr>
@@ -255,10 +266,10 @@ export function generateHtmlDigest(
 			</table>
 			<![endif]-->
 		`;
-		})
-		.join('');
+    })
+    .join('');
 
-	return `
+  return `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -409,12 +420,12 @@ export function generateHtmlDigest(
  * Escape HTML special characters to prevent XSS
  */
 function escapeHtml(text: string): string {
-	const map: Record<string, string> = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#039;'
-	};
-	return text.replace(/[&<>"']/g, (char) => map[char]);
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
 }

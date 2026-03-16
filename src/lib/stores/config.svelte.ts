@@ -21,18 +21,7 @@ const DEFAULT_CONFIGS: Configs = {
   featureReminders: true,
   featureInsurance: true,
   featureOverview: true,
-  cronJobsEnabled: true,
-  cronRemindersEnabled: true,
-  cronRemindersSchedule: '0 * * * *',
-  cronInsuranceEnabled: true,
-  cronInsuranceSchedule: '0 8 * * *',
-  cronPuccEnabled: true,
-  cronPuccSchedule: '30 8 * * *',
-  cronCleanupEnabled: true,
-  cronCleanupSchedule: '0 2 * * *',
-  cronEmailDigestEnabled: true,
-  cronEmailDigestSchedule: '0 9 * * *',
-  cronEmailDigestOnStartup: true
+  notificationProcessingTime: '09:00'
 };
 
 /**

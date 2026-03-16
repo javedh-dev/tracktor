@@ -4,7 +4,6 @@
   import SettingsSelectField from '$feature/settings/SettingsSelectField.svelte';
   import SettingsFeatureToggle from '$feature/settings/SettingsFeatureToggle.svelte';
   import SettingsSection from '$lib/components/feature/settings/SettingsSection.svelte';
-  import CronInput from '$feature/settings/CronInput.svelte';
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { themes } from '$lib/config/themes';
@@ -40,7 +39,6 @@
   import Settings from '@lucide/svelte/icons/settings';
   import Gauge from '@lucide/svelte/icons/gauge';
   import ToggleLeft from '@lucide/svelte/icons/toggle-left';
-  import Clock from '@lucide/svelte/icons/clock';
   import Bell from '@lucide/svelte/icons/bell';
   import NotificationProvidersSettings from '$feature/settings/NotificationProvidersSettings.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
@@ -49,19 +47,6 @@
 
   let processing = $state(false);
   let activeSection = $state('personalization');
-
-  // Create a dynamic schema based on config items
-  // Cron validation helper
-  function validateCronExpression(expr: string): boolean {
-    if (!expr || expr.trim() === '') return false;
-
-    const parts = expr.trim().split(/\s+/);
-    if (parts.length !== 5) return false;
-
-    // Check if parts contain valid characters (digits, *, /, -, ,)
-    const validPattern = /^[\d*/,-]+$/;
-    return parts.every((part) => validPattern.test(part));
-  }
 
   const configSchema = z.object({
     dateFormat: z.string().refine((fmt) => {
@@ -85,33 +70,10 @@
     featureReminders: z.boolean().default(true),
     featureInsurance: z.boolean().default(true),
     featureOverview: z.boolean().default(true),
-    cronJobsEnabled: z.boolean().default(true),
-    cronRemindersEnabled: z.boolean().default(true),
-    cronRemindersSchedule: z
+    notificationProcessingTime: z
       .string()
-      .default('0 * * * *')
-      .refine(validateCronExpression, 'Invalid cron expression'),
-    cronInsuranceEnabled: z.boolean().default(true),
-    cronInsuranceSchedule: z
-      .string()
-      .default('0 8 * * *')
-      .refine(validateCronExpression, 'Invalid cron expression'),
-    cronPuccEnabled: z.boolean().default(true),
-    cronPuccSchedule: z
-      .string()
-      .default('30 8 * * *')
-      .refine(validateCronExpression, 'Invalid cron expression'),
-    cronCleanupEnabled: z.boolean().default(true),
-    cronCleanupSchedule: z
-      .string()
-      .default('0 2 * * *')
-      .refine(validateCronExpression, 'Invalid cron expression'),
-    cronEmailDigestEnabled: z.boolean().default(true),
-    cronEmailDigestSchedule: z
-      .string()
-      .default('0 9 * * *')
-      .refine(validateCronExpression, 'Invalid cron expression'),
-    cronEmailDigestOnStartup: z.boolean().default(true)
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format')
+      .default('09:00')
   });
 
   const form = superForm(defaults(zod4(configSchema)), {
@@ -135,17 +97,10 @@
         // Persist configuration before applying a locale change
         await saveConfig(updatedConfig);
 
-        // If any cron settings changed, reload cron jobs
-        const cronKeys = Object.keys(f.data).filter((key) => key.startsWith('cron'));
-        if (cronKeys.length > 0) {
-          try {
-            const reloadResponse = await fetch('/api/cron/reload', { method: 'POST' });
-            if (reloadResponse.ok) {
-              console.log('Cron jobs reloaded successfully');
-            }
-          } catch (error) {
-            console.error('Failed to reload cron jobs:', error);
-          }
+        try {
+          await fetch('/api/cron/reload', { method: 'POST' });
+        } catch {
+          /* noop */
         }
 
         // If locale changed, update Paraglide (triggers reload by default)
@@ -184,11 +139,6 @@
       icon: ToggleLeft
     },
     {
-      id: 'automatedJobs',
-      label: 'Automated Jobs',
-      icon: Clock
-    },
-    {
       id: 'notifications',
       label: 'Notifications',
       icon: Bell
@@ -220,8 +170,14 @@
   ];
 
   const mileageUnitFormatOptions = [
-    { value: 'distance-per-fuel', label: m.settings_mileage_format_distance_per_fuel() },
-    { value: 'fuel-per-distance', label: m.settings_mileage_format_fuel_per_distance() }
+    {
+      value: 'distance-per-fuel',
+      label: m.settings_mileage_format_distance_per_fuel()
+    },
+    {
+      value: 'fuel-per-distance',
+      label: m.settings_mileage_format_fuel_per_distance()
+    }
   ];
 
   const localeLabels: Record<string, string> = {
@@ -634,213 +590,26 @@
           </SettingsSection>
         {/if}
 
-        <!-- Automated Jobs Section -->
-        {#if activeSection === 'automatedJobs'}
-          <SettingsSection
-            title="Automated Jobs"
-            description="Configure scheduled jobs for automated notifications and maintenance tasks."
-          >
-            <!-- Global Enable/Disable -->
-            <fieldset class="space-y-6" disabled={processing}>
-              <!-- <SettingFormSection> -->
-              <SettingsFeatureToggle
-                {form}
-                name="cronJobsEnabled"
-                label="Enable Automated Jobs"
-                description="Master switch to enable or disable all automated background jobs"
-                checked={$formData.cronJobsEnabled ?? true}
-                disabled={processing}
-              />
-              <!-- </SettingFormSection> -->
-
-              <!-- Reminder Processing Job -->
-              <SettingFormSection
-                title="Reminder Processing"
-                subtitle="Automatically generate notifications from active reminders"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm font-medium">Enable Reminder Processing</span>
-                  </div>
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronRemindersEnabled"
-                    label=""
-                    description=""
-                    checked={$formData.cronRemindersEnabled ?? true}
-                    disabled={processing || !$formData.cronJobsEnabled}
-                  />
-                </div>
-                <Form.Field {form} name="cronRemindersSchedule" class="w-full">
-                  <Form.Control>
-                    {#snippet children()}
-                      <FormLabel>Schedule</FormLabel>
-                      <CronInput
-                        bind:value={$formData.cronRemindersSchedule}
-                        disabled={processing || !$formData.cronRemindersEnabled}
-                        placeholder="0 * * * *"
-                      />
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
-              </SettingFormSection>
-
-              <!-- Insurance Expiry Job -->
-              <SettingFormSection
-                title="Insurance Expiry Notifications"
-                subtitle="Generate notifications for insurance policies expiring within 30 days"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm font-medium">Enable Insurance Notifications</span>
-                  </div>
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronInsuranceEnabled"
-                    label=""
-                    description=""
-                    checked={$formData.cronInsuranceEnabled ?? true}
-                    disabled={processing || !$formData.cronJobsEnabled}
-                  />
-                </div>
-                <Form.Field {form} name="cronInsuranceSchedule" class="w-full">
-                  <Form.Control>
-                    {#snippet children()}
-                      <FormLabel>Schedule</FormLabel>
-                      <CronInput
-                        bind:value={$formData.cronInsuranceSchedule}
-                        disabled={processing || !$formData.cronInsuranceEnabled}
-                        placeholder="0 8 * * *"
-                      />
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
-              </SettingFormSection>
-
-              <!-- PUCC Expiry Job -->
-              <SettingFormSection
-                title="PUCC Expiry Notifications"
-                subtitle="Generate notifications for pollution certificates expiring within 30 days"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm font-medium">Enable PUCC Notifications</span>
-                  </div>
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronPuccEnabled"
-                    label=""
-                    description=""
-                    checked={$formData.cronPuccEnabled ?? true}
-                    disabled={processing || !$formData.cronJobsEnabled}
-                  />
-                </div>
-                <Form.Field {form} name="cronPuccSchedule" class="w-full">
-                  <Form.Control>
-                    {#snippet children()}
-                      <FormLabel>Schedule</FormLabel>
-                      <CronInput
-                        bind:value={$formData.cronPuccSchedule}
-                        disabled={processing || !$formData.cronPuccEnabled}
-                        placeholder="30 8 * * *"
-                      />
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
-              </SettingFormSection>
-
-              <!-- Cleanup Job -->
-              <SettingFormSection
-                title="Notification Cleanup"
-                subtitle="Automatically delete read notifications older than 30 days"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm font-medium">Enable Cleanup</span>
-                  </div>
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronCleanupEnabled"
-                    label=""
-                    description=""
-                    checked={$formData.cronCleanupEnabled ?? true}
-                    disabled={processing || !$formData.cronJobsEnabled}
-                  />
-                </div>
-                <Form.Field {form} name="cronCleanupSchedule" class="w-full">
-                  <Form.Control>
-                    {#snippet children()}
-                      <FormLabel>Schedule</FormLabel>
-                      <CronInput
-                        bind:value={$formData.cronCleanupSchedule}
-                        disabled={processing || !$formData.cronCleanupEnabled}
-                        placeholder="0 2 * * *"
-                      />
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
-              </SettingFormSection>
-
-              <!-- Email Digest Job -->
-              <SettingFormSection
-                title="Email Notification Digest"
-                subtitle="Send a cumulated email digest of all pending notifications"
-              >
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="text-sm font-medium">Enable Email Digest</span>
-                  </div>
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronEmailDigestEnabled"
-                    label=""
-                    description=""
-                    checked={$formData.cronEmailDigestEnabled ?? true}
-                    disabled={processing || !$formData.cronJobsEnabled}
-                  />
-                </div>
-                <Form.Field {form} name="cronEmailDigestSchedule" class="w-full">
-                  <Form.Control>
-                    {#snippet children()}
-                      <FormLabel>Schedule</FormLabel>
-                      <CronInput
-                        bind:value={$formData.cronEmailDigestSchedule}
-                        disabled={processing || !$formData.cronEmailDigestEnabled}
-                        placeholder="0 9 * * *"
-                      />
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
-
-                <!-- Run on Startup Toggle -->
-                <div class="pt-2">
-                  <SettingsFeatureToggle
-                    {form}
-                    name="cronEmailDigestOnStartup"
-                    label="Run on Server Startup"
-                    description="Execute email digest once when the server starts to send any pending notifications immediately"
-                    checked={$formData.cronEmailDigestOnStartup ?? true}
-                    disabled={processing || !$formData.cronEmailDigestEnabled}
-                  />
-                </div>
-              </SettingFormSection>
-            </fieldset>
-          </SettingsSection>
-        {/if}
-
         <!-- Notifications Section -->
         {#if activeSection === 'notifications'}
           <SettingsSection
             title="Notifications"
-            description="Configure notification providers and email preferences for alerts and reminders."
+            description="Configure provider subscriptions and the daily processing time for scheduled delivery."
           >
             <fieldset class="space-y-6" disabled={processing}>
-              <NotificationProvidersSettings />
+              <NotificationProvidersSettings
+                bind:processingTime={$formData.notificationProcessingTime}
+                onProcessingTimeChange={(value) => {
+                  $formData.notificationProcessingTime = value;
+                }}
+                disabled={processing}
+              />
+
+              <div class="flex justify-end">
+                <SubmitButton {processing} class="w-full sm:w-auto">
+                  {m.settings_update_button()}
+                </SubmitButton>
+              </div>
             </fieldset>
           </SettingsSection>
         {/if}
@@ -868,7 +637,7 @@
             </div>
           {/if}
 
-          {#if activeSection != 'notifications'}
+          {#if activeSection !== 'notifications'}
             <div class="flex justify-end">
               <SubmitButton {processing} class="w-full sm:w-auto">
                 {m.settings_update_button()}

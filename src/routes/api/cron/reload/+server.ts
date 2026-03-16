@@ -1,15 +1,22 @@
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { reloadCronJobs } from '$server/services/cronService';
-import logger from '$server/config/logger';
+import { error, json } from '@sveltejs/kit';
+
+import { AppError } from '$server/exceptions/AppError';
+import { reloadNotificationScheduler } from '$server/services/notificationSchedulerService';
 
 export const POST: RequestHandler = async () => {
-	try {
-		logger.info('Received request to reload cron jobs');
-		await reloadCronJobs();
-		return json({ success: true, message: 'Cron jobs reloaded successfully' });
-	} catch (error) {
-		logger.error('Failed to reload cron jobs:', error);
-		return json({ success: false, message: 'Failed to reload cron jobs' }, { status: 500 });
-	}
+  try {
+    await reloadNotificationScheduler();
+
+    return json({
+      success: true,
+      message: 'Notification scheduler reloaded successfully'
+    });
+  } catch (err) {
+    if (err instanceof AppError) {
+      throw error(err.status, err.message);
+    }
+
+    throw error(500, 'Failed to reload notification scheduler');
+  }
 };

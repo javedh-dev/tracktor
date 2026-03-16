@@ -103,15 +103,8 @@
     {
       "idx": 14,
       "version": "6",
-      "when": 1771153206607,
-      "tag": "20260215110006_add_notification_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "6",
-      "when": 1771229019688,
-      "tag": "20260216080339_add_notification_providers",
+      "when": 1773644016419,
+      "tag": "20260316065336_add_notification_system",
       "breakpoints": true
     }
   ]

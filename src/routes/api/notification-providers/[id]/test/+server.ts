@@ -1,14 +1,15 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
-import { testEmailProvider } from '$server/services/emailNotificationService';
-import { getProviderById } from '$server/services/notificationProviderService';
-import { AppError } from '$server/exceptions/AppError';
+import { error, json } from '@sveltejs/kit';
 import { ZodError } from 'zod';
+
 import type {
   EmailProviderConfig,
-  WebhookProviderConfig,
-  GotifyProviderConfig
+  GotifyProviderConfig,
+  WebhookProviderConfig
 } from '$lib/domain/notification-provider';
+import { AppError } from '$server/exceptions/AppError';
+import { testEmailProvider } from '$server/services/emailNotificationService';
+import { getProviderById } from '$server/services/notificationProviderService';
 
 async function testWebhookProvider(
   config: WebhookProviderConfig,
@@ -20,22 +21,22 @@ async function testWebhookProvider(
       ...config.headers
     };
 
-    // Add authentication headers
     if (config.authType === 'basic' && config.authCredentials?.username) {
-      const auth = btoa(`${config.authCredentials.username}:${config.authCredentials.password}`);
+      const auth = btoa(
+        `${config.authCredentials.username}:${config.authCredentials.password ?? ''}`
+      );
       headers['Authorization'] = `Basic ${auth}`;
     } else if (config.authType === 'bearer' && config.authCredentials?.token) {
       headers['Authorization'] = `Bearer ${config.authCredentials.token}`;
     } else if (config.authType === 'api-key' && config.authCredentials?.apiKey) {
-      const headerName = config.authCredentials.apiKeyHeader || 'X-API-Key';
-      headers[headerName] = config.authCredentials.apiKey;
+      headers[config.authCredentials.apiKeyHeader || 'X-API-Key'] = config.authCredentials.apiKey;
     }
 
     const response = await fetch(config.url, {
       method: config.method,
       headers,
       body: JSON.stringify({
-        title: 'Test Notification from Tracktor',
+        title: 'Tracktor test notification',
         message: testMessage,
         timestamp: new Date().toISOString(),
         test: true
@@ -50,7 +51,8 @@ async function testWebhookProvider(
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as Error;
     return {
       success: false,
       error: err.message || 'Failed to send webhook'
@@ -63,15 +65,13 @@ async function testGotifyProvider(
   testMessage: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const url = `${config.serverUrl}/message?token=${config.appToken}`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`${config.serverUrl}/message?token=${config.appToken}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        title: 'Test Notification from Tracktor',
+        title: 'Tracktor test notification',
         message: testMessage,
         priority: config.priority
       })
@@ -85,7 +85,8 @@ async function testGotifyProvider(
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as Error;
     return {
       success: false,
       error: err.message || 'Failed to send Gotify notification'
@@ -102,7 +103,6 @@ export const POST: RequestHandler = async (event) => {
       throw error(400, 'Provider ID is required');
     }
 
-    // Get the provider
     const result = await getProviderById(providerId);
     const provider = result.data;
 
@@ -115,11 +115,15 @@ export const POST: RequestHandler = async (event) => {
     if (provider.config.type === 'email') {
       testResult = await testEmailProvider(provider.config as EmailProviderConfig, body.testEmail);
     } else if (provider.config.type === 'webhook') {
-      const testMessage = body.testMessage || 'This is a test notification from Tracktor';
-      testResult = await testWebhookProvider(provider.config as WebhookProviderConfig, testMessage);
+      testResult = await testWebhookProvider(
+        provider.config as WebhookProviderConfig,
+        body.testMessage || 'This is a test notification from Tracktor'
+      );
     } else if (provider.config.type === 'gotify') {
-      const testMessage = body.testMessage || 'This is a test notification from Tracktor';
-      testResult = await testGotifyProvider(provider.config as GotifyProviderConfig, testMessage);
+      testResult = await testGotifyProvider(
+        provider.config as GotifyProviderConfig,
+        body.testMessage || 'This is a test notification from Tracktor'
+      );
     } else {
       throw error(400, `Provider type ${provider.config.type} is not supported for testing`);
     }
@@ -132,10 +136,8 @@ export const POST: RequestHandler = async (event) => {
       data: testResult
     });
   } catch (err) {
-    console.error('Test notification error:', err);
-
     if (err instanceof ZodError) {
-      throw error(400, `Validation error: ${err.issues.map((e) => e.message).join(', ')}`);
+      throw error(400, `Validation error: ${err.issues.map((issue) => issue.message).join(', ')}`);
     }
 
     if (err instanceof AppError) {

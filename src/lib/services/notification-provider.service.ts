@@ -1,8 +1,7 @@
 import type {
   CreateNotificationProvider,
   UpdateNotificationProvider,
-  NotificationProviderWithParsedConfig,
-  EmailProviderConfig
+  NotificationProviderWithParsedConfig
 } from '$lib/domain/notification-provider';
 import { apiClient } from '$lib/helper/api.helper';
 
@@ -62,30 +61,15 @@ export const deleteProvider = async (id: string): Promise<void> => {
   }
 };
 
-export const testEmailProvider = async (
-  config: EmailProviderConfig,
-  testEmail: string
-): Promise<{ success: boolean; error?: string }> => {
-  try {
-    const response = await apiClient.post('/notification-providers/test-email', {
-      config,
-      testEmail
-    });
-    return response.data.data;
-  } catch (error) {
-    console.error('Failed to test email provider:', error);
-    throw error;
-  }
-};
-
 export const testProvider = async (
   providerId: string,
-  testMessage?: string
+  payload?: string | { testMessage?: string; testEmail?: string }
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    const response = await apiClient.post(`/notification-providers/${providerId}/test`, {
-      testMessage
-    });
+    const response = await apiClient.post(
+      `/notification-providers/${providerId}/test`,
+      typeof payload === 'string' ? { testMessage: payload } : payload || {}
+    );
     return response.data.data;
   } catch (error) {
     console.error('Failed to test provider:', error);

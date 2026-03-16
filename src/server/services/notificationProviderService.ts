@@ -1,46 +1,88 @@
-import { eq } from 'drizzle-orm';
-import { db } from '../db/index';
-import * as schema from '../db/schema/index';
-import { AppError, Status } from '../exceptions/AppError';
 import type { ApiResponse } from '$lib/response';
 import type {
   CreateNotificationProvider,
-  UpdateNotificationProvider,
-  NotificationProviderWithParsedConfig
+  NotificationChannel,
+  NotificationProviderType,
+  NotificationProviderConfig,
+  NotificationProviderWithParsedConfig,
+  UpdateNotificationProvider
 } from '$lib/domain/notification-provider';
 import {
   createNotificationProviderSchema,
-  updateNotificationProviderSchema,
-  notificationProviderConfigSchema
+  notificationProviderConfigSchema,
+  notificationProviderChannelsSchema,
+  notificationProviderTypeSchema,
+  updateNotificationProviderSchema
 } from '$lib/domain/notification-provider';
 import logger from '$server/config/logger';
-import { encrypt, decrypt } from '$server/utils/encryption';
+import { db } from '$server/db';
+import * as schema from '$server/db/schema';
+import { AppError, Status } from '$server/exceptions/AppError';
+import { decrypt, encrypt } from '$server/utils/encryption';
+import { eq } from 'drizzle-orm';
 
-const parseProviderConfig = (provider: any): NotificationProviderWithParsedConfig => {
+type ProviderRecord = typeof schema.notificationProviderTable.$inferSelect;
+
+function parseChannels(rawChannels: string): NotificationChannel[] {
   try {
-    // Decrypt the config
-    const config = decrypt(provider.config);
+    return notificationProviderChannelsSchema.parse(JSON.parse(rawChannels));
+  } catch (error) {
+    logger.error('Failed to parse provider channels', { rawChannels, error });
+    throw new AppError('Invalid provider channels', Status.INTERNAL_SERVER_ERROR);
+  }
+}
+
+function parseProvider(provider: ProviderRecord): NotificationProviderWithParsedConfig {
+  try {
+    const config = notificationProviderConfigSchema.parse(decrypt(provider.config));
+    const channels = parseChannels(provider.channels);
+    const type = notificationProviderTypeSchema.parse(provider.type) as NotificationProviderType;
+
     return {
       ...provider,
-      config
+      type,
+      config,
+      channels
     };
   } catch (error) {
-    logger.error('Failed to parse provider config', { providerId: provider.id, error });
+    logger.error('Failed to parse provider config', {
+      providerId: provider.id,
+      error
+    });
     throw new AppError('Invalid provider configuration', Status.INTERNAL_SERVER_ERROR);
   }
-};
+}
+
+function resolveUpdatedConfig(
+  existingConfig: NotificationProviderConfig,
+  incomingConfig: NotificationProviderConfig
+): NotificationProviderConfig {
+  if (
+    incomingConfig.type === 'email' &&
+    existingConfig.type === 'email' &&
+    incomingConfig.auth.pass.trim().length === 0
+  ) {
+    return {
+      ...incomingConfig,
+      auth: {
+        ...incomingConfig.auth,
+        pass: existingConfig.auth.pass
+      }
+    };
+  }
+
+  return incomingConfig;
+}
 
 export const getProvidersByUserId = async (): Promise<ApiResponse> => {
   const providers = await db.query.notificationProviderTable.findMany({
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
-  const parsedProviders = providers.map(parseProviderConfig);
-
   return {
     success: true,
     message: 'Providers fetched successfully',
-    data: parsedProviders
+    data: providers.map(parseProvider)
   };
 };
 
@@ -53,12 +95,10 @@ export const getProviderById = async (providerId: string): Promise<ApiResponse> 
     throw new AppError('Provider not found', Status.NOT_FOUND);
   }
 
-  const parsedProvider = parseProviderConfig(provider);
-
   return {
     success: true,
     message: 'Provider fetched successfully',
-    data: parsedProvider
+    data: parseProvider(provider)
   };
 };
 
@@ -66,17 +106,7 @@ export const addProvider = async (
   providerData: CreateNotificationProvider
 ): Promise<ApiResponse> => {
   const validated = createNotificationProviderSchema.parse(providerData);
-
-  // Validate the config based on provider type
   const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
-
-  // If this is set as default, unset all other default providers
-  if (validated.isDefault) {
-    await db
-      .update(schema.notificationProviderTable)
-      .set({ isDefault: false })
-      .where(eq(schema.notificationProviderTable.type, validated.type));
-  }
 
   const [provider] = await db
     .insert(schema.notificationProviderTable)
@@ -84,8 +114,8 @@ export const addProvider = async (
       name: validated.name,
       type: validated.type,
       config: encrypt(validatedConfig),
-      isEnabled: validated.isEnabled,
-      isDefault: validated.isDefault
+      channels: JSON.stringify(validated.channels),
+      isEnabled: validated.isEnabled
     })
     .returning();
 
@@ -93,12 +123,10 @@ export const addProvider = async (
     throw new AppError('Failed to create provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  const parsedProvider = parseProviderConfig(provider);
-
   return {
     success: true,
     message: 'Provider created successfully',
-    data: parsedProvider
+    data: parseProvider(provider)
   };
 };
 
@@ -107,8 +135,6 @@ export const updateProvider = async (
   providerData: UpdateNotificationProvider
 ): Promise<ApiResponse> => {
   const validated = updateNotificationProviderSchema.parse(providerData);
-
-  // Check if provider exists
   const existingProvider = await db.query.notificationProviderTable.findFirst({
     where: (providers, { eq }) => eq(providers.id, providerId)
   });
@@ -117,22 +143,16 @@ export const updateProvider = async (
     throw new AppError('Provider not found', Status.NOT_FOUND);
   }
 
-  // If this is set as default, unset all other default providers of the same type
-  if (validated.isDefault) {
-    await db
-      .update(schema.notificationProviderTable)
-      .set({ isDefault: false })
-      .where(eq(schema.notificationProviderTable.type, existingProvider.type));
-  }
+  const updateData: Partial<typeof schema.notificationProviderTable.$inferInsert> = {};
 
-  const updateData: any = {};
   if (validated.name !== undefined) updateData.name = validated.name;
   if (validated.isEnabled !== undefined) updateData.isEnabled = validated.isEnabled;
-  if (validated.isDefault !== undefined) updateData.isDefault = validated.isDefault;
+  if (validated.channels !== undefined) updateData.channels = JSON.stringify(validated.channels);
 
   if (validated.config !== undefined) {
-    const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
-    updateData.config = encrypt(validatedConfig);
+    const existingConfig = notificationProviderConfigSchema.parse(decrypt(existingProvider.config));
+    const mergedConfig = resolveUpdatedConfig(existingConfig, validated.config);
+    updateData.config = encrypt(notificationProviderConfigSchema.parse(mergedConfig));
   }
 
   const [updatedProvider] = await db
@@ -145,17 +165,14 @@ export const updateProvider = async (
     throw new AppError('Failed to update provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  const parsedProvider = parseProviderConfig(updatedProvider);
-
   return {
     success: true,
     message: 'Provider updated successfully',
-    data: parsedProvider
+    data: parseProvider(updatedProvider)
   };
 };
 
 export const deleteProvider = async (providerId: string): Promise<ApiResponse> => {
-  // Check if provider exists
   const existingProvider = await db.query.notificationProviderTable.findFirst({
     where: (providers, { eq }) => eq(providers.id, providerId)
   });
@@ -175,18 +192,33 @@ export const deleteProvider = async (providerId: string): Promise<ApiResponse> =
   };
 };
 
-export const getDefaultProvider = async (
-  type: string
-): Promise<NotificationProviderWithParsedConfig | null> => {
-  const provider = await db.query.notificationProviderTable.findFirst({
-    where: (providers, { eq, and }) =>
-      and(eq(providers.type, type), eq(providers.isDefault, true), eq(providers.isEnabled, true))
+export const getEnabledProvidersForChannels = async (channels: NotificationChannel[]) => {
+  const providers = await db.query.notificationProviderTable.findMany({
+    where: (provider, { eq }) => eq(provider.isEnabled, true)
   });
-  console.log('Default provider:', provider);
 
-  if (!provider) {
-    return null;
+  return providers
+    .map(parseProvider)
+    .filter((provider) => provider.channels.some((channel) => channels.includes(channel)));
+};
+
+export const getEnabledProvidersByType = async (type: string) => {
+  const providers = await db.query.notificationProviderTable.findMany({
+    where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true))
+  });
+
+  return providers.map(parseProvider);
+};
+
+export const getEnabledProvidersByIds = async (providerIds: string[]) => {
+  if (providerIds.length === 0) {
+    return [];
   }
 
-  return parseProviderConfig(provider);
+  const providers = await db.query.notificationProviderTable.findMany({
+    where: (provider, { and, eq, inArray }) =>
+      and(eq(provider.isEnabled, true), inArray(provider.id, providerIds))
+  });
+
+  return providers.map(parseProvider);
 };

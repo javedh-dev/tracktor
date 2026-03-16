@@ -1,18 +1,18 @@
 export type DataPoint = {
-	x: Date | string;
-	y: number | null;
+  x: Date | string;
+  y: number | null;
 };
 
 export type Response<DataType> = {
-	status: 'OK' | 'ERROR';
-	data?: DataType;
-	error?: string;
+  status: 'OK' | 'ERROR';
+  data?: DataType;
+  error?: string;
 };
 
 export enum Status {
-	LOADING,
-	DONE,
-	ERROR
+  LOADING,
+  DONE,
+  ERROR
 }
 
 // Re-export types from other modules
@@ -29,9 +29,14 @@ export type { Notification, NotificationSchema } from './notification';
 export { INSURANCE_RECURRENCE_TYPES, insuranceSchema } from './insurance';
 export { PUCC_RECURRENCE_TYPES, pollutionCertificateSchema } from './pucc';
 export {
-	REMINDER_TYPES,
-	REMINDER_SCHEDULES,
-	REMINDER_RECURRENCE_TYPES,
-	reminderSchema
+  REMINDER_TYPES,
+  REMINDER_SCHEDULES,
+  REMINDER_RECURRENCE_TYPES,
+  reminderSchema
 } from './reminder';
-export { NOTIFICATION_TYPES, NOTIFICATION_SOURCES, notificationSchema } from './notification';
+export {
+  NOTIFICATION_CHANNELS,
+  NOTIFICATION_TYPES,
+  NOTIFICATION_SOURCES,
+  notificationSchema
+} from './notification';

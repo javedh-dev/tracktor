@@ -1,18 +1,24 @@
 <script lang="ts">
-  import * as Dialog from '$ui/dialog';
-  import Button from '$ui/button/button.svelte';
-  import { Label } from '$ui/label';
-  import { Textarea } from '$ui/textarea';
-  import { toast } from 'svelte-sonner';
+  import Bell from '@lucide/svelte/icons/bell';
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Mail from '@lucide/svelte/icons/mail';
   import Webhook from '@lucide/svelte/icons/webhook';
-  import Bell from '@lucide/svelte/icons/bell';
+  import { toast } from 'svelte-sonner';
+
+  import Button from '$ui/button/button.svelte';
+  import * as Dialog from '$ui/dialog';
+  import { Label } from '$ui/label';
+  import { Textarea } from '$ui/textarea';
+  import Input from '$appui/input.svelte';
   import type { NotificationProviderWithParsedConfig } from '$lib/domain/notification-provider';
-  import * as providerService from '$lib/services/notification-provider.service';
+  import { testProvider } from '$lib/services/notification-provider.service';
+
+  type ProviderWithChannels = NotificationProviderWithParsedConfig & {
+    channels: Array<'reminder' | 'alert' | 'information'>;
+  };
 
   interface Props {
-    provider: NotificationProviderWithParsedConfig | null;
+    provider: ProviderWithChannels | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
   }
@@ -20,18 +26,20 @@
   let { provider, open = $bindable(false), onOpenChange }: Props = $props();
 
   let testMessage = $state('');
+  let testEmail = $state('');
   let testing = $state(false);
 
-  // Reset form when dialog closes
   $effect(() => {
     if (!open) {
       testMessage = '';
+      testEmail = '';
       testing = false;
     }
   });
 
   const getProviderIcon = () => {
     if (!provider) return Mail;
+
     switch (provider.type) {
       case 'email':
         return Mail;
@@ -50,17 +58,21 @@
     try {
       testing = true;
 
-      const result = await providerService.testProvider(provider.id, testMessage);
+      const result = await testProvider(provider.id, {
+        testMessage,
+        testEmail
+      });
 
       if (result.success) {
-        toast.success('Test notification sent successfully!');
+        toast.success('Test notification sent successfully');
         onOpenChange(false);
-      } else {
-        toast.error(`Failed to send test: ${result.error}`);
+        return;
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send test notification');
-      console.error(error);
+
+      toast.error(`Failed to send test: ${result.error}`);
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err.message || 'Failed to send test notification');
     } finally {
       testing = false;
     }
@@ -89,21 +101,29 @@
           <div>
             <p class="font-medium">{provider.name}</p>
             <p class="text-muted-foreground text-xs">
-              {provider.type.charAt(0).toUpperCase() + provider.type.slice(1)} Provider
+              {provider.type.charAt(0).toUpperCase() + provider.type.slice(1)} provider
             </p>
           </div>
         </div>
+
+        {#if provider.type === 'email'}
+          <div class="space-y-2">
+            <Label>Test Email</Label>
+            <Input bind:value={testEmail} type="email" placeholder="recipient@example.com" />
+            <p class="text-muted-foreground text-xs">
+              Optional override recipient for this test message.
+            </p>
+          </div>
+        {/if}
+
         <div class="space-y-2">
-          <Label>Test Message (Optional)</Label>
+          <Label>Test Message</Label>
           <Textarea
             bind:value={testMessage}
             placeholder="This is a test notification from Tracktor"
             disabled={testing}
             rows={3}
           />
-          <p class="text-muted-foreground text-xs">
-            Custom message for the test notification (default will be used if empty)
-          </p>
         </div>
       {/if}
     </div>

@@ -182,10 +182,10 @@ throw new AppError('Resource not found', Status.NOT_FOUND);
 
 // Client-side: Use try-catch with proper typing
 try {
-	const result = await apiService.getData();
+  const result = await apiService.getData();
 } catch (err) {
-	const error = err as Error;
-	console.error('Failed to fetch:', error.message);
+  const error = err as Error;
+  console.error('Failed to fetch:', error.message);
 }
 
 // SvelteKit: Use error() helper in load functions
@@ -198,20 +198,20 @@ throw error(404, 'Vehicle not found');
 ```typescript
 // Use query builder for complex queries
 const vehicle = await db.query.vehicleTable.findFirst({
-	where: (v, { eq }) => eq(v.id, vehicleId),
-	with: { fuelLogs: true }
+  where: (v, { eq }) => eq(v.id, vehicleId),
+  with: { fuelLogs: true }
 });
 
 // Use select for simple queries
 const vehicles = await db
-	.select()
-	.from(schema.vehicleTable)
-	.where(eq(schema.vehicleTable.userId, userId));
+  .select()
+  .from(schema.vehicleTable)
+  .where(eq(schema.vehicleTable.userId, userId));
 
 // Always use transactions for multi-step operations
 await db.transaction(async (tx) => {
-	await tx.insert(schema.vehicleTable).values(newVehicle);
-	await tx.insert(schema.fuelLogTable).values(initialLog);
+  await tx.insert(schema.vehicleTable).values(newVehicle);
+  await tx.insert(schema.fuelLogTable).values(initialLog);
 });
 ```
 

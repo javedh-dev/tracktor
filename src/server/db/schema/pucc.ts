@@ -4,21 +4,21 @@ import { vehicleTable } from './vehicle';
 import { timestamps } from './audit';
 
 export const pollutionCertificateTable = table('pollution_certificates', {
-	id: t
-		.text()
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	vehicleId: t
-		.text()
-		.notNull()
-		.references(() => vehicleTable.id, { onDelete: 'cascade' }),
-	certificateNumber: t.text().notNull(),
-	issueDate: t.text().notNull(),
-	expiryDate: t.text(),
-	recurrenceType: t.text().notNull().default('none'),
-	recurrenceInterval: t.integer().notNull().default(1),
-	testingCenter: t.text().notNull(),
-	notes: t.text(),
-	attachment: t.text(),
-	...timestamps
+  id: t
+    .text()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  vehicleId: t
+    .text()
+    .notNull()
+    .references(() => vehicleTable.id, { onDelete: 'cascade' }),
+  certificateNumber: t.text().notNull(),
+  issueDate: t.text().notNull(),
+  expiryDate: t.text(),
+  recurrenceType: t.text().notNull().default('none'),
+  recurrenceInterval: t.integer().notNull().default(1),
+  testingCenter: t.text().notNull(),
+  notes: t.text(),
+  attachment: t.text(),
+  ...timestamps
 });

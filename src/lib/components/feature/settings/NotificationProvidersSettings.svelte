@@ -1,50 +1,87 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import * as Card from '$ui/card';
-  import Button from '$ui/button/button.svelte';
-  import * as Dialog from '$ui/dialog';
-  import * as Select from '$ui/select';
-  import Input from '$appui/input.svelte';
-  import { Label } from '$ui/label';
-  import { Checkbox } from '$ui/checkbox';
-  import { toast } from 'svelte-sonner';
-  import type {
-    NotificationProviderWithParsedConfig,
-    CreateNotificationProvider,
-    NotificationProviderType,
-    EmailProviderConfig,
-    WebhookProviderConfig,
-    GotifyProviderConfig
-  } from '$lib/domain/notification-provider';
-  import * as providerService from '$lib/services/notification-provider.service';
-  import Mail from '@lucide/svelte/icons/mail';
-  import Plus from '@lucide/svelte/icons/plus';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Webhook from '@lucide/svelte/icons/webhook';
   import Bell from '@lucide/svelte/icons/bell';
   import BellOff from '@lucide/svelte/icons/bell-off';
+  import Clock3 from '@lucide/svelte/icons/clock-3';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Mail from '@lucide/svelte/icons/mail';
+  import Plus from '@lucide/svelte/icons/plus';
+  import Webhook from '@lucide/svelte/icons/webhook';
+  import { onMount } from 'svelte';
+  import { toast } from 'svelte-sonner';
+
+  import Input from '$appui/input.svelte';
+  import type {
+    EmailProviderConfig,
+    GotifyProviderConfig,
+    NotificationProviderType,
+    NotificationProviderWithParsedConfig,
+    WebhookProviderConfig
+  } from '$lib/domain/notification-provider';
+  import * as providerService from '$lib/services/notification-provider.service';
+  import { Checkbox } from '$ui/checkbox';
+  import Button from '$ui/button/button.svelte';
+  import * as Card from '$ui/card';
+  import * as Dialog from '$ui/dialog';
+  import { Label } from '$ui/label';
+  import * as Select from '$ui/select';
+
+  import EmailProviderForm from './EmailProviderForm.svelte';
+  import GotifyProviderForm from './GotifyProviderForm.svelte';
   import ProviderCard from './ProviderCard.svelte';
   import TestProviderDialog from './TestProviderDialog.svelte';
-  import EmailProviderForm from './EmailProviderForm.svelte';
   import WebhookProviderForm from './WebhookProviderForm.svelte';
-  import GotifyProviderForm from './GotifyProviderForm.svelte';
 
-  let providers = $state<NotificationProviderWithParsedConfig[]>([]);
+  type ProviderChannel = 'reminder' | 'alert' | 'information';
+  type ProviderWithChannels = NotificationProviderWithParsedConfig & {
+    channels: ProviderChannel[];
+  };
+
+  interface Props {
+    processingTime: string;
+    onProcessingTimeChange: (value: string) => void;
+    disabled?: boolean;
+  }
+
+  let {
+    processingTime = $bindable('09:00'),
+    onProcessingTimeChange,
+    disabled = false
+  }: Props = $props();
+
+  const channelOptions: Array<{
+    value: ProviderChannel;
+    label: string;
+    description: string;
+  }> = [
+    {
+      value: 'reminder',
+      label: 'Reminder',
+      description: 'Due dates and reminder-style notifications'
+    },
+    {
+      value: 'alert',
+      label: 'Alert',
+      description: 'Urgent or expiring items that need attention'
+    },
+    {
+      value: 'information',
+      label: 'Information',
+      description: 'General informational updates'
+    }
+  ];
+
+  let providers = $state<ProviderWithChannels[]>([]);
   let loading = $state(true);
   let dialogOpen = $state(false);
-  let editingProvider = $state<NotificationProviderWithParsedConfig | null>(null);
-  let processing = $state(false);
+  let editingProvider = $state<ProviderWithChannels | null>(null);
+  let savingProvider = $state(false);
   let testDialogOpen = $state(false);
-  let testingProvider = $state<NotificationProviderWithParsedConfig | null>(null);
-  let testingProviderId = $state<string | null>(null);
+  let testingProvider = $state<ProviderWithChannels | null>(null);
 
-  // Form state
   let formName = $state('');
   let formType = $state<NotificationProviderType>();
   let formIsEnabled = $state(true);
-  let formIsDefault = $state(false);
-
-  // Provider-specific configs
+  let formChannels = $state<ProviderChannel[]>(['reminder', 'alert', 'information']);
   let emailConfig = $state<Partial<EmailProviderConfig>>({});
   let webhookConfig = $state<Partial<WebhookProviderConfig>>({});
   let gotifyConfig = $state<Partial<GotifyProviderConfig>>({});
@@ -56,15 +93,22 @@
   async function loadProviders() {
     try {
       loading = true;
-      const result = await providerService.getProviders();
-      console.log('Loaded providers:', result);
-      providers = result;
-    } catch (error) {
+      providers = (await providerService.getProviders()) as ProviderWithChannels[];
+    } catch {
       toast.error('Failed to load notification providers');
-      console.error(error);
     } finally {
       loading = false;
     }
+  }
+
+  function resetForm() {
+    formName = '';
+    formType = undefined;
+    formIsEnabled = true;
+    formChannels = ['reminder', 'alert', 'information'];
+    emailConfig = {};
+    webhookConfig = {};
+    gotifyConfig = {};
   }
 
   function openCreateDialog() {
@@ -73,12 +117,12 @@
     dialogOpen = true;
   }
 
-  function openEditDialog(provider: NotificationProviderWithParsedConfig) {
+  function openEditDialog(provider: ProviderWithChannels) {
     editingProvider = provider;
     formName = provider.name;
     formType = provider.type;
     formIsEnabled = provider.isEnabled;
-    formIsDefault = provider.isDefault;
+    formChannels = [...provider.channels];
 
     if (provider.type === 'email') {
       emailConfig = provider.config as EmailProviderConfig;
@@ -91,66 +135,78 @@
     dialogOpen = true;
   }
 
-  function resetForm() {
-    formName = '';
-    formType = undefined;
-    formIsEnabled = true;
-    formIsDefault = false;
-    emailConfig = {};
-    webhookConfig = {};
-    gotifyConfig = {};
+  function toggleChannel(channel: ProviderChannel, checked: boolean) {
+    if (checked) {
+      formChannels = Array.from(new Set([...formChannels, channel])) as ProviderChannel[];
+      return;
+    }
+
+    formChannels = formChannels.filter((value) => value !== channel);
+  }
+
+  function resolveProviderConfig() {
+    if (formType === 'email') {
+      return { type: 'email' as const, ...emailConfig };
+    }
+
+    if (formType === 'webhook') {
+      return { type: 'webhook' as const, ...webhookConfig };
+    }
+
+    if (formType === 'gotify') {
+      return { type: 'gotify' as const, ...gotifyConfig };
+    }
+
+    return null;
   }
 
   async function handleSave() {
+    const config = resolveProviderConfig();
+
+    if (!formType || !config) {
+      toast.error('Please select a provider type');
+      return;
+    }
+
+    if (formChannels.length === 0) {
+      toast.error('Select at least one notification channel');
+      return;
+    }
+
     try {
-      processing = true;
-
-      let config: any;
-      if (formType === 'email') {
-        config = { type: 'email' as const, ...emailConfig };
-      } else if (formType === 'webhook') {
-        config = { type: 'webhook' as const, ...webhookConfig };
-      } else if (formType === 'gotify') {
-        config = { type: 'gotify' as const, ...gotifyConfig };
-      } else {
-        toast.error('Please select a provider type');
-        return;
-      }
-
-      const providerData: CreateNotificationProvider = {
-        name: formName,
-        type: formType,
-        config,
-        isEnabled: formIsEnabled,
-        isDefault: formIsDefault
-      };
+      savingProvider = true;
+      const providerConfig = config as any;
 
       if (editingProvider) {
-        const result = await providerService.updateProvider(editingProvider.id, {
+        await providerService.updateProvider(editingProvider.id, {
           name: formName,
-          config,
-          isEnabled: formIsEnabled,
-          isDefault: formIsDefault
-        });
-        console.log('Provider updated:', result);
+          config: providerConfig,
+          channels: formChannels,
+          isEnabled: formIsEnabled
+        } as any);
         toast.success('Provider updated successfully');
       } else {
-        const result = await providerService.createProvider(providerData);
-        console.log('Provider created:', result);
+        await providerService.createProvider({
+          name: formName,
+          type: formType,
+          config: providerConfig,
+          channels: formChannels,
+          isEnabled: formIsEnabled
+        } as any);
         toast.success('Provider created successfully');
       }
 
       dialogOpen = false;
       await loadProviders();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to save provider');
-      console.error(error);
+    } catch (error) {
+      const err = error as Error;
+      toast.error(err.message || 'Failed to save provider');
     } finally {
-      processing = false;
+      savingProvider = false;
     }
   }
 
-  async function handleDelete(provider: NotificationProviderWithParsedConfig) {
+  async function handleDelete(provider: ProviderWithChannels) {
     if (!confirm(`Are you sure you want to delete "${provider.name}"?`)) {
       return;
     }
@@ -159,27 +215,59 @@
       await providerService.deleteProvider(provider.id);
       toast.success('Provider deleted successfully');
       await loadProviders();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete provider');
-      console.error(error);
     }
   }
 
-  function handleTest(provider: NotificationProviderWithParsedConfig) {
+  function handleTest(provider: ProviderWithChannels) {
     testingProvider = provider;
     testDialogOpen = true;
   }
 </script>
 
 <div class="space-y-6">
-  <div class="flex items-center justify-between">
+  <Card.Root>
+    <Card.Content class="space-y-4 pt-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold">Scheduled delivery</h3>
+          <p class="text-muted-foreground text-sm">
+            Tracktor checks pending notifications at this time and sends them to subscribed
+            providers.
+          </p>
+        </div>
+        <div
+          class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg"
+        >
+          <Clock3 class="h-5 w-5" />
+        </div>
+      </div>
+
+      <div class="max-w-xs space-y-2">
+        <Label for="notification-processing-time">Processing time</Label>
+        <Input
+          id="notification-processing-time"
+          type="time"
+          bind:value={processingTime}
+          {disabled}
+          oninput={() => onProcessingTimeChange(processingTime)}
+        />
+        <p class="text-muted-foreground text-xs">
+          In-app notifications stay real-time. This time only affects provider delivery.
+        </p>
+      </div>
+    </Card.Content>
+  </Card.Root>
+
+  <div class="flex items-center justify-between gap-4">
     <div>
-      <h3 class="text-lg font-semibold">Notification Providers</h3>
+      <h3 class="text-lg font-semibold">Notification providers</h3>
       <p class="text-muted-foreground text-sm">
-        Configure email and other notification providers for sending alerts
+        Each provider can subscribe to Reminder, Alert, and Information channels.
       </p>
     </div>
-    <Button onclick={openCreateDialog} size="sm">
+    <Button onclick={openCreateDialog} size="sm" {disabled}>
       <Plus class="mr-2 h-4 w-4" />
       Add Provider
     </Button>
@@ -193,13 +281,12 @@
     <Card.Root class="border-dashed">
       <Card.Content class="flex flex-col items-center justify-center py-12">
         <BellOff class="text-muted-foreground mb-4 h-12 w-12" />
-        <p class="text-muted-foreground mb-4 text-center">
+        <p class="text-muted-foreground mb-2 text-center font-medium">
           No notification providers configured yet
         </p>
-        <!-- <Button onclick={openCreateDialog} size="sm">
-          <Plus class="mr-2 h-4 w-4" />
-          Add Your First Provider
-        </Button> -->
+        <p class="text-muted-foreground text-center text-sm">
+          Add a provider to receive scheduled Reminder, Alert, or Information notifications.
+        </p>
       </Card.Content>
     </Card.Root>
   {:else}
@@ -210,34 +297,29 @@
           onEdit={openEditDialog}
           onDelete={handleDelete}
           onTest={handleTest}
-          testing={testingProviderId === provider.id}
         />
       {/each}
     </div>
   {/if}
 </div>
 
-<!-- Add/Edit Provider Dialog -->
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-150">
     <Dialog.Header>
-      <Dialog.Title>
-        {editingProvider ? 'Edit' : 'Add'} Notification Provider
-      </Dialog.Title>
+      <Dialog.Title>{editingProvider ? 'Edit' : 'Add'} Notification Provider</Dialog.Title>
       <Dialog.Description>
-        Configure your notification provider for sending alerts
+        Choose a provider type, configure its destination, and subscribe it to notification
+        channels.
       </Dialog.Description>
     </Dialog.Header>
 
-    <div class="space-y-4 py-4">
+    <div class="space-y-5 py-4">
       <div class="grid gap-4 sm:grid-cols-2">
-        <!-- Provider Name -->
         <div class="space-y-2">
           <Label>Provider Name</Label>
-          <Input bind:value={formName} placeholder="My Notification Provider" />
+          <Input bind:value={formName} placeholder="Daily digest email" />
         </div>
 
-        <!-- Provider Type Selection -->
         <div class="space-y-2">
           <Label>Provider Type</Label>
           <Select.Root bind:value={formType} type="single" disabled={!!editingProvider}>
@@ -278,14 +360,9 @@
               </Select.Item>
             </Select.Content>
           </Select.Root>
-          {#if editingProvider}
-            <p class="text-muted-foreground text-xs">
-              Provider type cannot be changed after creation
-            </p>
-          {/if}
         </div>
       </div>
-      <!-- Dynamic Provider Forms -->
+
       {#if formType === 'email'}
         <EmailProviderForm
           config={editingProvider?.type === 'email'
@@ -313,33 +390,50 @@
       {/if}
 
       {#if formType}
-        <!-- Provider Settings -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="space-y-0.5">
-              <Label>Enable Provider</Label>
-              <p class="text-muted-foreground text-xs">Allow this provider to send notifications</p>
-            </div>
-            <Checkbox bind:checked={formIsEnabled} />
+        <div class="space-y-4 rounded-lg border p-4">
+          <div>
+            <h4 class="font-medium">Channel subscriptions</h4>
+            <p class="text-muted-foreground text-sm">
+              Pick which notification channels this provider should receive.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            {#each channelOptions as channel}
+              <label class="flex items-start justify-between gap-3 rounded-md border p-3">
+                <div class="space-y-1">
+                  <p class="font-medium">{channel.label}</p>
+                  <p class="text-muted-foreground text-xs">
+                    {channel.description}
+                  </p>
+                </div>
+                <Checkbox
+                  checked={formChannels.includes(channel.value)}
+                  onCheckedChange={(checked) => toggleChannel(channel.value, Boolean(checked))}
+                />
+              </label>
+            {/each}
           </div>
 
           <div class="flex items-center justify-between">
             <div class="space-y-0.5">
-              <Label>Set as Default</Label>
-              <p class="text-muted-foreground text-xs">Use this provider by default</p>
+              <Label>Enable Provider</Label>
+              <p class="text-muted-foreground text-xs">
+                Allow this provider to receive scheduled notifications.
+              </p>
             </div>
-            <Checkbox bind:checked={formIsDefault} />
+            <Checkbox bind:checked={formIsEnabled} />
           </div>
         </div>
       {/if}
     </div>
 
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (dialogOpen = false)} disabled={processing}>
+      <Button variant="outline" onclick={() => (dialogOpen = false)} disabled={savingProvider}>
         Cancel
       </Button>
-      <Button onclick={handleSave} disabled={processing}>
-        {#if processing}
+      <Button onclick={handleSave} disabled={savingProvider}>
+        {#if savingProvider}
           <Loader2 class="mr-2 h-4 w-4 animate-spin" />
         {/if}
         {editingProvider ? 'Update' : 'Create'} Provider
@@ -348,7 +442,6 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<!-- Test Provider Dialog -->
 <TestProviderDialog
   provider={testingProvider}
   bind:open={testDialogOpen}

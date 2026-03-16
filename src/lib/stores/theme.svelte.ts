@@ -6,76 +6,76 @@ import { getStoredTheme, saveTheme, applyThemeColors, setThemeClass } from '$lib
 const THEME_KEY = Symbol('theme');
 
 interface ThemeStore {
-	theme: ThemeName;
-	setTheme: (name: ThemeName) => void;
-	getThemes: () => ThemeConfig[];
-	getActiveTheme: () => ThemeConfig | undefined;
-	initializeTheme: () => void;
+  theme: ThemeName;
+  setTheme: (name: ThemeName) => void;
+  getThemes: () => ThemeConfig[];
+  getActiveTheme: () => ThemeConfig | undefined;
+  initializeTheme: () => void;
 }
 
 function createThemeStore(): ThemeStore {
-	let theme = $state<ThemeName>('slate');
-	let initialized = false;
+  let theme = $state<ThemeName>('slate');
+  let initialized = false;
 
-	function applyTheme(name: ThemeName) {
-		const themeConfig = themes[name];
-		if (themeConfig) {
-			applyThemeColors(themeConfig.colors, themeConfig.darkColors);
-			setThemeClass(name);
-		}
-	}
+  function applyTheme(name: ThemeName) {
+    const themeConfig = themes[name];
+    if (themeConfig) {
+      applyThemeColors(themeConfig.colors, themeConfig.darkColors);
+      setThemeClass(name);
+    }
+  }
 
-	function initializeTheme() {
-		if (initialized || typeof window === 'undefined') return;
+  function initializeTheme() {
+    if (initialized || typeof window === 'undefined') return;
 
-		const storedTheme = getStoredTheme();
-		if (storedTheme && storedTheme in themes) {
-			theme = storedTheme;
-		} else {
-			theme = 'slate';
-		}
+    const storedTheme = getStoredTheme();
+    if (storedTheme && storedTheme in themes) {
+      theme = storedTheme;
+    } else {
+      theme = 'slate';
+    }
 
-		applyTheme(theme);
-		initialized = true;
-	}
+    applyTheme(theme);
+    initialized = true;
+  }
 
-	function setTheme(name: ThemeName) {
-		if (name in themes) {
-			theme = name;
-			applyTheme(name);
-			saveTheme(name);
-		}
-	}
+  function setTheme(name: ThemeName) {
+    if (name in themes) {
+      theme = name;
+      applyTheme(name);
+      saveTheme(name);
+    }
+  }
 
-	function getThemes(): ThemeConfig[] {
-		return Object.values(themes);
-	}
+  function getThemes(): ThemeConfig[] {
+    return Object.values(themes);
+  }
 
-	function getActiveTheme(): ThemeConfig | undefined {
-		return themes[theme];
-	}
+  function getActiveTheme(): ThemeConfig | undefined {
+    return themes[theme];
+  }
 
-	return {
-		get theme() {
-			return theme;
-		},
-		set theme(value: ThemeName) {
-			setTheme(value);
-		},
-		setTheme,
-		getThemes,
-		getActiveTheme,
-		initializeTheme
-	};
+  return {
+    get theme() {
+      return theme;
+    },
+    set theme(value: ThemeName) {
+      setTheme(value);
+    },
+    setTheme,
+    getThemes,
+    getActiveTheme,
+    initializeTheme
+  };
 }
 
 export const themeStore = createThemeStore();
 
 // Context helpers for components
 export function setThemeContext(store: ThemeStore) {
-	return setContext(THEME_KEY, store);
+  return setContext(THEME_KEY, store);
 }
 
 export function getThemeContext(): ThemeStore {
-	return getContext<ThemeStore>(THEME_KEY);
+  return getContext<ThemeStore>(THEME_KEY);
 }

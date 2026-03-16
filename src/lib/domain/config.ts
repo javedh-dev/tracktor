@@ -11,14 +11,7 @@ export const BOOLEAN_CONFIG_KEYS = new Set([
   'featurePucc',
   'featureReminders',
   'featureInsurance',
-  'featureOverview',
-  'cronJobsEnabled',
-  'cronRemindersEnabled',
-  'cronInsuranceEnabled',
-  'cronPuccEnabled',
-  'cronCleanupEnabled',
-  'cronEmailDigestEnabled',
-  'cronEmailDigestOnStartup'
+  'featureOverview'
 ]);
 
 export interface Configs {
@@ -38,16 +31,5 @@ export interface Configs {
   featureReminders?: boolean;
   featureInsurance?: boolean;
   featureOverview?: boolean;
-  cronJobsEnabled?: boolean;
-  cronRemindersEnabled?: boolean;
-  cronRemindersSchedule?: string;
-  cronInsuranceEnabled?: boolean;
-  cronInsuranceSchedule?: string;
-  cronPuccEnabled?: boolean;
-  cronPuccSchedule?: string;
-  cronCleanupEnabled?: boolean;
-  cronCleanupSchedule?: string;
-  cronEmailDigestEnabled?: boolean;
-  cronEmailDigestSchedule?: string;
-  cronEmailDigestOnStartup?: boolean;
+  notificationProcessingTime?: string;
 }

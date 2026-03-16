@@ -5,7 +5,12 @@
     title,
     subtitle,
     children
-  }: { title?: string; subtitle?: string; separator?: boolean; children: () => any } = $props();
+  }: {
+    title?: string;
+    subtitle?: string;
+    separator?: boolean;
+    children: () => any;
+  } = $props();
 </script>
 
 <Accordion.Item value={title} class="m-0 p-0">
