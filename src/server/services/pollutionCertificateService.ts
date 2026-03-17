@@ -6,6 +6,7 @@ import type { ApiResponse } from '$lib/response';
 import type { PollutionCertificate } from '$lib/domain/pucc';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 type PollutionCertificatePayload = {
   certificateNumber: string;
@@ -31,11 +32,10 @@ export const addPollutionCertificate = async (
       vehicleId: vehicleId
     })
     .returning();
-  return {
-    data: pollutionCertificate[0],
-    success: true,
-    message: 'Pollution certificate added successfully.'
-  };
+  return createSuccessResponse(
+    pollutionCertificate[0],
+    'Pollution certificate added successfully.'
+  );
 };
 
 export const getPollutionCertificates = async (vehicleId: string): Promise<ApiResponse> => {
@@ -45,23 +45,18 @@ export const getPollutionCertificates = async (vehicleId: string): Promise<ApiRe
   const normalized = pollutionCertificates.map((c) =>
     c.recurrenceType !== 'none' ? { ...c, expiryDate: null } : c
   );
-  return {
-    data: normalized,
-    success: true
-  };
+  return createSuccessResponse(normalized);
 };
 
 export const getPollutionCertificateById = async (id: string): Promise<ApiResponse> => {
-  const pollutionCertificate = await db.query.pollutionCertificateTable.findFirst({
-    where: (certificates, { eq }) => eq(certificates.id, id)
-  });
-  if (!pollutionCertificate) {
-    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: pollutionCertificate,
-    success: true
-  };
+  const pollutionCertificate = requireRecord(
+    await db.query.pollutionCertificateTable.findFirst({
+      where: (certificates, { eq }) => eq(certificates.id, id)
+    }),
+    `No PUCC found for id : ${id}`
+  );
+
+  return createSuccessResponse(pollutionCertificate);
 };
 
 export const updatePollutionCertificate = async (
@@ -69,24 +64,23 @@ export const updatePollutionCertificate = async (
   id: string,
   pollutionCertificateData: PollutionCertificatePayload
 ): Promise<ApiResponse> => {
-  const pollutionCertificate = await db.query.pollutionCertificateTable.findFirst({
-    where: (certificates, { eq, and }) =>
-      and(eq(certificates.vehicleId, vehicleId), eq(certificates.id, id))
-  });
-  if (!pollutionCertificate) {
-    throw new AppError(`No PUCC found for id : ${id}`, Status.NOT_FOUND);
-  }
+  requireRecord(
+    await db.query.pollutionCertificateTable.findFirst({
+      where: (certificates, { eq, and }) =>
+        and(eq(certificates.vehicleId, vehicleId), eq(certificates.id, id))
+    }),
+    `No PUCC found for id : ${id}`
+  );
 
   const updatedCertificate = await db
     .update(schema.pollutionCertificateTable)
     .set(clearFixedEndDate(pollutionCertificateData))
     .where(eq(schema.pollutionCertificateTable.id, id))
     .returning();
-  return {
-    data: updatedCertificate[0],
-    success: true,
-    message: 'Pollution certificate updated successfully.'
-  };
+  return createSuccessResponse(
+    updatedCertificate[0],
+    'Pollution certificate updated successfully.'
+  );
 };
 
 export const deletePollutionCertificate = async (id: string): Promise<ApiResponse> => {

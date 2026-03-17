@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
 import type { Vehicle } from '$lib/domain/vehicle';
 import { performDelete } from '../utils/serviceUtils';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
 type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
@@ -112,11 +113,7 @@ export const addVehicle = async (vehicleData: VehicleMutationPayload): Promise<A
   const processedData = serializeVehiclePayload(vehicleData);
   const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
 
-  return {
-    data: parseVehicleRecord(vehicle),
-    success: true,
-    message: 'Vehicle added successfully.'
-  };
+  return createSuccessResponse(parseVehicleRecord(vehicle), 'Vehicle added successfully.');
 };
 
 export const getAllVehicles = async (): Promise<ApiResponse> => {
@@ -174,34 +171,27 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
     })
   );
 
-  return {
-    data: enrichedVehicles,
-    success: true
-  };
+  return createSuccessResponse(enrichedVehicles);
 };
 
 export const getVehicleById = async (id: string): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, id)
-  });
-
-  if (!vehicle) {
-    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
-  }
+  const vehicle = requireRecord(
+    await db.query.vehicleTable.findFirst({
+      where: (vehicles, { eq }) => eq(vehicles.id, id)
+    }),
+    `No vehicle found for id : ${id}`
+  );
 
   const [currentOdometer, overallMileage] = await Promise.all([
     getLatestOdometer(id),
     calculateOverallMileage(id)
   ]);
 
-  return {
-    data: {
-      ...parseVehicleRecord(vehicle),
-      currentOdometer: currentOdometer || vehicle.odometer || 0,
-      overallMileage
-    },
-    success: true
-  };
+  return createSuccessResponse({
+    ...parseVehicleRecord(vehicle),
+    currentOdometer: currentOdometer || vehicle.odometer || 0,
+    overallMileage
+  });
 };
 
 export const updateVehicle = async (
@@ -218,11 +208,7 @@ export const updateVehicle = async (
     .where(eq(schema.vehicleTable.id, id))
     .returning();
 
-  return {
-    data: parseVehicleRecord(updatedVehicle),
-    success: true,
-    message: 'Vehicle updated successfully.'
-  };
+  return createSuccessResponse(parseVehicleRecord(updatedVehicle), 'Vehicle updated successfully.');
 };
 
 export const deleteVehicle = async (id: string): Promise<ApiResponse> => {
@@ -240,10 +226,7 @@ export const getVehiclesMinimal = async (): Promise<ApiResponse> => {
       licensePlate: true
     }
   });
-  return {
-    data: vehicles,
-    success: true
-  };
+  return createSuccessResponse(vehicles);
 };
 
 export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
@@ -259,12 +242,9 @@ export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
     })
   ]);
 
-  return {
-    data: {
-      ...vehicle.data,
-      totalFuelLogs: fuelLogsCount.length,
-      totalMaintenanceLogs: maintenanceLogsCount.length
-    },
-    success: true
-  };
+  return createSuccessResponse({
+    ...vehicle.data,
+    totalFuelLogs: fuelLogsCount.length,
+    totalMaintenanceLogs: maintenanceLogsCount.length
+  });
 };

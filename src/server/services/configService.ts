@@ -4,29 +4,23 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 export const getAppConfigs = async (): Promise<ApiResponse> => {
-  let configs = await db.query.configTable.findMany();
-  if (!configs) {
-    configs = [];
-  }
-  return {
-    data: configs,
-    success: true
-  };
+  const configs = await db.query.configTable.findMany();
+
+  return createSuccessResponse(configs);
 };
 
 export const getAppConfigByKey = async (key: string): Promise<ApiResponse> => {
-  let config = await db.query.configTable.findFirst({
-    where: (configs, { eq }) => eq(configs.key, key)
-  });
-  if (!config) {
-    throw new AppError(`No config found for key : ${key}`, Status.NOT_FOUND);
-  }
-  return {
-    data: config,
-    success: true
-  };
+  const config = requireRecord(
+    await db.query.configTable.findFirst({
+      where: (configs, { eq }) => eq(configs.key, key)
+    }),
+    `No config found for key : ${key}`
+  );
+
+  return createSuccessResponse(config);
 };
 
 export const updateAppConfig = async (
@@ -55,8 +49,6 @@ export const updateAppConfig = async (
         .returning();
     })
   );
-  return {
-    data: updatedConfigs,
-    success: true
-  };
+
+  return createSuccessResponse(updatedConfigs);
 };

@@ -12,6 +12,7 @@ import {
   invalidateSession,
   type User
 } from '../utils/session';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 export const createUser = async (username: string, password: string): Promise<ApiResponse> => {
   // Check if user already exists
@@ -32,11 +33,7 @@ export const createUser = async (username: string, password: string): Promise<Ap
     passwordHash
   });
 
-  return {
-    success: true,
-    message: 'User created successfully',
-    data: { userId, username }
-  };
+  return createSuccessResponse({ userId, username }, 'User created successfully');
 };
 
 export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
@@ -63,13 +60,13 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
 };
 
 export const loginUser = async (username: string, password: string): Promise<ApiResponse> => {
-  const user = await db.query.usersTable.findFirst({
-    where: (users, { eq }) => eq(users.username, username)
-  });
-
-  if (!user) {
-    throw new AppError('Invalid username or password', Status.UNAUTHORIZED);
-  }
+  const user = requireRecord(
+    await db.query.usersTable.findFirst({
+      where: (users, { eq }) => eq(users.username, username)
+    }),
+    'Invalid username or password',
+    Status.UNAUTHORIZED
+  );
 
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) {
@@ -79,25 +76,21 @@ export const loginUser = async (username: string, password: string): Promise<Api
   const sessionToken = generateSessionToken();
   const session = await createSession(sessionToken, user.id);
 
-  return {
-    success: true,
-    message: 'Login successful',
-    data: {
+  return createSuccessResponse(
+    {
       sessionToken,
       user: {
         id: user.id,
         username: user.username
       }
-    }
-  };
+    },
+    'Login successful'
+  );
 };
 
 export const logoutUser = async (sessionId: string): Promise<ApiResponse> => {
   await invalidateSession(sessionId);
-  return {
-    success: true,
-    message: 'Logout successful'
-  };
+  return createSuccessResponse(undefined, 'Logout successful');
 };
 
 export const validateSession = async (sessionToken: string): Promise<{ user: User | null }> => {
@@ -107,26 +100,22 @@ export const validateSession = async (sessionToken: string): Promise<{ user: Use
 
 export const getUsersCount = async (): Promise<ApiResponse> => {
   const users = await db.select().from(schema.usersTable);
-  return {
-    success: true,
-    data: {
-      count: users.length,
-      hasUsers: users.length > 0
-    }
-  };
+  return createSuccessResponse({
+    count: users.length,
+    hasUsers: users.length > 0
+  });
 };
 
 export const updateUserProfile = async (
   userId: string,
   data: { username?: string; currentPassword?: string; newPassword?: string }
 ): Promise<ApiResponse> => {
-  const user = await db.query.usersTable.findFirst({
-    where: (users, { eq }) => eq(users.id, userId)
-  });
-
-  if (!user) {
-    throw new AppError('User not found', Status.NOT_FOUND);
-  }
+  const user = requireRecord(
+    await db.query.usersTable.findFirst({
+      where: (users, { eq }) => eq(users.id, userId)
+    }),
+    'User not found'
+  );
 
   const updates: { username?: string; passwordHash?: string } = {};
 
@@ -158,18 +147,13 @@ export const updateUserProfile = async (
   }
 
   if (Object.keys(updates).length === 0) {
-    return {
-      success: true,
-      message: 'No changes to update',
-      data: { id: user.id, username: user.username }
-    };
+    return createSuccessResponse({ id: user.id, username: user.username }, 'No changes to update');
   }
 
   await db.update(schema.usersTable).set(updates).where(eq(schema.usersTable.id, userId));
 
-  return {
-    success: true,
-    message: 'Profile updated successfully',
-    data: { id: user.id, username: updates.username || user.username }
-  };
+  return createSuccessResponse(
+    { id: user.id, username: updates.username || user.username },
+    'Profile updated successfully'
+  );
 };

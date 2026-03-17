@@ -16,6 +16,7 @@ import {
   sortNotificationsByDueDate,
   type GeneratedNotification
 } from './notification-service.helper';
+import { createFailureResponse, createSuccessResponse } from './service-response.helper';
 
 type NotificationType = keyof typeof NOTIFICATION_TYPES;
 type NotificationSource = keyof typeof NOTIFICATION_SOURCES;
@@ -208,10 +209,7 @@ export const getNotifications = async (vehicleId: string): Promise<ApiResponse> 
     ]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const getPendingNotificationsForChannels = async (
@@ -229,10 +227,7 @@ export const getPendingNotificationsForChannels = async (
     orderBy: (notification, { asc }) => [asc(notification.dueDate), asc(notification.created_at)]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const getActiveNotificationsForChannels = async (
@@ -246,10 +241,7 @@ export const getActiveNotificationsForChannels = async (
     orderBy: (notification, { asc }) => [asc(notification.dueDate), asc(notification.created_at)]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const clearNotification = async (notificationId: string): Promise<ApiResponse> => {
@@ -258,19 +250,11 @@ export const clearNotification = async (notificationId: string): Promise<ApiResp
   });
 
   if (!existingNotification) {
-    return {
-      data: null,
-      success: false,
-      message: 'Notification not found.'
-    };
+    return createFailureResponse('Notification not found.', null);
   }
 
   if (existingNotification.channel === 'alert') {
-    return {
-      data: null,
-      success: false,
-      message: 'Alert notifications cannot be cleared.'
-    };
+    return createFailureResponse('Alert notifications cannot be cleared.', null);
   }
 
   const clearedNotifications = await db
@@ -279,11 +263,7 @@ export const clearNotification = async (notificationId: string): Promise<ApiResp
     .where(eq(schema.notificationTable.id, notificationId))
     .returning();
 
-  return {
-    data: clearedNotifications[0],
-    success: true,
-    message: 'Notification cleared successfully.'
-  };
+  return createSuccessResponse(clearedNotifications[0], 'Notification cleared successfully.');
 };
 
 export const markNotificationAsRead = async (notificationId: string): Promise<ApiResponse> => {
@@ -294,18 +274,10 @@ export const markNotificationAsRead = async (notificationId: string): Promise<Ap
     .returning();
 
   if (updatedNotification.length === 0) {
-    return {
-      data: null,
-      success: false,
-      message: 'Notification not found.'
-    };
+    return createFailureResponse('Notification not found.', null);
   }
 
-  return {
-    data: updatedNotification[0],
-    success: true,
-    message: 'Notification marked as read.'
-  };
+  return createSuccessResponse(updatedNotification[0], 'Notification marked as read.');
 };
 
 export const markAllNotificationsAsRead = async (vehicleId: string): Promise<ApiResponse> => {
@@ -322,9 +294,5 @@ export const markAllNotificationsAsRead = async (vehicleId: string): Promise<Api
     )
     .returning();
 
-  return {
-    data: updatedNotifications,
-    success: true,
-    message: 'All notifications marked as read.'
-  };
+  return createSuccessResponse(updatedNotifications, 'All notifications marked as read.');
 };

@@ -6,6 +6,7 @@ import type { ApiResponse } from '$lib/response';
 import type { Insurance } from '$lib/domain/insurance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 type InsurancePayload = {
   provider: string;
@@ -32,11 +33,7 @@ export const addInsurance = async (
       vehicleId: vehicleId
     })
     .returning();
-  return {
-    data: insurance[0],
-    success: true,
-    message: 'Insurance details added successfully.'
-  };
+  return createSuccessResponse(insurance[0], 'Insurance details added successfully.');
 };
 
 export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => {
@@ -47,23 +44,18 @@ export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => 
   const normalized = insurance.map((i) =>
     i.recurrenceType !== 'none' ? { ...i, endDate: null } : i
   );
-  return {
-    data: normalized,
-    success: true
-  };
+  return createSuccessResponse(normalized);
 };
 
 export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
-  const insurance = await db.query.insuranceTable.findFirst({
-    where: (insurances, { eq }) => eq(insurances.id, id)
-  });
-  if (!insurance) {
-    throw new AppError(`No insurance found for id: ${id}`, Status.NOT_FOUND);
-  }
-  return {
-    data: insurance,
-    success: true
-  };
+  const insurance = requireRecord(
+    await db.query.insuranceTable.findFirst({
+      where: (insurances, { eq }) => eq(insurances.id, id)
+    }),
+    `No insurance found for id: ${id}`
+  );
+
+  return createSuccessResponse(insurance);
 };
 
 export const updateInsurance = async (
@@ -71,23 +63,19 @@ export const updateInsurance = async (
   id: string,
   insuranceData: InsurancePayload
 ): Promise<ApiResponse> => {
-  const insurance = await db.query.insuranceTable.findFirst({
-    where: (insurances, { eq, and }) =>
-      and(eq(insurances.vehicleId, vehicleId), eq(insurances.id, id))
-  });
-  if (!insurance) {
-    throw new AppError(`No Insurances found for id: ${id}`, Status.NOT_FOUND);
-  }
+  requireRecord(
+    await db.query.insuranceTable.findFirst({
+      where: (insurances, { eq, and }) =>
+        and(eq(insurances.vehicleId, vehicleId), eq(insurances.id, id))
+    }),
+    `No Insurances found for id: ${id}`
+  );
   const updatedInsurance = await db
     .update(schema.insuranceTable)
     .set(clearFixedEndDate(insuranceData))
     .where(eq(schema.insuranceTable.id, id))
     .returning();
-  return {
-    data: updatedInsurance[0],
-    success: true,
-    message: 'Insurance details updated successfully.'
-  };
+  return createSuccessResponse(updatedInsurance[0], 'Insurance details updated successfully.');
 };
 
 export const deleteInsurance = async (id: string): Promise<ApiResponse> => {

@@ -6,6 +6,7 @@ import type {
 } from '$lib/domain/notification-provider';
 import { AppError, Status } from '$server/exceptions/AppError';
 
+import { buildWebhookHeaders } from './notification-provider-http.helper';
 import { testEmailProvider } from './emailNotificationService';
 
 export type NotificationProviderTestResult = {
@@ -19,26 +20,6 @@ type NotificationProviderTestOptions = {
 };
 
 const DEFAULT_TEST_MESSAGE = 'This is a test notification from Tracktor';
-
-function buildWebhookHeaders(config: WebhookProviderConfig): Record<string, string> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...config.headers
-  };
-
-  if (config.authType === 'basic' && config.authCredentials?.username) {
-    const auth = btoa(
-      `${config.authCredentials.username}:${config.authCredentials.password ?? ''}`
-    );
-    headers['Authorization'] = `Basic ${auth}`;
-  } else if (config.authType === 'bearer' && config.authCredentials?.token) {
-    headers['Authorization'] = `Bearer ${config.authCredentials.token}`;
-  } else if (config.authType === 'api-key' && config.authCredentials?.apiKey) {
-    headers[config.authCredentials.apiKeyHeader || 'X-API-Key'] = config.authCredentials.apiKey;
-  }
-
-  return headers;
-}
 
 async function testWebhookProvider(
   config: WebhookProviderConfig,
