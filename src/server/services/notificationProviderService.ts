@@ -3,7 +3,6 @@ import type {
   CreateNotificationProvider,
   NotificationChannel,
   NotificationProviderType,
-  NotificationProviderConfig,
   NotificationProviderWithParsedConfig,
   UpdateNotificationProvider
 } from '$lib/domain/notification-provider';
@@ -20,6 +19,7 @@ import * as schema from '$server/db/schema';
 import { AppError, Status } from '$server/exceptions/AppError';
 import { decrypt, encrypt } from '$server/utils/encryption';
 import { eq } from 'drizzle-orm';
+import { resolveUpdatedConfig } from './notification-provider-service.helper';
 
 type ProviderRecord = typeof schema.notificationProviderTable.$inferSelect;
 
@@ -51,83 +51,6 @@ function parseProvider(provider: ProviderRecord): NotificationProviderWithParsed
     });
     throw new AppError('Invalid provider configuration', Status.INTERNAL_SERVER_ERROR);
   }
-}
-
-function resolveUpdatedConfig(
-  existingConfig: NotificationProviderConfig,
-  incomingConfig: NotificationProviderConfig
-): NotificationProviderConfig {
-  if (
-    incomingConfig.type === 'email' &&
-    existingConfig.type === 'email' &&
-    incomingConfig.auth.pass.trim().length === 0
-  ) {
-    return {
-      ...incomingConfig,
-      auth: {
-        ...incomingConfig.auth,
-        pass: existingConfig.auth.pass
-      }
-    };
-  }
-
-  if (
-    incomingConfig.type === 'gotify' &&
-    existingConfig.type === 'gotify' &&
-    incomingConfig.appToken.trim().length === 0
-  ) {
-    return {
-      ...incomingConfig,
-      appToken: existingConfig.appToken
-    };
-  }
-
-  if (incomingConfig.type === 'webhook' && existingConfig.type === 'webhook') {
-    if (
-      incomingConfig.authType === 'basic' &&
-      existingConfig.authType === 'basic' &&
-      incomingConfig.authCredentials?.username &&
-      incomingConfig.authCredentials.password?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          password: existingConfig.authCredentials?.password
-        }
-      };
-    }
-
-    if (
-      incomingConfig.authType === 'bearer' &&
-      existingConfig.authType === 'bearer' &&
-      incomingConfig.authCredentials?.token?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          token: existingConfig.authCredentials?.token
-        }
-      };
-    }
-
-    if (
-      incomingConfig.authType === 'api-key' &&
-      existingConfig.authType === 'api-key' &&
-      incomingConfig.authCredentials?.apiKey?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          apiKey: existingConfig.authCredentials?.apiKey
-        }
-      };
-    }
-  }
-
-  return incomingConfig;
 }
 
 export const getProvidersByUserId = async (): Promise<ApiResponse> => {
