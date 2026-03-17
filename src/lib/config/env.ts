@@ -6,13 +6,13 @@ import { resolve } from '$app/paths';
  * Only includes public environment variables that are safe to expose to the browser
  */
 export const clientEnv = {
-	DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
-	DISABLE_AUTH: publicEnv.TRACKTOR_DISABLE_AUTH === 'true',
-	BASE_URL: resolve('/')
+  DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
+  DISABLE_AUTH: publicEnv.TRACKTOR_DISABLE_AUTH === 'true',
+  BASE_URL: resolve('/')
 } as const;
 
 export const env = {
-	...clientEnv
+  ...clientEnv
 } as const;
 
 export const isDevelopment = import.meta.env.DEV;

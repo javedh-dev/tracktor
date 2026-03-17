@@ -2,13 +2,13 @@ import FileDropZone from './file-drop-zone.svelte';
 import { type FileRejectedReason, type FileDropZoneProps } from './types';
 
 export const displaySize = (bytes: number): string => {
-	if (bytes < KILOBYTE) return `${bytes.toFixed(0)} B`;
+  if (bytes < KILOBYTE) return `${bytes.toFixed(0)} B`;
 
-	if (bytes < MEGABYTE) return `${(bytes / KILOBYTE).toFixed(0)} KB`;
+  if (bytes < MEGABYTE) return `${(bytes / KILOBYTE).toFixed(0)} KB`;
 
-	if (bytes < GIGABYTE) return `${(bytes / MEGABYTE).toFixed(0)} MB`;
+  if (bytes < GIGABYTE) return `${(bytes / MEGABYTE).toFixed(0)} MB`;
 
-	return `${(bytes / GIGABYTE).toFixed(0)} GB`;
+  return `${(bytes / GIGABYTE).toFixed(0)} GB`;
 };
 
 // Utilities for working with file sizes

@@ -1,426 +1,379 @@
 <script lang="ts">
-	import Bell from '@lucide/svelte/icons/bell';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import CalendarDays from '@lucide/svelte/icons/calendar-days';
-	import Shield from '@lucide/svelte/icons/shield';
-	import BadgeInfo from '@lucide/svelte/icons/badge-info';
+  import Bell from '@lucide/svelte/icons/bell';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import CalendarDays from '@lucide/svelte/icons/calendar-days';
+  import Shield from '@lucide/svelte/icons/shield';
+  import Wrench from '@lucide/svelte/icons/wrench';
+  import Leaf from '@lucide/svelte/icons/leaf';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import Info from '@lucide/svelte/icons/info';
+  import X from '@lucide/svelte/icons/x';
 
-	import { browser } from '$app/environment';
-	import { getReminderTypeLabel } from '$lib/domain/reminder';
-	import * as m from '$lib/paraglide/messages';
-	import type { Reminder } from '$lib/domain';
-	import { reminderStore } from '$stores/reminder.svelte';
-	import { insuranceStore } from '$stores/insurance.svelte';
-	import { puccStore } from '$stores/pucc.svelte';
-	import { vehicleStore } from '$stores/vehicle.svelte';
-	import { differenceInDays, format } from 'date-fns';
-	import { getNextDueDate } from '$lib/helper/recurrence.helper';
-	import { calculateVehicleAlerts, type VehicleAlert } from '$lib/helper/alert.helper';
-	import { saveReminder } from '$lib/services/reminder.service';
-	import { toast } from 'svelte-sonner';
-	import { formatDate } from '$lib/helper/format.helper';
-	import { authStore } from '$lib/stores/auth.svelte';
-	import * as DropdownMenu from '../ui/dropdown-menu';
-	import Button from '../ui/button/button.svelte';
-	import {
-		notifications_title,
-		notifications_new,
-		notifications_select_vehicle_hint,
-		notifications_syncing,
-		notifications_caught_up,
-		notifications_section_reminders,
-		notifications_section_alerts,
-		notifications_mark_done_title,
-		notifications_mark_done_aria,
-		notifications_overdue_days,
-		notifications_due_today,
-		notifications_due_tomorrow,
-		notifications_due_in_days,
-		alerts_status_expired,
-		alerts_status_expiring,
-		alerts_status_valid,
-		alerts_status_missing,
-		notifications_expires,
-		notifications_error_no_id,
-		notifications_error_update_failed,
-		notifications_success_marked_done,
-		notifications_severity_overdue,
-		notifications_severity_due_soon,
-		notifications_severity_upcoming
-	} from '$lib/paraglide/messages/_index.js';
+  import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
+  import type { Notification } from '$lib/domain/notification';
+  import { vehicleStore } from '$stores/vehicle.svelte';
+  import { format } from 'date-fns';
+  import {
+    clearNotification,
+    getNotifications,
+    markAllNotificationsAsRead
+  } from '$services/notification.service';
+  import { toast } from 'svelte-sonner';
+  import { authStore } from '$lib/stores/auth.svelte';
+  import * as DropdownMenu from '../ui/dropdown-menu';
+  import Button from '../ui/button/button.svelte';
+  import * as m from '$lib/paraglide/messages/_index.js';
 
-	type ReminderSeverity = 'critical' | 'warning' | 'info';
+  type NotificationType = Notification['type'];
 
-	type ReminderNotification = Reminder & {
-		dueDate: Date;
-		daysRemaining: number;
-		severity: ReminderSeverity;
-	};
+  const notificationTypeStyles: Record<
+    NotificationType,
+    { ring: string; badge: string; icon: any }
+  > = {
+    reminder: {
+      ring: 'border-blue-500/40 bg-blue-500/10 text-blue-500 dark:border-blue-500/50 dark:bg-blue-500/10',
+      badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
+      icon: CalendarDays
+    },
+    maintenance: {
+      ring: 'border-violet-500/40 bg-violet-500/10 text-violet-500 dark:border-violet-500/50 dark:bg-violet-500/10',
+      badge: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300',
+      icon: Wrench
+    },
+    insurance: {
+      ring: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/50 dark:bg-emerald-500/10',
+      badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+      icon: Shield
+    },
+    pollution: {
+      ring: 'border-green-500/40 bg-green-500/10 text-green-600 dark:border-green-500/50 dark:bg-green-500/10',
+      badge: 'bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-300',
+      icon: Leaf
+    },
+    registration: {
+      ring: 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:border-amber-500/50 dark:bg-amber-500/10',
+      badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
+      icon: FileText
+    },
+    alert: {
+      ring: 'border-red-500/40 bg-red-500/10 text-red-500 dark:border-red-500/50 dark:bg-red-500/10',
+      badge: 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300',
+      icon: AlertTriangle
+    },
+    information: {
+      ring: 'border-sky-500/40 bg-sky-500/10 text-sky-600 dark:border-sky-500/50 dark:bg-sky-500/10',
+      badge: 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300',
+      icon: Info
+    }
+  };
 
-	const REMINDER_LOOKAHEAD_DAYS = 30;
-	const REMINDER_PAST_WINDOW_DAYS = 30;
-	const REMINDER_URGENT_DAYS = 7;
+  let markingAsReadIds: Record<string, boolean> = {};
+  let apiNotifications = $state<Notification[]>([]);
+  let isLoadingNotifications = $state(false);
+  let isClearingAll = $state(false);
+  let isDropdownOpen = $state(false);
 
-	const reminderSeverityLabel: Record<ReminderSeverity, string> = {
-		critical: notifications_severity_overdue(),
-		warning: notifications_severity_due_soon(),
-		info: notifications_severity_upcoming()
-	};
+  const fetchNotifications = async (vehicleId: string) => {
+    isLoadingNotifications = true;
+    try {
+      const response = await getNotifications(vehicleId);
+      if (response.status === 'OK' && response.data) {
+        apiNotifications = response.data;
+      } else {
+        apiNotifications = [];
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+      apiNotifications = [];
+    } finally {
+      isLoadingNotifications = false;
+    }
+  };
 
-	const reminderSeverityBadge: Record<ReminderSeverity, string> = {
-		critical: 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300',
-		warning: 'bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300',
-		info: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-	};
+  const setMarkingAsReadLoading = (id: string, state: boolean) => {
+    if (state) {
+      markingAsReadIds = { ...markingAsReadIds, [id]: true };
+      return;
+    }
+    markingAsReadIds = Object.fromEntries(
+      Object.entries(markingAsReadIds).filter(([key]) => key !== id)
+    );
+  };
 
-	const reminderSeverityRing: Record<ReminderSeverity, string> = {
-		critical:
-			'border-red-500/40 bg-red-500/10 text-red-500 dark:border-red-500/50 dark:bg-red-500/10',
-		warning:
-			'border-orange-500/40 bg-orange-500/10 text-orange-500 dark:border-orange-500/50 dark:bg-orange-500/10',
-		info: 'border-blue-500/40 bg-blue-500/10 text-blue-500 dark:border-blue-500/50 dark:bg-blue-500/10'
-	};
+  const isNotificationMarkingAsRead = (id?: string) => (id ? Boolean(markingAsReadIds[id]) : false);
 
-	const alertStatusLabel: Record<VehicleAlert['status'], string> = {
-		expired: alerts_status_expired(),
-		expiring: alerts_status_expiring(),
-		valid: alerts_status_valid(),
-		missing: alerts_status_missing()
-	};
+  const handleNotificationClick = async (notification: Notification) => {
+    // Close the dropdown immediately
+    isDropdownOpen = false;
 
-	const alertStatusBadge: Record<VehicleAlert['status'], string> = {
-		expired: 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300',
-		expiring: 'bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300',
-		valid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
-		missing: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-	};
+    // Only mark as read if it's unread
+    if (!notification.isRead && vehicleStore.selectedId && notification.id) {
+      if (isNotificationMarkingAsRead(notification.id)) return;
+      setMarkingAsReadLoading(notification.id, true);
+      try {
+        const { markNotificationAsRead: markAsReadService } =
+          await import('$services/notification.service');
+        const response = await markAsReadService(vehicleStore.selectedId, notification.id);
+        if (response.status === 'OK') {
+          // Update local state
+          apiNotifications = apiNotifications.map((n) =>
+            n.id === notification.id ? { ...n, isRead: true } : n
+          );
+        }
+      } catch (err) {
+        console.error('Failed to mark as read:', err);
+      } finally {
+        setMarkingAsReadLoading(notification.id, false);
+      }
+    }
 
-	const alertStatusRing: Record<VehicleAlert['status'], string> = {
-		expired:
-			'border-red-500/40 bg-red-500/10 text-red-500 dark:border-red-500/50 dark:bg-red-500/15',
-		expiring:
-			'border-orange-500/40 bg-orange-500/10 text-orange-500 dark:border-orange-500/50 dark:bg-orange-500/15',
-		valid:
-			'border-emerald-500/40 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/50 dark:bg-emerald-500/15',
-		missing:
-			'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:border-amber-400/50 dark:bg-amber-500/15'
-	};
+    // Navigate to the appropriate page based on notification type
+    const navigationMap: Record<NotificationType, string> = {
+      information: '/dashboard',
+      insurance: '/dashboard/insurance',
+      pollution: '/dashboard/pollution',
+      reminder: '/dashboard/reminders',
+      maintenance: '/dashboard/maintenance',
+      registration: '/dashboard', // Default to dashboard for now
+      alert: '/dashboard' // Default to dashboard for now
+    };
 
-	const describeReminderTiming = (daysRemaining: number) => {
-		if (daysRemaining < 0) {
-			const overdue = Math.abs(daysRemaining);
-			return notifications_overdue_days({ days: overdue, plural: overdue === 1 ? '' : 's' });
-		}
-		if (daysRemaining === 0) return notifications_due_today();
-		if (daysRemaining === 1) return notifications_due_tomorrow();
-		return notifications_due_in_days({ days: daysRemaining });
-	};
+    const targetPath = navigationMap[notification.type];
+    if (targetPath) {
+      await goto(targetPath);
+    }
+  };
 
-	const buildReminderPayload = (
-		reminder: ReminderNotification,
-		isCompleted: boolean
-	): Reminder => ({
-		id: reminder.id,
-		vehicleId: reminder.vehicleId,
-		type: reminder.type,
-		dueDate: reminder.dueDate,
-		remindSchedule: reminder.remindSchedule,
-		note: reminder.note,
-		isCompleted,
-		recurrenceType: reminder.recurrenceType,
-		recurrenceInterval: reminder.recurrenceInterval,
-		recurrenceEndDate: reminder.recurrenceEndDate
-	});
+  const handleClearAllRead = async () => {
+    if (!vehicleStore.selectedId || isClearingAll) return;
 
-	let completingReminderIds: Record<string, boolean> = {};
+    const readNotifications = apiNotifications.filter((n) => n.isRead && n.channel !== 'alert');
+    if (readNotifications.length === 0) return;
 
-	const setReminderLoading = (id: string, state: boolean) => {
-		if (state) {
-			completingReminderIds = { ...completingReminderIds, [id]: true };
-			return;
-		}
-		completingReminderIds = Object.fromEntries(
-			Object.entries(completingReminderIds).filter(([key]) => key !== id)
-		);
-	};
+    isClearingAll = true;
+    try {
+      const clearPromises = readNotifications.map((notification) =>
+        clearNotification(vehicleStore.selectedId!, notification.id!)
+      );
 
-	const isReminderCompleting = (id?: string | null) =>
-		id ? Boolean(completingReminderIds[id]) : false;
+      const results = await Promise.allSettled(clearPromises);
 
-	const markReminderComplete = async (reminder: ReminderNotification) => {
-		if (!reminder.id) {
-			toast.error(notifications_error_no_id());
-			return;
-		}
-		if (isReminderCompleting(reminder.id)) return;
-		setReminderLoading(reminder.id, true);
-		try {
-			const response = await saveReminder(buildReminderPayload(reminder, true));
-			if (response.status !== 'OK') {
-				throw new Error(response.error || notifications_error_update_failed());
-			}
-			toast.success(notifications_success_marked_done());
-			await reminderStore.refreshReminders();
-		} catch (err) {
-			const message = err instanceof Error ? err.message : notifications_error_update_failed();
-			toast.error(message);
-		} finally {
-			setReminderLoading(reminder.id, false);
-		}
-	};
+      // Count successful deletions
+      const successCount = results.filter((r) => r.status === 'fulfilled').length;
+      const failCount = results.filter((r) => r.status === 'rejected').length;
 
-	const reminderNotifications = $derived<ReminderNotification[]>(
-		(() => {
-			if (!vehicleStore.selectedId || !reminderStore.reminders) return [];
-			const now = new Date();
-			return reminderStore.reminders
-				.filter((reminder) => !reminder.isCompleted)
-				.map((reminder) => {
-					const baseDueDate =
-						reminder.dueDate instanceof Date ? reminder.dueDate : new Date(reminder.dueDate);
-					const recurrenceEnd =
-						reminder.recurrenceEndDate instanceof Date
-							? reminder.recurrenceEndDate
-							: reminder.recurrenceEndDate
-								? new Date(reminder.recurrenceEndDate)
-								: null;
-					const nextDueDate =
-						reminder.recurrenceType && reminder.recurrenceType !== 'none'
-							? (getNextDueDate(
-									baseDueDate,
-									reminder.recurrenceType,
-									reminder.recurrenceInterval ?? 1,
-									recurrenceEnd
-								) ?? baseDueDate)
-							: baseDueDate;
-					const daysRemaining = differenceInDays(nextDueDate, now);
-					const severity: ReminderSeverity =
-						daysRemaining < 0
-							? 'critical'
-							: daysRemaining <= REMINDER_URGENT_DAYS
-								? 'warning'
-								: 'info';
-					return {
-						...reminder,
-						dueDate: nextDueDate,
-						daysRemaining,
-						severity
-					};
-				})
-				.filter(
-					(reminder) =>
-						reminder.daysRemaining <= REMINDER_LOOKAHEAD_DAYS &&
-						reminder.daysRemaining >= -REMINDER_PAST_WINDOW_DAYS
-				)
-				.sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
-				.slice(0, 5);
-		})()
-	);
+      // Remove successfully deleted notifications from local state
+      const clearedIds = readNotifications
+        .map((n) => n.id)
+        .filter((_, index) => results[index].status === 'fulfilled');
 
-	const alertNotifications = $derived<VehicleAlert[]>(
-		vehicleStore.selectedId
-			? calculateVehicleAlerts(insuranceStore.insurances, puccStore.pollutionCerts, m).filter(
-					(alert) =>
-						alert.status === 'expired' || alert.status === 'expiring' || alert.status === 'missing'
-				)
-			: []
-	);
+      apiNotifications = apiNotifications.filter((n) => !clearedIds.includes(n.id));
 
-	const notificationCount = $derived(
-		reminderNotifications.length +
-			alertNotifications.filter((alert) => alert.status !== 'valid').length
-	);
+      // Show appropriate toast message
+      if (failCount === 0) {
+        toast.success(`Cleared ${successCount} read notification${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(
+          `Cleared ${successCount} notification${successCount > 1 ? 's' : ''}, ${failCount} failed`
+        );
+      } else {
+        toast.error('Failed to clear read notifications');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to clear read notifications';
+      toast.error(message);
+    } finally {
+      isClearingAll = false;
+    }
+  };
 
-	const notificationLoading = $derived(
-		reminderStore.processing || insuranceStore.processing || puccStore.processing
-	);
+  const handleMarkAllAsRead = async () => {
+    if (!vehicleStore.selectedId || unreadCount === 0 || isClearingAll) return;
 
-	let hydratedVehicleId: string | undefined;
+    isClearingAll = true;
+    try {
+      const response = await markAllNotificationsAsRead(vehicleStore.selectedId);
+      if (response.status === 'OK') {
+        apiNotifications = apiNotifications.map((notification) => ({
+          ...notification,
+          isRead: true
+        }));
+        toast.success('All notifications marked as read');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to mark notifications as read';
+      toast.error(message);
+    } finally {
+      isClearingAll = false;
+    }
+  };
 
-	$effect(() => {
-		if (!browser || !authStore.isLoggedIn) return;
-		const selectedId = vehicleStore.selectedId;
-		if (!selectedId) {
-			hydratedVehicleId = undefined;
-			reminderStore.refreshReminders();
-			insuranceStore.refreshInsurances();
-			puccStore.refreshPuccs();
-			return;
-		}
-		if (hydratedVehicleId === selectedId) return;
-		hydratedVehicleId = selectedId;
-		reminderStore.refreshReminders();
-		insuranceStore.refreshInsurances();
-		puccStore.refreshPuccs();
-	});
+  const unreadCount = $derived(apiNotifications.filter((n) => !n.isRead).length);
+  const clearableReadCount = $derived(
+    apiNotifications.filter((n) => n.isRead && n.channel !== 'alert').length
+  );
+
+  let hydratedVehicleId: string | undefined;
+
+  $effect(() => {
+    if (!browser || !authStore.isLoggedIn) return;
+    const selectedId = vehicleStore.selectedId;
+    if (!selectedId) {
+      hydratedVehicleId = undefined;
+      apiNotifications = [];
+      return;
+    }
+    if (hydratedVehicleId === selectedId) return;
+    hydratedVehicleId = selectedId;
+    fetchNotifications(selectedId);
+  });
 </script>
 
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger
-		id="notifications-trigger"
-		class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-		aria-label={notifications_title()}
-		title={notifications_title()}
-	>
-		<Bell class="text-primary h-[1.15rem] w-[1.15rem]" />
-		{#if notificationCount > 0}
-			<span
-				id="notification-badge"
-				class="notification-count bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.65rem] leading-none font-semibold"
-			>
-				{notificationCount > 9 ? '9+' : notificationCount}
-			</span>
-		{/if}
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content id="notifications-menu" align="end" class="w-88 space-y-2">
-		<div id="notifications-header" class="flex items-center justify-between px-2 py-1.5">
-			<span class="text-sm font-semibold">{notifications_title()}</span>
-			{#if notificationCount > 0}
-				<span
-					id="notifications-count-badge"
-					class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold"
-				>
-					{notificationCount}
-					{notifications_new()}
-				</span>
-			{/if}
-		</div>
-		<DropdownMenu.Separator />
-		{#if !vehicleStore.selectedId}
-			<div
-				class="notifications-empty text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
-			>
-				<AlertTriangle class="h-4 w-4" />
-				<span>{notifications_select_vehicle_hint()}</span>
-			</div>
-		{:else if notificationLoading}
-			<div
-				class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
-			>
-				<Loader2 class="h-4 w-4 animate-spin" />
-				<span>{notifications_syncing()}</span>
-			</div>
-		{:else if notificationCount === 0}
-			<div
-				class="notifications-success text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
-			>
-				<CheckCircle2 class="h-4 w-4" />
-				<span>{notifications_caught_up()}</span>
-			</div>
-		{:else}
-			<div id="notifications-list-container" class="max-h-80 space-y-3 overflow-auto px-1 py-2">
-				{#if reminderNotifications.length}
-					<p
-						class="notifications-section-title text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase"
-					>
-						{notifications_section_reminders()}
-					</p>
-					<ul id="notifications-reminders-list" class="space-y-2">
-						{#each reminderNotifications as reminder (reminder.id ?? `${reminder.vehicleId}-${reminder.dueDate.getTime()}`)}
-							<li
-								id="notification-reminder-{reminder.id}"
-								class="notification-item border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 shadow-sm"
-							>
-								<div class="rounded-full border p-1 {reminderSeverityRing[reminder.severity]}">
-									<CalendarDays class="h-4 w-4" />
-								</div>
-								<div class="flex-1">
-									<div class="flex items-center justify-between gap-2">
-										<p class="text-sm font-semibold">
-											{getReminderTypeLabel(reminder.type, m)}
-										</p>
-										<div class="flex items-center gap-2">
-											<span
-												class="rounded-full px-2 py-0.5 text-xs font-semibold {reminderSeverityBadge[
-													reminder.severity
-												]}"
-											>
-												{reminderSeverityLabel[reminder.severity]}
-											</span>
-											<Button
-												variant="ghost"
-												size="sm"
-												title={notifications_mark_done_title()}
-												aria-label={notifications_mark_done_aria({
-													type: getReminderTypeLabel(reminder.type, m)
-												})}
-												onclick={() => markReminderComplete(reminder)}
-												disabled={!reminder.id || isReminderCompleting(reminder.id)}
-											>
-												{#if isReminderCompleting(reminder.id)}
-													<Loader2 class="h-3.5 w-3.5 animate-spin" />
-												{:else}
-													<CheckCircle2 class="h-3.5 w-3.5" />
-												{/if}
-											</Button>
-										</div>
-									</div>
-									<p class="text-muted-foreground text-xs">
-										{formatDate(reminder.dueDate)} · {describeReminderTiming(
-											reminder.daysRemaining
-										)}
-									</p>
-									{#if reminder.note}
-										<p class="text-muted-foreground mt-1 text-xs">
-											{reminder.note}
-										</p>
-									{/if}
-								</div>
-							</li>
-						{/each}
-					</ul>
-				{/if}
-				{#if alertNotifications.length}
-					<p
-						class="notifications-section-title text-muted-foreground px-2 text-xs font-semibold tracking-wide uppercase"
-					>
-						{notifications_section_alerts()}
-					</p>
-					<ul id="notifications-alerts-list" class="space-y-2">
-						{#each alertNotifications as alert (alert.type)}
-							<li
-								id="notification-alert-{alert.type}"
-								class="notification-item border-border/50 bg-background/90 flex items-center gap-3 rounded-md border px-3 py-2 align-middle shadow-sm"
-							>
-								<div class="rounded-full border p-1 {alertStatusRing[alert.status]}">
-									{#if alert.type === 'insurance'}
-										<Shield class="h-4 w-4" />
-									{:else}
-										<BadgeInfo class="h-4 w-4" />
-									{/if}
-								</div>
-								<div class="flex-1">
-									<div class="flex items-center justify-between gap-2">
-										<p class="text-sm font-semibold">{alert.title}</p>
-										<span
-											class="rounded-full px-2 py-0.5 text-xs font-semibold {alertStatusBadge[
-												alert.status
-											]}"
-										>
-											{alertStatusLabel[alert.status]}
-										</span>
-									</div>
-									{#if alert.status === 'missing'}
-										<p class="text-muted-foreground text-xs">{alert.message}</p>
-									{:else}
-										<p class="text-muted-foreground text-xs">
-											{notifications_expires()}
-											{#if alert.expiryDate}
-												{` ${format(alert.expiryDate, 'MMM dd, yyyy')}`}
-											{:else}
-												—
-											{/if}
-										</p>
-										<p class="text-muted-foreground text-xs">{alert.message}</p>
-									{/if}
-								</div>
-							</li>
-						{/each}
-					</ul>
-				{/if}
-			</div>
-		{/if}
-	</DropdownMenu.Content>
+<DropdownMenu.Root bind:open={isDropdownOpen}>
+  <DropdownMenu.Trigger
+    id="notifications-trigger"
+    class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+    aria-label={m.notifications_title()}
+    title={m.notifications_title()}
+  >
+    <Bell class="text-primary h-[1.15rem] w-[1.15rem]" />
+    {#if unreadCount > 0}
+      <span
+        id="notification-badge"
+        class="notification-count bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.65rem] leading-none font-semibold"
+      >
+        {unreadCount > 9 ? '9+' : unreadCount}
+      </span>
+    {/if}
+  </DropdownMenu.Trigger>
+  <DropdownMenu.Content id="notifications-menu" align="end" class="w-88 space-y-2">
+    <div id="notifications-header" class="flex items-center justify-between px-2 py-1.5">
+      <span class="text-sm font-semibold">{m.notifications_title()}</span>
+      <div class="flex items-center gap-2">
+        {#if unreadCount > 0}
+          <Button
+            variant="ghost"
+            size="sm"
+            title="Mark all notifications as read"
+            aria-label="Mark all notifications as read"
+            disabled={isClearingAll}
+            onclick={handleMarkAllAsRead}
+            class="h-7 px-2"
+          >
+            <span class="text-xs">Mark All Read</span>
+          </Button>
+        {/if}
+        {#if clearableReadCount > 0}
+          <Button
+            variant="ghost"
+            size="sm"
+            title="Clear all read notifications"
+            aria-label="Clear all read notifications"
+            disabled={isClearingAll}
+            onclick={handleClearAllRead}
+            class="h-7 px-2"
+          >
+            {#if isClearingAll}
+              <Loader2 class="h-3.5 w-3.5 animate-spin" />
+            {:else}
+              <X class="h-3.5 w-3.5" />
+            {/if}
+            <span class="ml-1 text-xs">Clear Read</span>
+          </Button>
+        {/if}
+        {#if unreadCount > 0}
+          <span
+            id="notifications-count-badge"
+            class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold"
+          >
+            {unreadCount}
+            {m.notifications_new()}
+          </span>
+        {/if}
+      </div>
+    </div>
+    <DropdownMenu.Separator />
+    {#if !vehicleStore.selectedId}
+      <div
+        class="notifications-empty text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+      >
+        <AlertTriangle class="h-4 w-4" />
+        <span>{m.notifications_select_vehicle_hint()}</span>
+      </div>
+    {:else if isLoadingNotifications}
+      <div
+        class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+      >
+        <Loader2 class="h-4 w-4 animate-spin" />
+        <span>{m.notifications_syncing()}</span>
+      </div>
+    {:else if apiNotifications.length === 0}
+      <div
+        class="notifications-success text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
+      >
+        <CheckCircle2 class="h-4 w-4" />
+        <span>{m.notifications_caught_up()}</span>
+      </div>
+    {:else}
+      <div id="notifications-list-container" class="max-h-80 space-y-3 overflow-auto px-1 py-2">
+        <ul id="notifications-api-list" class="space-y-2">
+          {#each apiNotifications as notification (notification.id)}
+            {@const displayType =
+              notification.channel === 'information' ? 'information' : notification.type}
+            {@const notifStyle = notificationTypeStyles[displayType]}
+            {@const NotifIcon = notifStyle.icon}
+            <li id="notification-api-{notification.id}" class="relative">
+              <button
+                type="button"
+                onclick={() => handleNotificationClick(notification)}
+                class="notification-item border-border/50 bg-background/90 hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-left shadow-sm transition-colors"
+              >
+                <!-- Read/Unread indicator dot in top-right corner -->
+                <div class="absolute top-2 right-2">
+                  {#if notification.isRead}
+                    <!-- Hollow gray dot for read notifications -->
+                    <div
+                      class="border-muted-foreground/40 h-2 w-2 rounded-full border-2"
+                      title="Read"
+                    ></div>
+                  {:else}
+                    <!-- Solid blue dot for unread notifications -->
+                    <div class="bg-primary h-2 w-2 rounded-full" title="Unread"></div>
+                  {/if}
+                </div>
+                <div class="rounded-full border p-1 {notifStyle.ring}">
+                  <NotifIcon class="h-4 w-4" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <p
+                      class="text-sm font-semibold {notification.isRead
+                        ? 'text-muted-foreground'
+                        : ''}"
+                    >
+                      {notification.channel.charAt(0).toUpperCase() + notification.channel.slice(1)}
+                    </p>
+                  </div>
+                  <div class="mt-1 flex items-center gap-2">
+                    <span class="text-muted-foreground text-[11px] tracking-wide uppercase">
+                      {notification.type}
+                    </span>
+                  </div>
+                  <p class="text-muted-foreground truncate text-xs">
+                    {notification.message}
+                  </p>
+                  <p class="text-muted-foreground text-xs">
+                    Due: {format(new Date(notification.dueDate), 'MMM dd, yyyy')}
+                  </p>
+                </div>
+              </button>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+  </DropdownMenu.Content>
 </DropdownMenu.Root>
