@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
   import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
   import IconButton from '$appui/IconButton.svelte';
 
@@ -7,7 +8,7 @@
     feature: string;
     buttonStyles: string;
     iconStyles: string;
-    icon: any;
+    icon: Component;
     ariaLabel: string;
     onclick: () => void;
   }

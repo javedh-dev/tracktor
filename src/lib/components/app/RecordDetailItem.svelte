@@ -1,15 +1,16 @@
 <script lang="ts">
+  import type { Component, Snippet } from 'svelte';
   import { cn } from '$lib/utils';
 
   interface Props {
-    icon: any;
+    icon: Component<{ class?: string }>;
     label: string;
     value?: string | number | null;
     class?: string;
     iconClass?: string;
     labelClass?: string;
     valueClass?: string;
-    children?: any;
+    children?: Snippet;
   }
 
   let {

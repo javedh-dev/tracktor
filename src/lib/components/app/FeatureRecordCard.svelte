@@ -1,15 +1,16 @@
 <script lang="ts">
+  import type { Component, Snippet } from 'svelte';
   import { cn } from '$lib/utils';
 
   interface Props {
     id: string;
     title: string;
-    titleIcon: any;
+    titleIcon: Component<{ class?: string }>;
     titleClass?: string;
     class?: string;
-    headerExtras?: any;
-    actions?: any;
-    children?: any;
+    headerExtras?: Snippet;
+    actions?: Snippet;
+    children?: Snippet;
   }
 
   let {

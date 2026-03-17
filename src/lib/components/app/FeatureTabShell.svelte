@@ -1,18 +1,20 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
   import TabContainer from '$appui/TabContainer.svelte';
   import { sheetStore } from '$lib/stores/sheet.svelte';
   import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
   type SheetDataResolver = () => unknown;
+  type AnyComponent = Component<any>;
 
   interface Props {
     title: string;
-    listComponent: any;
+    listComponent: AnyComponent;
     addSheetTitle?: string;
-    addSheetComponent?: any;
+    addSheetComponent?: AnyComponent;
     addSheetData?: unknown | SheetDataResolver;
     importSheetTitle?: string;
-    importSheetComponent?: any;
+    importSheetComponent?: AnyComponent;
     importSheetData?: unknown | SheetDataResolver;
   }
 
