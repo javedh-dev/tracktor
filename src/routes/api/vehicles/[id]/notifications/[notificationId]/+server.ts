@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as notificationService from '$server/services/notificationService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const PATCH: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Notification PATCH error:', async () => {
     const { notificationId } = event.params;
 
     if (!notificationId) {
@@ -13,23 +13,11 @@ export const PATCH: RequestHandler = async (event) => {
 
     const result = await notificationService.markNotificationAsRead(notificationId);
     return json(result);
-  } catch (err) {
-    console.error('Notification PATCH error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Notification DELETE error:', async () => {
     const { notificationId } = event.params;
 
     if (!notificationId) {
@@ -38,17 +26,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await notificationService.clearNotification(notificationId);
     return json(result);
-  } catch (err) {
-    console.error('Notification DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as notificationService from '$server/services/notificationService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Notifications GET error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await notificationService.getNotifications(id);
     return json(result);
-  } catch (err) {
-    console.error('Notifications GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Notifications PUT error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -38,17 +26,5 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await notificationService.markAllNotificationsAsRead(id);
     return json(result, { status: 201 });
-  } catch (err) {
-    console.error('Notifications PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

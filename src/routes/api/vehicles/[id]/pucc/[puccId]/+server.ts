@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as pollutionCertificateService from '$server/services/pollutionCertificateService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('PUCC GET error:', async () => {
     const { puccId } = event.params;
 
     if (!puccId) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await pollutionCertificateService.getPollutionCertificateById(puccId);
     return json(result);
-  } catch (err) {
-    console.error('PUCC GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('PUCC PUT error:', async () => {
     const { id, puccId } = event.params;
 
     if (!id || !puccId) {
@@ -65,23 +53,11 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await pollutionCertificateService.updatePollutionCertificate(id, puccId, body);
     return json(result);
-  } catch (err) {
-    console.error('PUCC PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('PUCC DELETE error:', async () => {
     const { puccId } = event.params;
 
     if (!puccId) {
@@ -90,17 +66,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await pollutionCertificateService.deletePollutionCertificate(puccId);
     return json(result);
-  } catch (err) {
-    console.error('PUCC DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
