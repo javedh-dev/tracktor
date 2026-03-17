@@ -31,8 +31,8 @@
   import PollutionCertificateForm from '../pollution/PollutionCertificateForm.svelte';
   import VehicleForm from './VehicleForm.svelte';
   import ReminderForm from '../reminder/ReminderForm.svelte';
-  import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
   import { Features } from '$lib/helper/feature.helper';
+  import VehicleQuickActions from './VehicleQuickActions.svelte';
 
   const { vehicle, onclick, onkeydown, isSelected = false } = $props();
   let deleteDialog = $state(false);
@@ -60,6 +60,60 @@
   const imageUrl = $derived(
     vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
   );
+
+  const quickActions = [
+    {
+      id: 'vehicle-card-fuel-btn',
+      feature: Features.FUEL_LOG,
+      buttonStyles: 'hover:bg-green-100 dark:hover:bg-green-700',
+      iconStyles:
+        'text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200',
+      icon: Fuel,
+      onclick: () => sheetStore.openSheet(FuelLogForm, m.vehicle_action_add_fuel_log(), ''),
+      ariaLabel: m.vehicle_action_add_fuel_log()
+    },
+    {
+      id: 'vehicle-card-maintenance-btn',
+      feature: Features.MAINTENANCE,
+      buttonStyles: 'hover:bg-amber-100 dark:hover:bg-amber-700',
+      iconStyles:
+        'text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200',
+      icon: Wrench,
+      onclick: () =>
+        sheetStore.openSheet(MaintenanceForm, m.vehicle_action_add_maintenance_log(), ''),
+      ariaLabel: m.vehicle_action_add_maintenance_log()
+    },
+    {
+      id: 'vehicle-card-insurance-btn',
+      feature: Features.INSURANCE,
+      buttonStyles: 'hover:bg-sky-100 dark:hover:bg-sky-700',
+      iconStyles: 'text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200',
+      icon: Shield,
+      onclick: () => sheetStore.openSheet(InsuranceForm, m.vehicle_action_add_insurance(), ''),
+      ariaLabel: m.vehicle_action_add_insurance()
+    },
+    {
+      id: 'vehicle-card-pollution-btn',
+      feature: Features.PUCC,
+      buttonStyles: 'hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700',
+      iconStyles:
+        'text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200',
+      icon: BadgeCheck,
+      onclick: () =>
+        sheetStore.openSheet(PollutionCertificateForm, m.vehicle_action_add_pollution(), ''),
+      ariaLabel: m.vehicle_action_add_pollution()
+    },
+    {
+      id: 'vehicle-card-reminder-btn',
+      feature: Features.REMINDERS,
+      buttonStyles: 'hover:bg-indigo-100 dark:hover:bg-indigo-700',
+      iconStyles:
+        'text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200',
+      icon: BellRing,
+      onclick: () => sheetStore.openSheet(ReminderForm, m.vehicle_action_add_reminder(), ''),
+      ariaLabel: m.vehicle_action_add_reminder()
+    }
+  ];
 </script>
 
 <div
@@ -125,86 +179,7 @@
     </Card.Content>
     <Card.Footer id="vehicle-card-actions" class="px-3">
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
-        <div id="vehicle-card-primary-actions" class="flex justify-start">
-          <!-- Fuel Log Button -->
-          <FeatureGate feature={Features.FUEL_LOG}>
-            {#snippet children()}
-              <IconButton
-                id="vehicle-card-fuel-btn"
-                buttonStyles="hover:bg-green-100 dark:hover:bg-green-700"
-                iconStyles="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200"
-                icon={Fuel}
-                onclick={() =>
-                  sheetStore.openSheet(FuelLogForm, m.vehicle_action_add_fuel_log(), '')}
-                ariaLabel={m.vehicle_action_add_fuel_log()}
-              />
-            {/snippet}
-          </FeatureGate>
-
-          <!-- Maintenance Button -->
-          <FeatureGate feature={Features.MAINTENANCE}>
-            {#snippet children()}
-              <IconButton
-                id="vehicle-card-maintenance-btn"
-                buttonStyles="hover:bg-amber-100 dark:hover:bg-amber-700"
-                iconStyles="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200"
-                icon={Wrench}
-                onclick={() =>
-                  sheetStore.openSheet(MaintenanceForm, m.vehicle_action_add_maintenance_log(), '')}
-                ariaLabel={m.vehicle_action_add_maintenance_log()}
-              />
-            {/snippet}
-          </FeatureGate>
-
-          <!-- Insurance Button -->
-          <FeatureGate feature={Features.INSURANCE}>
-            {#snippet children()}
-              <IconButton
-                id="vehicle-card-insurance-btn"
-                buttonStyles="hover:bg-sky-100 dark:hover:bg-sky-700"
-                iconStyles="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200"
-                icon={Shield}
-                onclick={() =>
-                  sheetStore.openSheet(InsuranceForm, m.vehicle_action_add_insurance(), '')}
-                ariaLabel={m.vehicle_action_add_insurance()}
-              />
-            {/snippet}
-          </FeatureGate>
-
-          <!-- PUCC Button -->
-          <FeatureGate feature={Features.PUCC}>
-            {#snippet children()}
-              <IconButton
-                id="vehicle-card-pollution-btn"
-                buttonStyles="hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700"
-                iconStyles="text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200"
-                icon={BadgeCheck}
-                onclick={() =>
-                  sheetStore.openSheet(
-                    PollutionCertificateForm,
-                    m.vehicle_action_add_pollution(),
-                    ''
-                  )}
-                ariaLabel={m.vehicle_action_add_pollution()}
-              />
-            {/snippet}
-          </FeatureGate>
-
-          <!-- Reminders Button -->
-          <FeatureGate feature={Features.REMINDERS}>
-            {#snippet children()}
-              <IconButton
-                id="vehicle-card-reminder-btn"
-                buttonStyles="hover:bg-indigo-100 dark:hover:bg-indigo-700"
-                iconStyles="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200"
-                icon={BellRing}
-                onclick={() =>
-                  sheetStore.openSheet(ReminderForm, m.vehicle_action_add_reminder(), '')}
-                ariaLabel={m.vehicle_action_add_reminder()}
-              />
-            {/snippet}
-          </FeatureGate>
-        </div>
+        <VehicleQuickActions actions={quickActions} />
         <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
           <IconButton
             id="vehicle-card-info-btn"
