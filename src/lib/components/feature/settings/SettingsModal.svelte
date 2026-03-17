@@ -38,8 +38,8 @@
   import { Textarea } from '$lib/components/ui/textarea';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
+  import SettingsFeaturesTab from './SettingsFeaturesTab.svelte';
   import SettingsSelectField from './SettingsSelectField.svelte';
-  import SettingsFeatureToggle from './SettingsFeatureToggle.svelte';
 
   let localConfig: Config[] = $state([]);
   let processing = $state(false);
@@ -443,61 +443,7 @@
               </Tabs.Content>
 
               <Tabs.Content value="features" class="space-y-6">
-                <fieldset class="flex flex-col gap-4" disabled={processing}>
-                  <div class="space-y-4">
-                    <div class="text-muted-foreground text-sm">
-                      {m.settings_features_intro()}
-                    </div>
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featureFuelLog"
-                      label={m.feature_label_fuel()}
-                      description={m.feature_desc_fuel()}
-                      bind:checked={$formData.featureFuelLog}
-                      disabled={processing}
-                    />
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featureMaintenance"
-                      label={m.feature_label_maintenance()}
-                      description={m.feature_desc_maintenance()}
-                      bind:checked={$formData.featureMaintenance}
-                      disabled={processing}
-                    />
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featurePucc"
-                      label={m.feature_label_pollution()}
-                      description={m.feature_desc_pollution()}
-                      bind:checked={$formData.featurePucc}
-                      disabled={processing}
-                    />
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featureReminders"
-                      label={m.feature_label_reminders()}
-                      description={m.feature_desc_reminders()}
-                      bind:checked={$formData.featureReminders}
-                      disabled={processing}
-                    />
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featureInsurance"
-                      label={m.feature_label_insurance()}
-                      description={m.feature_desc_insurance()}
-                      bind:checked={$formData.featureInsurance}
-                      disabled={processing}
-                    />
-                    <SettingsFeatureToggle
-                      {form}
-                      name="featureOverview"
-                      label={m.feature_label_overview()}
-                      description={m.feature_desc_overview()}
-                      bind:checked={$formData.featureOverview}
-                      disabled={processing}
-                    />
-                  </div>
-                </fieldset>
+                <SettingsFeaturesTab {form} formData={$formData} {processing} messages={m} />
               </Tabs.Content>
             </div>
 
