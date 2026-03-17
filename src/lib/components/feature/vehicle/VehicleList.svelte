@@ -1,10 +1,8 @@
 <script lang="ts">
+  import ResourceState from '$appui/ResourceState.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import VehicleCard from './VehicleCard.svelte';
   import { ScrollArea } from '$ui/scroll-area';
-  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-  import CircleAlert from '@lucide/svelte/icons/circle-alert';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import * as m from '$lib/paraglide/messages';
 
@@ -22,12 +20,7 @@
     <Skeleton class="h-72 w-80 shrink-0 rounded-2xl" />
   </div>
 {:else if vehicleStore.error}
-  <LabelWithIcon
-    icon={CircleAlert}
-    iconClass="h-6 w-6"
-    style="flex min-h-98 items-center justify-center gap-4 text-xl text-rose-500"
-    label={vehicleStore.error}
-  />
+  <ResourceState state="error" message={vehicleStore.error} />
 {:else if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
   <ScrollArea
     id="vehicle-list-container"
@@ -48,10 +41,5 @@
     </div>
   </ScrollArea>
 {:else}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-6 w-6"
-    style="flex min-h-98 items-center justify-center gap-4 text-xl"
-    label={m.vehicle_list_empty()}
-  />
+  <ResourceState state="empty" message={m.vehicle_list_empty()} />
 {/if}
