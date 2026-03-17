@@ -3,23 +3,32 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
+import type { PollutionCertificate } from '$lib/domain/pucc';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
+import { clearFixedEndDate } from './domain-payload.helper';
+
+type PollutionCertificatePayload = {
+  certificateNumber: string;
+  issueDate: string;
+  expiryDate: string | null;
+  recurrenceType: PollutionCertificate['recurrenceType'];
+  recurrenceInterval: number;
+  testingCenter: string;
+  notes: string | null;
+  attachment: string | null;
+};
 
 export const addPollutionCertificate = async (
   vehicleId: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: PollutionCertificatePayload
 ): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
-  // Sanitize: remove expiryDate on backend when recurrence is not fixed
-  if (pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none') {
-    pollutionCertificateData.expiryDate = null;
-  }
+  const sanitizedPayload = clearFixedEndDate(pollutionCertificateData);
   const pollutionCertificate = await db
     .insert(schema.pollutionCertificateTable)
     .values({
-      ...pollutionCertificateData,
-      vehicleId: vehicleId,
-      id: undefined
+      ...sanitizedPayload,
+      vehicleId: vehicleId
     })
     .returning();
   return {
@@ -58,7 +67,7 @@ export const getPollutionCertificateById = async (id: string): Promise<ApiRespon
 export const updatePollutionCertificate = async (
   vehicleId: string,
   id: string,
-  pollutionCertificateData: any
+  pollutionCertificateData: PollutionCertificatePayload
 ): Promise<ApiResponse> => {
   const pollutionCertificate = await db.query.pollutionCertificateTable.findFirst({
     where: (certificates, { eq, and }) =>
@@ -70,11 +79,7 @@ export const updatePollutionCertificate = async (
 
   const updatedCertificate = await db
     .update(schema.pollutionCertificateTable)
-    .set({
-      ...(pollutionCertificateData && pollutionCertificateData.recurrenceType !== 'none'
-        ? { ...pollutionCertificateData, expiryDate: null }
-        : pollutionCertificateData)
-    })
+    .set(clearFixedEndDate(pollutionCertificateData))
     .where(eq(schema.pollutionCertificateTable.id, id))
     .returning();
   return {

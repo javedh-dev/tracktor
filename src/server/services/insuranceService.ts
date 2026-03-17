@@ -3,20 +3,33 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
+import type { Insurance } from '$lib/domain/insurance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
+import { clearFixedEndDate } from './domain-payload.helper';
 
-export const addInsurance = async (vehicleId: string, insuranceData: any): Promise<ApiResponse> => {
+type InsurancePayload = {
+  provider: string;
+  policyNumber: string;
+  startDate: string;
+  endDate: string | null;
+  recurrenceType: Insurance['recurrenceType'];
+  recurrenceInterval: number;
+  cost: number;
+  notes: string | null;
+  attachment: string | null;
+};
+
+export const addInsurance = async (
+  vehicleId: string,
+  insuranceData: InsurancePayload
+): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
-  // Sanitize: remove endDate on backend when recurrence is not fixed
-  if (insuranceData && insuranceData.recurrenceType !== 'none') {
-    insuranceData.endDate = null;
-  }
+  const sanitizedInsuranceData = clearFixedEndDate(insuranceData);
   const insurance = await db
     .insert(schema.insuranceTable)
     .values({
-      ...insuranceData,
-      vehicleId: vehicleId,
-      id: undefined
+      ...sanitizedInsuranceData,
+      vehicleId: vehicleId
     })
     .returning();
   return {
@@ -56,7 +69,7 @@ export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
 export const updateInsurance = async (
   vehicleId: string,
   id: string,
-  insuranceData: any
+  insuranceData: InsurancePayload
 ): Promise<ApiResponse> => {
   const insurance = await db.query.insuranceTable.findFirst({
     where: (insurances, { eq, and }) =>
@@ -67,11 +80,7 @@ export const updateInsurance = async (
   }
   const updatedInsurance = await db
     .update(schema.insuranceTable)
-    .set({
-      ...(insuranceData && insuranceData.recurrenceType !== 'none'
-        ? { ...insuranceData, endDate: null }
-        : insuranceData)
-    })
+    .set(clearFixedEndDate(insuranceData))
     .where(eq(schema.insuranceTable.id, id))
     .returning();
   return {
