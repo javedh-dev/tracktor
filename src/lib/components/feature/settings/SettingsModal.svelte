@@ -5,8 +5,6 @@
   import { Button, buttonVariants } from '$ui/button';
   import * as Form from '$ui/form/index.js';
   import FormLabel from '$appui/FormLabel.svelte';
-  import * as Select from '$ui/select/index.js';
-  import { Checkbox } from '$ui/checkbox';
   import * as Tabs from '$ui/tabs';
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
@@ -40,6 +38,8 @@
   import { Textarea } from '$lib/components/ui/textarea';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
+  import SettingsSelectField from './SettingsSelectField.svelte';
+  import SettingsFeatureToggle from './SettingsFeatureToggle.svelte';
 
   let localConfig: Config[] = $state([]);
   let processing = $state(false);
@@ -207,6 +207,12 @@
     label: localeLabels[code] || code.toUpperCase()
   }));
 
+  const themeOptions = Object.values(themes).map((theme) => ({
+    value: theme.name,
+    label: theme.label,
+    colorPreview: theme.colors?.primary || '#000'
+  }));
+
   $effect(() => {
     if (localConfig.length > 0) {
       const configData: any = {};
@@ -268,63 +274,28 @@
             <div class="flex-1 space-y-4">
               <Tabs.Content value="personalization" class="space-y-6">
                 <fieldset class="flex flex-col gap-4" disabled={processing}>
-                  <!-- Theme -->
-                  <Form.Field {form} name="theme" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_theme()}
-                          >{m.settings_label_theme()}</FormLabel
-                        >
-                        <Select.Root bind:value={$formData.theme} type="single">
-                          <Select.Trigger {...props} class="w-full">
-                            <div class="flex items-center justify-start">
-                              <Palette class="mr-2 h-4 w-4" />
-                              {themes[$formData.theme]?.label || m.settings_select_theme()}
-                            </div>
-                          </Select.Trigger>
-                          <Select.Content>
-                            {#each Object.values(themes) as theme (theme.name)}
-                              <Select.Item value={theme.name}>
-                                <div class="flex items-center gap-2">
-                                  <div
-                                    class="border-foreground/20 h-3 w-3 rounded border"
-                                    style="background-color: {theme.colors?.primary || '#000'}"
-                                  ></div>
-                                  {theme.label}
-                                </div>
-                              </Select.Item>
-                            {/each}
-                          </Select.Content>
-                        </Select.Root>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                  <!-- Locale -->
-                  <Form.Field {form} name="locale" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_locale()}
-                          >{m.settings_label_locale()}</FormLabel
-                        >
-                        <Select.Root bind:value={$formData.locale} type="single">
-                          <Select.Trigger {...props} class="w-full">
-                            <div class="flex items-center justify-start">
-                              <Languages class="mr-2 h-4 w-4" />
-                              {localeOptions.find((opt) => opt.value === $formData.locale)?.label ||
-                                m.settings_select_language()}
-                            </div>
-                          </Select.Trigger>
-                          <Select.Content>
-                            {#each localeOptions as option}
-                              <Select.Item value={option.value}>{option.label}</Select.Item>
-                            {/each}
-                          </Select.Content>
-                        </Select.Root>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
+                  <SettingsSelectField
+                    {form}
+                    name="theme"
+                    label={m.settings_label_theme()}
+                    description={m.settings_desc_theme()}
+                    icon={Palette}
+                    options={themeOptions}
+                    placeholder={m.settings_select_theme()}
+                    bind:value={$formData.theme}
+                    disabled={processing}
+                  />
+                  <SettingsSelectField
+                    {form}
+                    name="locale"
+                    label={m.settings_label_locale()}
+                    description={m.settings_desc_locale()}
+                    icon={Languages}
+                    options={localeOptions}
+                    placeholder={m.settings_select_language()}
+                    bind:value={$formData.locale}
+                    disabled={processing}
+                  />
                   <!-- Timezone -->
                   <Form.Field {form} name="timezone" class="w-full">
                     <Form.Control>
@@ -403,61 +374,28 @@
 
               <Tabs.Content value="units" class="space-y-6">
                 <fieldset class="flex flex-col gap-4" disabled={processing}>
-                  <!-- Unit of Distance -->
-                  <Form.Field {form} name="unitOfDistance" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_unit_distance()}
-                          >{m.settings_label_unit_distance()}</FormLabel
-                        >
-                        <Select.Root bind:value={$formData.unitOfDistance} type="single">
-                          <Select.Trigger {...props} class="w-full">
-                            <div class="flex items-center justify-start">
-                              <RulerDimensionLine class="mr-2 h-4 w-4" />
-                              {uodOptions.find((opt) => opt.value === $formData.unitOfDistance)
-                                ?.label || m.settings_select_unit_system()}
-                            </div>
-                          </Select.Trigger>
-                          <Select.Content>
-                            {#each uodOptions as option}
-                              <Select.Item value={option.value}>
-                                {option.label}
-                              </Select.Item>
-                            {/each}
-                          </Select.Content>
-                        </Select.Root>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                  <!-- Mileage Unit Format -->
-                  <Form.Field {form} name="mileageUnitFormat" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_mileage_format()}
-                          >{m.settings_label_mileage_format()}</FormLabel
-                        >
-                        <Select.Root bind:value={$formData.mileageUnitFormat} type="single">
-                          <Select.Trigger {...props} class="w-full">
-                            <div class="flex items-center justify-start">
-                              <Rabbit class="mr-2 h-4 w-4" />
-                              {mileageUnitFormatOptions.find(
-                                (opt) => opt.value === $formData.mileageUnitFormat
-                              )?.label || m.settings_select_unit_system()}
-                            </div>
-                          </Select.Trigger>
-                          <Select.Content>
-                            {#each mileageUnitFormatOptions as option}
-                              <Select.Item value={option.value}>
-                                {option.label}
-                              </Select.Item>
-                            {/each}
-                          </Select.Content>
-                        </Select.Root>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
+                  <SettingsSelectField
+                    {form}
+                    name="unitOfDistance"
+                    label={m.settings_label_unit_distance()}
+                    description={m.settings_desc_unit_distance()}
+                    icon={RulerDimensionLine}
+                    options={uodOptions}
+                    placeholder={m.settings_select_unit_system()}
+                    bind:value={$formData.unitOfDistance}
+                    disabled={processing}
+                  />
+                  <SettingsSelectField
+                    {form}
+                    name="mileageUnitFormat"
+                    label={m.settings_label_mileage_format()}
+                    description={m.settings_desc_mileage_format()}
+                    icon={Rabbit}
+                    options={mileageUnitFormatOptions}
+                    placeholder={m.settings_select_unit_system()}
+                    bind:value={$formData.mileageUnitFormat}
+                    disabled={processing}
+                  />
                   <div class="space-y-3">
                     <div class="space-y-1">
                       <p class="text-sm font-medium">Fuel types</p>
@@ -466,83 +404,39 @@
                       </p>
                     </div>
                     <div class="flex flex-col gap-4">
-                      <!-- Petrol/Diesel -->
-                      <Form.Field {form} name="unitOfVolume" class="w-full">
-                        <Form.Control>
-                          {#snippet children({ props })}
-                            <FormLabel description={m.settings_desc_unit_volume()}
-                              >Petrol/Diesel</FormLabel
-                            >
-                            <Select.Root bind:value={$formData.unitOfVolume} type="single">
-                              <Select.Trigger {...props} class="w-full">
-                                <div class="flex items-center justify-start">
-                                  <Currency class="mr-2 h-4 w-4" />
-                                  {uovOptions.find((opt) => opt.value === $formData.unitOfVolume)
-                                    ?.label || m.settings_select_unit_system()}
-                                </div>
-                              </Select.Trigger>
-                              <Select.Content>
-                                {#each uovOptions as option}
-                                  <Select.Item value={option.value}>
-                                    {option.label}
-                                  </Select.Item>
-                                {/each}
-                              </Select.Content>
-                            </Select.Root>
-                          {/snippet}
-                        </Form.Control>
-                        <Form.FieldErrors />
-                      </Form.Field>
-                      <!-- LPG -->
-                      <Form.Field {form} name="unitOfLpg" class="w-full">
-                        <Form.Control>
-                          {#snippet children({ props })}
-                            <FormLabel description={m.settings_desc_unit_volume()}>LPG</FormLabel>
-                            <Select.Root bind:value={$formData.unitOfLpg} type="single">
-                              <Select.Trigger {...props} class="w-full">
-                                <div class="flex items-center justify-start">
-                                  <Fuel class="mr-2 h-4 w-4" />
-                                  {gasUnitOptions.find((opt) => opt.value === $formData.unitOfLpg)
-                                    ?.label || m.settings_select_unit_system()}
-                                </div>
-                              </Select.Trigger>
-                              <Select.Content>
-                                {#each gasUnitOptions as option}
-                                  <Select.Item value={option.value}>
-                                    {option.label}
-                                  </Select.Item>
-                                {/each}
-                              </Select.Content>
-                            </Select.Root>
-                          {/snippet}
-                        </Form.Control>
-                        <Form.FieldErrors />
-                      </Form.Field>
-                      <!-- CNG -->
-                      <Form.Field {form} name="unitOfCng" class="w-full">
-                        <Form.Control>
-                          {#snippet children({ props })}
-                            <FormLabel description={m.settings_desc_unit_volume()}>CNG</FormLabel>
-                            <Select.Root bind:value={$formData.unitOfCng} type="single">
-                              <Select.Trigger {...props} class="w-full">
-                                <div class="flex items-center justify-start">
-                                  <Fuel class="mr-2 h-4 w-4" />
-                                  {gasUnitOptions.find((opt) => opt.value === $formData.unitOfCng)
-                                    ?.label || m.settings_select_unit_system()}
-                                </div>
-                              </Select.Trigger>
-                              <Select.Content>
-                                {#each gasUnitOptions as option}
-                                  <Select.Item value={option.value}>
-                                    {option.label}
-                                  </Select.Item>
-                                {/each}
-                              </Select.Content>
-                            </Select.Root>
-                          {/snippet}
-                        </Form.Control>
-                        <Form.FieldErrors />
-                      </Form.Field>
+                      <SettingsSelectField
+                        {form}
+                        name="unitOfVolume"
+                        label="Petrol/Diesel"
+                        description={m.settings_desc_unit_volume()}
+                        icon={Currency}
+                        options={uovOptions}
+                        placeholder={m.settings_select_unit_system()}
+                        bind:value={$formData.unitOfVolume}
+                        disabled={processing}
+                      />
+                      <SettingsSelectField
+                        {form}
+                        name="unitOfLpg"
+                        label="LPG"
+                        description={m.settings_desc_unit_volume()}
+                        icon={Fuel}
+                        options={gasUnitOptions}
+                        placeholder={m.settings_select_unit_system()}
+                        bind:value={$formData.unitOfLpg}
+                        disabled={processing}
+                      />
+                      <SettingsSelectField
+                        {form}
+                        name="unitOfCng"
+                        label="CNG"
+                        description={m.settings_desc_unit_volume()}
+                        icon={Fuel}
+                        options={gasUnitOptions}
+                        placeholder={m.settings_select_unit_system()}
+                        bind:value={$formData.unitOfCng}
+                        disabled={processing}
+                      />
                     </div>
                   </div>
                 </fieldset>
@@ -554,136 +448,54 @@
                     <div class="text-muted-foreground text-sm">
                       {m.settings_features_intro()}
                     </div>
-
-                    <!-- Fuel Log Feature -->
-                    <Form.Field {form} name="featureFuelLog" class="flex items-center space-x-3">
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featureFuelLog}
-                            id="featureFuelLog"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featureFuelLog" class="font-medium"
-                              >{m.feature_label_fuel()}</Form.Label
-                            >
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_fuel()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
-
-                    <!-- Maintenance Feature -->
-                    <Form.Field
+                    <SettingsFeatureToggle
+                      {form}
+                      name="featureFuelLog"
+                      label={m.feature_label_fuel()}
+                      description={m.feature_desc_fuel()}
+                      bind:checked={$formData.featureFuelLog}
+                      disabled={processing}
+                    />
+                    <SettingsFeatureToggle
                       {form}
                       name="featureMaintenance"
-                      class="flex items-center space-x-3"
-                    >
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featureMaintenance}
-                            id="featureMaintenance"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featureMaintenance" class="font-medium">
-                              {m.feature_label_maintenance()}
-                            </Form.Label>
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_maintenance()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
-
-                    <!-- PUCC Feature -->
-                    <Form.Field {form} name="featurePucc" class="flex items-center space-x-3">
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featurePucc}
-                            id="featurePucc"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featurePucc" class="font-medium"
-                              >{m.feature_label_pollution()}</Form.Label
-                            >
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_pollution()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
-
-                    <!-- Reminders Feature -->
-                    <Form.Field {form} name="featureReminders" class="flex items-center space-x-3">
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featureReminders}
-                            id="featureReminders"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featureReminders" class="font-medium"
-                              >{m.feature_label_reminders()}</Form.Label
-                            >
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_reminders()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
-
-                    <!-- Insurance Feature -->
-                    <Form.Field {form} name="featureInsurance" class="flex items-center space-x-3">
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featureInsurance}
-                            id="featureInsurance"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featureInsurance" class="font-medium"
-                              >{m.feature_label_insurance()}</Form.Label
-                            >
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_insurance()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
-
-                    <!-- Overview Feature -->
-                    <Form.Field {form} name="featureOverview" class="flex items-center space-x-3">
-                      <Form.Control>
-                        {#snippet children({ props })}
-                          <Checkbox
-                            {...props}
-                            bind:checked={$formData.featureOverview}
-                            id="featureOverview"
-                          />
-                          <div class="flex flex-col gap-1">
-                            <Form.Label for="featureOverview" class="font-medium"
-                              >{m.feature_label_overview()}</Form.Label
-                            >
-                            <Form.Description class="text-xs">
-                              {m.feature_desc_overview()}
-                            </Form.Description>
-                          </div>
-                        {/snippet}
-                      </Form.Control>
-                    </Form.Field>
+                      label={m.feature_label_maintenance()}
+                      description={m.feature_desc_maintenance()}
+                      bind:checked={$formData.featureMaintenance}
+                      disabled={processing}
+                    />
+                    <SettingsFeatureToggle
+                      {form}
+                      name="featurePucc"
+                      label={m.feature_label_pollution()}
+                      description={m.feature_desc_pollution()}
+                      bind:checked={$formData.featurePucc}
+                      disabled={processing}
+                    />
+                    <SettingsFeatureToggle
+                      {form}
+                      name="featureReminders"
+                      label={m.feature_label_reminders()}
+                      description={m.feature_desc_reminders()}
+                      bind:checked={$formData.featureReminders}
+                      disabled={processing}
+                    />
+                    <SettingsFeatureToggle
+                      {form}
+                      name="featureInsurance"
+                      label={m.feature_label_insurance()}
+                      description={m.feature_desc_insurance()}
+                      bind:checked={$formData.featureInsurance}
+                      disabled={processing}
+                    />
+                    <SettingsFeatureToggle
+                      {form}
+                      name="featureOverview"
+                      label={m.feature_label_overview()}
+                      description={m.feature_desc_overview()}
+                      bind:checked={$formData.featureOverview}
+                      disabled={processing}
+                    />
                   </div>
                 </fieldset>
               </Tabs.Content>
