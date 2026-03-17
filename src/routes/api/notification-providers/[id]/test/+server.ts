@@ -1,15 +1,14 @@
 import type { RequestHandler } from './$types';
 import { error, json } from '@sveltejs/kit';
-import { ZodError } from 'zod';
 
 import type {
   EmailProviderConfig,
   GotifyProviderConfig,
   WebhookProviderConfig
 } from '$lib/domain/notification-provider';
-import { AppError } from '$server/exceptions/AppError';
 import { testEmailProvider } from '$server/services/emailNotificationService';
 import { getProviderById } from '$server/services/notificationProviderService';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 async function testWebhookProvider(
   config: WebhookProviderConfig,
@@ -95,7 +94,7 @@ async function testGotifyProvider(
 }
 
 export const POST: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Notification provider test POST error:', async () => {
     const body = event.locals.requestBody || (await event.request.json());
     const providerId = event.params.id;
 
@@ -135,19 +134,5 @@ export const POST: RequestHandler = async (event) => {
         : `Failed to send test notification: ${testResult.error}`,
       data: testResult
     });
-  } catch (err) {
-    if (err instanceof ZodError) {
-      throw error(400, `Validation error: ${err.issues.map((issue) => issue.message).join(', ')}`);
-    }
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

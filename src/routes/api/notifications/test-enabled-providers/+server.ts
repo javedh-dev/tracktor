@@ -1,18 +1,12 @@
 import type { RequestHandler } from './$types';
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 
-import { AppError } from '$server/exceptions/AppError';
 import { dispatchAllNotificationsToEnabledProviders } from '$server/services/notificationDispatchService';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const POST: RequestHandler = async () => {
-  try {
+  return withRouteErrorHandling('Test enabled providers POST error:', async () => {
     const result = await dispatchAllNotificationsToEnabledProviders();
     return json(result);
-  } catch (err) {
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
