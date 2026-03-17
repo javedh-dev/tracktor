@@ -1,13 +1,20 @@
 import type { Component } from 'svelte';
 
+type SheetComponent = Component<any>;
+
 class SheetStore {
   open = $state(false);
-  formComponent = $state<Component>();
-  formData = $state<any>();
+  formComponent = $state<SheetComponent | undefined>(undefined);
+  formData = $state<unknown>(undefined);
   title = $state('');
   description = $state('');
 
-  openSheet(formComponent: any, title: string, description = '', data: any = undefined) {
+  openSheet(
+    formComponent: SheetComponent,
+    title: string,
+    description = '',
+    data: unknown = undefined
+  ) {
     this.formComponent = formComponent;
     this.formData = data;
     this.open = true;

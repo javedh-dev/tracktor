@@ -30,13 +30,13 @@
       formUsername = config.auth?.user || '';
       formFrom = config.from || '';
       formFromName = config.fromName || '';
-      formRecepient = (config as any).recepient || '';
+      formRecepient = config.recepient || '';
     }
   });
 
   // Notify parent of config changes
   $effect(() => {
-    onConfigChange({
+    const nextConfig: Partial<EmailProviderConfig> = {
       host: formHost,
       port: formPort,
       secure: formSecure,
@@ -47,7 +47,9 @@
       from: formFrom,
       fromName: formFromName || undefined,
       recepient: formRecepient || undefined
-    } as any);
+    };
+
+    onConfigChange(nextConfig);
   });
 </script>
 
