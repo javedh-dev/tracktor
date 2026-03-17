@@ -1,18 +1,13 @@
 <script lang="ts">
   import Bell from '@lucide/svelte/icons/bell';
-  import BellOff from '@lucide/svelte/icons/bell-off';
-  import Clock3 from '@lucide/svelte/icons/clock-3';
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Mail from '@lucide/svelte/icons/mail';
   import Plus from '@lucide/svelte/icons/plus';
-  import Send from '@lucide/svelte/icons/send';
   import Webhook from '@lucide/svelte/icons/webhook';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
 
-  import CronInput from '$feature/settings/CronInput.svelte';
   import Input from '$appui/input.svelte';
-  import { env } from '$lib/config/env';
   import type {
     EmailProviderConfig,
     GotifyProviderConfig,
@@ -23,13 +18,14 @@
   import * as providerService from '$lib/services/notification-provider.service';
   import { Checkbox } from '$ui/checkbox';
   import Button from '$ui/button/button.svelte';
-  import * as Card from '$ui/card';
   import * as Dialog from '$ui/dialog';
   import { Label } from '$ui/label';
   import * as Select from '$ui/select';
 
   import EmailProviderForm from './EmailProviderForm.svelte';
   import GotifyProviderForm from './GotifyProviderForm.svelte';
+  import NotificationDeliveryPanel from './NotificationDeliveryPanel.svelte';
+  import NotificationProvidersEmptyState from './NotificationProvidersEmptyState.svelte';
   import ProviderCard from './ProviderCard.svelte';
   import TestProviderDialog from './TestProviderDialog.svelte';
   import WebhookProviderForm from './WebhookProviderForm.svelte';
@@ -264,46 +260,13 @@
 </script>
 
 <div class="space-y-6">
-  <div class="space-y-3 rounded-lg border p-4">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <h3 class="text-lg font-semibold">Scheduled delivery</h3>
-        <p class="text-muted-foreground text-sm">
-          In-app notifications stay real-time. This schedule only controls provider delivery.
-        </p>
-      </div>
-      <div class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
-        <Clock3 class="h-5 w-5" />
-      </div>
-    </div>
-
-    <div class="space-y-2">
-      <Label for="notification-processing-schedule">Processing schedule</Label>
-      <CronInput
-        value={processingSchedule}
-        onValueChange={(value) => onProcessingScheduleChange?.(value)}
-        {disabled}
-        placeholder="0 9 * * *"
-      />
-    </div>
-
-    {#if env.DEMO_MODE}
-      <div class="flex justify-end">
-        <Button
-          variant="outline"
-          onclick={handleSendAllNotifications}
-          disabled={disabled || sendingNotifications}
-        >
-          {#if sendingNotifications}
-            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-          {:else}
-            <Send class="mr-2 h-4 w-4" />
-          {/if}
-          Send All Notifications Now
-        </Button>
-      </div>
-    {/if}
-  </div>
+  <NotificationDeliveryPanel
+    {processingSchedule}
+    {onProcessingScheduleChange}
+    {disabled}
+    {sendingNotifications}
+    onSendAllNotifications={handleSendAllNotifications}
+  />
 
   <div class="flex items-center justify-between gap-4">
     <div>
@@ -323,17 +286,7 @@
       <Loader2 class="h-8 w-8 animate-spin" />
     </div>
   {:else if providers.length === 0}
-    <Card.Root class="border-dashed">
-      <Card.Content class="flex flex-col items-center justify-center py-12">
-        <BellOff class="text-muted-foreground mb-4 h-12 w-12" />
-        <p class="text-muted-foreground mb-2 text-center font-medium">
-          No notification providers configured yet
-        </p>
-        <p class="text-muted-foreground text-center text-sm">
-          Add a provider to receive scheduled Reminder, Alert, or Information notifications.
-        </p>
-      </Card.Content>
-    </Card.Root>
+    <NotificationProvidersEmptyState />
   {:else}
     <div class="grid gap-3 md:grid-cols-2">
       {#each providers as provider (provider.id)}

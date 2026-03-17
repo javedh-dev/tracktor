@@ -123,7 +123,7 @@
       />
     </div>
     <Select.Root bind:value={selectedPreset} type="single" {disabled}>
-      <Select.Trigger class="w-[140px]">
+      <Select.Trigger class="w-35">
         <Clock class="mr-2 h-4 w-4" />
         Presets
       </Select.Trigger>
