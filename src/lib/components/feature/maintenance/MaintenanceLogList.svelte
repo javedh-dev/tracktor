@@ -12,11 +12,11 @@
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import ResourceState from '$appui/ResourceState.svelte';
   import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
   import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import * as m from '$lib/paraglide/messages';
 
   const columns: ColumnDef<MaintenanceLog>[] = [
@@ -115,14 +115,9 @@
     <Skeleton class="h-12 w-full rounded-md" />
   </div>
 {:else if maintenanceStore.error}
-  <p class="text-red-500">Error: {maintenanceStore.error}</p>
+  <ResourceState state="error" message={maintenanceStore.error} />
 {:else if maintenanceStore.maintenanceLogs?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={m.maintenance_list_empty()}
-  />
+  <ResourceState state="empty" message={m.maintenance_list_empty()} />
 {:else}
   <div id="maintenance-log-table" class="maintenance-log-table">
     <AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />

@@ -2,6 +2,7 @@
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import Badge from '$ui/badge/badge.svelte';
+  import ResourceState from '$appui/ResourceState.svelte';
   import { reminderStore } from '$stores/reminder.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import {
@@ -10,8 +11,6 @@
     getReminderTypeLabel
   } from '$lib/domain/reminder';
   import { formatDate } from '$lib/helper/format.helper';
-  import CircleAlert from '@lucide/svelte/icons/circle-alert';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import Calendar from '@lucide/svelte/icons/calendar';
   import AlarmClock from '@lucide/svelte/icons/alarm-clock';
@@ -60,12 +59,7 @@
     <Skeleton class="h-28 w-full rounded-2xl" />
   </div>
 {:else if reminderStore.error}
-  <LabelWithIcon
-    icon={CircleAlert}
-    iconClass="h-5 w-5"
-    style="flex items-center gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-destructive"
-    label={reminderStore.error}
-  />
+  <ResourceState state="error" message={reminderStore.error} />
 {:else if reminders.length > 0}
   {#each reminders as reminder (reminderKey(reminder))}
     <div
@@ -143,10 +137,5 @@
     </div>
   {/each}
 {:else}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={m.reminder_list_empty()}
-  />
+  <ResourceState state="empty" message={m.reminder_list_empty()} />
 {/if}

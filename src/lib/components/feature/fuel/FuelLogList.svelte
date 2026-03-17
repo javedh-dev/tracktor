@@ -24,11 +24,11 @@
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import ResourceState from '$appui/ResourceState.svelte';
   import AppTable from '$layout/AppTable.svelte';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import {
     col_date,
     col_odometer,
@@ -188,14 +188,9 @@
     <Skeleton class="h-12 w-full rounded-md" />
   </div>
 {:else if fuelLogStore.error}
-  <p class="text-red-500">Error: {fuelLogStore.error}</p>
+  <ResourceState state="error" message={fuelLogStore.error} />
 {:else if fuelLogStore.fuelLogs?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={fuel_empty_list()}
-  />
+  <ResourceState state="empty" message={fuel_empty_list()} />
 {:else}
   <AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}

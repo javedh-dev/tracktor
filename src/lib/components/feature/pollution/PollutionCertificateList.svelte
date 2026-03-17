@@ -13,7 +13,7 @@
   import { puccStore } from '$stores/pucc.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+  import ResourceState from '$appui/ResourceState.svelte';
   import { getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
   import type { PollutionCertificate } from '$lib/domain/pucc';
   import * as m from '$lib/paraglide/messages';
@@ -49,14 +49,9 @@
     {/each}
   </div>
 {:else if puccStore.error}
-  <p class="text-red-500">Error: {puccStore.error}</p>
+  <ResourceState state="error" message={puccStore.error} />
 {:else if puccStore.pollutionCerts?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={m.pollution_list_empty()}
-  />
+  <ResourceState state="empty" message={m.pollution_list_empty()} />
 {:else}
   {#each puccStore.pollutionCerts as pucc (pucc.id)}
     <div

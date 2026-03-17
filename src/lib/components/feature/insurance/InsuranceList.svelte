@@ -14,7 +14,7 @@
   import { insuranceStore } from '$stores/insurance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+  import ResourceState from '$appui/ResourceState.svelte';
   import { getInsuranceRecurrenceTypeLabel } from '$lib/domain/insurance';
   import type { Insurance } from '$lib/domain/insurance';
   import * as m from '$lib/paraglide/messages';
@@ -52,14 +52,9 @@
     {/each}
   </div>
 {:else if insuranceStore.error}
-  <p class="text-red-500">Error: {insuranceStore.error}</p>
+  <ResourceState state="error" message={insuranceStore.error} />
 {:else if insuranceStore.insurances?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={m.insurance_list_empty()}
-  />
+  <ResourceState state="empty" message={m.insurance_list_empty()} />
 {:else}
   {#each insuranceStore.insurances as ins (ins.id)}
     {@const nextDue = getNextInsuranceDue(ins)}
