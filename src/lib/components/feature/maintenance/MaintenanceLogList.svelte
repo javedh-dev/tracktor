@@ -7,7 +7,7 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Paperclip from '@lucide/svelte/icons/paperclip';
   import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
@@ -107,13 +107,7 @@
 </script>
 
 {#if maintenanceStore.processing}
-  <div id="maintenance-log-list-skeleton" class="space-y-3">
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-  </div>
+  <TableSkeleton containerId="maintenance-log-list-skeleton" />
 {:else if maintenanceStore.error}
   <ResourceState state="error" message={maintenanceStore.error} />
 {:else if maintenanceStore.maintenanceLogs?.length === 0}

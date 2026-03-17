@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { type FuelLog } from '$lib/domain/fuel';
 
   import Badge from '$ui/badge/badge.svelte';
@@ -25,6 +24,7 @@
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import ResourceState from '$appui/ResourceState.svelte';
+  import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
@@ -180,13 +180,7 @@
 </script>
 
 {#if fuelLogStore.processing}
-  <div id="fuel-log-list-skeleton" class="space-y-3">
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-  </div>
+  <TableSkeleton containerId="fuel-log-list-skeleton" />
 {:else if fuelLogStore.error}
   <ResourceState state="error" message={fuelLogStore.error} />
 {:else if fuelLogStore.fuelLogs?.length === 0}
