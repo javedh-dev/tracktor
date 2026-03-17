@@ -7,10 +7,10 @@
   import Repeat from '@lucide/svelte/icons/repeat';
   import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
   import FeatureRecordCard from '$appui/FeatureRecordCard.svelte';
+  import FeatureRecordCardSkeleton from '$appui/FeatureRecordCardSkeleton.svelte';
   import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import { formatDate } from '$lib/helper/format.helper';
   import { getNextDueDate } from '$lib/helper/recurrence.helper';
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import PuccContextMenu from './PuccContextMenu.svelte';
   import { puccStore } from '$stores/pucc.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
@@ -33,22 +33,7 @@
 </script>
 
 {#if puccStore.processing}
-  <div id="pollution-list-skeleton" class="space-y-4 pt-4">
-    {#each [0, 1] as i (i)}
-      <div class="bg-background rounded-lg border p-4 shadow-sm lg:p-6">
-        <div class="mb-4 flex items-center justify-between">
-          <Skeleton class="h-6 w-48" />
-          <Skeleton class="h-8 w-8 rounded-full" />
-        </div>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Skeleton class="h-5 w-full max-w-[200px]" />
-          <Skeleton class="h-5 w-full max-w-40" />
-          <Skeleton class="h-5 w-full max-w-48" />
-          <Skeleton class="h-5 w-full max-w-48" />
-        </div>
-      </div>
-    {/each}
-  </div>
+  <FeatureRecordCardSkeleton containerId="pollution-list-skeleton" />
 {:else if puccStore.error}
   <ResourceState state="error" message={puccStore.error} />
 {:else if puccStore.pollutionCerts?.length === 0}

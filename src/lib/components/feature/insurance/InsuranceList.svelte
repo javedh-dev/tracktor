@@ -8,10 +8,10 @@
   import Repeat from '@lucide/svelte/icons/repeat';
   import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
   import FeatureRecordCard from '$appui/FeatureRecordCard.svelte';
+  import FeatureRecordCardSkeleton from '$appui/FeatureRecordCardSkeleton.svelte';
   import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import { formatCurrency, formatDate } from '$lib/helper/format.helper';
   import { getNextDueDate } from '$lib/helper/recurrence.helper';
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import InsuranceContextMenu from './InsuranceContextMenu.svelte';
   import { insuranceStore } from '$stores/insurance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
@@ -36,22 +36,7 @@
 </script>
 
 {#if insuranceStore.processing}
-  <div class="space-y-4 pt-4">
-    {#each [0, 1] as i (i)}
-      <div class="bg-background rounded-lg border p-4 shadow-sm lg:p-6">
-        <div class="mb-4 flex items-center justify-between">
-          <Skeleton class="h-6 w-48" />
-          <Skeleton class="h-8 w-8 rounded-full" />
-        </div>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Skeleton class="h-5 w-full max-w-50" />
-          <Skeleton class="h-5 w-full max-w-40" />
-          <Skeleton class="h-5 w-full max-w-48" />
-          <Skeleton class="h-5 w-full max-w-48" />
-        </div>
-      </div>
-    {/each}
-  </div>
+  <FeatureRecordCardSkeleton />
 {:else if insuranceStore.error}
   <ResourceState state="error" message={insuranceStore.error} />
 {:else if insuranceStore.insurances?.length === 0}
