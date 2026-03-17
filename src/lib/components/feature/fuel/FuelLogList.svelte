@@ -3,12 +3,14 @@
 
   import Badge from '$ui/badge/badge.svelte';
   import {
-    formatCurrency,
-    formatDate,
-    formatDistance,
-    formatFuel,
-    getMileageUnit
-  } from '$lib/helper/format.helper';
+    formatTableBoolean,
+    formatTableCurrency,
+    formatTableDate,
+    formatTableDistance,
+    formatTableFuelAmount,
+    formatTableMileage,
+    formatTableText
+  } from '$helper/table-cell.helper';
   import FuelLogContextMenu from './FuelLogContextMenu.svelte';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Rabbit from '@lucide/svelte/icons/rabbit';
@@ -191,43 +193,38 @@
 
 {#snippet badge(params: any)}
   <div class="flex flex-row justify-center">
-    <Badge variant="outline"><span>{params.value ? common_yes() : common_no()}</span></Badge>
+    <Badge variant="outline"
+      ><span>{formatTableBoolean(params.value, common_yes(), common_no())}</span></Badge
+    >
   </div>
 {/snippet}
 
 {#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">
-    {params.value !== null && params.value !== undefined ? formatDistance(params.value) : '-'}
-  </div>
+  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
 {/snippet}
 
 {#snippet fuelAmountCell(params: any)}
   <div class="flex flex-row justify-center">
-    {params.amount !== null && params.amount !== undefined
-      ? formatFuel(params.amount, params.fuelType as string)
-      : '-'}
+    {formatTableFuelAmount(params.amount, params.fuelType as string | undefined)}
   </div>
 {/snippet}
 
 {#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
 {/snippet}
 
 {#snippet mileageCell(params: any)}
-  {@const unit = getMileageUnit(params.fuelType as string)}
-  {@const isValidNumber =
-    params.mileage != null && typeof params.mileage === 'number' && !isNaN(params.mileage)}
   <div class="flex flex-row justify-center">
-    {!isValidNumber ? '-' : `${params.mileage.toFixed(2)} ${unit}`}
+    {formatTableMileage(params.mileage, params.fuelType as string | undefined)}
   </div>
 {/snippet}
 
 {#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value || '-'}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet attachmentCell(params: any)}

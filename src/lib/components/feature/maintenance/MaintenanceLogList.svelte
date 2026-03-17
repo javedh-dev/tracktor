@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { formatCurrency, formatDate, formatDistance } from '$lib/helper/format.helper';
+  import {
+    formatTableCurrency,
+    formatTableDate,
+    formatTableDistance,
+    formatTableText
+  } from '$helper/table-cell.helper';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -119,23 +124,23 @@
 {/if}
 
 {#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
 {/snippet}
 
 {#snippet serviceCenterCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
 {/snippet}
 
 {#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value || '-'}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet attachmentCell(params: any)}
