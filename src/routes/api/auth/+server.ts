@@ -1,12 +1,12 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
-import { AppError } from '$server/exceptions/AppError';
 import { env } from '$lib/config/env.server';
+import { rethrowRouteError, withRouteErrorHandling } from '$server/utils/route-handler';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Auth POST error:', async () => {
     const body = event.locals.requestBody || (await event.request.json());
 
     // Validate request body
@@ -28,24 +28,12 @@ export const POST: RequestHandler = async (event) => {
     }
 
     return json(result);
-  } catch (err) {
-    console.error('Auth POST error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 // GET /api/auth - Get authentication status and validate session
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Auth GET error:', async () => {
     const result = await authService.getUsersCount();
     const isAuthDisabled = env.DISABLE_AUTH;
 
@@ -59,7 +47,7 @@ export const GET: RequestHandler = async (event) => {
         user = sessionResult.user;
       } catch (err) {
         // Session is invalid, but don't throw error - just return null user
-        console.log('Invalid session during auth check:', err);
+        console.error('Invalid session during auth check:', err);
       }
     }
 
@@ -72,15 +60,7 @@ export const GET: RequestHandler = async (event) => {
         isAuthenticated: isAuthDisabled || !!user
       }
     });
-  } catch (err) {
-    console.error('Auth GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 // DELETE /api/auth - Logout
@@ -113,11 +93,6 @@ export const DELETE: RequestHandler = async (event) => {
     });
   } catch (err) {
     console.error('Auth DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    throw error(500, 'Internal server error');
+    rethrowRouteError(err);
   }
 };
