@@ -1,11 +1,12 @@
 <script lang="ts">
   import * as Accordion from '$lib/components/ui/accordion';
   import * as Separator from '$ui/separator';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     title: string;
     description?: string;
-    children: () => any;
+    children: Snippet;
   }
 
   let { title, description, children }: Props = $props();

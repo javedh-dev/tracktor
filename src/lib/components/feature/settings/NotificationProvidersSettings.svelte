@@ -6,10 +6,12 @@
   import { toast } from 'svelte-sonner';
 
   import type {
+    CreateNotificationProvider,
     EmailProviderConfig,
     GotifyProviderConfig,
     NotificationProviderType,
     NotificationProviderWithParsedConfig,
+    UpdateNotificationProvider,
     WebhookProviderConfig
   } from '$lib/domain/notification-provider';
   import * as providerService from '$lib/services/notification-provider.service';
@@ -74,9 +76,9 @@
   let formType = $state<NotificationProviderType>();
   let formIsEnabled = $state(true);
   let formChannels = $state<ProviderChannel[]>(['reminder', 'alert', 'information']);
-  let emailConfig = $state({});
-  let webhookConfig = $state({});
-  let gotifyConfig = $state({});
+  let emailConfig = $state<Partial<EmailProviderConfig>>({});
+  let webhookConfig = $state<Partial<WebhookProviderConfig>>({});
+  let gotifyConfig = $state<Partial<GotifyProviderConfig>>({});
 
   onMount(async () => {
     await loadProviders();
@@ -138,15 +140,15 @@
 
   function resolveProviderConfig() {
     if (formType === 'email') {
-      return { type: 'email' as const, ...emailConfig };
+      return { type: 'email' as const, ...(emailConfig as EmailProviderConfig) };
     }
 
     if (formType === 'webhook') {
-      return { type: 'webhook' as const, ...webhookConfig };
+      return { type: 'webhook' as const, ...(webhookConfig as WebhookProviderConfig) };
     }
 
     if (formType === 'gotify') {
-      return { type: 'gotify' as const, ...gotifyConfig };
+      return { type: 'gotify' as const, ...(gotifyConfig as GotifyProviderConfig) };
     }
 
     return null;
@@ -167,24 +169,27 @@
 
     try {
       savingProvider = true;
-      const providerConfig = config as any;
 
       if (editingProvider) {
-        await providerService.updateProvider(editingProvider.id, {
+        const updatePayload: UpdateNotificationProvider = {
           name: formName,
-          config: providerConfig,
+          config,
           channels: formChannels,
           isEnabled: formIsEnabled
-        } as any);
+        };
+
+        await providerService.updateProvider(editingProvider.id, updatePayload);
         toast.success('Provider updated successfully');
       } else {
-        await providerService.createProvider({
+        const createPayload: CreateNotificationProvider = {
           name: formName,
           type: formType,
-          config: providerConfig,
+          config,
           channels: formChannels,
           isEnabled: formIsEnabled
-        } as any);
+        };
+
+        await providerService.createProvider(createPayload);
         toast.success('Provider created successfully');
       }
 
@@ -220,7 +225,9 @@
   async function handleToggleProvider(provider: ProviderWithChannels) {
     try {
       togglingProviderId = provider.id;
-      await providerService.updateProvider(provider.id, { isEnabled: provider.isEnabled } as any);
+      await providerService.updateProvider(provider.id, {
+        isEnabled: provider.isEnabled
+      });
       providers = providers.map((entry) =>
         entry.id === provider.id ? { ...entry, isEnabled: provider.isEnabled } : entry
       );

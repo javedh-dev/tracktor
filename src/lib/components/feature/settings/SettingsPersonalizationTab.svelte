@@ -4,6 +4,7 @@
   import Input from '$appui/input.svelte';
   import SearchableSelect from '$appui/SearchableSelect.svelte';
   import { Textarea } from '$lib/components/ui/textarea';
+  import type { SettingsOption } from '$lib/types/settings';
   import Calendar from '@lucide/svelte/icons/calendar';
   import Currency from '@lucide/svelte/icons/currency';
   import Earth from '@lucide/svelte/icons/earth';
@@ -15,10 +16,10 @@
     form: any;
     formData: any;
     processing: boolean;
-    themeOptions: Array<{ value: string; label: string; colorPreview?: string }>;
-    localeOptions: Array<{ value: string; label: string }>;
-    currencyOptions: Array<{ value: string; label: string }>;
-    getTimezoneOptions: () => Array<{ value: string; label: string }>;
+    themeOptions: Array<SettingsOption>;
+    localeOptions: Array<SettingsOption>;
+    currencyOptions: Array<SettingsOption>;
+    getTimezoneOptions: () => Array<SettingsOption>;
     isValidFormat: (value: string) => { valid: boolean; ex?: string };
     messages: typeof import('$lib/paraglide/messages');
   }

@@ -3,21 +3,17 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
   import Rabbit from '@lucide/svelte/icons/rabbit';
+  import type { SettingsOption } from '$lib/types/settings';
   import SettingsSelectField from './SettingsSelectField.svelte';
-
-  interface Option {
-    value: string;
-    label: string;
-  }
 
   interface Props {
     form: any;
     formData: any;
     processing: boolean;
-    uodOptions: Option[];
-    uovOptions: Option[];
-    gasUnitOptions: Option[];
-    mileageUnitFormatOptions: Option[];
+    uodOptions: SettingsOption[];
+    uovOptions: SettingsOption[];
+    gasUnitOptions: SettingsOption[];
+    mileageUnitFormatOptions: SettingsOption[];
     messages: typeof import('$lib/paraglide/messages');
   }
 

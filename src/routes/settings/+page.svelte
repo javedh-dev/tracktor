@@ -12,6 +12,7 @@
   import { saveConfig } from '$lib/services/config.service';
   import { rawConfigToFormData, formDataToConfigs } from '$helper/config.helper';
   import { createSettingsConfigSchema, createSettingsOptions } from '$helper/settings-form.helper';
+  import type { SettingsFormShape } from '$lib/types/settings';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
@@ -46,10 +47,7 @@
           themeStore.setTheme(f.data.theme as any);
         }
 
-        const updatedConfig = formDataToConfigs(
-          f.data as Record<string, unknown>,
-          configStore.rawConfig
-        );
+        const updatedConfig = formDataToConfigs(f.data as SettingsFormShape, configStore.rawConfig);
 
         // Persist configuration before applying a locale change
         await saveConfig(updatedConfig);
@@ -84,10 +82,13 @@
   });
 
   const updateNotificationProcessingSchedule = (value: string) => {
-    formData.update((current) => ({
-      ...current,
-      notificationProcessingSchedule: value
-    }));
+    formData.update(
+      (current) =>
+        ({
+          ...current,
+          notificationProcessingSchedule: value
+        }) as SettingsFormShape
+    );
   };
 
   const hasErrors = $derived.by(() =>
@@ -141,10 +142,13 @@
   // Populate form when configs are loaded
   $effect(() => {
     if (configStore.rawConfig.length > 0) {
-      const configData = rawConfigToFormData(configStore.rawConfig, configStore.configs);
+      const configData = rawConfigToFormData(
+        configStore.rawConfig,
+        configStore.configs
+      ) as SettingsFormShape;
       // Add current theme to form data (theme is client-side only)
       configData.theme = themeStore.theme;
-      formData.set(configData as typeof $formData);
+      formData.set(configData);
     }
   });
 </script>
