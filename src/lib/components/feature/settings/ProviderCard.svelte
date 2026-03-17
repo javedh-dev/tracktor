@@ -22,11 +22,20 @@
     onEdit?: (provider: ProviderWithChannels) => void;
     onDelete?: (provider: ProviderWithChannels) => void;
     onTest?: (provider: ProviderWithChannels) => void;
+    onToggleEnabled: (provider: ProviderWithChannels) => void;
     toggling?: boolean;
     testing?: boolean;
   }
 
-  let { provider, onEdit, onDelete, onTest, toggling = false, testing = false }: Props = $props();
+  let {
+    provider,
+    onEdit,
+    onDelete,
+    onTest,
+    onToggleEnabled,
+    toggling = false,
+    testing = false
+  }: Props = $props();
 
   const channelLabelMap = {
     reminder: 'Reminder',
@@ -74,7 +83,11 @@
       <div class="flex flex-col justify-between gap-3 sm:items-end">
         <div class="flex items-center gap-2 self-start sm:self-end">
           <span class="text-muted-foreground text-xs">Enabled</span>
-          <Switch checked={provider.isEnabled} disabled={toggling} />
+          <Switch
+            checked={provider.isEnabled}
+            disabled={toggling}
+            onchange={(e) => onToggleEnabled(provider)}
+          />
         </div>
 
         <div class="flex items-end gap-1 self-start sm:self-end">

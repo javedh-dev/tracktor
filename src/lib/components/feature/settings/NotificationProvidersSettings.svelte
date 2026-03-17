@@ -225,12 +225,12 @@
     testDialogOpen = true;
   }
 
-  async function handleToggleProvider(provider: ProviderWithChannels, enabled: boolean) {
+  async function handleToggleProvider(provider: ProviderWithChannels) {
     try {
       togglingProviderId = provider.id;
-      await providerService.updateProvider(provider.id, { isEnabled: enabled } as any);
+      await providerService.updateProvider(provider.id, { isEnabled: provider.isEnabled } as any);
       providers = providers.map((entry) =>
-        entry.id === provider.id ? { ...entry, isEnabled: enabled } : entry
+        entry.id === provider.id ? { ...entry, isEnabled: provider.isEnabled } : entry
       );
     } catch (error) {
       const err = error as Error;
