@@ -9,13 +9,26 @@ import {
   performDelete
 } from '../utils/serviceUtils';
 
-export const addFuelLog = async (vehicleId: string, fuelLogData: any): Promise<ApiResponse> => {
+type FuelLogPayload = {
+  date: string;
+  odometer: number | null;
+  filled: boolean;
+  missedLast: boolean;
+  fuelAmount: number | null;
+  cost: number;
+  notes: string | null;
+  attachment: string | null;
+};
+
+export const addFuelLog = async (
+  vehicleId: string,
+  fuelLogData: FuelLogPayload
+): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
   const fuelLog = await db
     .insert(schema.fuelLogTable)
     .values({
       ...fuelLogData,
-      id: undefined,
       vehicleId: vehicleId
     })
     .returning();
@@ -123,7 +136,7 @@ export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
 export const updateFuelLog = async (
   vehicleId: string,
   id: string,
-  fuelLogData: any
+  fuelLogData: FuelLogPayload
 ): Promise<ApiResponse> => {
   // Validate that the fuel log exists and belongs to the specified vehicle
   const fuelLog = await db.query.fuelLogTable.findFirst({
@@ -153,7 +166,7 @@ export const deleteFuelLog = async (id: string): Promise<ApiResponse> => {
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
-  fuelLogData: any
+  fuelLogData: FuelLogPayload
 ): Promise<ApiResponse> => {
   await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
