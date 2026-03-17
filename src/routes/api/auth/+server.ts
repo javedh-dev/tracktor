@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { env } from '$lib/config/env.server';
-import { rethrowRouteError, withRouteErrorHandling } from '$server/utils/route-handler';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
@@ -65,7 +65,7 @@ export const GET: RequestHandler = async (event) => {
 
 // DELETE /api/auth - Logout
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Auth DELETE error:', async () => {
     const sessionToken = event.cookies.get('session');
 
     if (sessionToken) {
@@ -91,8 +91,5 @@ export const DELETE: RequestHandler = async (event) => {
       success: true,
       message: 'Logout successful'
     });
-  } catch (err) {
-    console.error('Auth DELETE error:', err);
-    rethrowRouteError(err);
-  }
+  });
 };

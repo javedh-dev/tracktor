@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { ZodError } from 'zod';
 import { AppError } from '$server/exceptions/AppError';
 
@@ -28,5 +28,25 @@ export async function withRouteErrorHandling<T>(
   } catch (err) {
     console.error(label, err);
     rethrowRouteError(err, fallbackMessage);
+  }
+}
+
+export async function withJsonErrorHandling<T>(
+  label: string,
+  handler: () => Promise<T>,
+  message: string,
+  status = 500
+): Promise<T | Response> {
+  try {
+    return await handler();
+  } catch (err) {
+    console.error(label, err);
+    return json(
+      {
+        success: false,
+        message
+      },
+      { status }
+    );
   }
 }
