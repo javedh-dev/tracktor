@@ -182,7 +182,7 @@ export function generateHtmlDigest(
     })
     .join('<br><br>');
 
-  const appUrl = env.APP_URL || '';
+  const appUrl = env.BASE_URL || '';
   const appLinkHtml = appUrl ? `<a href="${escapeHtml(appUrl)}">Open Tracktor</a><br><br>` : '';
 
   return `<!DOCTYPE html>

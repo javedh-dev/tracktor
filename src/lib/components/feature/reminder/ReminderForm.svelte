@@ -144,7 +144,7 @@
                 <span>
                   {$formData.remindSchedule
                     ? getReminderScheduleLabel($formData.remindSchedule, m)
-                    : 'Reminder timing'}
+                    : m.reminder_form_schedule_desc()}
                 </span>
               </div>
             </Select.Trigger>
@@ -172,7 +172,7 @@
                 <span>
                   {$formData.recurrenceType
                     ? getRecurrenceTypeLabel($formData.recurrenceType, m)
-                    : 'Select recurrence'}
+                    : m.reminder_form_recurrence_type_desc()}
                 </span>
               </div>
             </Select.Trigger>
@@ -192,14 +192,15 @@
         <Form.Control>
           {#snippet children({ props })}
             <FormLabel description={m.reminder_form_recurrence_interval_desc()}>
-              Repeat every {$formData.recurrenceInterval || 1}
+              {m.recurrence_every()}
+              {$formData.recurrenceInterval || 1}
               {$formData.recurrenceType === 'yearly'
-                ? 'year(s)'
+                ? m.recurrence_interval_years()
                 : $formData.recurrenceType === 'monthly'
-                  ? 'month(s)'
+                  ? m.recurrence_interval_months()
                   : $formData.recurrenceType === 'weekly'
-                    ? 'week(s)'
-                    : 'day(s)'}
+                    ? m.recurrence_interval_weeks()
+                    : m.recurrence_interval_days()}
             </FormLabel>
             <Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
           {/snippet}

@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { cn, type WithElementRef } from '$lib/utils.js';
   import type { Component } from 'svelte';
+  import * as m from '$lib/paraglide/messages';
 
   type Props = WithElementRef<
     HTMLInputAttributes & {
@@ -11,16 +12,16 @@
     }
   >;
 
-	let {
-		ref = $bindable(null),
-		value = $bindable(''),
-		icon: Icon,
-		suggestions = [],
-		loading = false,
-		class: className,
-		placeholder = m.autocomplete_placeholder(),
-		...restProps
-	}: Props = $props();
+  let {
+    ref = $bindable(null),
+    value = $bindable(''),
+    icon: Icon,
+    suggestions = [],
+    loading = false,
+    class: className,
+    placeholder = m.autocomplete_placeholder(),
+    ...restProps
+  }: Props = $props();
 
   let open = $state(false);
   let inputElement = $state<HTMLInputElement | null>(null);
@@ -99,32 +100,32 @@
     />
   {/if}
 
-	{#if open}
-		<div
-			class="bg-popover text-popover-foreground absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-md"
-		>
-			{#if loading}
-				<div class="p-2 text-center text-sm">{m.autocomplete_loading()}</div>
-			{:else if filteredSuggestions.length > 0}
-				<div class="p-1">
-					{#each filteredSuggestions as suggestion (suggestion)}
-						<button
-							type="button"
-							class="hover:bg-accent hover:text-accent-foreground relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none"
-							onmousedown={(e) => {
-								e.preventDefault();
-								selectSuggestion(suggestion);
-							}}
-						>
-							{suggestion}
-						</button>
-					{/each}
-				</div>
-			{:else}
-				<div class="text-muted-foreground p-2 text-center text-sm">
-					{m.autocomplete_no_results()}
-				</div>
-			{/if}
-		</div>
-	{/if}
+  {#if open}
+    <div
+      class="bg-popover text-popover-foreground absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-md"
+    >
+      {#if loading}
+        <div class="p-2 text-center text-sm">{m.autocomplete_loading()}</div>
+      {:else if filteredSuggestions.length > 0}
+        <div class="p-1">
+          {#each filteredSuggestions as suggestion (suggestion)}
+            <button
+              type="button"
+              class="hover:bg-accent hover:text-accent-foreground relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none"
+              onmousedown={(e) => {
+                e.preventDefault();
+                selectSuggestion(suggestion);
+              }}
+            >
+              {suggestion}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <div class="text-muted-foreground p-2 text-center text-sm">
+          {m.autocomplete_no_results()}
+        </div>
+      {/if}
+    </div>
+  {/if}
 </div>

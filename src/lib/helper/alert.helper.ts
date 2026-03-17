@@ -1,5 +1,6 @@
 import type { Insurance, PollutionCertificate } from '$lib/domain';
 import { differenceInDays } from 'date-fns';
+import * as m from '$lib/paraglide/messages';
 
 export type VehicleAlertType = 'insurance' | 'pucc';
 export type VehicleAlertStatus = 'expired' | 'expiring' | 'valid' | 'missing';
@@ -23,14 +24,14 @@ const classifyStatus = (daysRemaining: number): VehicleAlertStatus => {
 };
 
 const formatMessage = (type: VehicleAlertType, status: VehicleAlertStatus, days: number) => {
-  const label = type === 'insurance' ? 'Insurance' : 'PUCC';
+  const label = type === 'insurance' ? m.alert_type_insurance() : m.alert_type_pucc();
   if (status === 'expired') {
-    return `${label} expired ${Math.abs(days)} days ago`;
+    return m.alert_status_expired_ago({ label, days: Math.abs(days) });
   }
   if (status === 'expiring') {
-    return `${label} expires in ${days} days`;
+    return m.alert_status_expires_in({ label, days });
   }
-  return `${label} valid for ${days} days`;
+  return m.alert_status_valid_for({ label, days });
 };
 
 const buildAlert = (type: VehicleAlertType, expiryDate: Date): VehicleAlert => {
@@ -41,7 +42,7 @@ const buildAlert = (type: VehicleAlertType, expiryDate: Date): VehicleAlert => {
   return {
     type,
     status,
-    title: type === 'insurance' ? 'Insurance' : 'Pollution Certificate',
+    title: type === 'insurance' ? m.alert_type_insurance() : m.alert_type_pucc(),
     message: formatMessage(type, status, daysRemaining),
     daysRemaining,
     expiryDate,
@@ -54,8 +55,8 @@ const buildMissingAlert = (type: VehicleAlertType): VehicleAlert => {
   return {
     type,
     status: 'missing',
-    title: type === 'insurance' ? 'Insurance' : 'Pollution Certificate',
-    message: `${label} record not found. Add details to stay compliant.`,
+    title: type === 'insurance' ? m.alert_type_insurance() : m.alert_type_pucc(),
+    message: m.alert_record_not_found({ label }),
     daysRemaining: Number.POSITIVE_INFINITY,
     expiryDate: null,
     hasRecord: false
@@ -72,8 +73,8 @@ export const calculateInsuranceAlert = (insurances?: Insurance[] | null): Vehicl
     return {
       type: 'insurance',
       status: 'valid',
-      title: 'Insurance',
-      message: 'Insurance is active with no end date',
+      title: m.alert_type_insurance(),
+      message: m.alert_insurance_active_no_end(),
       daysRemaining: Number.POSITIVE_INFINITY,
       expiryDate: null,
       hasRecord: true
@@ -98,8 +99,8 @@ export const calculatePuccAlert = (
     return {
       type: 'pucc',
       status: 'valid',
-      title: 'Pollution Certificate',
-      message: 'PUCC is active with no end date',
+      title: m.alert_type_pucc(),
+      message: m.alert_pucc_active_no_end(),
       daysRemaining: Number.POSITIVE_INFINITY,
       expiryDate: null,
       hasRecord: true

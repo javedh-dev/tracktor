@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { locales, localizeHref } from '$lib/paraglide/runtime';
-	import { ModeWatcher } from 'mode-watcher';
-	import '../styles/app.css';
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-	import { Toaster } from '$ui/sonner';
-	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import { navigating, page } from '$app/state';
-	import Header from '$layout/Header.svelte';
-	import { onMount } from 'svelte';
-	import { env } from '$lib/config/env';
-	import { toast } from 'svelte-sonner';
-	import { configStore } from '$lib/stores/config.svelte';
-	import { themeStore } from '$lib/stores/theme.svelte';
-	import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
-	import { app_new_update_available } from '$lib/paraglide/messages';
+  import { locales, localizeHref } from '$lib/paraglide/runtime';
+  import { ModeWatcher } from 'mode-watcher';
+  import '../styles/app.css';
+  import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import { Toaster } from '$ui/sonner';
+  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import { navigating, page } from '$app/state';
+  import Header from '$layout/Header.svelte';
+  import { onMount } from 'svelte';
+  import { env } from '$lib/config/env';
+  import { toast } from 'svelte-sonner';
+  import { configStore } from '$lib/stores/config.svelte';
+  import { themeStore } from '$lib/stores/theme.svelte';
+  import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
+  import { app_new_update_available } from '$lib/paraglide/messages';
 
   let { children } = $props();
   let demoMode = env.DEMO_MODE;
@@ -34,9 +34,9 @@
     registrations?.addEventListener('updatefound', () => {
       const newSW = registrations.installing;
 
-			newSW?.addEventListener('statechange', () => {
-				if (newSW.state === 'installed') {
-					toast.info(app_new_update_available());
+      newSW?.addEventListener('statechange', () => {
+        if (newSW.state === 'installed') {
+          toast.info(app_new_update_available());
 
           setTimeout(() => {
             newSW.postMessage({ type: 'SKIP_WAITING' });

@@ -1,26 +1,26 @@
 <script lang="ts">
-	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-	import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-	import Badge from '$ui/badge/badge.svelte';
-	import { reminderStore } from '$stores/reminder.svelte';
-	import { vehicleStore } from '$stores/vehicle.svelte';
-	import {
-		getReminderScheduleLabel,
-		getRecurrenceTypeLabel,
-		getReminderTypeLabel
-	} from '$lib/domain/reminder';
-	import { formatDate } from '$lib/helper/format.helper';
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
-	import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
-	import BellRing from '@lucide/svelte/icons/bell-ring';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import AlarmClock from '@lucide/svelte/icons/alarm-clock';
-	import Repeat from '@lucide/svelte/icons/repeat';
-	import { browser } from '$app/environment';
-	import type { Reminder } from '$lib/domain';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import ReminderContextMenu from './ReminderContextMenu.svelte';
-	import * as m from '$lib/paraglide/messages';
+  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import Badge from '$ui/badge/badge.svelte';
+  import { reminderStore } from '$stores/reminder.svelte';
+  import { vehicleStore } from '$stores/vehicle.svelte';
+  import {
+    getReminderScheduleLabel,
+    getRecurrenceTypeLabel,
+    getReminderTypeLabel
+  } from '$lib/domain/reminder';
+  import { formatDate } from '$lib/helper/format.helper';
+  import CircleAlert from '@lucide/svelte/icons/circle-alert';
+  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
+  import BellRing from '@lucide/svelte/icons/bell-ring';
+  import Calendar from '@lucide/svelte/icons/calendar';
+  import AlarmClock from '@lucide/svelte/icons/alarm-clock';
+  import Repeat from '@lucide/svelte/icons/repeat';
+  import { browser } from '$app/environment';
+  import type { Reminder } from '$lib/domain';
+  import FileText from '@lucide/svelte/icons/file-text';
+  import ReminderContextMenu from './ReminderContextMenu.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let lastVehicleId: string | undefined;
 
@@ -67,35 +67,35 @@
     label={reminderStore.error}
   />
 {:else if reminders.length > 0}
-	{#each reminders as reminder (reminderKey(reminder))}
-		<div
-			id="reminder-item-{reminderKey(reminder)}"
-			class="reminder-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
-		>
-			<div class="flex items-center justify-between">
-				<div class="flex flex-wrap items-center gap-4 align-middle">
-					<div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
-						<BellRing class="h-6 w-6" />
-						<span class="line-clamp-1 text-lg font-bold lg:text-xl">
-							{getReminderTypeLabel(reminder.type, m)}
-						</span>
-					</div>
-					<div class="flex flex-wrap items-center gap-2">
-						<Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
-							{reminder.isCompleted ? m.reminder_status_completed() : m.reminder_status_pending()}
-						</Badge>
-						{#if isOverdue(reminder)}
-							<Badge variant="destructive">{m.reminder_status_overdue()}</Badge>
-						{/if}
-					</div>
-				</div>
-				<ReminderContextMenu
-					{reminder}
-					onaction={() => {
-						reminderStore.refreshReminders();
-					}}
-				/>
-			</div>
+  {#each reminders as reminder (reminderKey(reminder))}
+    <div
+      id="reminder-item-{reminderKey(reminder)}"
+      class="reminder-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center gap-4 align-middle">
+          <div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
+            <BellRing class="h-6 w-6" />
+            <span class="line-clamp-1 text-lg font-bold lg:text-xl">
+              {getReminderTypeLabel(reminder.type, m)}
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
+              {reminder.isCompleted ? m.reminder_status_completed() : m.reminder_status_pending()}
+            </Badge>
+            {#if isOverdue(reminder)}
+              <Badge variant="destructive">{m.reminder_status_overdue()}</Badge>
+            {/if}
+          </div>
+        </div>
+        <ReminderContextMenu
+          {reminder}
+          onaction={() => {
+            reminderStore.refreshReminders();
+          }}
+        />
+      </div>
 
       <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
