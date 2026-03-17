@@ -4,7 +4,25 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
+import type { Vehicle } from '$lib/domain/vehicle';
 import { performDelete } from '../utils/serviceUtils';
+
+type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
+type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
+
+function serializeVehiclePayload(vehicleData: VehicleMutationPayload) {
+  return {
+    ...vehicleData,
+    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
+  };
+}
+
+function parseVehicleRecord<T extends { customFields: string | null }>(vehicle: T) {
+  return {
+    ...vehicle,
+    customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null
+  };
+}
 
 // Helper functions
 const getLatestOdometer = async (vehicleId: string) => {
@@ -90,23 +108,12 @@ const calculateOverallMileage = async (vehicleId: string) => {
   return parseFloat(avgMileage.toFixed(2));
 };
 
-export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
-  // Serialize customFields to JSON string
-  const processedData = {
-    ...vehicleData,
-    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
-  };
-
-  const [vehicle] = await db
-    .insert(schema.vehicleTable)
-    .values({ ...processedData, id: undefined })
-    .returning();
+export const addVehicle = async (vehicleData: VehicleMutationPayload): Promise<ApiResponse> => {
+  const processedData = serializeVehiclePayload(vehicleData);
+  const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
 
   return {
-    data: {
-      ...vehicle,
-      customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null
-    },
+    data: parseVehicleRecord(vehicle),
     success: true,
     message: 'Vehicle added successfully.'
   };
@@ -155,9 +162,10 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
       const vehiclePuccDates = pollutionCerts
         .filter((pucc) => pucc.vehicleId === vehicle.id && pucc.expiryDate)
         .map((pucc) => new Date(pucc.expiryDate!));
+      const parsedVehicle = parseVehicleRecord(vehicle);
+
       return {
-        ...vehicle,
-        customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
+        ...parsedVehicle,
         odometer: latestOdometer || vehicle.odometer || 0,
         overallMileage,
         insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
@@ -188,8 +196,7 @@ export const getVehicleById = async (id: string): Promise<ApiResponse> => {
 
   return {
     data: {
-      ...vehicle,
-      customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
+      ...parseVehicleRecord(vehicle),
       currentOdometer: currentOdometer || vehicle.odometer || 0,
       overallMileage
     },
@@ -197,14 +204,13 @@ export const getVehicleById = async (id: string): Promise<ApiResponse> => {
   };
 };
 
-export const updateVehicle = async (id: string, vehicleData: any): Promise<ApiResponse> => {
+export const updateVehicle = async (
+  id: string,
+  vehicleData: VehicleMutationPayload
+): Promise<ApiResponse> => {
   await getVehicleById(id); // Validates vehicle exists
 
-  // Serialize customFields to JSON string
-  const processedData = {
-    ...vehicleData,
-    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
-  };
+  const processedData = serializeVehiclePayload(vehicleData);
 
   const [updatedVehicle] = await db
     .update(schema.vehicleTable)
@@ -213,10 +219,7 @@ export const updateVehicle = async (id: string, vehicleData: any): Promise<ApiRe
     .returning();
 
   return {
-    data: {
-      ...updatedVehicle,
-      customFields: updatedVehicle.customFields ? JSON.parse(updatedVehicle.customFields) : null
-    },
+    data: parseVehicleRecord(updatedVehicle),
     success: true,
     message: 'Vehicle updated successfully.'
   };

@@ -5,9 +5,18 @@ import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 
+type MaintenanceLogPayload = {
+  date: string;
+  odometer: number;
+  serviceCenter: string;
+  cost: number;
+  notes: string | null;
+  attachment: string | null;
+};
+
 export const addMaintenanceLog = async (
   vehicleId: string,
-  maintenanceLogData: any
+  maintenanceLogData: MaintenanceLogPayload
 ): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
 
@@ -52,7 +61,7 @@ export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> =>
 
 export const updateMaintenanceLog = async (
   id: string,
-  maintenanceLogData: any
+  maintenanceLogData: MaintenanceLogPayload
 ): Promise<ApiResponse> => {
   await getMaintenanceLogById(id);
   const updatedLog = await db
