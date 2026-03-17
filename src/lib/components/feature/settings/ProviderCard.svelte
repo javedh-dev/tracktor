@@ -86,7 +86,7 @@
           <Switch
             checked={provider.isEnabled}
             disabled={toggling}
-            onchange={(e) => onToggleEnabled(provider)}
+            onchange={(_) => onToggleEnabled(provider)}
           />
         </div>
 
