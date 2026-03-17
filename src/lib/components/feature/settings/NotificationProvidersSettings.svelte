@@ -1,13 +1,10 @@
 <script lang="ts">
   import Bell from '@lucide/svelte/icons/bell';
   import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Mail from '@lucide/svelte/icons/mail';
   import Plus from '@lucide/svelte/icons/plus';
-  import Webhook from '@lucide/svelte/icons/webhook';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
 
-  import Input from '$appui/input.svelte';
   import type {
     EmailProviderConfig,
     GotifyProviderConfig,
@@ -16,19 +13,13 @@
     WebhookProviderConfig
   } from '$lib/domain/notification-provider';
   import * as providerService from '$lib/services/notification-provider.service';
-  import { Checkbox } from '$ui/checkbox';
   import Button from '$ui/button/button.svelte';
-  import * as Dialog from '$ui/dialog';
-  import { Label } from '$ui/label';
-  import * as Select from '$ui/select';
 
-  import EmailProviderForm from './EmailProviderForm.svelte';
-  import GotifyProviderForm from './GotifyProviderForm.svelte';
   import NotificationDeliveryPanel from './NotificationDeliveryPanel.svelte';
+  import NotificationProviderDialog from './NotificationProviderDialog.svelte';
   import NotificationProvidersEmptyState from './NotificationProvidersEmptyState.svelte';
   import ProviderCard from './ProviderCard.svelte';
   import TestProviderDialog from './TestProviderDialog.svelte';
-  import WebhookProviderForm from './WebhookProviderForm.svelte';
 
   type ProviderChannel = 'reminder' | 'alert' | 'information';
   type ProviderWithChannels = NotificationProviderWithParsedConfig & {
@@ -83,9 +74,9 @@
   let formType = $state<NotificationProviderType>();
   let formIsEnabled = $state(true);
   let formChannels = $state<ProviderChannel[]>(['reminder', 'alert', 'information']);
-  let emailConfig = $state<Partial<EmailProviderConfig>>({});
-  let webhookConfig = $state<Partial<WebhookProviderConfig>>({});
-  let gotifyConfig = $state<Partial<GotifyProviderConfig>>({});
+  let emailConfig = $state({});
+  let webhookConfig = $state({});
+  let gotifyConfig = $state({});
 
   onMount(async () => {
     await loadProviders();
@@ -304,144 +295,29 @@
   {/if}
 </div>
 
-<Dialog.Root bind:open={dialogOpen}>
-  <Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-150">
-    <Dialog.Header>
-      <Dialog.Title>{editingProvider ? 'Edit' : 'Add'} Notification Provider</Dialog.Title>
-      <Dialog.Description>
-        Choose a provider type, configure its destination, and subscribe it to notification
-        channels.
-      </Dialog.Description>
-    </Dialog.Header>
-
-    <div class="space-y-5 py-4">
-      <div class="grid gap-4 sm:grid-cols-2">
-        <div class="space-y-2">
-          <Label>Provider Name</Label>
-          <Input bind:value={formName} placeholder="Daily digest email" />
-        </div>
-
-        <div class="space-y-2">
-          <Label>Provider Type</Label>
-          <Select.Root bind:value={formType} type="single" disabled={!!editingProvider}>
-            <Select.Trigger class="w-full justify-between border">
-              <span class="flex items-center gap-2">
-                {#if formType === 'email'}
-                  <Mail class="h-4 w-4" />
-                  Email (SMTP)
-                {:else if formType === 'webhook'}
-                  <Webhook class="h-4 w-4" />
-                  Webhook
-                {:else if formType === 'gotify'}
-                  <Bell class="h-4 w-4" />
-                  Gotify
-                {:else}
-                  Select Provider Type
-                {/if}
-              </span>
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="email">
-                <span class="flex items-center gap-2">
-                  <Mail class="h-4 w-4" />
-                  Email (SMTP)
-                </span>
-              </Select.Item>
-              <Select.Item value="webhook">
-                <span class="flex items-center gap-2">
-                  <Webhook class="h-4 w-4" />
-                  Webhook
-                </span>
-              </Select.Item>
-              <Select.Item value="gotify">
-                <span class="flex items-center gap-2">
-                  <Bell class="h-4 w-4" />
-                  Gotify
-                </span>
-              </Select.Item>
-            </Select.Content>
-          </Select.Root>
-        </div>
-      </div>
-
-      {#if formType === 'email'}
-        <EmailProviderForm
-          config={editingProvider?.type === 'email'
-            ? (editingProvider.config as EmailProviderConfig)
-            : undefined}
-          isEditing={!!editingProvider}
-          onConfigChange={(config) => (emailConfig = config)}
-        />
-      {:else if formType === 'webhook'}
-        <WebhookProviderForm
-          config={editingProvider?.type === 'webhook'
-            ? (editingProvider.config as WebhookProviderConfig)
-            : undefined}
-          isEditing={!!editingProvider}
-          onConfigChange={(config) => (webhookConfig = config)}
-        />
-      {:else if formType === 'gotify'}
-        <GotifyProviderForm
-          config={editingProvider?.type === 'gotify'
-            ? (editingProvider.config as GotifyProviderConfig)
-            : undefined}
-          isEditing={!!editingProvider}
-          onConfigChange={(config) => (gotifyConfig = config)}
-        />
-      {/if}
-
-      {#if formType}
-        <div class="space-y-4 rounded-lg border p-4">
-          <div>
-            <h4 class="font-medium">Channel subscriptions</h4>
-            <p class="text-muted-foreground text-sm">
-              Pick which notification channels this provider should receive.
-            </p>
-          </div>
-
-          <div class="space-y-3">
-            {#each channelOptions as channel}
-              <label class="flex items-start justify-between gap-3 rounded-md border p-3">
-                <div class="space-y-1">
-                  <p class="font-medium">{channel.label}</p>
-                  <p class="text-muted-foreground text-xs">
-                    {channel.description}
-                  </p>
-                </div>
-                <Checkbox
-                  checked={formChannels.includes(channel.value)}
-                  onCheckedChange={(checked) => toggleChannel(channel.value, Boolean(checked))}
-                />
-              </label>
-            {/each}
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div class="space-y-0.5">
-              <Label>Enable Provider</Label>
-              <p class="text-muted-foreground text-xs">
-                Allow this provider to receive scheduled notifications.
-              </p>
-            </div>
-            <Checkbox bind:checked={formIsEnabled} />
-          </div>
-        </div>
-      {/if}
-    </div>
-
-    <Dialog.Footer>
-      <Button variant="outline" onclick={() => (dialogOpen = false)} disabled={savingProvider}>
-        Cancel
-      </Button>
-      <Button onclick={handleSave} disabled={savingProvider}>
-        {#if savingProvider}
-          <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-        {/if}
-        {editingProvider ? 'Update' : 'Create'} Provider
-      </Button>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+<NotificationProviderDialog
+  open={dialogOpen}
+  onOpenChange={(open) => (dialogOpen = open)}
+  {editingProvider}
+  {formName}
+  onFormNameChange={(value) => (formName = value)}
+  {formType}
+  onFormTypeChange={(value) => (formType = value)}
+  {formChannels}
+  onToggleChannel={toggleChannel}
+  {formIsEnabled}
+  onFormIsEnabledChange={(checked) => (formIsEnabled = checked)}
+  {emailConfig}
+  onEmailConfigChange={(config) => (emailConfig = config)}
+  {webhookConfig}
+  onWebhookConfigChange={(config) => (webhookConfig = config)}
+  {gotifyConfig}
+  onGotifyConfigChange={(config) => (gotifyConfig = config)}
+  {channelOptions}
+  {savingProvider}
+  onCancel={() => (dialogOpen = false)}
+  onSave={handleSave}
+/>
 
 <TestProviderDialog
   provider={testingProvider}
