@@ -7,10 +7,6 @@
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { themes } from '$lib/config/themes';
-  import Currency from '@lucide/svelte/icons/currency';
-  import Fuel from '@lucide/svelte/icons/fuel';
-  import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
-  import Rabbit from '@lucide/svelte/icons/rabbit';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import { toast } from 'svelte-sonner';
   import { superForm, defaults } from 'sveltekit-superforms';
@@ -31,7 +27,7 @@
   import Settings from '@lucide/svelte/icons/settings';
   import SettingsFeaturesTab from './SettingsFeaturesTab.svelte';
   import SettingsPersonalizationTab from './SettingsPersonalizationTab.svelte';
-  import SettingsSelectField from './SettingsSelectField.svelte';
+  import SettingsUnitsTab from './SettingsUnitsTab.svelte';
 
   let localConfig: Config[] = $state([]);
   let processing = $state(false);
@@ -279,73 +275,16 @@
               </Tabs.Content>
 
               <Tabs.Content value="units" class="space-y-6">
-                <fieldset class="flex flex-col gap-4" disabled={processing}>
-                  <SettingsSelectField
-                    {form}
-                    name="unitOfDistance"
-                    label={m.settings_label_unit_distance()}
-                    description={m.settings_desc_unit_distance()}
-                    icon={RulerDimensionLine}
-                    options={uodOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    bind:value={$formData.unitOfDistance}
-                    disabled={processing}
-                  />
-                  <SettingsSelectField
-                    {form}
-                    name="mileageUnitFormat"
-                    label={m.settings_label_mileage_format()}
-                    description={m.settings_desc_mileage_format()}
-                    icon={Rabbit}
-                    options={mileageUnitFormatOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    bind:value={$formData.mileageUnitFormat}
-                    disabled={processing}
-                  />
-                  <div class="space-y-3">
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium">Fuel types</p>
-                      <p class="text-muted-foreground text-xs">
-                        Choose the measurement for each fuel.
-                      </p>
-                    </div>
-                    <div class="flex flex-col gap-4">
-                      <SettingsSelectField
-                        {form}
-                        name="unitOfVolume"
-                        label="Petrol/Diesel"
-                        description={m.settings_desc_unit_volume()}
-                        icon={Currency}
-                        options={uovOptions}
-                        placeholder={m.settings_select_unit_system()}
-                        bind:value={$formData.unitOfVolume}
-                        disabled={processing}
-                      />
-                      <SettingsSelectField
-                        {form}
-                        name="unitOfLpg"
-                        label="LPG"
-                        description={m.settings_desc_unit_volume()}
-                        icon={Fuel}
-                        options={gasUnitOptions}
-                        placeholder={m.settings_select_unit_system()}
-                        bind:value={$formData.unitOfLpg}
-                        disabled={processing}
-                      />
-                      <SettingsSelectField
-                        {form}
-                        name="unitOfCng"
-                        label="CNG"
-                        description={m.settings_desc_unit_volume()}
-                        icon={Fuel}
-                        options={gasUnitOptions}
-                        placeholder={m.settings_select_unit_system()}
-                        bind:value={$formData.unitOfCng}
-                        disabled={processing}
-                      />
-                    </div>
-                  </div>
-                </fieldset>
+                <SettingsUnitsTab
+                  {form}
+                  formData={$formData}
+                  {processing}
+                  {uodOptions}
+                  {uovOptions}
+                  {gasUnitOptions}
+                  {mileageUnitFormatOptions}
+                  messages={m}
+                />
               </Tabs.Content>
 
               <Tabs.Content value="features" class="space-y-6">
