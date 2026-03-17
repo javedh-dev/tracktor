@@ -101,7 +101,6 @@
           captionLayout="dropdown"
           onValueChange={(v) => {
             if (v) {
-              console.log(v.toString());
               value = formatDateForCalendar(v);
               open = false;
             }

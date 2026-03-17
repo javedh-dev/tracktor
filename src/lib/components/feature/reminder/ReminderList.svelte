@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import Badge from '$ui/badge/badge.svelte';
   import FeatureRecordCard from '$appui/FeatureRecordCard.svelte';
+  import FeatureRecordCardSkeleton from '$appui/FeatureRecordCardSkeleton.svelte';
   import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import ResourceState from '$appui/ResourceState.svelte';
   import { reminderStore } from '$stores/reminder.svelte';
@@ -55,10 +55,7 @@
     <p class="text-sm">{m.reminder_list_select_hint()}</p>
   </div>
 {:else if reminderStore.processing}
-  <div class="space-y-4 pt-4">
-    <Skeleton class="h-28 w-full rounded-2xl" />
-    <Skeleton class="h-28 w-full rounded-2xl" />
-  </div>
+  <FeatureRecordCardSkeleton cardClass="bg-background rounded-2xl border p-4 shadow-sm h-28" />
 {:else if reminderStore.error}
   <ResourceState state="error" message={reminderStore.error} />
 {:else if reminders.length > 0}
