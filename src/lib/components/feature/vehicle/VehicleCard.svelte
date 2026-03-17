@@ -1,25 +1,18 @@
 <script lang="ts">
   import { withBase } from '$lib/utils';
-  import LicensePlate from '$appui/LicensePlate.svelte';
-  import Gauge from '@lucide/svelte/icons/gauge';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
-  import IdCard from '@lucide/svelte/icons/id-card';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import Info from '@lucide/svelte/icons/info';
-  import { formatDistance } from '$lib/helper/format.helper';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { browser } from '$app/environment';
-  import { getFuelTypeLabel } from '$lib/domain/vehicle';
   import IconButton from '$appui/IconButton.svelte';
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import * as Card from '$ui/card';
-  import Badge from '$ui/badge/badge.svelte';
-  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import VehicleDetailsModal from '$lib/components/feature/vehicle/VehicleDetailsModal.svelte';
   import { deleteVehicle } from '$lib/services/vehicle.service';
   import { toast } from 'svelte-sonner';
@@ -32,6 +25,8 @@
   import VehicleForm from './VehicleForm.svelte';
   import ReminderForm from '../reminder/ReminderForm.svelte';
   import { Features } from '$lib/helper/feature.helper';
+  import VehicleCardDetails from './VehicleCardDetails.svelte';
+  import VehicleCardHeader from './VehicleCardHeader.svelte';
   import VehicleQuickActions from './VehicleQuickActions.svelte';
 
   const { vehicle, onclick, onkeydown, isSelected = false } = $props();
@@ -128,54 +123,10 @@
     class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
   >
     <Card.Header class="relative h-38 overflow-hidden p-0 ">
-      <div class="w-full">
-        {#if imageUrl}
-          <img src={imageUrl} alt="car" class="rounded-t-xl object-center opacity-30" />
-        {/if}
-      </div>
-      <div class="absolute inset-0 flex flex-col justify-between border-b p-4">
-        <div class="flex flex-col">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-primary text-2xl font-bold">{vehicle.make} {vehicle.model}</span>
-            </div>
-            <p class="flex items-center gap-2">
-              {#if vehicle.color}
-                <Badge class="m-1 h-5 w-8" style={`background-color: ${vehicle.color}`} />
-              {/if}
-            </p>
-          </div>
-          <div class="mt-2 flex flex-row justify-between text-sm font-medium">
-            <LabelWithIcon
-              icon={IdCard}
-              iconClass="h-5 w-5"
-              style="mono text-zinc-600 dark:text-zinc-400 flex items-center gap-2"
-              label={vehicle.vin ? vehicle.vin : '-'}
-            />
-            <LabelWithIcon
-              icon={Gauge}
-              iconClass="h-5 w-5"
-              style="mono text-foreground flex items-center gap-2"
-              label={vehicle.odometer ? formatDistance(vehicle.odometer) : '-'}
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-row justify-end"></div>
-      </div>
+      <VehicleCardHeader {vehicle} {imageUrl} />
     </Card.Header>
     <Card.Content class="px-4">
-      <div class="flex items-center justify-between">
-        <LicensePlate registrationNumber={vehicle.licensePlate} />
-        <div class="flex gap-2">
-          <Badge variant="secondary" class="text-xs"
-            >{vehicle.fuelType
-              ? getFuelTypeLabel(vehicle.fuelType, m)
-              : getFuelTypeLabel('petrol', m)}</Badge
-          >
-          <Badge variant="outline" class="text-sm">{vehicle.year}</Badge>
-        </div>
-      </div>
+      <VehicleCardDetails {vehicle} messages={m} />
     </Card.Content>
     <Card.Footer id="vehicle-card-actions" class="px-3">
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
