@@ -3,18 +3,12 @@
   import { sheetStore } from '$stores/sheet.svelte';
   import XIcon from '@lucide/svelte/icons/x';
   import { Button, buttonVariants } from '$ui/button';
-  import * as Form from '$ui/form/index.js';
-  import FormLabel from '$appui/FormLabel.svelte';
   import * as Tabs from '$ui/tabs';
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { themes } from '$lib/config/themes';
-  import Calendar from '@lucide/svelte/icons/calendar';
   import Currency from '@lucide/svelte/icons/currency';
-  import Earth from '@lucide/svelte/icons/earth';
   import Fuel from '@lucide/svelte/icons/fuel';
-  import Languages from '@lucide/svelte/icons/languages';
-  import Palette from '@lucide/svelte/icons/palette';
   import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
   import Rabbit from '@lucide/svelte/icons/rabbit';
   import SubmitButton from '$appui/SubmitButton.svelte';
@@ -22,9 +16,7 @@
   import { superForm, defaults } from 'sveltekit-superforms';
   import { zod4 } from 'sveltekit-superforms/adapters';
   import { z } from 'zod/v4';
-  import Input from '$appui/input.svelte';
   import { data as currencies } from 'currency-codes';
-  import SearchableSelect from '$appui/SearchableSelect.svelte';
   import {
     getCurrencySymbol,
     getTimezoneOptions,
@@ -35,10 +27,10 @@
   import * as m from '$lib/paraglide/messages';
   import { saveConfig } from '$lib/services/config.service';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { Textarea } from '$lib/components/ui/textarea';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
   import SettingsFeaturesTab from './SettingsFeaturesTab.svelte';
+  import SettingsPersonalizationTab from './SettingsPersonalizationTab.svelte';
   import SettingsSelectField from './SettingsSelectField.svelte';
 
   let localConfig: Config[] = $state([]);
@@ -273,103 +265,17 @@
           >
             <div class="flex-1 space-y-4">
               <Tabs.Content value="personalization" class="space-y-6">
-                <fieldset class="flex flex-col gap-4" disabled={processing}>
-                  <SettingsSelectField
-                    {form}
-                    name="theme"
-                    label={m.settings_label_theme()}
-                    description={m.settings_desc_theme()}
-                    icon={Palette}
-                    options={themeOptions}
-                    placeholder={m.settings_select_theme()}
-                    bind:value={$formData.theme}
-                    disabled={processing}
-                  />
-                  <SettingsSelectField
-                    {form}
-                    name="locale"
-                    label={m.settings_label_locale()}
-                    description={m.settings_desc_locale()}
-                    icon={Languages}
-                    options={localeOptions}
-                    placeholder={m.settings_select_language()}
-                    bind:value={$formData.locale}
-                    disabled={processing}
-                  />
-                  <!-- Timezone -->
-                  <Form.Field {form} name="timezone" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_timezone()}
-                          >{m.settings_label_timezone()}</FormLabel
-                        >
-                        <SearchableSelect
-                          bind:value={$formData.timezone}
-                          options={getTimezoneOptions()}
-                          icon={Earth}
-                          {...props}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                  <!-- Currency -->
-                  <Form.Field {form} name="currency" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_currency()}
-                          >{m.settings_label_currency()}</FormLabel
-                        >
-                        <SearchableSelect
-                          bind:value={$formData.currency}
-                          icon={Currency}
-                          options={currencyOptions}
-                          {...props}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                  <!-- Date Format -->
-                  <Form.Field {form} name="dateFormat" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_date_format()}
-                          >{m.settings_label_date_format()}</FormLabel
-                        >
-                        <Input
-                          {...props}
-                          bind:value={$formData.dateFormat}
-                          icon={Calendar}
-                          type="text"
-                          class="mono"
-                        />
-                        <Form.Description>
-                          {m.common_example_prefix()}
-                          {isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
-                        </Form.Description>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                  <!-- Custom CSS -->
-                  <Form.Field {form} name="customCss" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_custom_css()}
-                          >{m.settings_label_custom_css()}</FormLabel
-                        >
-                        <Textarea
-                          {...props}
-                          placeholder="Add your custom CSS here..."
-                          class="mono h-40 resize-none"
-                          bind:value={$formData.customCss}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                </fieldset>
+                <SettingsPersonalizationTab
+                  {form}
+                  formData={$formData}
+                  {processing}
+                  {themeOptions}
+                  {localeOptions}
+                  {currencyOptions}
+                  {getTimezoneOptions}
+                  {isValidFormat}
+                  messages={m}
+                />
               </Tabs.Content>
 
               <Tabs.Content value="units" class="space-y-6">
