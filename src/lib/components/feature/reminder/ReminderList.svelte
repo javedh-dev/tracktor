@@ -1,7 +1,8 @@
 <script lang="ts">
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import Badge from '$ui/badge/badge.svelte';
+  import FeatureRecordCard from '$appui/FeatureRecordCard.svelte';
+  import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import ResourceState from '$appui/ResourceState.svelte';
   import { reminderStore } from '$stores/reminder.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
@@ -62,79 +63,80 @@
   <ResourceState state="error" message={reminderStore.error} />
 {:else if reminders.length > 0}
   {#each reminders as reminder (reminderKey(reminder))}
-    <div
+    <FeatureRecordCard
       id="reminder-item-{reminderKey(reminder)}"
-      class="reminder-item bg-background/50 mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+      class="reminder-item bg-background/50"
+      title={getReminderTypeLabel(reminder.type, m)}
+      titleIcon={BellRing}
+      titleClass="text-indigo-500 dark:text-indigo-400"
     >
-      <div class="flex items-center justify-between">
-        <div class="flex flex-wrap items-center gap-4 align-middle">
-          <div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400">
-            <BellRing class="h-6 w-6" />
-            <span class="line-clamp-1 text-lg font-bold lg:text-xl">
-              {getReminderTypeLabel(reminder.type, m)}
-            </span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
-              {reminder.isCompleted ? m.reminder_status_completed() : m.reminder_status_pending()}
-            </Badge>
-            {#if isOverdue(reminder)}
-              <Badge variant="destructive">{m.reminder_status_overdue()}</Badge>
-            {/if}
-          </div>
+      {#snippet headerExtras()}
+        <div class="flex flex-wrap items-center gap-2">
+          <Badge variant={reminder.isCompleted ? 'secondary' : 'outline'}>
+            {reminder.isCompleted ? m.reminder_status_completed() : m.reminder_status_pending()}
+          </Badge>
+          {#if isOverdue(reminder)}
+            <Badge variant="destructive">{m.reminder_status_overdue()}</Badge>
+          {/if}
         </div>
+      {/snippet}
+
+      {#snippet actions()}
         <ReminderContextMenu
           {reminder}
           onaction={() => {
             reminderStore.refreshReminders();
           }}
         />
-      </div>
+      {/snippet}
 
-      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-          <Calendar class="h-5 w-5" />
-          <span class="font-semibold">{m.reminder_col_due_date()}:</span>
-          <span>{formatDate(reminder.dueDate)}</span>
-        </div>
-        <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-          <AlarmClock class="h-5 w-5" />
-          <span class="font-semibold">{m.reminder_col_reminder_schedule()}:</span>
-          <span>{getReminderScheduleLabel(reminder.remindSchedule, m)}</span>
-        </div>
-        {#if reminder.recurrenceType && reminder.recurrenceType !== 'none'}
-          <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-            <Repeat class="h-5 w-5" />
-            <span class="font-semibold">{m.reminder_col_recurrence()}:</span>
-            <span>
-              {getRecurrenceTypeLabel(reminder.recurrenceType, m)}
-              {#if reminder.recurrenceInterval > 1}
-                ({m.recurrence_every()}
-                {reminder.recurrenceInterval}
-                {reminder.recurrenceType === 'yearly'
-                  ? m.recurrence_interval_years()
-                  : reminder.recurrenceType === 'monthly'
-                    ? m.recurrence_interval_months()
-                    : reminder.recurrenceType === 'weekly'
-                      ? m.recurrence_interval_weeks()
-                      : m.recurrence_interval_days()})
-              {/if}
-              {#if reminder.recurrenceEndDate}
-                - {m.recurrence_until()}
-                {formatDate(reminder.recurrenceEndDate)}
-              {/if}
-            </span>
-          </div>
-        {/if}
-        {#if reminder.note}
-          <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-            <FileText class="h-5 w-5" />
-            <span class="font-semibold">{m.reminder_col_note()}:</span>
-            <span>{reminder.note}</span>
-          </div>
-        {/if}
-      </div>
-    </div>
+      <RecordDetailItem
+        label={m.reminder_col_due_date()}
+        value={formatDate(reminder.dueDate)}
+        icon={Calendar}
+        class="text-gray-900 dark:text-gray-100"
+      />
+      <RecordDetailItem
+        label={m.reminder_col_reminder_schedule()}
+        value={getReminderScheduleLabel(reminder.remindSchedule, m)}
+        icon={AlarmClock}
+        class="text-gray-900 dark:text-gray-100"
+      />
+      {#if reminder.recurrenceType && reminder.recurrenceType !== 'none'}
+        <RecordDetailItem
+          label={m.reminder_col_recurrence()}
+          icon={Repeat}
+          class="text-gray-900 dark:text-gray-100"
+        >
+          <span>
+            {getRecurrenceTypeLabel(reminder.recurrenceType, m)}
+            {#if reminder.recurrenceInterval > 1}
+              ({m.recurrence_every()}
+              {reminder.recurrenceInterval}
+              {reminder.recurrenceType === 'yearly'
+                ? m.recurrence_interval_years()
+                : reminder.recurrenceType === 'monthly'
+                  ? m.recurrence_interval_months()
+                  : reminder.recurrenceType === 'weekly'
+                    ? m.recurrence_interval_weeks()
+                    : m.recurrence_interval_days()})
+            {/if}
+            {#if reminder.recurrenceEndDate}
+              - {m.recurrence_until()}
+              {formatDate(reminder.recurrenceEndDate)}
+            {/if}
+          </span>
+        </RecordDetailItem>
+      {/if}
+      {#if reminder.note}
+        <RecordDetailItem
+          label={m.reminder_col_note()}
+          value={reminder.note}
+          icon={FileText}
+          class="text-gray-900 dark:text-gray-100"
+        />
+      {/if}
+    </FeatureRecordCard>
   {/each}
 {:else}
   <ResourceState state="empty" message={m.reminder_list_empty()} />

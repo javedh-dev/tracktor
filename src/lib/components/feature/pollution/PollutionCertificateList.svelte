@@ -6,13 +6,14 @@
   import Paperclip from '@lucide/svelte/icons/paperclip';
   import Repeat from '@lucide/svelte/icons/repeat';
   import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
+  import FeatureRecordCard from '$appui/FeatureRecordCard.svelte';
+  import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import { formatDate } from '$lib/helper/format.helper';
   import { getNextDueDate } from '$lib/helper/recurrence.helper';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import PuccContextMenu from './PuccContextMenu.svelte';
   import { puccStore } from '$stores/pucc.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import LabelWithIcon from '$lib/components/app/LabelWithIcon.svelte';
   import ResourceState from '$appui/ResourceState.svelte';
   import { getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
   import type { PollutionCertificate } from '$lib/domain/pucc';
@@ -54,90 +55,96 @@
   <ResourceState state="empty" message={m.pollution_list_empty()} />
 {:else}
   {#each puccStore.pollutionCerts as pucc (pucc.id)}
-    <div
+    {@const nextDue = getNextPuccDue(pucc)}
+    <FeatureRecordCard
       id="pollution-certificate-item-{pucc.id}"
-      class="pollution-certificate-item lg:bg-background/50 bg-secondary mt-4 rounded-lg border p-4 shadow-sm lg:p-6"
+      class="pollution-certificate-item bg-secondary lg:bg-background/50"
+      title={pucc.certificateNumber}
+      titleIcon={BadgeCheck}
+      titleClass="text-fuchsia-500 dark:text-fuchsia-400"
     >
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 text-fuchsia-500 dark:text-fuchsia-400">
-          <BadgeCheck class="h-6 w-6 " />
-          <span class="line-clamp-1 text-lg font-bold lg:text-xl">{pucc.certificateNumber}</span>
-        </div>
+      {#snippet actions()}
         <PuccContextMenu
           {pucc}
           onaction={() => {
             puccStore.refreshPuccs();
           }}
         />
-      </div>
-      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-          <Calendar class="h-5 w-5" />
-          <span class="font-semibold">{m.pollution_col_issue_date()}:</span>
-          <span>{formatDate(pucc.issueDate)}</span>
-        </div>
-        {#if pucc.expiryDate}
-          <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-            <Calendar class="h-5 w-5" />
-            <span class="font-semibold">{m.pollution_col_expiry_date()}:</span>
-            <span>{formatDate(pucc.expiryDate)}</span>
-          </div>
-        {/if}
-        {#if true}
-          {@const nextDue = getNextPuccDue(pucc)}
-          <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-            <Calendar class="h-5 w-5" />
-            <span class="font-semibold">{m.pollution_col_next_due()}:</span>
-            <span>
-              {#if nextDue}
-                {formatDate(nextDue)}
-              {:else if pucc.recurrenceType === 'no_end'}
-                {m.col_no_end_date()}
-              {:else}
-                —
-              {/if}
-            </span>
-          </div>
-        {/if}
-        {#if pucc.recurrenceType && pucc.recurrenceType !== 'none'}
-          <div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
-            <Repeat class="h-5 w-5" />
-            <span class="font-semibold">{m.pollution_col_recurrence()}:</span>
-            <span>
-              {getPuccRecurrenceTypeLabel(pucc.recurrenceType, m)}
-              {#if (pucc.recurrenceType === 'yearly' || pucc.recurrenceType === 'monthly') && pucc.recurrenceInterval > 1}
-                ({m.recurrence_every()}
-                {pucc.recurrenceInterval}
-                {pucc.recurrenceType === 'yearly'
-                  ? m.recurrence_interval_years()
-                  : m.recurrence_interval_months()})
-              {/if}
-            </span>
-          </div>
-        {/if}
-        <div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-          <MapPin class="h-5 w-5" />
-          <span class="font-semibold">{m.pollution_col_testing_center()}:</span>
-          <span>{pucc.testingCenter}</span>
-        </div>
-        {#if pucc.notes}
-          <div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
-            <FileText class="h-5 w-5" />
-            <span class="font-semibold">{m.pollution_col_notes()}:</span>
-            <span>{pucc.notes}</span>
-          </div>
-        {/if}
-        {#if pucc.attachment}
-          {@const fileName = pucc.attachment}
-          <div class="flex items-center gap-2 text-gray-900 md:col-span-2 dark:text-gray-100">
-            <Paperclip class="h-5 w-5" />
-            <span class="font-semibold">{m.col_attachment()}:</span>
-            <AttachmentLink {fileName}>
-              <span class="text-sm">{m.pollution_col_view_certificate()}</span>
-            </AttachmentLink>
-          </div>
-        {/if}
-      </div>
-    </div>
+      {/snippet}
+
+      <RecordDetailItem
+        label={m.pollution_col_issue_date()}
+        value={formatDate(pucc.issueDate)}
+        icon={Calendar}
+        class="text-gray-900 dark:text-gray-100"
+      />
+      {#if pucc.expiryDate}
+        <RecordDetailItem
+          label={m.pollution_col_expiry_date()}
+          value={formatDate(pucc.expiryDate)}
+          icon={Calendar}
+          class="text-gray-900 dark:text-gray-100"
+        />
+      {/if}
+      <RecordDetailItem
+        label={m.pollution_col_next_due()}
+        icon={Calendar}
+        class="text-gray-900 dark:text-gray-100"
+      >
+        <span>
+          {#if nextDue}
+            {formatDate(nextDue)}
+          {:else if pucc.recurrenceType === 'no_end'}
+            {m.col_no_end_date()}
+          {:else}
+            —
+          {/if}
+        </span>
+      </RecordDetailItem>
+      {#if pucc.recurrenceType && pucc.recurrenceType !== 'none'}
+        <RecordDetailItem
+          label={m.pollution_col_recurrence()}
+          icon={Repeat}
+          class="text-gray-900 md:col-span-2 dark:text-gray-100"
+        >
+          <span>
+            {getPuccRecurrenceTypeLabel(pucc.recurrenceType, m)}
+            {#if (pucc.recurrenceType === 'yearly' || pucc.recurrenceType === 'monthly') && pucc.recurrenceInterval > 1}
+              ({m.recurrence_every()}
+              {pucc.recurrenceInterval}
+              {pucc.recurrenceType === 'yearly'
+                ? m.recurrence_interval_years()
+                : m.recurrence_interval_months()})
+            {/if}
+          </span>
+        </RecordDetailItem>
+      {/if}
+      <RecordDetailItem
+        label={m.pollution_col_testing_center()}
+        value={pucc.testingCenter}
+        icon={MapPin}
+        class="text-gray-900 dark:text-gray-100"
+      />
+      {#if pucc.notes}
+        <RecordDetailItem
+          label={m.pollution_col_notes()}
+          value={pucc.notes}
+          icon={FileText}
+          class="text-gray-900 md:col-span-2 dark:text-gray-100"
+        />
+      {/if}
+      {#if pucc.attachment}
+        {@const fileName = pucc.attachment}
+        <RecordDetailItem
+          label={m.col_attachment()}
+          icon={Paperclip}
+          class="text-gray-900 md:col-span-2 dark:text-gray-100"
+        >
+          <AttachmentLink {fileName}>
+            <span class="text-sm">{m.pollution_col_view_certificate()}</span>
+          </AttachmentLink>
+        </RecordDetailItem>
+      {/if}
+    </FeatureRecordCard>
   {/each}
 {/if}
