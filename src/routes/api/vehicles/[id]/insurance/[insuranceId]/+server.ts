@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as insuranceService from '$server/services/insuranceService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Insurance GET error:', async () => {
     const { insuranceId } = event.params;
 
     if (!insuranceId) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await insuranceService.getInsuranceById(insuranceId);
     return json(result);
-  } catch (err) {
-    console.error('Insurance GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Insurance PUT error:', async () => {
     const { id, insuranceId } = event.params;
 
     if (!id || !insuranceId) {
@@ -66,23 +54,11 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await insuranceService.updateInsurance(id, insuranceId, body);
     return json(result);
-  } catch (err) {
-    console.error('Insurance PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Insurance DELETE error:', async () => {
     const { insuranceId } = event.params;
 
     if (!insuranceId) {
@@ -91,17 +67,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await insuranceService.deleteInsurance(insuranceId);
     return json(result);
-  } catch (err) {
-    console.error('Insurance DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
