@@ -1,46 +1,27 @@
 <script lang="ts">
-  import * as Form from '$ui/form/index.js';
-  import FormLabel from '$appui/FormLabel.svelte';
-  import SettingsSelectField from '$feature/settings/SettingsSelectField.svelte';
-  import SettingsFeatureToggle from '$feature/settings/SettingsFeatureToggle.svelte';
   import SettingsSection from '$lib/components/feature/settings/SettingsSection.svelte';
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { themes } from '$lib/config/themes';
-  import Calendar from '@lucide/svelte/icons/calendar';
-  import Currency from '@lucide/svelte/icons/currency';
-  import Earth from '@lucide/svelte/icons/earth';
-  import Fuel from '@lucide/svelte/icons/fuel';
-  import Languages from '@lucide/svelte/icons/languages';
-  import Palette from '@lucide/svelte/icons/palette';
   import LeftArrow from '@lucide/svelte/icons/move-left';
-  import RulerDimensionLine from '@lucide/svelte/icons/ruler-dimension-line';
-  import Rabbit from '@lucide/svelte/icons/rabbit';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import { toast } from 'svelte-sonner';
   import { superForm, defaults } from 'sveltekit-superforms';
   import { zod4 } from 'sveltekit-superforms/adapters';
-  import { z } from 'zod/v4';
-  import Input from '$appui/input.svelte';
-  import { data as currencies } from 'currency-codes';
-  import SearchableSelect from '$appui/SearchableSelect.svelte';
-  import {
-    getCurrencySymbol,
-    getTimezoneOptions,
-    isValidFormat,
-    isValidTimezone
-  } from '$lib/helper/format.helper';
+  import { getTimezoneOptions, isValidFormat, isValidTimezone } from '$lib/helper/format.helper';
   import * as m from '$lib/paraglide/messages';
   import { saveConfig } from '$lib/services/config.service';
   import { rawConfigToFormData, formDataToConfigs } from '$helper/config.helper';
+  import { createSettingsConfigSchema, createSettingsOptions } from '$helper/settings-form.helper';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { Textarea } from '$lib/components/ui/textarea';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
   import Gauge from '@lucide/svelte/icons/gauge';
   import ToggleLeft from '@lucide/svelte/icons/toggle-left';
   import Bell from '@lucide/svelte/icons/bell';
   import NotificationProvidersSettings from '$feature/settings/NotificationProvidersSettings.svelte';
+  import SettingsFeaturesTab from '$feature/settings/SettingsFeaturesTab.svelte';
+  import SettingsPersonalizationTab from '$feature/settings/SettingsPersonalizationTab.svelte';
+  import SettingsUnitsTab from '$feature/settings/SettingsUnitsTab.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { goto } from '$app/navigation';
   import SettingFormSection from '$lib/components/feature/settings/SettingFormSection.svelte';
@@ -48,32 +29,8 @@
   let processing = $state(false);
   let activeSection = $state('personalization');
 
-  const configSchema = z.object({
-    dateFormat: z.string().refine((fmt) => {
-      return isValidFormat(fmt).valid;
-    }, 'Format not valid'),
-    locale: z.string().min(2),
-    timezone: z.string().min(3).refine(isValidTimezone, 'Invalid timzone value.'),
-    currency: z.string().min(1, 'Currency is required'),
-    unitOfDistance: z.enum(['kilometer', 'mile']),
-    unitOfVolume: z.enum(['liter', 'gallon']),
-    unitOfLpg: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('liter'),
-    unitOfCng: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('kilogram'),
-    mileageUnitFormat: z
-      .enum(['distance-per-fuel', 'fuel-per-distance'])
-      .default('distance-per-fuel'),
-    theme: z.string().default('light'),
-    customCss: z.string().optional(),
-    featureFuelLog: z.boolean().default(true),
-    featureMaintenance: z.boolean().default(true),
-    featurePucc: z.boolean().default(true),
-    featureReminders: z.boolean().default(true),
-    featureInsurance: z.boolean().default(true),
-    featureOverview: z.boolean().default(true),
-    notificationProcessingSchedule: z
-      .string()
-      .refine((expr) => expr.trim().split(/\s+/).length === 5, 'Invalid cron expression')
-      .default('0 9 * * *')
+  const configSchema = createSettingsConfigSchema(isValidFormat, isValidTimezone, {
+    includeNotificationProcessingSchedule: true
   });
 
   const form = superForm(defaults(zod4(configSchema)), {
@@ -121,7 +78,38 @@
   });
   const { form: formData, enhance, errors } = form;
 
-  // Sidebar navigation items
+  const notificationProcessingSchedule = $derived.by(() => {
+    const value = ($formData as Record<string, unknown>).notificationProcessingSchedule;
+    return typeof value === 'string' ? value : '0 9 * * *';
+  });
+
+  const updateNotificationProcessingSchedule = (value: string) => {
+    formData.update((current) => ({
+      ...current,
+      notificationProcessingSchedule: value
+    }));
+  };
+
+  const hasErrors = $derived.by(() =>
+    Object.values($errors).some((errorArray) => Array.isArray(errorArray) && errorArray.length > 0)
+  );
+
+  const errorEntries = $derived.by(() =>
+    Object.entries($errors).filter(
+      (entry): entry is [string, string[]] => Array.isArray(entry[1]) && entry[1].length > 0
+    )
+  );
+
+  const {
+    themeOptions,
+    currencyOptions,
+    uodOptions,
+    uovOptions,
+    gasUnitOptions,
+    mileageUnitFormatOptions,
+    localeOptions
+  } = createSettingsOptions(m, locales);
+
   const sidebarItems = [
     {
       id: 'personalization',
@@ -144,57 +132,6 @@
       icon: Bell
     }
   ];
-
-  const currencyOptions = currencies.map((currency) => {
-    return {
-      value: currency.code,
-      label: `${getCurrencySymbol(currency.code)} - ${currency.currency} `
-    };
-  });
-
-  const uodOptions = [
-    { value: 'kilometer', label: m.common_kilometer() },
-    { value: 'mile', label: m.common_mile() }
-  ];
-
-  const uovOptions = [
-    { value: 'liter', label: m.common_litre() },
-    { value: 'gallon', label: m.common_gallon() }
-  ];
-
-  const gasUnitOptions = [
-    { value: 'liter', label: m.common_litre() },
-    { value: 'gallon', label: m.common_gallon() },
-    { value: 'kilogram', label: 'Kilogram (kg)' },
-    { value: 'pound', label: 'Pound (lb)' }
-  ];
-
-  const mileageUnitFormatOptions = [
-    {
-      value: 'distance-per-fuel',
-      label: m.settings_mileage_format_distance_per_fuel()
-    },
-    {
-      value: 'fuel-per-distance',
-      label: m.settings_mileage_format_fuel_per_distance()
-    }
-  ];
-
-  const localeLabels: Record<string, string> = {
-    en: 'English',
-    ar: 'العربية',
-    hi: 'हिंदी',
-    es: 'Español',
-    fr: 'Français',
-    de: 'Deutsch',
-    it: 'Italiano',
-    hu: 'Magyar',
-    fi: 'Suomi'
-  };
-  const localeOptions = locales.map((code) => ({
-    value: code,
-    label: localeLabels[code] || code.toUpperCase()
-  }));
 
   // Load configs on mount
   $effect(() => {
@@ -271,135 +208,21 @@
             description="Customize your experience with themes, languages, and formats."
           >
             <fieldset class="space-y-6" disabled={processing}>
-              <!-- Appearance Settings -->
               <SettingFormSection
-                title="Appearance"
-                subtitle="Customize the look and feel of your application"
+                title="General"
+                subtitle="Customize appearance, localization, and display formats"
               >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Theme -->
-                  <SettingsSelectField
-                    {form}
-                    name="theme"
-                    label={m.settings_label_theme()}
-                    description={m.settings_desc_theme()}
-                    icon={Palette}
-                    bind:value={$formData.theme}
-                    options={Object.values(themes).map((theme) => ({
-                      value: theme.name,
-                      label: theme.label,
-                      colorPreview: theme.colors?.primary || '#000'
-                    }))}
-                    placeholder={m.settings_select_theme()}
-                    disabled={processing}
-                  />
-
-                  <!-- Custom CSS -->
-                  <Form.Field {form} name="customCss" class="w-full md:col-span-2">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_custom_css()}
-                          >{m.settings_label_custom_css()}</FormLabel
-                        >
-                        <Textarea
-                          {...props}
-                          placeholder="Add your custom CSS here..."
-                          class="mono h-36 resize-none"
-                          bind:value={$formData.customCss}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                </div>
-              </SettingFormSection>
-
-              <!-- Localization Settings -->
-              <SettingFormSection
-                title="Localization"
-                subtitle="Set your preferred language and timezone"
-              >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Locale -->
-                  <SettingsSelectField
-                    {form}
-                    name="locale"
-                    label={m.settings_label_locale()}
-                    description={m.settings_desc_locale()}
-                    icon={Languages}
-                    bind:value={$formData.locale}
-                    options={localeOptions}
-                    placeholder={m.settings_select_language()}
-                    disabled={processing}
-                  />
-
-                  <!-- Timezone -->
-                  <Form.Field {form} name="timezone" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_timezone()}
-                          >{m.settings_label_timezone()}</FormLabel
-                        >
-                        <SearchableSelect
-                          bind:value={$formData.timezone}
-                          options={getTimezoneOptions()}
-                          icon={Earth}
-                          {...props}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                </div>
-              </SettingFormSection>
-
-              <!-- Format Settings -->
-              <SettingFormSection
-                title="Formats"
-                subtitle="Set your preferred currency and date format"
-              >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Currency -->
-                  <Form.Field {form} name="currency" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_currency()}
-                          >{m.settings_label_currency()}</FormLabel
-                        >
-                        <SearchableSelect
-                          bind:value={$formData.currency}
-                          icon={Currency}
-                          options={currencyOptions}
-                          {...props}
-                        />
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-
-                  <!-- Date Format -->
-                  <Form.Field {form} name="dateFormat" class="w-full">
-                    <Form.Control>
-                      {#snippet children({ props })}
-                        <FormLabel description={m.settings_desc_date_format()}
-                          >{m.settings_label_date_format()}</FormLabel
-                        >
-                        <Input
-                          {...props}
-                          bind:value={$formData.dateFormat}
-                          icon={Calendar}
-                          type="text"
-                          class="mono"
-                        />
-                        <Form.Description>
-                          {m.common_example_prefix()}
-                          {isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
-                        </Form.Description>
-                      {/snippet}
-                    </Form.Control>
-                    <Form.FieldErrors />
-                  </Form.Field>
-                </div>
+                <SettingsPersonalizationTab
+                  {form}
+                  formData={$formData}
+                  {processing}
+                  {themeOptions}
+                  {localeOptions}
+                  {currencyOptions}
+                  {getTimezoneOptions}
+                  {isValidFormat}
+                  messages={m}
+                />
               </SettingFormSection>
             </fieldset>
           </SettingsSection>
@@ -412,85 +235,20 @@
             description="Configure measurement units for distance, volume, and fuel types."
           >
             <fieldset class="space-y-6" disabled={processing}>
-              <!-- Distance and Mileage Settings -->
               <SettingFormSection
-                title="Distance & Mileage"
-                subtitle="Choose your preferred units for distance and mileage calculations"
+                title="Units"
+                subtitle="Choose preferred units for distance, mileage, and fuel types"
               >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Unit of Distance -->
-                  <SettingsSelectField
-                    {form}
-                    name="unitOfDistance"
-                    label={m.settings_label_unit_distance()}
-                    description={m.settings_desc_unit_distance()}
-                    icon={RulerDimensionLine}
-                    bind:value={$formData.unitOfDistance}
-                    options={uodOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    disabled={processing}
-                  />
-
-                  <!-- Mileage Unit Format -->
-                  <SettingsSelectField
-                    {form}
-                    name="mileageUnitFormat"
-                    label={m.settings_label_mileage_format()}
-                    description={m.settings_desc_mileage_format()}
-                    icon={Rabbit}
-                    bind:value={$formData.mileageUnitFormat}
-                    options={mileageUnitFormatOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    disabled={processing}
-                  />
-                </div>
-              </SettingFormSection>
-
-              <!-- Fuel Volume Settings -->
-              <SettingFormSection
-                title="Fuel Units"
-                subtitle="SSelect units for different fuel types (petrol, diesel, LPG, CNG)"
-              >
-                <div class="grid gap-4 md:grid-cols-3">
-                  <!-- Petrol/Diesel -->
-                  <SettingsSelectField
-                    {form}
-                    name="unitOfVolume"
-                    label="Petrol/Diesel"
-                    description={m.settings_desc_unit_volume()}
-                    icon={Fuel}
-                    bind:value={$formData.unitOfVolume}
-                    options={uovOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    disabled={processing}
-                  />
-
-                  <!-- LPG -->
-                  <SettingsSelectField
-                    {form}
-                    name="unitOfLpg"
-                    label="LPG"
-                    description={m.settings_desc_unit_volume()}
-                    icon={Fuel}
-                    bind:value={$formData.unitOfLpg}
-                    options={gasUnitOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    disabled={processing}
-                  />
-
-                  <!-- CNG -->
-                  <SettingsSelectField
-                    {form}
-                    name="unitOfCng"
-                    label="CNG"
-                    description={m.settings_desc_unit_volume()}
-                    icon={Fuel}
-                    bind:value={$formData.unitOfCng}
-                    options={gasUnitOptions}
-                    placeholder={m.settings_select_unit_system()}
-                    disabled={processing}
-                  />
-                </div>
+                <SettingsUnitsTab
+                  {form}
+                  formData={$formData}
+                  {processing}
+                  {uodOptions}
+                  {uovOptions}
+                  {gasUnitOptions}
+                  {mileageUnitFormatOptions}
+                  messages={m}
+                />
               </SettingFormSection>
             </fieldset>
           </SettingsSection>
@@ -503,88 +261,11 @@
             description={m.settings_features_intro()}
           >
             <fieldset class="space-y-6" disabled={processing}>
-              <!-- Data Tracking Features -->
               <SettingFormSection
-                title="Data Tracking"
-                subtitle="Enable or disable fuel and maintenance tracking features"
+                title="Feature Flags"
+                subtitle="Enable or disable major app modules"
               >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Fuel Log Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featureFuelLog"
-                    label={m.feature_label_fuel()}
-                    description={m.feature_desc_fuel()}
-                    checked={$formData.featureFuelLog ?? true}
-                    disabled={processing}
-                  />
-
-                  <!-- Maintenance Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featureMaintenance"
-                    label={m.feature_label_maintenance()}
-                    description={m.feature_desc_maintenance()}
-                    checked={$formData.featureMaintenance ?? true}
-                    disabled={processing}
-                  />
-                </div>
-              </SettingFormSection>
-
-              <!-- Document Management Features -->
-              <SettingFormSection
-                title="Document Management"
-                subtitle="Manage pollution certificates and insurance policies"
-              >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- PUCC Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featurePucc"
-                    label={m.feature_label_pollution()}
-                    description={m.feature_desc_pollution()}
-                    checked={$formData.featurePucc ?? true}
-                    disabled={processing}
-                  />
-
-                  <!-- Insurance Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featureInsurance"
-                    label={m.feature_label_insurance()}
-                    description={m.feature_desc_insurance()}
-                    checked={$formData.featureInsurance ?? true}
-                    disabled={processing}
-                  />
-                </div>
-              </SettingFormSection>
-
-              <!-- Additional Features -->
-              <SettingFormSection
-                title="Additional Features"
-                subtitle="Configure reminders and overview dashboard features"
-              >
-                <div class="grid gap-4 md:grid-cols-2">
-                  <!-- Reminders Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featureReminders"
-                    label={m.feature_label_reminders()}
-                    description={m.feature_desc_reminders()}
-                    checked={$formData.featureReminders ?? true}
-                    disabled={processing}
-                  />
-
-                  <!-- Overview Feature -->
-                  <SettingsFeatureToggle
-                    {form}
-                    name="featureOverview"
-                    label={m.feature_label_overview()}
-                    description={m.feature_desc_overview()}
-                    checked={$formData.featureOverview ?? true}
-                    disabled={processing}
-                  />
-                </div>
+                <SettingsFeaturesTab {form} formData={$formData} {processing} messages={m} />
               </SettingFormSection>
             </fieldset>
           </SettingsSection>
@@ -598,7 +279,8 @@
           >
             <fieldset class="space-y-6" disabled={processing}>
               <NotificationProvidersSettings
-                bind:processingSchedule={$formData.notificationProcessingSchedule}
+                processingSchedule={notificationProcessingSchedule}
+                onProcessingScheduleChange={updateNotificationProcessingSchedule}
                 disabled={processing}
               />
 
@@ -614,21 +296,19 @@
         <!-- Submit Button (always visible at bottom) -->
         <div class="mt-6 flex flex-col gap-4 pt-6">
           <!-- Error Summary -->
-          {#if Object.values($errors).some((err) => err && err.length > 0)}
+          {#if hasErrors}
             <div class="bg-destructive/10 border-destructive/50 rounded-lg border p-4">
               <h3 class="text-destructive mb-2 text-sm font-semibold">
                 Please fix the following errors:
               </h3>
               <ul class="text-destructive list-inside list-disc space-y-1 text-sm">
-                {#each Object.entries($errors) as [field, errorArray]}
-                  {#if errorArray && errorArray.length > 0}
-                    <li>
-                      <span class="font-medium capitalize"
-                        >{field.replace(/([A-Z])/g, ' $1').trim()}:</span
-                      >
-                      {errorArray.join(', ')}
-                    </li>
-                  {/if}
+                {#each errorEntries as [field, errorArray]}
+                  <li>
+                    <span class="font-medium capitalize"
+                      >{field.replace(/([A-Z])/g, ' $1').trim()}:</span
+                    >
+                    {errorArray.join(', ')}
+                  </li>
                 {/each}
               </ul>
             </div>

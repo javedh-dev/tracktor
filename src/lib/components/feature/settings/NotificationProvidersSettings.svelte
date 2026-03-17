@@ -41,10 +41,15 @@
 
   interface Props {
     processingSchedule: string;
+    onProcessingScheduleChange?: (value: string) => void;
     disabled?: boolean;
   }
 
-  let { processingSchedule = $bindable('0 9 * * *'), disabled = false }: Props = $props();
+  let {
+    processingSchedule = '0 9 * * *',
+    onProcessingScheduleChange,
+    disabled = false
+  }: Props = $props();
 
   const channelOptions: Array<{
     value: ProviderChannel;
@@ -274,7 +279,12 @@
 
     <div class="space-y-2">
       <Label for="notification-processing-schedule">Processing schedule</Label>
-      <CronInput bind:value={processingSchedule} {disabled} placeholder="0 9 * * *" />
+      <CronInput
+        value={processingSchedule}
+        onValueChange={(value) => onProcessingScheduleChange?.(value)}
+        {disabled}
+        placeholder="0 9 * * *"
+      />
     </div>
 
     {#if env.DEMO_MODE}

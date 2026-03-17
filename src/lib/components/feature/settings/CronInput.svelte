@@ -7,11 +7,17 @@
 
   interface Props {
     value: string;
+    onValueChange?: (value: string) => void;
     disabled?: boolean;
     placeholder?: string;
   }
 
-  let { value = $bindable(), disabled = false, placeholder = '* * * * *' }: Props = $props();
+  let {
+    value = $bindable(),
+    onValueChange,
+    disabled = false,
+    placeholder = '* * * * *'
+  }: Props = $props();
 
   // Common cron presets
   const presets = [
@@ -98,6 +104,10 @@
     if (selectedPreset) {
       value = selectedPreset;
     }
+  });
+
+  $effect(() => {
+    onValueChange?.(value);
   });
 </script>
 
