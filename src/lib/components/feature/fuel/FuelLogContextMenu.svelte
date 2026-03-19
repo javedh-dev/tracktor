@@ -1,61 +1,36 @@
 <script lang="ts">
-	import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
-	import Button from '$ui/button/button.svelte';
-	import * as DropdownMenu from '$ui/dropdown-menu';
-	import { deleteFuelLog } from '$lib/services/fuel.service';
-	import type { FuelLog } from '$lib/domain/fuel';
-	import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
-	import { toast } from 'svelte-sonner';
-	import { sheetStore } from '$stores/sheet.svelte';
-	import FuelLogForm from './FuelLogForm.svelte';
+  import CrudActionsMenu from '$appui/CrudActionsMenu.svelte';
+  import { deleteFuelLog } from '$lib/services/fuel.service';
+  import type { FuelLog } from '$lib/domain/fuel';
+  import { toast } from 'svelte-sonner';
+  import { sheetStore } from '$stores/sheet.svelte';
+  import FuelLogForm from './FuelLogForm.svelte';
+  import * as m from '$lib/paraglide/messages';
 
-	let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
-	let showDeleteDialog = $state(false);
+  let { fuelLog, onaction }: { fuelLog: FuelLog; onaction: () => void } = $props();
 
-	const deleteLog = () => {
-		deleteFuelLog(fuelLog).then((res) => {
-			if (res.status === 'OK') {
-				showDeleteDialog = false;
-				toast.success('Deleted Fuel Log');
-				onaction();
-			} else {
-				toast.error(res.error || 'Some error occurred while deleting vehicle.');
-			}
-		});
-	};
+  const deleteLog = (closeDialog: () => void) => {
+    deleteFuelLog(fuelLog).then((res) => {
+      if (res.status === 'OK') {
+        closeDialog();
+        toast.success(m.fuel_log_delete_success());
+        onaction();
+      } else {
+        toast.error(res.error || m.fuel_log_delete_error());
+      }
+    });
+  };
 </script>
 
-<div id="fuel-log-context-menu" class="fuel-context-menu flex flex-row justify-end">
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger
-			id="fuel-log-menu-trigger"
-			class="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-		>
-			{#snippet child({ props })}
-				<Button variant="ghost" size="icon" {...props}>
-					<EllipsisVertical />
-					<span class="sr-only">Open menu</span>
-				</Button>
-			{/snippet}
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content id="fuel-log-menu-content" align="end" class="w-32">
-			<DropdownMenu.Item
-				id="fuel-log-menu-edit"
-				onclick={() => {
-					sheetStore.openSheet(FuelLogForm, 'Update Fuel Log', '', fuelLog);
-				}}
-			>
-				Edit
-			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				id="fuel-log-menu-delete"
-				variant="destructive"
-				onclick={() => (showDeleteDialog = true)}
-			>
-				Delete
-			</DropdownMenu.Item>
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-</div>
-
-<DeleteConfirmation onConfirm={() => deleteLog()} bind:open={showDeleteDialog} />
+<CrudActionsMenu
+  menuId="fuel-log-context-menu"
+  triggerId="fuel-log-menu-trigger"
+  contentId="fuel-log-menu-content"
+  editItemId="fuel-log-menu-edit"
+  deleteItemId="fuel-log-menu-delete"
+  openLabel={m.fuel_log_menu_open()}
+  editLabel={m.fuel_log_edit()}
+  deleteLabel={m.fuel_log_delete()}
+  onEdit={() => sheetStore.openSheet(FuelLogForm, m.fuel_log_menu_sheet_title(), '', fuelLog)}
+  onDelete={deleteLog}
+/>

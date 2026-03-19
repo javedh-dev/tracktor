@@ -6,11 +6,11 @@ import type { PageLoad } from './$types';
  * Redirects to overview if disabled
  */
 export const load: PageLoad = async ({ parent }) => {
-	const { configs } = await parent();
+  const { configs } = await parent();
 
-	if (configs?.featurePucc === false) {
-		throw redirect(307, '/dashboard/overview');
-	}
+  if (configs?.featurePucc === false) {
+    throw redirect(307, '/dashboard/overview');
+  }
 
-	return {};
+  return {};
 };

@@ -47,32 +47,32 @@ The easiest way to conditionally show/hide components based on feature flags:
 
 ```svelte
 <script>
-	import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
+  import FeatureGate from '$lib/components/feature/FeatureGate.svelte';
 </script>
 
 <!-- Show component only if fuel log feature is enabled -->
 <FeatureGate feature="fuelLog">
-	<FuelLogComponent />
+  <FuelLogComponent />
 </FeatureGate>
 
 <!-- Require multiple features (all must be enabled) -->
 <FeatureGate requireAll={['fuelLog', 'maintenance']}>
-	<CombinedView />
+  <CombinedView />
 </FeatureGate>
 
 <!-- Require at least one feature to be enabled -->
 <FeatureGate requireAny={['insurance', 'pucc']}>
-	<DocumentsSection />
+  <DocumentsSection />
 </FeatureGate>
 
 <!-- With fallback content -->
 <FeatureGate feature="overview">
-	{#snippet children()}
-		<OverviewDashboard />
-	{/snippet}
-	{#snippet fallback()}
-		<p>Overview feature is currently disabled</p>
-	{/snippet}
+  {#snippet children()}
+    <OverviewDashboard />
+  {/snippet}
+  {#snippet fallback()}
+    <p>Overview feature is currently disabled</p>
+  {/snippet}
 </FeatureGate>
 ```
 
@@ -82,16 +82,16 @@ For more programmatic control:
 
 ```typescript
 import {
-	isFeatureEnabled,
-	Features,
-	getEnabledFeatures,
-	areAllFeaturesEnabled,
-	isAnyFeatureEnabled
+  isFeatureEnabled,
+  Features,
+  getEnabledFeatures,
+  areAllFeaturesEnabled,
+  isAnyFeatureEnabled
 } from '$lib/helper/feature.helper';
 
 // Check if a single feature is enabled
 if (isFeatureEnabled(Features.FUEL_LOG)) {
-	// Show fuel log functionality
+  // Show fuel log functionality
 }
 
 // Get all enabled features
@@ -100,12 +100,12 @@ console.log('Enabled features:', enabledFeatures);
 
 // Check if all features are enabled
 if (areAllFeaturesEnabled([Features.FUEL_LOG, Features.MAINTENANCE])) {
-	// Show combined view
+  // Show combined view
 }
 
 // Check if any feature is enabled
 if (isAnyFeatureEnabled([Features.INSURANCE, Features.PUCC])) {
-	// Show documents section
+  // Show documents section
 }
 ```
 
@@ -124,15 +124,15 @@ You can use feature flags to conditionally show/hide navigation items:
 
 ```svelte
 <script>
-	import { configStore } from '$stores/config.svelte';
+  import { configStore } from '$stores/config.svelte';
 </script>
 
 {#if configStore.configs.featureFuelLog}
-	<NavItem href="/fuel-log">Fuel Log</NavItem>
+  <NavItem href="/fuel-log">Fuel Log</NavItem>
 {/if}
 
 {#if configStore.configs.featureMaintenance}
-	<NavItem href="/maintenance">Maintenance</NavItem>
+  <NavItem href="/maintenance">Maintenance</NavItem>
 {/if}
 ```
 
@@ -159,8 +159,8 @@ To add a new feature toggle:
 
    ```typescript
    export interface Configs {
-   	// ... existing fields
-   	featureNewFeature?: boolean;
+     // ... existing fields
+     featureNewFeature?: boolean;
    }
    ```
 
@@ -172,8 +172,8 @@ To add a new feature toggle:
 
    ```typescript
    const configSchema = z.object({
-   	// ... existing fields
-   	featureNewFeature: z.boolean().optional()
+     // ... existing fields
+     featureNewFeature: z.boolean().optional()
    });
    ```
 
@@ -182,8 +182,8 @@ To add a new feature toggle:
 6. **Update the Features constant** in [src/lib/helper/feature.helper.ts](feature.helper.ts):
    ```typescript
    export const Features = {
-   	// ... existing features
-   	NEW_FEATURE: 'newFeature'
+     // ... existing features
+     NEW_FEATURE: 'newFeature'
    } as const;
    ```
 

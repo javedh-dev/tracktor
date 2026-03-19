@@ -10,31 +10,31 @@
  * @returns The next occurrence date
  */
 export function calculateNextOccurrence(
-	currentDate: Date,
-	recurrenceType: string,
-	interval: number = 1
+  currentDate: Date,
+  recurrenceType: string,
+  interval: number = 1
 ): Date {
-	const nextDate = new Date(currentDate);
+  const nextDate = new Date(currentDate);
 
-	switch (recurrenceType) {
-		case 'yearly':
-			nextDate.setFullYear(nextDate.getFullYear() + interval);
-			break;
-		case 'monthly':
-			nextDate.setMonth(nextDate.getMonth() + interval);
-			break;
-		case 'weekly':
-			nextDate.setDate(nextDate.getDate() + 7 * interval);
-			break;
-		case 'daily':
-			nextDate.setDate(nextDate.getDate() + interval);
-			break;
-		default:
-			// For 'none' or 'no_end', return the same date
-			return currentDate;
-	}
+  switch (recurrenceType) {
+    case 'yearly':
+      nextDate.setFullYear(nextDate.getFullYear() + interval);
+      break;
+    case 'monthly':
+      nextDate.setMonth(nextDate.getMonth() + interval);
+      break;
+    case 'weekly':
+      nextDate.setDate(nextDate.getDate() + 7 * interval);
+      break;
+    case 'daily':
+      nextDate.setDate(nextDate.getDate() + interval);
+      break;
+    default:
+      // For 'none' or 'no_end', return the same date
+      return currentDate;
+  }
 
-	return nextDate;
+  return nextDate;
 }
 
 /**
@@ -43,7 +43,7 @@ export function calculateNextOccurrence(
  * @returns true if the date should recur
  */
 export function shouldRecur(recurrenceType: string): boolean {
-	return ['yearly', 'monthly', 'weekly', 'daily'].includes(recurrenceType);
+  return ['yearly', 'monthly', 'weekly', 'daily'].includes(recurrenceType);
 }
 
 /**
@@ -53,10 +53,10 @@ export function shouldRecur(recurrenceType: string): boolean {
  * @returns true if recurrence has ended
  */
 export function hasRecurrenceEnded(currentDate: Date, recurrenceEndDate: Date | null): boolean {
-	if (!recurrenceEndDate) {
-		return false;
-	}
-	return currentDate > recurrenceEndDate;
+  if (!recurrenceEndDate) {
+    return false;
+  }
+  return currentDate > recurrenceEndDate;
 }
 
 /**
@@ -69,35 +69,35 @@ export function hasRecurrenceEnded(currentDate: Date, recurrenceEndDate: Date | 
  * @returns Array of occurrence dates
  */
 export function calculateOccurrences(
-	startDate: Date,
-	endDate: Date | null,
-	recurrenceType: string,
-	interval: number = 1,
-	maxOccurrences: number = 100
+  startDate: Date,
+  endDate: Date | null,
+  recurrenceType: string,
+  interval: number = 1,
+  maxOccurrences: number = 100
 ): Date[] {
-	if (!shouldRecur(recurrenceType)) {
-		return [startDate];
-	}
+  if (!shouldRecur(recurrenceType)) {
+    return [startDate];
+  }
 
-	const occurrences: Date[] = [startDate];
-	let currentDate = new Date(startDate);
-	const today = new Date();
+  const occurrences: Date[] = [startDate];
+  let currentDate = new Date(startDate);
+  const today = new Date();
 
-	// If no end date, calculate future occurrences up to maxOccurrences or 2 years ahead
-	const calculationLimit =
-		endDate || new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+  // If no end date, calculate future occurrences up to maxOccurrences or 2 years ahead
+  const calculationLimit =
+    endDate || new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
 
-	while (occurrences.length < maxOccurrences) {
-		currentDate = calculateNextOccurrence(currentDate, recurrenceType, interval);
+  while (occurrences.length < maxOccurrences) {
+    currentDate = calculateNextOccurrence(currentDate, recurrenceType, interval);
 
-		if (currentDate > calculationLimit) {
-			break;
-		}
+    if (currentDate > calculationLimit) {
+      break;
+    }
 
-		occurrences.push(new Date(currentDate));
-	}
+    occurrences.push(new Date(currentDate));
+  }
 
-	return occurrences;
+  return occurrences;
 }
 
 /**
@@ -107,10 +107,10 @@ export function calculateOccurrences(
  * @returns The effective end date or null for no end
  */
 export function getEffectiveEndDate(endDate: Date, recurrenceType: string): Date | null {
-	if (recurrenceType === 'no_end') {
-		return null;
-	}
-	return endDate;
+  if (recurrenceType === 'no_end') {
+    return null;
+  }
+  return endDate;
 }
 
 /**
@@ -120,17 +120,17 @@ export function getEffectiveEndDate(endDate: Date, recurrenceType: string): Date
  * @returns Human-readable recurrence description
  */
 export function formatRecurrenceDescription(recurrenceType: string, interval: number = 1): string {
-	if (recurrenceType === 'none') {
-		return 'Fixed end date';
-	}
-	if (recurrenceType === 'no_end') {
-		return 'No end date';
-	}
+  if (recurrenceType === 'none') {
+    return 'Fixed end date';
+  }
+  if (recurrenceType === 'no_end') {
+    return 'No end date';
+  }
 
-	const intervalText = interval === 1 ? '' : `every ${interval} `;
-	const periodText = interval === 1 ? recurrenceType.slice(0, -2) : recurrenceType;
+  const intervalText = interval === 1 ? '' : `every ${interval} `;
+  const periodText = interval === 1 ? recurrenceType.slice(0, -2) : recurrenceType;
 
-	return `Renews ${intervalText}${periodText}`;
+  return `Renews ${intervalText}${periodText}`;
 }
 
 /**
@@ -138,37 +138,37 @@ export function formatRecurrenceDescription(recurrenceType: string, interval: nu
  * Returns null when there is no further scheduled occurrence.
  */
 export function getNextDueDate(
-	baseDate: Date,
-	recurrenceType: string,
-	interval: number = 1,
-	recurrenceEndDate: Date | null = null
+  baseDate: Date,
+  recurrenceType: string,
+  interval: number = 1,
+  recurrenceEndDate: Date | null = null
 ): Date | null {
-	// Fixed date: return the base date as the only due date. Perpetual coverage has no next due date.
-	if (recurrenceType === 'none') {
-		return baseDate;
-	}
-	if (recurrenceType === 'no_end') {
-		return null;
-	}
+  // Fixed date: return the base date as the only due date. Perpetual coverage has no next due date.
+  if (recurrenceType === 'none') {
+    return baseDate;
+  }
+  if (recurrenceType === 'no_end') {
+    return null;
+  }
 
-	if (!shouldRecur(recurrenceType)) {
-		return null;
-	}
+  if (!shouldRecur(recurrenceType)) {
+    return null;
+  }
 
-	const today = new Date();
-	let nextDate = calculateNextOccurrence(baseDate, recurrenceType, interval);
+  const today = new Date();
+  let nextDate = calculateNextOccurrence(baseDate, recurrenceType, interval);
 
-	// Advance until the next future occurrence (if any)
-	while (nextDate <= today) {
-		nextDate = calculateNextOccurrence(nextDate, recurrenceType, interval);
-		if (recurrenceEndDate && nextDate > recurrenceEndDate) {
-			return null;
-		}
-	}
+  // Advance until the next future occurrence (if any)
+  while (nextDate <= today) {
+    nextDate = calculateNextOccurrence(nextDate, recurrenceType, interval);
+    if (recurrenceEndDate && nextDate > recurrenceEndDate) {
+      return null;
+    }
+  }
 
-	if (recurrenceEndDate && nextDate > recurrenceEndDate) {
-		return null;
-	}
+  if (recurrenceEndDate && nextDate > recurrenceEndDate) {
+    return null;
+  }
 
-	return nextDate;
+  return nextDate;
 }
