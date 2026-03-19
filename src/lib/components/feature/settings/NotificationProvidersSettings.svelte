@@ -138,15 +138,17 @@
   }
 
   function resolveProviderConfig() {
-    if (formType === 'email') {
+    const providerType = formType ?? editingProvider?.type;
+
+    if (providerType === 'email') {
       return { type: 'email' as const, ...(emailConfig as EmailProviderConfig) };
     }
 
-    if (formType === 'webhook') {
+    if (providerType === 'webhook') {
       return { type: 'webhook' as const, ...(webhookConfig as WebhookProviderConfig) };
     }
 
-    if (formType === 'gotify') {
+    if (providerType === 'gotify') {
       return { type: 'gotify' as const, ...(gotifyConfig as GotifyProviderConfig) };
     }
 
@@ -155,8 +157,9 @@
 
   async function handleSave() {
     const config = resolveProviderConfig();
+    const providerType = formType ?? editingProvider?.type;
 
-    if (!formType || !config) {
+    if (!providerType || !config) {
       toast.error('Please select a provider type');
       return;
     }
@@ -172,7 +175,7 @@
       if (editingProvider) {
         const updatePayload: UpdateNotificationProvider = {
           name: formName,
-          config,
+          config: config,
           channels: formChannels,
           isEnabled: editingProvider?.isEnabled ?? true
         };
@@ -182,8 +185,8 @@
       } else {
         const createPayload: CreateNotificationProvider = {
           name: formName,
-          type: formType,
-          config,
+          type: providerType,
+          config: config,
           channels: formChannels,
           isEnabled: true
         };
@@ -317,7 +320,7 @@
   {editingProvider}
   {formName}
   onFormNameChange={(value) => (formName = value)}
-  {formType}
+  bind:formType
   {emailConfig}
   onEmailConfigChange={(config) => (emailConfig = config)}
   {webhookConfig}

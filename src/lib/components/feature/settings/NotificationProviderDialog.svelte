@@ -72,6 +72,12 @@
     onCancel,
     onSave
   }: Props = $props();
+
+  $effect(() => {
+    if (!formType && editingProvider?.type) {
+      formType = editingProvider.type;
+    }
+  });
 </script>
 
 <Dialog.Root {open} {onOpenChange}>
