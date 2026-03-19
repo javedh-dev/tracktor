@@ -37,7 +37,7 @@
   }: Props = $props();
 </script>
 
-<fieldset class="flex flex-col gap-4" disabled={processing}>
+<fieldset class="grid gap-4 lg:grid-cols-3" disabled={processing}>
   <SettingsSelectField
     {form}
     name="theme"
@@ -46,7 +46,7 @@
     icon={Palette}
     options={themeOptions}
     placeholder={m.settings_select_theme()}
-    bind:value={formData.theme}
+    bind:value={$formData.theme}
     disabled={processing}
   />
   <SettingsSelectField
@@ -57,7 +57,7 @@
     icon={Languages}
     options={localeOptions}
     placeholder={m.settings_select_language()}
-    bind:value={formData.locale}
+    bind:value={$formData.locale}
     disabled={processing}
   />
   <Form.Field {form} name="timezone" class="w-full">
@@ -66,7 +66,7 @@
         <FormLabel description={m.settings_desc_timezone()}>{m.settings_label_timezone()}</FormLabel
         >
         <SearchableSelect
-          bind:value={formData.timezone}
+          bind:value={$formData.timezone}
           options={getTimezoneOptions()}
           icon={Earth}
           {...props}
@@ -81,7 +81,7 @@
         <FormLabel description={m.settings_desc_currency()}>{m.settings_label_currency()}</FormLabel
         >
         <SearchableSelect
-          bind:value={formData.currency}
+          bind:value={$formData.currency}
           icon={Currency}
           options={currencyOptions}
           {...props}
@@ -98,7 +98,7 @@
         >
         <Input
           {...props}
-          bind:value={formData.dateFormat}
+          bind:value={$formData.dateFormat}
           icon={Calendar}
           type="text"
           class="mono"
@@ -111,7 +111,7 @@
     </Form.Control>
     <Form.FieldErrors />
   </Form.Field>
-  <Form.Field {form} name="customCss" class="w-full">
+  <Form.Field {form} name="customCss" class="w-full lg:col-span-3">
     <Form.Control>
       {#snippet children({ props })}
         <FormLabel description={m.settings_desc_custom_css()}
@@ -121,7 +121,7 @@
           {...props}
           placeholder="Add your custom CSS here..."
           class="mono h-40 resize-none"
-          bind:value={formData.customCss}
+          bind:value={$formData.customCss}
         />
       {/snippet}
     </Form.Control>

@@ -13,28 +13,25 @@
     channelOptions: ChannelOption[];
     selectedChannels: ProviderChannel[];
     onToggleChannel: (channel: ProviderChannel, checked: boolean) => void;
-    enabled: boolean;
-    onEnabledChange: (checked: boolean) => void;
   }
 
-  let { channelOptions, selectedChannels, onToggleChannel, enabled, onEnabledChange }: Props =
-    $props();
+  let { channelOptions, selectedChannels, onToggleChannel }: Props = $props();
 </script>
 
-<div class="space-y-4 rounded-lg border p-4">
+<div class="space-y-2 rounded-lg border p-2.5">
   <div>
     <h4 class="font-medium">Channel subscriptions</h4>
-    <p class="text-muted-foreground text-sm">
+    <p class="text-muted-foreground text-xs">
       Pick which notification channels this provider should receive.
     </p>
   </div>
 
-  <div class="space-y-3">
+  <div class="grid gap-1.5 sm:grid-cols-2">
     {#each channelOptions as channel}
-      <label class="flex items-start justify-between gap-3 rounded-md border p-3">
-        <div class="space-y-1">
-          <p class="font-medium">{channel.label}</p>
-          <p class="text-muted-foreground text-xs">{channel.description}</p>
+      <label class="flex items-center justify-between gap-2 rounded-md border px-2.5 py-2">
+        <div class="min-w-0 space-y-0.5">
+          <p class="text-[13px] font-medium">{channel.label}</p>
+          <p class="text-muted-foreground truncate text-[10px]">{channel.description}</p>
         </div>
         <Checkbox
           checked={selectedChannels.includes(channel.value)}
@@ -42,15 +39,5 @@
         />
       </label>
     {/each}
-  </div>
-
-  <div class="flex items-center justify-between">
-    <div class="space-y-0.5">
-      <p class="text-sm font-medium">Enable Provider</p>
-      <p class="text-muted-foreground text-xs">
-        Allow this provider to receive scheduled notifications.
-      </p>
-    </div>
-    <Checkbox checked={enabled} onCheckedChange={(checked) => onEnabledChange(Boolean(checked))} />
   </div>
 </div>

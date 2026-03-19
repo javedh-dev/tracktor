@@ -111,17 +111,8 @@
   });
 </script>
 
-<div class="space-y-2">
+<div class="grow space-y-2">
   <div class="flex gap-2">
-    <div class="flex-1">
-      <Input
-        bind:value
-        {placeholder}
-        {disabled}
-        class="mono font-mono"
-        aria-label="Cron expression"
-      />
-    </div>
     <Select.Root bind:value={selectedPreset} type="single" {disabled}>
       <Select.Trigger class="w-35">
         <Clock class="mr-2 h-4 w-4" />
@@ -135,6 +126,15 @@
         {/each}
       </Select.Content>
     </Select.Root>
+    <div class="flex-1">
+      <Input
+        bind:value
+        {placeholder}
+        {disabled}
+        class="mono font-mono"
+        aria-label="Cron expression"
+      />
+    </div>
   </div>
 
   <div class="flex items-center gap-2 text-xs">

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Bell from '@lucide/svelte/icons/bell';
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Plus from '@lucide/svelte/icons/plus';
   import { onMount } from 'svelte';
@@ -16,6 +15,7 @@
   } from '$lib/domain/notification-provider';
   import * as providerService from '$lib/services/notification-provider.service';
   import Button from '$ui/button/button.svelte';
+  import SettingFormSection from './SettingFormSection.svelte';
 
   import NotificationDeliveryPanel from './NotificationDeliveryPanel.svelte';
   import NotificationProviderDialog from './NotificationProviderDialog.svelte';
@@ -29,12 +29,14 @@
   };
 
   interface Props {
+    notificationProcessingEnabled: boolean;
     processingSchedule: string;
     onProcessingScheduleChange?: (value: string) => void;
     disabled?: boolean;
   }
 
   let {
+    notificationProcessingEnabled = $bindable(true),
     processingSchedule = '0 9 * * *',
     onProcessingScheduleChange,
     disabled = false
@@ -74,7 +76,6 @@
 
   let formName = $state('');
   let formType = $state<NotificationProviderType>();
-  let formIsEnabled = $state(true);
   let formChannels = $state<ProviderChannel[]>(['reminder', 'alert', 'information']);
   let emailConfig = $state<Partial<EmailProviderConfig>>({});
   let webhookConfig = $state<Partial<WebhookProviderConfig>>({});
@@ -98,7 +99,6 @@
   function resetForm() {
     formName = '';
     formType = undefined;
-    formIsEnabled = true;
     formChannels = ['reminder', 'alert', 'information'];
     emailConfig = {};
     webhookConfig = {};
@@ -115,7 +115,6 @@
     editingProvider = provider;
     formName = provider.name;
     formType = provider.type;
-    formIsEnabled = provider.isEnabled;
     formChannels = [...provider.channels];
 
     if (provider.type === 'email') {
@@ -175,7 +174,7 @@
           name: formName,
           config,
           channels: formChannels,
-          isEnabled: formIsEnabled
+          isEnabled: editingProvider?.isEnabled ?? true
         };
 
         await providerService.updateProvider(editingProvider.id, updatePayload);
@@ -186,7 +185,7 @@
           type: formType,
           config,
           channels: formChannels,
-          isEnabled: formIsEnabled
+          isEnabled: true
         };
 
         await providerService.createProvider(createPayload);
@@ -257,49 +256,59 @@
   }
 </script>
 
-<div class="space-y-6">
-  <NotificationDeliveryPanel
-    {processingSchedule}
-    {onProcessingScheduleChange}
-    {disabled}
-    {sendingNotifications}
-    onSendAllNotifications={handleSendAllNotifications}
-  />
+<div class="space-y-4">
+  <SettingFormSection
+    title="Scheduled delivery"
+    subtitle="In-app notifications stay real-time. This schedule only controls provider delivery."
+  >
+    <NotificationDeliveryPanel
+      bind:processingEnabled={notificationProcessingEnabled}
+      {processingSchedule}
+      {onProcessingScheduleChange}
+      {disabled}
+      {sendingNotifications}
+      onSendAllNotifications={handleSendAllNotifications}
+    />
+  </SettingFormSection>
 
-  <div class="flex items-center justify-between gap-4">
-    <div>
-      <h3 class="text-lg font-semibold">Notification providers</h3>
-      <p class="text-muted-foreground text-sm">
-        Each provider can subscribe to Reminder, Alert, and Information channels.
-      </p>
+  <SettingFormSection
+    title="Providers"
+    subtitle="Create, edit, test, and enable notification providers."
+  >
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <p class="text-muted-foreground text-sm">
+          Each provider can subscribe to Reminder, Alert, and Information channels.
+        </p>
+      </div>
+      <Button onclick={openCreateDialog} size="sm" {disabled}>
+        <Plus class="mr-2 h-4 w-4" />
+        Add Provider
+      </Button>
     </div>
-    <Button onclick={openCreateDialog} size="sm" {disabled}>
-      <Plus class="mr-2 h-4 w-4" />
-      Add Provider
-    </Button>
-  </div>
 
-  {#if loading}
-    <div class="flex items-center justify-center py-12">
-      <Loader2 class="h-8 w-8 animate-spin" />
-    </div>
-  {:else if providers.length === 0}
-    <NotificationProvidersEmptyState />
-  {:else}
-    <div class="grid gap-3 md:grid-cols-2">
-      {#each providers as provider (provider.id)}
-        <ProviderCard
-          {provider}
-          onEdit={openEditDialog}
-          onDelete={handleDelete}
-          onTest={handleTest}
-          onToggleEnabled={handleToggleProvider}
-          toggling={togglingProviderId === provider.id}
-          testing={testDialogOpen && testingProvider?.id === provider.id}
-        />
-      {/each}
-    </div>
-  {/if}
+    {#if loading}
+      <div class="flex items-center justify-center py-12">
+        <Loader2 class="h-8 w-8 animate-spin" />
+      </div>
+    {:else if providers.length === 0}
+      <NotificationProvidersEmptyState />
+    {:else}
+      <div class="grid gap-3 md:grid-cols-2">
+        {#each providers as provider (provider.id)}
+          <ProviderCard
+            {provider}
+            onEdit={openEditDialog}
+            onDelete={handleDelete}
+            onTest={handleTest}
+            onToggleEnabled={handleToggleProvider}
+            toggling={togglingProviderId === provider.id}
+            testing={testDialogOpen && testingProvider?.id === provider.id}
+          />
+        {/each}
+      </div>
+    {/if}
+  </SettingFormSection>
 </div>
 
 <NotificationProviderDialog
@@ -309,17 +318,14 @@
   {formName}
   onFormNameChange={(value) => (formName = value)}
   {formType}
-  onFormTypeChange={(value) => (formType = value)}
-  {formChannels}
-  onToggleChannel={toggleChannel}
-  {formIsEnabled}
-  onFormIsEnabledChange={(checked) => (formIsEnabled = checked)}
   {emailConfig}
   onEmailConfigChange={(config) => (emailConfig = config)}
   {webhookConfig}
   onWebhookConfigChange={(config) => (webhookConfig = config)}
   {gotifyConfig}
   onGotifyConfigChange={(config) => (gotifyConfig = config)}
+  {formChannels}
+  onToggleChannel={toggleChannel}
   {channelOptions}
   {savingProvider}
   onCancel={() => (dialogOpen = false)}

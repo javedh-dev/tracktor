@@ -263,7 +263,7 @@
               <Tabs.Content value="personalization" class="space-y-6">
                 <SettingsPersonalizationTab
                   {form}
-                  formData={$formData}
+                  {formData}
                   {processing}
                   {themeOptions}
                   {localeOptions}
@@ -277,7 +277,7 @@
               <Tabs.Content value="units" class="space-y-6">
                 <SettingsUnitsTab
                   {form}
-                  formData={$formData}
+                  {formData}
                   {processing}
                   {uodOptions}
                   {uovOptions}
@@ -288,7 +288,7 @@
               </Tabs.Content>
 
               <Tabs.Content value="features" class="space-y-6">
-                <SettingsFeaturesTab {form} formData={$formData} {processing} messages={m} />
+                <SettingsFeaturesTab {form} {formData} {processing} messages={m} />
               </Tabs.Content>
             </div>
 

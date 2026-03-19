@@ -27,9 +27,29 @@
     mileageUnitFormatOptions,
     messages: m
   }: Props = $props();
+
+  let unitOfLpg = $state('liter');
+  let unitOfCng = $state('kilogram');
+
+  $effect(() => {
+    unitOfLpg = (formData.unitOfLpg || formData.unitOfVolume || 'liter') as string;
+    unitOfCng = (formData.unitOfCng || formData.unitOfVolume || 'kilogram') as string;
+  });
+
+  $effect(() => {
+    if (formData.unitOfLpg !== unitOfLpg) {
+      formData.update((fd: any) => ({ ...fd, unitOfLpg }));
+    }
+  });
+
+  $effect(() => {
+    if (formData.unitOfCng !== unitOfCng) {
+      formData.update((fd: any) => ({ ...fd, unitOfCng }));
+    }
+  });
 </script>
 
-<fieldset class="flex flex-col gap-4" disabled={processing}>
+<fieldset class="grid gap-4 lg:grid-cols-2" disabled={processing}>
   <SettingsSelectField
     {form}
     name="unitOfDistance"
@@ -38,7 +58,7 @@
     icon={RulerDimensionLine}
     options={uodOptions}
     placeholder={m.settings_select_unit_system()}
-    bind:value={formData.unitOfDistance}
+    bind:value={$formData.unitOfDistance}
     disabled={processing}
   />
   <SettingsSelectField
@@ -49,15 +69,15 @@
     icon={Rabbit}
     options={mileageUnitFormatOptions}
     placeholder={m.settings_select_unit_system()}
-    bind:value={formData.mileageUnitFormat}
+    bind:value={$formData.mileageUnitFormat}
     disabled={processing}
   />
-  <div class="space-y-3">
+  <div class="space-y-3 lg:col-span-2">
     <div class="space-y-1">
       <p class="text-sm font-medium">Fuel types</p>
       <p class="text-muted-foreground text-xs">Choose the measurement for each fuel.</p>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="grid gap-4 lg:grid-cols-3">
       <SettingsSelectField
         {form}
         name="unitOfVolume"
@@ -66,7 +86,7 @@
         icon={Currency}
         options={uovOptions}
         placeholder={m.settings_select_unit_system()}
-        bind:value={formData.unitOfVolume}
+        bind:value={$formData.unitOfVolume}
         disabled={processing}
       />
       <SettingsSelectField
@@ -77,7 +97,7 @@
         icon={Fuel}
         options={gasUnitOptions}
         placeholder={m.settings_select_unit_system()}
-        bind:value={formData.unitOfLpg}
+        bind:value={unitOfLpg}
         disabled={processing}
       />
       <SettingsSelectField
@@ -88,7 +108,7 @@
         icon={Fuel}
         options={gasUnitOptions}
         placeholder={m.settings_select_unit_system()}
-        bind:value={formData.unitOfCng}
+        bind:value={unitOfCng}
         disabled={processing}
       />
     </div>

@@ -5,9 +5,12 @@
   import CronInput from '$feature/settings/CronInput.svelte';
   import { env } from '$lib/config/env';
   import Button from '$ui/button/button.svelte';
+  import { Switch } from '$ui/switch';
   import { Label } from '$ui/label';
 
   interface Props {
+    processingEnabled: boolean;
+    onProcessingEnabledChange?: (value: boolean) => void;
     processingSchedule: string;
     onProcessingScheduleChange?: (value: string) => void;
     disabled?: boolean;
@@ -16,51 +19,56 @@
   }
 
   let {
+    processingEnabled = $bindable(true),
+    onProcessingEnabledChange,
     processingSchedule,
     onProcessingScheduleChange,
     disabled = false,
     sendingNotifications = false,
     onSendAllNotifications
   }: Props = $props();
+
+  $effect(() => {
+    onProcessingEnabledChange?.(processingEnabled);
+  });
 </script>
 
-<div class="space-y-3 rounded-lg border p-4">
-  <div class="flex items-start justify-between gap-4">
-    <div>
-      <h3 class="text-lg font-semibold">Scheduled delivery</h3>
-      <p class="text-muted-foreground text-sm">
-        In-app notifications stay real-time. This schedule only controls provider delivery.
-      </p>
-    </div>
-    <div class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
-      <Clock3 class="h-5 w-5" />
-    </div>
-  </div>
-
+<div class="space-y-3 pb-4">
   <div class="space-y-2">
-    <Label for="notification-processing-schedule">Processing schedule</Label>
-    <CronInput
-      value={processingSchedule}
-      onValueChange={(value) => onProcessingScheduleChange?.(value)}
-      {disabled}
-      placeholder="0 9 * * *"
-    />
-  </div>
-
-  {#if env.DEMO_MODE}
-    <div class="flex justify-end">
-      <Button
-        variant="outline"
-        onclick={onSendAllNotifications}
-        disabled={disabled || sendingNotifications}
-      >
-        {#if sendingNotifications}
-          <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-        {:else}
-          <Send class="mr-2 h-4 w-4" />
-        {/if}
-        Send All Notifications Now
-      </Button>
+    <div class="flex items-center justify-between gap-4">
+      <div class="space-y-0.5">
+        <Label for="notification-processing-schedule">Processing schedule</Label>
+        <p class="text-muted-foreground text-xs">
+          Run provider notification delivery on a schedule.
+        </p>
+      </div>
+      <Switch bind:checked={processingEnabled} {disabled} />
     </div>
-  {/if}
+
+    <div class="flex justify-between gap-4">
+      <CronInput
+        value={processingSchedule}
+        onValueChange={(value) => onProcessingScheduleChange?.(value)}
+        disabled={disabled || !processingEnabled}
+        placeholder="0 9 * * *"
+      />
+
+      {#if env.DEMO_MODE}
+        <div class="flex justify-end">
+          <Button
+            variant="outline"
+            onclick={onSendAllNotifications}
+            disabled={disabled || sendingNotifications || !processingEnabled}
+          >
+            {#if sendingNotifications}
+              <Loader2 class="h-4 w-4 animate-spin" />
+            {:else}
+              <Send class="h-4 w-4" />
+            {/if}
+            Send Now
+          </Button>
+        </div>
+      {/if}
+    </div>
+  </div>
 </div>

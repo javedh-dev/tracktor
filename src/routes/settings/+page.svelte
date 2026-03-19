@@ -29,6 +29,7 @@
 
   let processing = $state(false);
   let activeSection = $state('personalization');
+  let notificationProcessingEnabled = $state(true);
 
   const configSchema = createSettingsConfigSchema(isValidFormat, isValidTimezone, {
     includeNotificationProcessingSchedule: true
@@ -40,8 +41,6 @@
     resetForm: false,
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
-        processing = true;
-
         // Handle theme change
         if (f.data.theme) {
           themeStore.setTheme(f.data.theme as any);
@@ -70,7 +69,6 @@
         toast.success(m.settings_updated_success());
         configStore.refreshConfigs();
         vehicleStore.refreshVehicles();
-        processing = false;
       }
     }
   });
@@ -148,8 +146,22 @@
       ) as SettingsFormShape;
       // Add current theme to form data (theme is client-side only)
       configData.theme = themeStore.theme;
+      notificationProcessingEnabled = configData.notificationProcessingEnabled !== false;
       formData.set(configData);
     }
+  });
+
+  $effect(() => {
+    formData.update((current) => {
+      if (current.notificationProcessingEnabled === notificationProcessingEnabled) {
+        return current;
+      }
+
+      return {
+        ...current,
+        notificationProcessingEnabled
+      };
+    });
   });
 </script>
 
@@ -218,7 +230,7 @@
               >
                 <SettingsPersonalizationTab
                   {form}
-                  formData={$formData}
+                  {formData}
                   {processing}
                   {themeOptions}
                   {localeOptions}
@@ -245,7 +257,7 @@
               >
                 <SettingsUnitsTab
                   {form}
-                  formData={$formData}
+                  {formData}
                   {processing}
                   {uodOptions}
                   {uovOptions}
@@ -269,7 +281,7 @@
                 title="Feature Flags"
                 subtitle="Enable or disable major app modules"
               >
-                <SettingsFeaturesTab {form} formData={$formData} {processing} messages={m} />
+                <SettingsFeaturesTab {form} {formData} {processing} messages={m} />
               </SettingFormSection>
             </fieldset>
           </SettingsSection>
@@ -283,6 +295,7 @@
           >
             <fieldset class="space-y-6" disabled={processing}>
               <NotificationProvidersSettings
+                bind:notificationProcessingEnabled
                 processingSchedule={notificationProcessingSchedule}
                 onProcessingScheduleChange={updateNotificationProcessingSchedule}
                 disabled={processing}

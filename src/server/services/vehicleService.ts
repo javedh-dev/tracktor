@@ -1,5 +1,3 @@
-import { Status } from '../exceptions/AppError';
-import { AppError } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';

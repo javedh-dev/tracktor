@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import { themes } from '$lib/config/themes';
 import { data as currencies } from 'currency-codes';
 import { getCurrencySymbol } from '$lib/helper/format.helper';
@@ -43,7 +44,8 @@ export function createSettingsConfigSchema(
     featurePucc: z.boolean().default(true),
     featureReminders: z.boolean().default(true),
     featureInsurance: z.boolean().default(true),
-    featureOverview: z.boolean().default(true)
+    featureOverview: z.boolean().default(true),
+    notificationProcessingEnabled: z.boolean().default(true)
   });
 
   if (!options.includeNotificationProcessingSchedule) {
@@ -135,7 +137,8 @@ export function createSettingsFieldSectionMap(
     featurePucc: 'features',
     featureReminders: 'features',
     featureInsurance: 'features',
-    featureOverview: 'features'
+    featureOverview: 'features',
+    notificationProcessingEnabled: 'notifications'
   };
 
   if (includeNotifications) {

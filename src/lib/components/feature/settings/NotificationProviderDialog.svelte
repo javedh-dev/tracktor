@@ -38,11 +38,8 @@
     formName: string;
     onFormNameChange: (value: string) => void;
     formType: NotificationProviderType | undefined;
-    onFormTypeChange: (value: NotificationProviderType | undefined) => void;
     formChannels: ProviderChannel[];
     onToggleChannel: (channel: ProviderChannel, checked: boolean) => void;
-    formIsEnabled: boolean;
-    onFormIsEnabledChange: (checked: boolean) => void;
     emailConfig: Partial<EmailProviderConfig>;
     onEmailConfigChange: (config: Partial<EmailProviderConfig>) => void;
     webhookConfig: Partial<WebhookProviderConfig>;
@@ -61,12 +58,9 @@
     editingProvider,
     formName,
     onFormNameChange,
-    formType,
-    onFormTypeChange,
+    formType = $bindable(),
     formChannels,
     onToggleChannel,
-    formIsEnabled,
-    onFormIsEnabledChange,
     emailConfig,
     onEmailConfigChange,
     webhookConfig,
@@ -85,8 +79,8 @@
     <Dialog.Header>
       <Dialog.Title>{editingProvider ? 'Edit' : 'Add'} Notification Provider</Dialog.Title>
       <Dialog.Description>
-        Choose a provider type, configure its destination, and subscribe it to notification
-        channels.
+        Choose a provider type, configure its destination, and subscribe it to compact channel
+        toggles. Providers are enabled by default and can be disabled from the provider cards.
       </Dialog.Description>
     </Dialog.Header>
 
@@ -148,7 +142,7 @@
         <EmailProviderForm
           config={editingProvider?.type === 'email'
             ? (editingProvider.config as EmailProviderConfig)
-            : undefined}
+            : (emailConfig as EmailProviderConfig)}
           isEditing={!!editingProvider}
           onConfigChange={onEmailConfigChange}
         />
@@ -156,7 +150,7 @@
         <WebhookProviderForm
           config={editingProvider?.type === 'webhook'
             ? (editingProvider.config as WebhookProviderConfig)
-            : undefined}
+            : (webhookConfig as WebhookProviderConfig)}
           isEditing={!!editingProvider}
           onConfigChange={onWebhookConfigChange}
         />
@@ -164,7 +158,7 @@
         <GotifyProviderForm
           config={editingProvider?.type === 'gotify'
             ? (editingProvider.config as GotifyProviderConfig)
-            : undefined}
+            : (gotifyConfig as GotifyProviderConfig)}
           isEditing={!!editingProvider}
           onConfigChange={onGotifyConfigChange}
         />
@@ -175,8 +169,6 @@
           {channelOptions}
           selectedChannels={formChannels}
           {onToggleChannel}
-          enabled={formIsEnabled}
-          onEnabledChange={onFormIsEnabledChange}
         />
       {/if}
     </div>

@@ -28,6 +28,11 @@ export const seedData = async () => {
 const seedDefaultConfig = async () => {
   const defaultConfigs = [
     {
+      key: 'notificationProcessingEnabled',
+      value: 'true',
+      description: 'Enable scheduled processing of notification providers'
+    },
+    {
       key: 'notificationProcessingSchedule',
       value: '0 9 * * *',
       description: 'Cron schedule for processing queued provider notifications'

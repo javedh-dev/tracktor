@@ -16,6 +16,7 @@ export interface SettingsFormShape extends Record<string, unknown> {
   featureReminders: boolean;
   featureInsurance: boolean;
   featureOverview: boolean;
+  notificationProcessingEnabled?: boolean;
   notificationProcessingSchedule?: string;
 }
 
