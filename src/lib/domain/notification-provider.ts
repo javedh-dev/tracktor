@@ -111,7 +111,7 @@ const emailProviderConfigUpdateSchema = z.object({
   port: z.number().int().min(1).max(65535),
   secure: z.boolean(),
   auth: z.object({
-    user: z.email('Valid email is required'),
+    user: z.string().min(1, 'Username is required'),
     pass: z.string()
   }),
   from: z.email('Valid sender email is required'),
