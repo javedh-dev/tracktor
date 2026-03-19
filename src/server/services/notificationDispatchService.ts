@@ -13,6 +13,7 @@ import {
   groupNotifications
 } from './emailTemplateService';
 import { sendEmail } from './emailNotificationService';
+import { buildWebhookHeaders } from './notification-provider-http.helper';
 import { getEnabledProvidersForChannels } from './notificationProviderService';
 import {
   getActiveNotificationsForChannels,
@@ -35,25 +36,9 @@ async function sendWebhookNotification(
   const config = provider.config as WebhookProviderConfig;
 
   try {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...config.headers
-    };
-
-    if (config.authType === 'basic' && config.authCredentials?.username) {
-      const auth = btoa(
-        `${config.authCredentials.username}:${config.authCredentials.password ?? ''}`
-      );
-      headers['Authorization'] = `Basic ${auth}`;
-    } else if (config.authType === 'bearer' && config.authCredentials?.token) {
-      headers['Authorization'] = `Bearer ${config.authCredentials.token}`;
-    } else if (config.authType === 'api-key' && config.authCredentials?.apiKey) {
-      headers[config.authCredentials.apiKeyHeader || 'X-API-Key'] = config.authCredentials.apiKey;
-    }
-
     const response = await fetch(config.url, {
       method: config.method,
-      headers,
+      headers: buildWebhookHeaders(config),
       body: JSON.stringify({
         title: 'Tracktor notifications',
         notificationCount: notifications.length,

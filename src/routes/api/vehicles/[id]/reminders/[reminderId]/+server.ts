@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as reminderService from '$server/services/reminderService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Reminder GET error:', async () => {
     const { reminderId } = event.params;
 
     if (!reminderId) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await reminderService.getReminderById(reminderId);
     return json(result);
-  } catch (err) {
-    console.error('Reminder GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Reminder PUT error:', async () => {
     const { id, reminderId } = event.params;
 
     if (!id || !reminderId) {
@@ -40,23 +28,11 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await reminderService.updateReminder(id, reminderId, body);
     return json(result);
-  } catch (err) {
-    console.error('Reminder PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Reminder DELETE error:', async () => {
     const { reminderId } = event.params;
 
     if (!reminderId) {
@@ -65,17 +41,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await reminderService.deleteReminder(reminderId);
     return json(result);
-  } catch (err) {
-    console.error('Reminder DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

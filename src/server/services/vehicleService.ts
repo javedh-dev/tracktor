@@ -1,10 +1,27 @@
-import { Status } from '../exceptions/AppError';
-import { AppError } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
+import type { Vehicle } from '$lib/domain/vehicle';
 import { performDelete } from '../utils/serviceUtils';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
+
+type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
+type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
+
+function serializeVehiclePayload(vehicleData: VehicleMutationPayload) {
+  return {
+    ...vehicleData,
+    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
+  };
+}
+
+function parseVehicleRecord<T extends { customFields: string | null }>(vehicle: T) {
+  return {
+    ...vehicle,
+    customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null
+  };
+}
 
 // Helper functions
 const getLatestOdometer = async (vehicleId: string) => {
@@ -90,26 +107,11 @@ const calculateOverallMileage = async (vehicleId: string) => {
   return parseFloat(avgMileage.toFixed(2));
 };
 
-export const addVehicle = async (vehicleData: any): Promise<ApiResponse> => {
-  // Serialize customFields to JSON string
-  const processedData = {
-    ...vehicleData,
-    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
-  };
+export const addVehicle = async (vehicleData: VehicleMutationPayload): Promise<ApiResponse> => {
+  const processedData = serializeVehiclePayload(vehicleData);
+  const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
 
-  const [vehicle] = await db
-    .insert(schema.vehicleTable)
-    .values({ ...processedData, id: undefined })
-    .returning();
-
-  return {
-    data: {
-      ...vehicle,
-      customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null
-    },
-    success: true,
-    message: 'Vehicle added successfully.'
-  };
+  return createSuccessResponse(parseVehicleRecord(vehicle), 'Vehicle added successfully.');
 };
 
 export const getAllVehicles = async (): Promise<ApiResponse> => {
@@ -155,9 +157,10 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
       const vehiclePuccDates = pollutionCerts
         .filter((pucc) => pucc.vehicleId === vehicle.id && pucc.expiryDate)
         .map((pucc) => new Date(pucc.expiryDate!));
+      const parsedVehicle = parseVehicleRecord(vehicle);
+
       return {
-        ...vehicle,
-        customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
+        ...parsedVehicle,
         odometer: latestOdometer || vehicle.odometer || 0,
         overallMileage,
         insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
@@ -166,45 +169,36 @@ export const getAllVehicles = async (): Promise<ApiResponse> => {
     })
   );
 
-  return {
-    data: enrichedVehicles,
-    success: true
-  };
+  return createSuccessResponse(enrichedVehicles);
 };
 
 export const getVehicleById = async (id: string): Promise<ApiResponse> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.id, id)
-  });
-
-  if (!vehicle) {
-    throw new AppError(`No vehicle found for id : ${id}`, Status.NOT_FOUND);
-  }
+  const vehicle = requireRecord(
+    await db.query.vehicleTable.findFirst({
+      where: (vehicles, { eq }) => eq(vehicles.id, id)
+    }),
+    `No vehicle found for id : ${id}`
+  );
 
   const [currentOdometer, overallMileage] = await Promise.all([
     getLatestOdometer(id),
     calculateOverallMileage(id)
   ]);
 
-  return {
-    data: {
-      ...vehicle,
-      customFields: vehicle.customFields ? JSON.parse(vehicle.customFields) : null,
-      currentOdometer: currentOdometer || vehicle.odometer || 0,
-      overallMileage
-    },
-    success: true
-  };
+  return createSuccessResponse({
+    ...parseVehicleRecord(vehicle),
+    currentOdometer: currentOdometer || vehicle.odometer || 0,
+    overallMileage
+  });
 };
 
-export const updateVehicle = async (id: string, vehicleData: any): Promise<ApiResponse> => {
+export const updateVehicle = async (
+  id: string,
+  vehicleData: VehicleMutationPayload
+): Promise<ApiResponse> => {
   await getVehicleById(id); // Validates vehicle exists
 
-  // Serialize customFields to JSON string
-  const processedData = {
-    ...vehicleData,
-    customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
-  };
+  const processedData = serializeVehiclePayload(vehicleData);
 
   const [updatedVehicle] = await db
     .update(schema.vehicleTable)
@@ -212,14 +206,7 @@ export const updateVehicle = async (id: string, vehicleData: any): Promise<ApiRe
     .where(eq(schema.vehicleTable.id, id))
     .returning();
 
-  return {
-    data: {
-      ...updatedVehicle,
-      customFields: updatedVehicle.customFields ? JSON.parse(updatedVehicle.customFields) : null
-    },
-    success: true,
-    message: 'Vehicle updated successfully.'
-  };
+  return createSuccessResponse(parseVehicleRecord(updatedVehicle), 'Vehicle updated successfully.');
 };
 
 export const deleteVehicle = async (id: string): Promise<ApiResponse> => {
@@ -237,10 +224,7 @@ export const getVehiclesMinimal = async (): Promise<ApiResponse> => {
       licensePlate: true
     }
   });
-  return {
-    data: vehicles,
-    success: true
-  };
+  return createSuccessResponse(vehicles);
 };
 
 export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
@@ -256,12 +240,9 @@ export const getVehicleSummary = async (id: string): Promise<ApiResponse> => {
     })
   ]);
 
-  return {
-    data: {
-      ...vehicle.data,
-      totalFuelLogs: fuelLogsCount.length,
-      totalMaintenanceLogs: maintenanceLogsCount.length
-    },
-    success: true
-  };
+  return createSuccessResponse({
+    ...vehicle.data,
+    totalFuelLogs: fuelLogsCount.length,
+    totalMaintenanceLogs: maintenanceLogsCount.length
+  });
 };

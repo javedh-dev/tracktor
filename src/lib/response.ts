@@ -1,5 +1,5 @@
-export type ApiResponse = {
-  data?: any;
+export type ApiResponse<T = any> = {
+  data?: T;
   success: boolean;
   errors?: Error[];
   message?: string;

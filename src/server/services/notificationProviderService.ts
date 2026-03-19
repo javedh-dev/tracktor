@@ -3,7 +3,6 @@ import type {
   CreateNotificationProvider,
   NotificationChannel,
   NotificationProviderType,
-  NotificationProviderConfig,
   NotificationProviderWithParsedConfig,
   UpdateNotificationProvider
 } from '$lib/domain/notification-provider';
@@ -20,6 +19,8 @@ import * as schema from '$server/db/schema';
 import { AppError, Status } from '$server/exceptions/AppError';
 import { decrypt, encrypt } from '$server/utils/encryption';
 import { eq } from 'drizzle-orm';
+import { resolveUpdatedConfig } from './notification-provider-service.helper';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
 
 type ProviderRecord = typeof schema.notificationProviderTable.$inferSelect;
 
@@ -53,81 +54,12 @@ function parseProvider(provider: ProviderRecord): NotificationProviderWithParsed
   }
 }
 
-function resolveUpdatedConfig(
-  existingConfig: NotificationProviderConfig,
-  incomingConfig: NotificationProviderConfig
-): NotificationProviderConfig {
-  if (
-    incomingConfig.type === 'email' &&
-    existingConfig.type === 'email' &&
-    incomingConfig.auth.pass.trim().length === 0
-  ) {
-    return {
-      ...incomingConfig,
-      auth: {
-        ...incomingConfig.auth,
-        pass: existingConfig.auth.pass
-      }
-    };
-  }
+async function getProviderRecord(providerId: string): Promise<ProviderRecord> {
+  const provider = await db.query.notificationProviderTable.findFirst({
+    where: (providers, { eq }) => eq(providers.id, providerId)
+  });
 
-  if (
-    incomingConfig.type === 'gotify' &&
-    existingConfig.type === 'gotify' &&
-    incomingConfig.appToken.trim().length === 0
-  ) {
-    return {
-      ...incomingConfig,
-      appToken: existingConfig.appToken
-    };
-  }
-
-  if (incomingConfig.type === 'webhook' && existingConfig.type === 'webhook') {
-    if (
-      incomingConfig.authType === 'basic' &&
-      existingConfig.authType === 'basic' &&
-      incomingConfig.authCredentials?.username &&
-      incomingConfig.authCredentials.password?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          password: existingConfig.authCredentials?.password
-        }
-      };
-    }
-
-    if (
-      incomingConfig.authType === 'bearer' &&
-      existingConfig.authType === 'bearer' &&
-      incomingConfig.authCredentials?.token?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          token: existingConfig.authCredentials?.token
-        }
-      };
-    }
-
-    if (
-      incomingConfig.authType === 'api-key' &&
-      existingConfig.authType === 'api-key' &&
-      incomingConfig.authCredentials?.apiKey?.trim().length === 0
-    ) {
-      return {
-        ...incomingConfig,
-        authCredentials: {
-          ...incomingConfig.authCredentials,
-          apiKey: existingConfig.authCredentials?.apiKey
-        }
-      };
-    }
-  }
-
-  return incomingConfig;
+  return requireRecord(provider, 'Provider not found');
 }
 
 export const getProvidersByUserId = async (): Promise<ApiResponse> => {
@@ -135,27 +67,13 @@ export const getProvidersByUserId = async (): Promise<ApiResponse> => {
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
-  return {
-    success: true,
-    message: 'Providers fetched successfully',
-    data: providers.map(parseProvider)
-  };
+  return createSuccessResponse(providers.map(parseProvider), 'Providers fetched successfully');
 };
 
 export const getProviderById = async (providerId: string): Promise<ApiResponse> => {
-  const provider = await db.query.notificationProviderTable.findFirst({
-    where: (providers, { eq }) => eq(providers.id, providerId)
-  });
+  const provider = await getProviderRecord(providerId);
 
-  if (!provider) {
-    throw new AppError('Provider not found', Status.NOT_FOUND);
-  }
-
-  return {
-    success: true,
-    message: 'Provider fetched successfully',
-    data: parseProvider(provider)
-  };
+  return createSuccessResponse(parseProvider(provider), 'Provider fetched successfully');
 };
 
 export const addProvider = async (
@@ -179,11 +97,7 @@ export const addProvider = async (
     throw new AppError('Failed to create provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return {
-    success: true,
-    message: 'Provider created successfully',
-    data: parseProvider(provider)
-  };
+  return createSuccessResponse(parseProvider(provider), 'Provider created successfully');
 };
 
 export const updateProvider = async (
@@ -191,13 +105,7 @@ export const updateProvider = async (
   providerData: UpdateNotificationProvider
 ): Promise<ApiResponse> => {
   const validated = updateNotificationProviderSchema.parse(providerData);
-  const existingProvider = await db.query.notificationProviderTable.findFirst({
-    where: (providers, { eq }) => eq(providers.id, providerId)
-  });
-
-  if (!existingProvider) {
-    throw new AppError('Provider not found', Status.NOT_FOUND);
-  }
+  const existingProvider = await getProviderRecord(providerId);
 
   const updateData: Partial<typeof schema.notificationProviderTable.$inferInsert> = {};
 
@@ -221,31 +129,17 @@ export const updateProvider = async (
     throw new AppError('Failed to update provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return {
-    success: true,
-    message: 'Provider updated successfully',
-    data: parseProvider(updatedProvider)
-  };
+  return createSuccessResponse(parseProvider(updatedProvider), 'Provider updated successfully');
 };
 
 export const deleteProvider = async (providerId: string): Promise<ApiResponse> => {
-  const existingProvider = await db.query.notificationProviderTable.findFirst({
-    where: (providers, { eq }) => eq(providers.id, providerId)
-  });
-
-  if (!existingProvider) {
-    throw new AppError('Provider not found', Status.NOT_FOUND);
-  }
+  await getProviderRecord(providerId);
 
   await db
     .delete(schema.notificationProviderTable)
     .where(eq(schema.notificationProviderTable.id, providerId));
 
-  return {
-    success: true,
-    message: 'Provider deleted successfully',
-    data: null
-  };
+  return createSuccessResponse(null, 'Provider deleted successfully');
 };
 
 export const getEnabledProvidersForChannels = async (channels: NotificationChannel[]) => {

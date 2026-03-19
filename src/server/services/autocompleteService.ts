@@ -2,6 +2,7 @@ import { db } from '../db/index';
 import { sql } from 'drizzle-orm';
 import * as schema from '../db/schema/index';
 import type { ApiResponse } from '$lib/response';
+import { createSuccessResponse } from './service-response.helper';
 
 /**
  * Get unique values for service centers from maintenance logs
@@ -17,10 +18,7 @@ export const getUniqueServiceCenters = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.serviceCenter).filter(Boolean);
 
-  return {
-    data: values,
-    success: true
-  };
+  return createSuccessResponse(values);
 };
 
 /**
@@ -37,10 +35,7 @@ export const getUniqueInsuranceProviders = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.provider).filter(Boolean);
 
-  return {
-    data: values,
-    success: true
-  };
+  return createSuccessResponse(values);
 };
 
 /**
@@ -59,10 +54,7 @@ export const getUniqueTestingCenters = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.testingCenter).filter(Boolean);
 
-  return {
-    data: values,
-    success: true
-  };
+  return createSuccessResponse(values);
 };
 
 /**
@@ -77,10 +69,7 @@ export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.make).filter(Boolean);
 
-  return {
-    data: values,
-    success: true
-  };
+  return createSuccessResponse(values);
 };
 
 /**
@@ -95,8 +84,5 @@ export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.model).filter(Boolean);
 
-  return {
-    data: values,
-    success: true
-  };
+  return createSuccessResponse(values);
 };

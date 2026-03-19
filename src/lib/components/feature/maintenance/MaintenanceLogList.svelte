@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { formatCurrency, formatDate, formatDistance } from '$lib/helper/format.helper';
+  import {
+    formatTableCurrency,
+    formatTableDate,
+    formatTableDistance,
+    formatTableText
+  } from '$helper/table-cell.helper';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -7,16 +12,16 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Paperclip from '@lucide/svelte/icons/paperclip';
   import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import ResourceState from '$appui/ResourceState.svelte';
   import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
   import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import * as m from '$lib/paraglide/messages';
 
   const columns: ColumnDef<MaintenanceLog>[] = [
@@ -107,22 +112,11 @@
 </script>
 
 {#if maintenanceStore.processing}
-  <div id="maintenance-log-list-skeleton" class="space-y-3">
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-  </div>
+  <TableSkeleton containerId="maintenance-log-list-skeleton" />
 {:else if maintenanceStore.error}
-  <p class="text-red-500">Error: {maintenanceStore.error}</p>
+  <ResourceState state="error" message={maintenanceStore.error} />
 {:else if maintenanceStore.maintenanceLogs?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={m.maintenance_list_empty()}
-  />
+  <ResourceState state="empty" message={m.maintenance_list_empty()} />
 {:else}
   <div id="maintenance-log-table" class="maintenance-log-table">
     <AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
@@ -130,23 +124,23 @@
 {/if}
 
 {#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">{formatDistance(params.value)}</div>
+  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
 {/snippet}
 
 {#snippet serviceCenterCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
 {/snippet}
 
 {#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value || '-'}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet attachmentCell(params: any)}

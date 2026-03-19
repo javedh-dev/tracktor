@@ -7,11 +7,17 @@
 
   interface Props {
     value: string;
+    onValueChange?: (value: string) => void;
     disabled?: boolean;
     placeholder?: string;
   }
 
-  let { value = $bindable(), disabled = false, placeholder = '* * * * *' }: Props = $props();
+  let {
+    value = $bindable(),
+    onValueChange,
+    disabled = false,
+    placeholder = '* * * * *'
+  }: Props = $props();
 
   // Common cron presets
   const presets = [
@@ -99,21 +105,16 @@
       value = selectedPreset;
     }
   });
+
+  $effect(() => {
+    onValueChange?.(value);
+  });
 </script>
 
-<div class="space-y-2">
+<div class="grow space-y-2">
   <div class="flex gap-2">
-    <div class="flex-1">
-      <Input
-        bind:value
-        {placeholder}
-        {disabled}
-        class="mono font-mono"
-        aria-label="Cron expression"
-      />
-    </div>
     <Select.Root bind:value={selectedPreset} type="single" {disabled}>
-      <Select.Trigger class="w-[140px]">
+      <Select.Trigger class="w-35">
         <Clock class="mr-2 h-4 w-4" />
         Presets
       </Select.Trigger>
@@ -125,6 +126,15 @@
         {/each}
       </Select.Content>
     </Select.Root>
+    <div class="flex-1">
+      <Input
+        bind:value
+        {placeholder}
+        {disabled}
+        class="mono font-mono"
+        aria-label="Cron expression"
+      />
+    </div>
   </div>
 
   <div class="flex items-center gap-2 text-xs">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Accordion from '$lib/components/ui/accordion';
+  import type { Snippet } from 'svelte';
 
   const {
     title,
@@ -9,7 +10,7 @@
     title?: string;
     subtitle?: string;
     separator?: boolean;
-    children: () => any;
+    children: Snippet;
   } = $props();
 </script>
 

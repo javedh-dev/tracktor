@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as fuelLogService from '$server/services/fuelLogService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Fuel log GET error:', async () => {
     const { logId } = event.params;
 
     if (!logId) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await fuelLogService.getFuelLogById(logId);
     return json(result);
-  } catch (err) {
-    console.error('Fuel log GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Fuel log PUT error:', async () => {
     const { id, logId } = event.params;
 
     if (!id || !logId) {
@@ -59,23 +47,11 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await fuelLogService.updateFuelLog(id, logId, body);
     return json(result);
-  } catch (err) {
-    console.error('Fuel log PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Fuel log DELETE error:', async () => {
     const { logId } = event.params;
 
     if (!logId) {
@@ -84,17 +60,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await fuelLogService.deleteFuelLog(logId);
     return json(result);
-  } catch (err) {
-    console.error('Fuel log DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

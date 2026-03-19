@@ -20,6 +20,19 @@ async function getNotificationProcessingSchedule(): Promise<string> {
   return '0 9 * * *';
 }
 
+async function isNotificationProcessingEnabled(): Promise<boolean> {
+  try {
+    const result = await getAppConfigByKey('notificationProcessingEnabled');
+    if (result.success && result.data?.value !== undefined) {
+      return result.data.value === 'true';
+    }
+  } catch {
+    // Fallback to enabled below.
+  }
+
+  return true;
+}
+
 export async function processScheduledNotifications(): Promise<void> {
   const result = await dispatchScheduledNotifications();
 
@@ -37,11 +50,17 @@ export async function processScheduledNotifications(): Promise<void> {
 }
 
 export async function initializeNotificationScheduler(): Promise<void> {
+  const enabled = await isNotificationProcessingEnabled();
   const schedule = await getNotificationProcessingSchedule();
 
   if (scheduledTask) {
     scheduledTask.stop();
     scheduledTask = null;
+  }
+
+  if (!enabled) {
+    logger.info('Notification scheduler disabled');
+    return;
   }
 
   if (!cron.validate(schedule)) {

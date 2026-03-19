@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 // POST /api/auth/register - Register a new user
 export const POST: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Register POST error:', async () => {
     const body = event.locals.requestBody || (await event.request.json());
 
     // Validate request body
@@ -24,17 +24,5 @@ export const POST: RequestHandler = async (event) => {
 
     const result = await authService.createUser(body.username, body.password);
     return json(result);
-  } catch (err) {
-    console.error('Register POST error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

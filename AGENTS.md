@@ -1,313 +1,144 @@
-# AGENTS.md - Tracktor Project Guide for AI Coding Agents
-
-## Project Overview
-
-**Tracktor** is a full-stack SvelteKit web application for vehicle management (fuel, maintenance, insurance, documents).
-
-- **Frontend:** SvelteKit (Svelte 5), Tailwind CSS v4, shadcn-svelte components
-- **Backend:** SvelteKit server routes, SQLite database via Drizzle ORM
-- **Language:** TypeScript (strict mode) with ES modules
-- **Build Tool:** Vite
-- **Package Manager:** pnpm (required)
-- **Testing:** Vitest with jsdom
-- **i18n:** Paraglide (inlang) - translations in `messages/`, generated code in `src/lib/paraglide/`
-
----
-
-## Build, Lint, and Test Commands
-
-### Development
-
-```bash
-pnpm install              # Install dependencies (required: pnpm)
-pnpm dev                  # Start dev server with --host
-pnpm build                # Production build
-pnpm preview              # Preview production build
-pnpm start                # Start production server (node build)
-```
-
-### Testing
-
-```bash
-pnpm test                 # Run all tests once
-pnpm test:watch           # Run tests in watch mode
-pnpm test:coverage        # Generate coverage report
-
-# Run a single test file
-pnpm vitest src/__tests__/specific-file.test.ts
-
-# Run tests matching a pattern
-pnpm vitest --run -t "test name pattern"
-```
-
-### Code Quality
-
-```bash
-pnpm lint                 # Run ESLint + Prettier check
-pnpm format               # Fix ESLint issues + format with Prettier
-pnpm check                # TypeScript/Svelte type checking
-pnpm check:watch          # Type checking in watch mode
-```
-
-### Database
-
-```bash
-pnpm db:generate          # Generate Drizzle migrations
-pnpm db:migrate           # Run database migrations
-pnpm db:seed              # Seed database with test data
-```
-
----
-
-## Project Architecture
-
-### Directory Structure
-
-```
-src/
-├── __tests__/              # Vitest test files
-├── hooks.server.ts         # Server hooks & middleware chain
-├── lib/
-│   ├── components/
-│   │   ├── ui/            # shadcn-svelte base components (alias: $ui)
-│   │   ├── app/           # App-specific reusable components (alias: $appui)
-│   │   ├── layout/        # Layout components (alias: $layout)
-│   │   └── feature/       # Feature-specific components (alias: $feature)
-│   ├── config/            # Client config (env.ts, themes)
-│   ├── constants/         # Application constants
-│   ├── domain/            # Domain models with Zod schemas
-│   ├── helper/            # Helper utilities (api, format, csv, etc.)
-│   ├── paraglide/         # Generated i18n files (DO NOT EDIT MANUALLY)
-│   ├── services/          # Client-side API services (alias: $services)
-│   ├── stores/            # Svelte stores (alias: $stores)
-│   ├── types/             # TypeScript type definitions
-│   └── utils/             # General client utilities
-├── routes/                # SvelteKit routes & API endpoints
-│   ├── (auth)/           # Auth routes (grouped layout)
-│   ├── dashboard/        # Dashboard routes
-│   └── api/              # API endpoints (+server.ts files)
-└── server/                # Server-side code (alias: $server)
-    ├── config/           # Server configuration
-    ├── db/               # Database schema, migrations, seeders
-    ├── exceptions/       # Custom AppError class
-    ├── middlewares/      # Express-style middlewares
-    ├── services/         # Server-side business logic
-    └── utils/            # Server utilities
-```
-
-### Path Aliases (use these for imports)
-
-- `$lib` → `./src/lib`
-- `$ui` → `./src/lib/components/ui`
-- `$appui` → `./src/lib/components/app`
-- `$layout` → `./src/lib/components/layout`
-- `$feature` → `./src/lib/components/feature`
-- `$stores` → `./src/lib/stores`
-- `$services` → `./src/lib/services`
-- `$helper` → `./src/lib/helper`
-- `$server` → `./src/server`
-
----
-
-## Code Style Guidelines
-
-### Formatting (Prettier + ESLint)
-
-- **Indentation:** Tabs (NOT spaces)
-- **Quotes:** Single quotes for strings
-- **Line Width:** 100 characters max
-- **Trailing Commas:** None
-- **Semicolons:** Required (automatic insertion by Prettier)
-- **File Naming:** kebab-case for files, PascalCase for Svelte components
-
-### TypeScript
-
-- **Strict Mode:** Always enabled - no `any` compromises unless absolutely necessary
-- **Type Annotations:** Explicit types for function parameters and return values
-- **Interfaces vs Types:** Use `type` for domain models, `interface` for contracts
-- **Imports:** Use path aliases (`$lib/`, `$server/`, etc.) over relative paths
-- **Null Handling:** Use optional chaining (`?.`) and nullish coalescing (`??`)
-
-### Svelte 5 Patterns
-
-```typescript
-// Use Svelte 5 runes (modern syntax)
-let count = $state(0);                    // Reactive state
-let doubled = $derived(count * 2);        // Computed values
-$effect(() => console.log(count));        // Side effects
-let { prop = 'default' } = $props();      // Component props
-
-// Component snippets for composition
-{#snippet header()}
-  <h1>Title</h1>
-{/snippet}
-```
-
-### Naming Conventions
-
-- **Variables/Functions:** camelCase (`getUserById`, `vehicleData`)
-- **Components:** PascalCase (`VehicleCard.svelte`, `FuelLogForm.svelte`)
-- **Constants:** UPPER_SNAKE_CASE for true constants (`MAX_RETRIES`)
-- **Types/Interfaces:** PascalCase (`Vehicle`, `ApiResponse<T>`)
-- **Database Tables:** snake_case (handled by Drizzle config)
-- **Files:** kebab-case (`vehicle.service.ts`, `fuel-log-form.svelte`)
-
-### Imports Organization
+Tracktor repository instructions for agentic coding work.
 
-```typescript
-// 1. External libraries
-import { eq } from 'drizzle-orm';
-import { z } from 'zod';
+## Svelte MCP Usage
 
-// 2. SvelteKit imports
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+Use the Svelte MCP server for any Svelte, SvelteKit, or `.svelte`/
+`.svelte.ts` work.
 
-// 3. Internal absolute imports (use path aliases)
-import { db } from '$server/db';
-import type { Vehicle } from '$lib/domain/vehicle';
-import * as m from '$lib/paraglide/messages';
+### 1. `list-sections`
 
-// 4. Relative imports (only for same directory)
-import { helperFunction } from './utils';
-```
+Use this first to discover docs sections. Always start Svelte tasks here.
 
-### Error Handling
+### 2. `get-documentation`
 
-```typescript
-// Server-side: Use AppError class
-import { AppError, Status } from '$server/exceptions/AppError';
+After `list-sections`, inspect `use_cases` and fetch all relevant sections at
+once when possible.
 
-throw new AppError('Resource not found', Status.NOT_FOUND);
+### 3. `svelte-autofixer`
 
-// Client-side: Use try-catch with proper typing
-try {
-  const result = await apiService.getData();
-} catch (err) {
-  const error = err as Error;
-  console.error('Failed to fetch:', error.message);
-}
+Use this whenever writing or editing Svelte code. Iterate until clean.
 
-// SvelteKit: Use error() helper in load functions
-import { error } from '@sveltejs/kit';
-throw error(404, 'Vehicle not found');
-```
+### 4. `playground-link`
 
-### Database Patterns (Drizzle ORM)
+Only use after the user asks for a playground link. Never use it for code
+already written to the repo.
 
-```typescript
-// Use query builder for complex queries
-const vehicle = await db.query.vehicleTable.findFirst({
-  where: (v, { eq }) => eq(v.id, vehicleId),
-  with: { fuelLogs: true }
-});
+## Project Snapshot
 
-// Use select for simple queries
-const vehicles = await db
-  .select()
-  .from(schema.vehicleTable)
-  .where(eq(schema.vehicleTable.userId, userId));
+- Tracktor is a vehicle management app built with SvelteKit, Svelte 5, Vite,
+  Tailwind CSS, SQLite, and Drizzle ORM.
+- i18n uses inlang / Paraglide.
+- TypeScript is the default, with strict checking enabled.
 
-// Always use transactions for multi-step operations
-await db.transaction(async (tx) => {
-  await tx.insert(schema.vehicleTable).values(newVehicle);
-  await tx.insert(schema.fuelLogTable).values(initialLog);
-});
-```
+## Key Paths
 
-### Validation (Zod)
+- `src/routes/` pages, layouts, and endpoints.
+- `src/lib/components/` reusable UI.
+- `src/lib/domain/` business rules and models.
+- `src/lib/services/` orchestration and data access.
+- `src/lib/helper/` shared helpers.
+- `src/lib/config/` app config and feature toggles.
+- `src/server/` server-only helpers.
+- `messages/`, `project.inlang/`, `migrations/` for i18n and DB work.
 
-- Define schemas in `src/lib/domain/` with Zod
-- Use for both runtime validation and TypeScript type inference
-- Example: `vehicleSchema`, `fuelLogSchema`, `userSchema`
+## Core Commands
 
-### State Management
+- Install: `pnpm install`
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Preview: `pnpm preview`
+- Check: `pnpm check`
+- Watch check: `pnpm check:watch`
+- Lint: `pnpm lint`
+- Format: `pnpm format`
+- Test: `pnpm test`
+- Test watch: `pnpm test:watch`
+- Coverage: `pnpm test:coverage`
+- DB: `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`
+- Clean: `pnpm clean`
 
-- Use Svelte 5 runes (`$state`, `$derived`, `$effect`) for local component state
-- Use stores in `src/lib/stores/` for global/shared state
-- Store pattern: Class-based with runes, export singleton instance
+## Single-Test Commands
 
-### Logging
+- Run one file: `pnpm test -- path/to/file.test.ts`
+- Run one file directly: `pnpm vitest --run path/to/file.test.ts`
+- Run by name: `pnpm test -- -t "test name"`
+- Run a focused pattern: `pnpm vitest --run -t "test name"`
+- Run a folder: `pnpm vitest --run src/__tests__/feature`
 
-```typescript
-// Server-side only (winston logger)
-import logger from '$server/config/logger';
+## Tooling Expectations
 
-logger.info('Operation successful', { vehicleId, userId });
-logger.error('Database error', { error: err.message });
-```
+- Use `pnpm` for package commands.
+- Prefer repo scripts over raw binaries.
+- Run `pnpm check` and `pnpm lint` before finishing.
+- For test or logic changes, run the narrowest relevant test first.
 
----
+## Code Style
 
-## Testing Guidelines
+- Use ESM only; the repo is `type: module`.
+- Keep TypeScript strict; avoid `any` unless the surrounding code already uses it.
+- Remove unused imports; ESLint fails on them.
+- Prefer small, composable functions and clear names.
+- Use `camelCase` for values/functions, `PascalCase` for components/types,
+  and `SCREAMING_SNAKE_CASE` for constants.
+- Keep route/server code aligned with SvelteKit conventions.
+- Prefer aliases from `svelte.config.js` over long relative paths.
+- Group imports: external, aliases, then local.
 
-- Place tests in `src/__tests__/` (currently minimal coverage - contributions welcome!)
-- Use descriptive test names: `test('should calculate mileage correctly for partial fills', ...)`
-- Use `describe` blocks to group related tests
-- Mock external dependencies (database, API calls)
-- Test both happy paths and error cases
+## Formatting Rules
 
----
+- Follow the existing Prettier + ESLint setup.
+- Let `pnpm format` handle spacing, wrapping, and ordering.
+- Match the repo's quote and semicolon style.
+- Add comments only when something is non-obvious.
 
-## Important Conventions
+## Svelte Conventions
 
-### Feature Toggles
+- Assume Svelte 5 semantics where the file already uses them.
+- Use runes only where the project already expects them.
+- Keep props and events simple.
+- Prefer derived values/helpers over complex template logic.
+- Split busy `.svelte` markup into smaller components.
 
-- Documented in `docs/feature-toggles.md`
-- Controlled via `src/lib/config/`
-- Use `<FeatureGate feature="featureName">` component for conditional rendering
+## TypeScript Conventions
 
-### Internationalization (i18n)
+- Keep `strict`-compatible types in mind.
+- Prefer inference for obvious locals; annotate public APIs and shared helpers.
+- Use `unknown` for untrusted data.
+- Narrow before accessing API/request/JSON values.
+- Preserve file-name casing.
 
-```typescript
-// Import messages (generated, DO NOT EDIT src/lib/paraglide/)
-import * as m from '$lib/paraglide/messages';
+## Error Handling
 
-// Use in code
-const title = m.dashboard_title();
+- Fail fast on invalid inputs.
+- Prefer existing response helpers over ad hoc shapes.
+- Return clear, actionable error messages.
+- Log enough context to debug, but never leak secrets or raw user data.
+- Prefer typed branches and validation over broad catch-alls.
 
-// Use in Svelte templates
-<h1>{m.vehicles_list_title()}</h1>
-```
+## Testing Guidance
 
-### Environment Variables
+- Keep tests close to the behavior they cover.
+- Name tests clearly so `-t` and file filters stay useful.
+- Add regression tests for bug fixes when practical.
+- Prefer deterministic tests with minimal external dependencies.
 
-- Client-side: Define in `src/lib/config/env.ts`, prefix with `TRACKTOR_`
-- Server-side: Define in `src/lib/config/env.server.ts`, use `dotenv`
-- See `.env.example` for all available variables
+## Repo-Specific Rules
 
-### Authentication
+- Respect boundaries under `src/lib/domain`, `src/lib/services`, and
+  `src/lib/components`.
+- Keep translation changes in `messages/` aligned with inlang.
+- Use the Drizzle migration workflow for schema changes.
+- Do not edit generated or ignored directories unless required.
 
-- Server-side session validation in `hooks.server.ts`
-- Password hashing with bcrypt
-- Session tokens with `@oslojs/crypto`
+## Existing Guidance To Preserve
 
-### CI/CD Pipeline (GitHub Actions)
+- Copy the intent of `.github/copilot-instructions.md`.
+- If `.cursor/rules/` or `.cursorrules` exist, incorporate them too.
+- Keep changes consistent with the repo architecture and docs.
 
-1. Compile i18n messages
-2. Lint check (`pnpm lint`)
-3. Type check (`pnpm check`)
-4. Run tests (`pnpm test`)
-5. Build (`pnpm build`)
+## When In Doubt
 
----
-
-## DO NOT
-
-- ❌ Edit generated files in `src/lib/paraglide/` or `src/lib/components/ui/` manually
-- ❌ Use spaces for indentation (tabs only)
-- ❌ Use relative imports for cross-directory imports (use path aliases)
-- ❌ Add trailing commas
-- ❌ Skip type annotations on exported functions
-- ❌ Commit `.env` files (use `.env.example` as template)
-- ❌ Use `console.log` in production code (use `logger` on server)
-- ❌ Skip validation on user inputs (always use Zod schemas)
-
----
-
-## References
-
-- [README.md](./README.md) - Project overview and setup
-- [docs/](./docs/) - Detailed documentation (installation, auth, features)
-- [.github/copilot-instructions.md](./.github/copilot-instructions.md) - Original Copilot rules
-- [project.inlang/](./project.inlang/) - i18n configuration
+- Read the nearest module, test, or route first.
+- Match patterns in the same folder.
+- Prefer the smallest safe change.
+- Validate with checks/tests before handing work back.

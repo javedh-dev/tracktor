@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as fuelLogService from '$server/services/fuelLogService';
-import { AppError } from '$server/exceptions/AppError';
 import { fuelSchema } from '$lib/domain/fuel';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Fuel logs GET error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -14,23 +14,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await fuelLogService.getFuelLogs(id);
     return json(result);
-  } catch (err) {
-    console.error('Fuel logs GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const POST: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Fuel logs POST error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -71,17 +59,5 @@ export const POST: RequestHandler = async (event) => {
 
     const result = await fuelLogService.addFuelLog(id, body);
     return json(result, { status: 201 });
-  } catch (err) {
-    console.error('Fuel logs POST error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

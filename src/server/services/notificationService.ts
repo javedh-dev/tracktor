@@ -8,20 +8,19 @@ import { and, eq, inArray } from 'drizzle-orm';
 
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
+import {
+  formatExpiryMessage,
+  formatReminderMessage,
+  getDaysUntil,
+  isReminderAvailable,
+  sortNotificationsByDueDate,
+  type GeneratedNotification
+} from './notification-service.helper';
+import { createFailureResponse, createSuccessResponse } from './service-response.helper';
 
 type NotificationType = keyof typeof NOTIFICATION_TYPES;
 type NotificationSource = keyof typeof NOTIFICATION_SOURCES;
 type NotificationChannel = keyof typeof NOTIFICATION_CHANNELS;
-
-type GeneratedNotification = {
-  vehicleId: string;
-  type: NotificationType;
-  channel: NotificationChannel;
-  message: string;
-  source: NotificationSource;
-  dueDate: string;
-  notificationKey: string;
-};
 
 const CHANNEL_BY_TYPE: Record<NotificationType, NotificationChannel> = {
   reminder: 'reminder',
@@ -32,75 +31,6 @@ const CHANNEL_BY_TYPE: Record<NotificationType, NotificationChannel> = {
   registration: 'alert',
   information: 'information'
 };
-
-function toDateOnly(value: Date): Date {
-  return new Date(value.getFullYear(), value.getMonth(), value.getDate());
-}
-
-function calculateReminderNotificationDate(dueDate: Date, remindSchedule: string): Date {
-  const notificationDate = new Date(dueDate);
-
-  switch (remindSchedule) {
-    case 'one_day_before':
-      notificationDate.setDate(notificationDate.getDate() - 1);
-      break;
-    case 'three_days_before':
-      notificationDate.setDate(notificationDate.getDate() - 3);
-      break;
-    case 'one_week_before':
-      notificationDate.setDate(notificationDate.getDate() - 7);
-      break;
-    case 'one_month_before':
-      notificationDate.setMonth(notificationDate.getMonth() - 1);
-      break;
-    default:
-      break;
-  }
-
-  return notificationDate;
-}
-
-function isReminderAvailable(dueDate: Date, remindSchedule: string): boolean {
-  const today = toDateOnly(new Date());
-  const notificationDate = toDateOnly(calculateReminderNotificationDate(dueDate, remindSchedule));
-
-  return notificationDate <= today;
-}
-
-function formatReminderMessage(type: string, note: string | null, dueDate: Date): string {
-  const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-  const dueDateFormatted = dueDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-
-  return `${typeLabel} reminder${note ? `: ${note}` : ''} (Due: ${dueDateFormatted})`;
-}
-
-function getDaysUntil(targetDate: Date): number {
-  const today = toDateOnly(new Date());
-  const target = toDateOnly(targetDate);
-  return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function formatExpiryMessage(label: string, identifier: string, daysUntilExpiry: number): string {
-  if (daysUntilExpiry < 0) {
-    return `${label} ${identifier} expired ${Math.abs(daysUntilExpiry)} day${
-      Math.abs(daysUntilExpiry) === 1 ? '' : 's'
-    } ago`;
-  }
-
-  if (daysUntilExpiry === 0) {
-    return `${label} ${identifier} expires today`;
-  }
-
-  if (daysUntilExpiry === 1) {
-    return `${label} ${identifier} expires tomorrow`;
-  }
-
-  return `${label} ${identifier} expires in ${daysUntilExpiry} days`;
-}
 
 async function buildReminderNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
   const reminders = await db.query.reminderTable.findMany({
@@ -190,9 +120,7 @@ async function buildAvailableNotifications(vehicleId: string): Promise<Generated
     buildPuccNotifications(vehicleId)
   ]);
 
-  return [...reminders, ...insurances, ...puccCertificates].sort(
-    (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-  );
+  return sortNotificationsByDueDate([...reminders, ...insurances, ...puccCertificates]);
 }
 
 async function removeStaleNotifications(vehicleId: string, activeKeys: Set<string>): Promise<void> {
@@ -281,10 +209,7 @@ export const getNotifications = async (vehicleId: string): Promise<ApiResponse> 
     ]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const getPendingNotificationsForChannels = async (
@@ -302,10 +227,7 @@ export const getPendingNotificationsForChannels = async (
     orderBy: (notification, { asc }) => [asc(notification.dueDate), asc(notification.created_at)]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const getActiveNotificationsForChannels = async (
@@ -319,10 +241,7 @@ export const getActiveNotificationsForChannels = async (
     orderBy: (notification, { asc }) => [asc(notification.dueDate), asc(notification.created_at)]
   });
 
-  return {
-    data: notifications,
-    success: true
-  };
+  return createSuccessResponse(notifications);
 };
 
 export const clearNotification = async (notificationId: string): Promise<ApiResponse> => {
@@ -331,19 +250,11 @@ export const clearNotification = async (notificationId: string): Promise<ApiResp
   });
 
   if (!existingNotification) {
-    return {
-      data: null,
-      success: false,
-      message: 'Notification not found.'
-    };
+    return createFailureResponse('Notification not found.', null);
   }
 
   if (existingNotification.channel === 'alert') {
-    return {
-      data: null,
-      success: false,
-      message: 'Alert notifications cannot be cleared.'
-    };
+    return createFailureResponse('Alert notifications cannot be cleared.', null);
   }
 
   const clearedNotifications = await db
@@ -352,11 +263,7 @@ export const clearNotification = async (notificationId: string): Promise<ApiResp
     .where(eq(schema.notificationTable.id, notificationId))
     .returning();
 
-  return {
-    data: clearedNotifications[0],
-    success: true,
-    message: 'Notification cleared successfully.'
-  };
+  return createSuccessResponse(clearedNotifications[0], 'Notification cleared successfully.');
 };
 
 export const markNotificationAsRead = async (notificationId: string): Promise<ApiResponse> => {
@@ -367,18 +274,10 @@ export const markNotificationAsRead = async (notificationId: string): Promise<Ap
     .returning();
 
   if (updatedNotification.length === 0) {
-    return {
-      data: null,
-      success: false,
-      message: 'Notification not found.'
-    };
+    return createFailureResponse('Notification not found.', null);
   }
 
-  return {
-    data: updatedNotification[0],
-    success: true,
-    message: 'Notification marked as read.'
-  };
+  return createSuccessResponse(updatedNotification[0], 'Notification marked as read.');
 };
 
 export const markAllNotificationsAsRead = async (vehicleId: string): Promise<ApiResponse> => {
@@ -395,9 +294,5 @@ export const markAllNotificationsAsRead = async (vehicleId: string): Promise<Api
     )
     .returning();
 
-  return {
-    data: updatedNotifications,
-    success: true,
-    message: 'All notifications marked as read.'
-  };
+  return createSuccessResponse(updatedNotifications, 'All notifications marked as read.');
 };

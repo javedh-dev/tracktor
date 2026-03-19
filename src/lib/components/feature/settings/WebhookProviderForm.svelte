@@ -5,6 +5,8 @@
   import type { WebhookProviderConfig } from '$lib/domain/notification-provider';
   import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
+  type WebhookAuthCredentials = NonNullable<WebhookProviderConfig['authCredentials']>;
+
   interface Props {
     config?: WebhookProviderConfig;
     isEditing?: boolean;
@@ -37,7 +39,7 @@
 
   // Notify parent of config changes
   $effect(() => {
-    const authCredentials: any = {};
+    const authCredentials: WebhookAuthCredentials = {};
     if (formAuthType === 'basic') {
       authCredentials.username = formUsername;
       authCredentials.password = formPassword;
