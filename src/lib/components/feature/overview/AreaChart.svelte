@@ -124,7 +124,7 @@
       >
         {#snippet tooltip()}
           <Chart.Tooltip labelFormatter={xFormatter} indicator="line">
-            {#snippet formatter({ value, name, _ })}
+            {#snippet formatter({ value, name })}
               {@const formattedValue =
                 typeof value === 'number' ? (valueFormatter?.(value) ?? value.toFixed(2)) : value}
               <span class="text-muted-foreground">{name}</span>
