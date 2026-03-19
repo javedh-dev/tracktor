@@ -1,15 +1,16 @@
 <script lang="ts">
-  import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { type FuelLog } from '$lib/domain/fuel';
 
   import Badge from '$ui/badge/badge.svelte';
   import {
-    formatCurrency,
-    formatDate,
-    formatDistance,
-    formatFuel,
-    getMileageUnit
-  } from '$lib/helper/format.helper';
+    formatTableBoolean,
+    formatTableCurrency,
+    formatTableDate,
+    formatTableDistance,
+    formatTableFuelAmount,
+    formatTableMileage,
+    formatTableText
+  } from '$helper/table-cell.helper';
   import FuelLogContextMenu from './FuelLogContextMenu.svelte';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Rabbit from '@lucide/svelte/icons/rabbit';
@@ -24,11 +25,12 @@
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import ResourceState from '$appui/ResourceState.svelte';
+  import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import {
     col_date,
     col_odometer,
@@ -180,65 +182,49 @@
 </script>
 
 {#if fuelLogStore.processing}
-  <div id="fuel-log-list-skeleton" class="space-y-3">
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-    <Skeleton class="h-12 w-full rounded-md" />
-  </div>
+  <TableSkeleton containerId="fuel-log-list-skeleton" />
 {:else if fuelLogStore.error}
-  <p class="text-red-500">Error: {fuelLogStore.error}</p>
+  <ResourceState state="error" message={fuelLogStore.error} />
 {:else if fuelLogStore.fuelLogs?.length === 0}
-  <LabelWithIcon
-    icon={CircleSlash2}
-    iconClass="h-5 w-5"
-    style="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center"
-    label={fuel_empty_list()}
-  />
+  <ResourceState state="empty" message={fuel_empty_list()} />
 {:else}
   <AppTable data={fuelLogStore.fuelLogs || []} {columns} />
 {/if}
 
 {#snippet badge(params: any)}
   <div class="flex flex-row justify-center">
-    <Badge variant="outline"><span>{params.value ? common_yes() : common_no()}</span></Badge>
+    <Badge variant="outline"
+      ><span>{formatTableBoolean(params.value, common_yes(), common_no())}</span></Badge
+    >
   </div>
 {/snippet}
 
 {#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatDate(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
 {/snippet}
 
 {#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">
-    {params.value !== null && params.value !== undefined ? formatDistance(params.value) : '-'}
-  </div>
+  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
 {/snippet}
 
 {#snippet fuelAmountCell(params: any)}
   <div class="flex flex-row justify-center">
-    {params.amount !== null && params.amount !== undefined
-      ? formatFuel(params.amount, params.fuelType as string)
-      : '-'}
+    {formatTableFuelAmount(params.amount, params.fuelType as string | undefined)}
   </div>
 {/snippet}
 
 {#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatCurrency(params.value)}</div>
+  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
 {/snippet}
 
 {#snippet mileageCell(params: any)}
-  {@const unit = getMileageUnit(params.fuelType as string)}
-  {@const isValidNumber =
-    params.mileage != null && typeof params.mileage === 'number' && !isNaN(params.mileage)}
   <div class="flex flex-row justify-center">
-    {!isValidNumber ? '-' : `${params.mileage.toFixed(2)} ${unit}`}
+    {formatTableMileage(params.mileage, params.fuelType as string | undefined)}
   </div>
 {/snippet}
 
 {#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{params.value || '-'}</div>
+  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
 {/snippet}
 
 {#snippet attachmentCell(params: any)}

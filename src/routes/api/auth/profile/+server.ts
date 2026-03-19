@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 // PUT /api/auth/profile - Update current user's profile (username/password)
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Profile PUT error:', async () => {
     // Get current user from session
     const sessionToken = event.cookies.get('session');
     if (!sessionToken) {
@@ -40,17 +40,5 @@ export const PUT: RequestHandler = async (event) => {
     });
 
     return json(result);
-  } catch (err) {
-    console.error('Profile PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

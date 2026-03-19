@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as autocompleteService from '$server/services/autocompleteService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Autocomplete GET error:', async () => {
     const field = event.url.searchParams.get('field');
 
     if (!field) {
@@ -39,17 +39,5 @@ export const GET: RequestHandler = async (event) => {
     }
 
     return json(result);
-  } catch (err) {
-    console.error('Autocomplete GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

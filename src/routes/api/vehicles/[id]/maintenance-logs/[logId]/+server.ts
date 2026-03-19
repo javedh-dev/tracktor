@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as maintenanceLogService from '$server/services/maintenanceLogService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Maintenance log GET error:', async () => {
     const { logId } = event.params;
 
     if (!logId) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await maintenanceLogService.getMaintenanceLogById(logId);
     return json(result);
-  } catch (err) {
-    console.error('Maintenance log GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const PUT: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Maintenance log PUT error:', async () => {
     const { logId } = event.params;
 
     if (!logId) {
@@ -53,23 +41,11 @@ export const PUT: RequestHandler = async (event) => {
 
     const result = await maintenanceLogService.updateMaintenanceLog(logId, body);
     return json(result);
-  } catch (err) {
-    console.error('Maintenance log PUT error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Maintenance log DELETE error:', async () => {
     const { logId } = event.params;
 
     if (!logId) {
@@ -78,17 +54,5 @@ export const DELETE: RequestHandler = async (event) => {
 
     const result = await maintenanceLogService.deleteMaintenanceLog(logId);
     return json(result);
-  } catch (err) {
-    console.error('Maintenance log DELETE error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

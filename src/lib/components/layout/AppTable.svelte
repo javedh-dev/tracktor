@@ -11,6 +11,7 @@
     type SortingState,
     type VisibilityState
   } from '@tanstack/table-core';
+  import { applyUpdater, getColumnDisplayName, getVisiblePageItems } from '$helper/table.helper';
   import { createSvelteTable, FlexRender } from '$ui/data-table/index.js';
   import * as Table from '$ui/table/index.js';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
@@ -26,6 +27,8 @@
   import Badge from '$ui/badge/badge.svelte';
   import Input from '$appui/input.svelte';
   import * as m from '$lib/paraglide/messages';
+
+  const PAGE_SIZE_OPTIONS = [5, 10, 15, 25, 50, 100];
 
   type DataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
@@ -70,83 +73,15 @@
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onPaginationChange: (updater) => {
-      if (typeof updater === 'function') {
-        pagination = updater(pagination);
-      } else {
-        pagination = updater;
-      }
-    },
-    onSortingChange: (updater) => {
-      if (typeof updater === 'function') {
-        sorting = updater(sorting);
-      } else {
-        sorting = updater;
-      }
-    },
-    onColumnFiltersChange: (updater) => {
-      if (typeof updater === 'function') {
-        columnFilters = updater(columnFilters);
-      } else {
-        columnFilters = updater;
-      }
-    },
-    onColumnVisibilityChange: (updater) => {
-      if (typeof updater === 'function') {
-        columnVisibility = updater(columnVisibility);
-      } else {
-        columnVisibility = updater;
-      }
-    },
-    onRowSelectionChange: (updater) => {
-      if (typeof updater === 'function') {
-        rowSelection = updater(rowSelection);
-      } else {
-        rowSelection = updater;
-      }
-    }
+    onPaginationChange: (updater) => (pagination = applyUpdater(updater, pagination)),
+    onSortingChange: (updater) => (sorting = applyUpdater(updater, sorting)),
+    onColumnFiltersChange: (updater) => (columnFilters = applyUpdater(updater, columnFilters)),
+    onColumnVisibilityChange: (updater) =>
+      (columnVisibility = applyUpdater(updater, columnVisibility)),
+    onRowSelectionChange: (updater) => (rowSelection = applyUpdater(updater, rowSelection))
   });
 
-  // Calculate visible page numbers with ellipsis
-  const visiblePages = $derived(() => {
-    const totalPages = table.getPageCount();
-    const currentPage = table.getState().pagination.pageIndex;
-    const maxVisiblePages = 7; // Show max 7 page buttons
-
-    if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
-      return Array.from({ length: totalPages }, (_, i) => i);
-    }
-
-    const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
-
-    // Always show first page
-    pages.push(0);
-
-    // Calculate range around current page
-    const rangeStart = Math.max(1, currentPage - 1);
-    const rangeEnd = Math.min(totalPages - 2, currentPage + 2);
-
-    // Add ellipsis after first page if needed
-    if (rangeStart > 1) {
-      pages.push('ellipsis-start');
-    }
-
-    // Add pages around current page
-    for (let i = rangeStart; i <= rangeEnd; i++) {
-      pages.push(i);
-    }
-
-    // Add ellipsis before last page if needed
-    if (rangeEnd < totalPages - 2) {
-      pages.push('ellipsis-end');
-    }
-
-    // Always show last page
-    pages.push(totalPages - 1);
-
-    return pages;
-  });
+  const visiblePages = $derived(getVisiblePageItems(table));
 </script>
 
 <div id="app-table-container">
@@ -180,28 +115,12 @@
           {#each table
             .getAllColumns()
             .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
-            {@const headerContent = column.columnDef.header}
-            {@const displayName =
-              typeof headerContent === 'function'
-                ? (() => {
-                    try {
-                      const result = headerContent({} as any);
-                      // Try to extract label from rendered component
-                      if (result && typeof result === 'object' && 'props' in result) {
-                        return result.props?.label || column.id;
-                      }
-                      return column.id;
-                    } catch {
-                      return column.id;
-                    }
-                  })()
-                : column.id}
             <DropdownMenu.CheckboxItem
               class="capitalize"
               checked={column.getIsVisible()}
               onCheckedChange={(value) => column.toggleVisibility(!!value)}
             >
-              {displayName}
+              {getColumnDisplayName(column)}
             </DropdownMenu.CheckboxItem>
           {/each}
         </DropdownMenu.Content>
@@ -260,7 +179,7 @@
         >
           <ArrowLeft />
         </Button>
-        {#each visiblePages() as pageItem}
+        {#each visiblePages as pageItem}
           {#if typeof pageItem === 'number'}
             <Badge
               variant="outline"
@@ -292,7 +211,7 @@
         <Select.Root type="single" bind:value={pageSize}>
           <Select.Trigger size="sm">{pageSize}</Select.Trigger>
           <Select.Content>
-            {#each [5, 10, 15, 25, 50, 100] as rowsPerPage, index}
+            {#each PAGE_SIZE_OPTIONS as rowsPerPage, index}
               <Select.Item value={rowsPerPage.toString()} id={index.toString()}>
                 {rowsPerPage}
               </Select.Item>

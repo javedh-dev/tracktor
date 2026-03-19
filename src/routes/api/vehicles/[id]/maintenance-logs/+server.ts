@@ -1,10 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as maintenanceLogService from '$server/services/maintenanceLogService';
-import { AppError } from '$server/exceptions/AppError';
+import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Maintenance logs GET error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -13,23 +13,11 @@ export const GET: RequestHandler = async (event) => {
 
     const result = await maintenanceLogService.getMaintenanceLogs(id);
     return json(result);
-  } catch (err) {
-    console.error('Maintenance logs GET error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };
 
 export const POST: RequestHandler = async (event) => {
-  try {
+  return withRouteErrorHandling('Maintenance logs POST error:', async () => {
     const { id } = event.params;
 
     if (!id) {
@@ -57,17 +45,5 @@ export const POST: RequestHandler = async (event) => {
 
     const result = await maintenanceLogService.addMaintenanceLog(id, body);
     return json(result, { status: 201 });
-  } catch (err) {
-    console.error('Maintenance logs POST error:', err);
-
-    if (err instanceof AppError) {
-      throw error(err.status, err.message);
-    }
-
-    if (err instanceof Error && 'status' in err) {
-      throw err;
-    }
-
-    throw error(500, 'Internal server error');
-  }
+  });
 };

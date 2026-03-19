@@ -11,7 +11,8 @@ export const BOOLEAN_CONFIG_KEYS = new Set([
   'featurePucc',
   'featureReminders',
   'featureInsurance',
-  'featureOverview'
+  'featureOverview',
+  'notificationProcessingEnabled'
 ]);
 
 export interface Configs {
@@ -31,5 +32,6 @@ export interface Configs {
   featureReminders?: boolean;
   featureInsurance?: boolean;
   featureOverview?: boolean;
+  notificationProcessingEnabled?: boolean;
   notificationProcessingSchedule?: string;
 }

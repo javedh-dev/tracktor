@@ -2,9 +2,37 @@ import { AppError, Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import type { ApiResponse } from '$lib/response';
+import type { Reminder } from '$lib/domain/reminder';
 import { performDelete, validateVehicleExists } from '../utils/serviceUtils';
 import { eq } from 'drizzle-orm';
 import { syncVehicleNotifications } from './notificationService';
+import { createSuccessResponse, requireRecord } from './service-response.helper';
+
+type ReminderPayload = {
+  type: Reminder['type'];
+  dueDate: string;
+  remindSchedule: Reminder['remindSchedule'];
+  recurrenceType?: Reminder['recurrenceType'];
+  recurrenceInterval?: number;
+  recurrenceEndDate?: string | null;
+  note?: string | null;
+  isCompleted?: boolean;
+};
+
+function reminderRecordToPayload(
+  reminder: typeof schema.reminderTable.$inferSelect
+): ReminderPayload {
+  return {
+    type: reminder.type as Reminder['type'],
+    dueDate: reminder.dueDate,
+    remindSchedule: reminder.remindSchedule as Reminder['remindSchedule'],
+    recurrenceType: reminder.recurrenceType as Reminder['recurrenceType'],
+    recurrenceInterval: reminder.recurrenceInterval,
+    recurrenceEndDate: reminder.recurrenceEndDate,
+    note: reminder.note,
+    isCompleted: reminder.isCompleted
+  };
+}
 
 const sanitizeNote = (note: unknown) => {
   if (typeof note === 'string') {
@@ -14,7 +42,7 @@ const sanitizeNote = (note: unknown) => {
   return null;
 };
 
-const normalizeReminderPayload = (data: any, fallback?: any) => {
+const normalizeReminderPayload = (data: ReminderPayload, fallback?: Partial<ReminderPayload>) => {
   const merged = { ...fallback, ...data };
   const { type, remindSchedule, dueDate, recurrenceType, recurrenceInterval, recurrenceEndDate } =
     merged;
@@ -53,7 +81,10 @@ const normalizeReminderPayload = (data: any, fallback?: any) => {
   };
 };
 
-export const addReminder = async (vehicleId: string, reminderData: any): Promise<ApiResponse> => {
+export const addReminder = async (
+  vehicleId: string,
+  reminderData: ReminderPayload
+): Promise<ApiResponse> => {
   await validateVehicleExists(vehicleId);
   const payload = normalizeReminderPayload(reminderData);
   const inserted = await db
@@ -67,11 +98,7 @@ export const addReminder = async (vehicleId: string, reminderData: any): Promise
 
   await syncVehicleNotifications(vehicleId);
 
-  return {
-    data: inserted[0],
-    success: true,
-    message: 'Reminder created successfully.'
-  };
+  return createSuccessResponse(inserted[0], 'Reminder created successfully.');
 };
 
 export const getReminders = async (vehicleId: string): Promise<ApiResponse> => {
@@ -80,41 +107,33 @@ export const getReminders = async (vehicleId: string): Promise<ApiResponse> => {
     orderBy: (reminder, { asc }) => [asc(reminder.dueDate)]
   });
 
-  return {
-    data: reminders,
-    success: true
-  };
+  return createSuccessResponse(reminders);
 };
 
 export const getReminderById = async (id: string): Promise<ApiResponse> => {
-  const reminder = await db.query.reminderTable.findFirst({
-    where: (reminder, { eq }) => eq(reminder.id, id)
-  });
+  const reminder = requireRecord(
+    await db.query.reminderTable.findFirst({
+      where: (reminder, { eq }) => eq(reminder.id, id)
+    }),
+    `No reminder found for id : ${id}`
+  );
 
-  if (!reminder) {
-    throw new AppError(`No reminder found for id : ${id}`, Status.NOT_FOUND);
-  }
-
-  return {
-    data: reminder,
-    success: true
-  };
+  return createSuccessResponse(reminder);
 };
 
 export const updateReminder = async (
   vehicleId: string,
   id: string,
-  reminderData: any
+  reminderData: ReminderPayload
 ): Promise<ApiResponse> => {
-  const reminder = await db.query.reminderTable.findFirst({
-    where: (reminder, { eq, and }) => and(eq(reminder.vehicleId, vehicleId), eq(reminder.id, id))
-  });
+  const reminder = requireRecord(
+    await db.query.reminderTable.findFirst({
+      where: (reminder, { eq, and }) => and(eq(reminder.vehicleId, vehicleId), eq(reminder.id, id))
+    }),
+    `No reminder found for id : ${id}`
+  );
 
-  if (!reminder) {
-    throw new AppError(`No reminder found for id : ${id}`, Status.NOT_FOUND);
-  }
-
-  const payload = normalizeReminderPayload(reminderData, reminder);
+  const payload = normalizeReminderPayload(reminderData, reminderRecordToPayload(reminder));
   const [updated] = await db
     .update(schema.reminderTable)
     .set({ ...payload })
@@ -123,11 +142,7 @@ export const updateReminder = async (
 
   await syncVehicleNotifications(vehicleId);
 
-  return {
-    data: updated,
-    success: true,
-    message: 'Reminder updated successfully.'
-  };
+  return createSuccessResponse(updated, 'Reminder updated successfully.');
 };
 
 export const deleteReminder = async (id: string): Promise<ApiResponse> => {

@@ -3,12 +3,7 @@
   import FormLabel from '$appui/FormLabel.svelte';
   import * as Select from '$ui/select/index.js';
   import type { Component } from 'svelte';
-
-  interface Option {
-    value: string;
-    label: string;
-    colorPreview?: string;
-  }
+  import type { SettingsOption } from '$lib/types/settings';
 
   interface Props {
     form: any;
@@ -16,7 +11,7 @@
     label: string;
     description?: string;
     icon: Component;
-    options: Array<Option>;
+    options: Array<SettingsOption>;
     placeholder?: string;
     value: string;
     disabled?: boolean;
