@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getCurrencySymbol } from '$lib/helper/format.helper';
+  import { formatCurrency } from '$lib/helper/format.helper';
   import { chartStore } from '$stores/chart.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import AreaChart from './AreaChart.svelte';
@@ -14,6 +15,7 @@
   label={overview_chart_cost_label()}
   title={overview_chart_cost_title({ currency: getCurrencySymbol() })}
   loading={fuelLogStore.processing}
+  valueFormatter={(value: number) => formatCurrency(value)}
   xFormatter={(v: Date) =>
     v.toLocaleDateString('en-IN', {
       day: '2-digit',

@@ -9,12 +9,15 @@
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { overview_chart_no_data } from '$lib/paraglide/messages/_index.js';
 
+  type ChartPoint = DataPoint & { average: number };
+
   let {
     chartData,
     color = 'var(--primary)',
     label,
     title,
     xFormatter,
+    valueFormatter,
     loading = false
   }: {
     chartData: DataPoint[];
@@ -22,6 +25,7 @@
     label: string;
     title: string;
     xFormatter: (_: Date) => string;
+    valueFormatter?: (_: number) => string;
     loading?: boolean;
   } = $props();
 
@@ -51,13 +55,55 @@
       label
     }
   } satisfies Chart.ChartConfig);
+
+  const averageValue = $derived.by(() => {
+    const numericValues = chartData
+      .map((point) => point.y)
+      .filter((value): value is number => typeof value === 'number');
+    return numericValues.length
+      ? numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length
+      : 0;
+  });
+
+  const chartDataWithAverage = $derived.by(() => {
+    return chartData.map((point) => ({
+      ...point,
+      average: averageValue
+    })) as ChartPoint[];
+  });
+
+  const averageLinePosition = $derived.by(() => {
+    const values = chartData
+      .map((point) => point.y)
+      .filter((value): value is number => typeof value === 'number');
+    if (values.length === 0) return 50;
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (max === min) return 50;
+
+    return 100 - ((averageValue - min) / (max - min)) * 100;
+  });
+
+  const averageLabel = $derived.by(() => valueFormatter?.(averageValue) ?? averageValue.toFixed(2));
+
+  const formattedAverage = $derived.by(
+    () => valueFormatter?.(averageValue) ?? averageValue.toFixed(2)
+  );
 </script>
 
 <div
   id="chart-area-{title}"
-  class="area-chart lg:bg-background/50 bg-secondary rounded-lg px-4 pt-2 pb-6 lg:p-6"
+  class="area-chart lg:bg-background/50 bg-secondary relative rounded-lg px-4 pt-2 pb-6 lg:p-6"
 >
-  <div class="mb-4 flex flex-row justify-start font-bold">{title}</div>
+  <div class="mb-4 flex flex-row items-center justify-start gap-2 font-bold">
+    <span>{title}</span>
+    <span
+      class="bg-background/90 text-muted-foreground rounded-full border px-2 py-0.5 text-[11px] font-medium shadow-sm"
+    >
+      Avg: {formattedAverage}
+    </span>
+  </div>
   {#if loading}
     <div class="flex h-50 flex-col justify-end space-y-2">
       <div class="flex h-full items-end justify-between gap-2">
@@ -70,36 +116,59 @@
   {:else if chartData.length != 0}
     <Chart.Container config={chartConfig}>
       <AreaChart
-        data={chartData}
+        data={chartDataWithAverage}
         x="x"
         xScale={scaleUtc()}
         points={{
-          r: 3
+          r: 0
         }}
         series={[
           {
             key: 'y',
             label: chartConfig.data.label,
             color: chartConfig.data.color
+          },
+          {
+            key: 'average',
+            label: 'Average',
+            color: 'var(--muted-foreground)'
           }
         ]}
-        seriesLayout="stack"
         axis={'x'}
         props={chartProps}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip labelFormatter={xFormatter} indicator="line" />
+          <Chart.Tooltip labelFormatter={xFormatter} indicator="line">
+            {#snippet formatter({ value, name, item })}
+              {@const formattedValue =
+                typeof value === 'number' ? (valueFormatter?.(value) ?? value.toFixed(2)) : value}
+              <span class="text-muted-foreground">{name}</span>
+              <span class="font-mono font-medium tabular-nums">{formattedValue}</span>
+            {/snippet}
+          </Chart.Tooltip>
         {/snippet}
-        {#snippet marks({ series, getAreaProps })}
+        {#snippet marks({ series, getAreaProps }: any)}
           {#each series as s, i (s.key)}
-            <LinearGradient
-              stops={[s.color ?? '', 'color-mix(in lch, ' + s.color + ' 10%, transparent)']}
-              vertical
-            >
-              {#snippet children({ gradient })}
-                <Area {...getAreaProps(s, i)} fill={gradient} />
-              {/snippet}
-            </LinearGradient>
+            {#if s.key === 'y'}
+              <LinearGradient
+                stops={[s.color ?? '', 'color-mix(in lch, ' + s.color + ' 10%, transparent)']}
+                vertical
+              >
+                {#snippet children({ gradient })}
+                  <Area {...getAreaProps(s, i)} fill={gradient} />
+                {/snippet}
+              </LinearGradient>
+            {:else}
+              <Area
+                {...getAreaProps(s, i)}
+                fill="none"
+                line={{
+                  stroke: s.color ?? 'var(--muted-foreground)',
+                  strokeWidth: 1,
+                  'stroke-dasharray': '6 4'
+                }}
+              />
+            {/if}
           {/each}
         {/snippet}
       </AreaChart>
