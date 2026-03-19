@@ -72,21 +72,6 @@
     })) as ChartPoint[];
   });
 
-  const averageLinePosition = $derived.by(() => {
-    const values = chartData
-      .map((point) => point.y)
-      .filter((value): value is number => typeof value === 'number');
-    if (values.length === 0) return 50;
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    if (max === min) return 50;
-
-    return 100 - ((averageValue - min) / (max - min)) * 100;
-  });
-
-  const averageLabel = $derived.by(() => valueFormatter?.(averageValue) ?? averageValue.toFixed(2));
-
   const formattedAverage = $derived.by(
     () => valueFormatter?.(averageValue) ?? averageValue.toFixed(2)
   );
@@ -139,7 +124,7 @@
       >
         {#snippet tooltip()}
           <Chart.Tooltip labelFormatter={xFormatter} indicator="line">
-            {#snippet formatter({ value, name, item })}
+            {#snippet formatter({ value, name, _ })}
               {@const formattedValue =
                 typeof value === 'number' ? (valueFormatter?.(value) ?? value.toFixed(2)) : value}
               <span class="text-muted-foreground">{name}</span>

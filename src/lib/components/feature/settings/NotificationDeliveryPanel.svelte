@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Clock3 from '@lucide/svelte/icons/clock-3';
   import Loader2 from '@lucide/svelte/icons/loader-2';
   import Send from '@lucide/svelte/icons/send';
   import CronInput from '$feature/settings/CronInput.svelte';
