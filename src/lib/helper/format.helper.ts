@@ -211,7 +211,11 @@ const getMileageUnit = (vehicleType: string): string => {
   }
 
   // only show uk mpg if miles and liters are used
-  if (configs.mileageUnitFormat === 'uk-mpg' && configs.unitOfDistance === 'mile' && fuelUnit === 'liter') {
+  if (
+    configs.mileageUnitFormat === 'uk-mpg' &&
+    configs.unitOfDistance === 'mile' &&
+    fuelUnit === 'liter'
+  ) {
     return 'mpg';
   }
 
@@ -236,7 +240,11 @@ const formatMileage = (mileage: number, vehicleType: string): string => {
   }
 
   // only show uk mpg if miles and liters are used
-  if (configs.mileageUnitFormat === 'uk-mpg' && configs.unitOfDistance === 'mile' && fuelUnit === 'liter') {
+  if (
+    configs.mileageUnitFormat === 'uk-mpg' &&
+    configs.unitOfDistance === 'mile' &&
+    fuelUnit === 'liter'
+  ) {
     return `${mileage.toFixed(2)} mpg`;
   }
 
