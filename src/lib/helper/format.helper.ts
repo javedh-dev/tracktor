@@ -210,6 +210,11 @@ const getMileageUnit = (vehicleType: string): string => {
     return `${fuelLabel}/100${distanceUnit}`;
   }
 
+  // only show uk mpg if miles and liters are used
+  if (configs.mileageUnitFormat === 'uk-mpg' && configs.unitOfDistance === 'mile' && fuelUnit === 'liter') {
+    return 'mpg';
+  }
+
   // Default: distance-per-fuel (e.g., km/L, mpg)
   const mileageUnit = `${configs.unitOfDistance}-per-${fuelUnit}`;
   const label = safeUnitLabel(mileageUnit);
@@ -228,6 +233,11 @@ const formatMileage = (mileage: number, vehicleType: string): string => {
   if (configs.mileageUnitFormat === 'fuel-per-distance') {
     // For fuel/distance format (e.g., L/100km), display as fuel per 100 distance units
     return `${mileage.toFixed(2)} ${fuelLabel}/100${distanceUnit}`;
+  }
+
+  // only show uk mpg if miles and liters are used
+  if (configs.mileageUnitFormat === 'uk-mpg' && configs.unitOfDistance === 'mile' && fuelUnit === 'liter') {
+    return `${mileage.toFixed(2)} mpg`;
   }
 
   // Default: distance-per-fuel (e.g., km/L, mpg)

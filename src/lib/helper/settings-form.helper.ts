@@ -35,7 +35,7 @@ export function createSettingsConfigSchema(
     unitOfLpg: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('liter'),
     unitOfCng: z.enum(['liter', 'gallon', 'kilogram', 'pound']).default('kilogram'),
     mileageUnitFormat: z
-      .enum(['distance-per-fuel', 'fuel-per-distance'])
+      .enum(['distance-per-fuel', 'fuel-per-distance', 'uk-mpg'])
       .default('distance-per-fuel'),
     theme: z.string().default('light'),
     customCss: z.string().optional(),
@@ -46,7 +46,10 @@ export function createSettingsConfigSchema(
     featureInsurance: z.boolean().default(true),
     featureOverview: z.boolean().default(true),
     notificationProcessingEnabled: z.boolean().default(true)
-  });
+  }).refine((obj) => {
+    if (obj.mileageUnitFormat !== 'uk-mpg') return true;
+    return obj.unitOfDistance === 'mile' && obj.unitOfVolume === 'liter'
+  }, 'UK MPG calculation requires unit of distance to be miles and unit of volume to be litres.');
 
   if (!options.includeNotificationProcessingSchedule) {
     return baseSchema;
@@ -108,6 +111,10 @@ export function createSettingsOptions(
       {
         value: 'fuel-per-distance',
         label: m.settings_mileage_format_fuel_per_distance()
+      },
+      {
+        value: 'uk-mpg',
+        label: m.settings_mileage_format_uk_mpg()
       }
     ],
     localeOptions: locales.map((code) => ({
