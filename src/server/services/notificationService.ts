@@ -17,6 +17,7 @@ import {
   type GeneratedNotification
 } from './notification-service.helper';
 import { createFailureResponse, createSuccessResponse } from './service-response.helper';
+import { getAppConfigByKey } from './configService';
 
 type NotificationType = keyof typeof NOTIFICATION_TYPES;
 type NotificationSource = keyof typeof NOTIFICATION_SOURCES;
@@ -114,10 +115,18 @@ async function buildPuccNotifications(vehicleId: string): Promise<GeneratedNotif
 }
 
 async function buildAvailableNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
+  let puccEnabled = true;
+  try {
+    const puccConfig = await getAppConfigByKey('featurePucc');
+    if (puccConfig.success) puccEnabled = puccConfig.data?.value !== 'false';
+  } catch {
+    // key not in DB yet — default to enabled
+  }
+
   const [reminders, insurances, puccCertificates] = await Promise.all([
     buildReminderNotifications(vehicleId),
     buildInsuranceNotifications(vehicleId),
-    buildPuccNotifications(vehicleId)
+    puccEnabled ? buildPuccNotifications(vehicleId) : Promise.resolve([])
   ]);
 
   return sortNotificationsByDueDate([...reminders, ...insurances, ...puccCertificates]);
