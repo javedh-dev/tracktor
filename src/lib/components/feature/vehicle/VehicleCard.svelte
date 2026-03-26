@@ -9,7 +9,6 @@
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import Info from '@lucide/svelte/icons/info';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { browser } from '$app/environment';
   import IconButton from '$appui/IconButton.svelte';
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import * as Card from '$ui/card';
@@ -36,19 +35,12 @@
   const performDelete = async (vehicleId: string) => {
     deleteVehicle(vehicleId).then((res) => {
       if (res.status == 'OK') {
-        fetchVehicles();
+        vehicleStore.refreshVehicles();
         toast.success(m.vehicle_delete_success());
       } else {
         toast.error(res.error || m.vehicle_delete_error());
       }
     });
-  };
-
-  const fetchVehicles = () => {
-    if (browser) {
-      const pin = localStorage.getItem('userPin') || undefined;
-      if (pin) vehicleStore.refreshVehicles();
-    }
   };
 
   // Dynamic image URL - fallback to default if vehicle doesn't have image
