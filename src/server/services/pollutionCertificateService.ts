@@ -28,7 +28,8 @@ export const addPollutionCertificate = async (
     .insert(schema.pollutionCertificateTable)
     .values({
       ...sanitizedPayload,
-      vehicleId: vehicleId
+      vehicleId: vehicleId,
+      id: undefined
     })
     .returning();
   return createSuccessResponse(

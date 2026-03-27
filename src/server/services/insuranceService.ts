@@ -29,7 +29,8 @@ export const addInsurance = async (
     .insert(schema.insuranceTable)
     .values({
       ...sanitizedInsuranceData,
-      vehicleId: vehicleId
+      vehicleId: vehicleId,
+      id: undefined
     })
     .returning();
   return createSuccessResponse(insurance[0], 'Insurance details added successfully.');
