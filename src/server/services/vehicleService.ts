@@ -109,7 +109,10 @@ const calculateOverallMileage = async (vehicleId: string) => {
 
 export const addVehicle = async (vehicleData: VehicleMutationPayload): Promise<ApiResponse> => {
   const processedData = serializeVehiclePayload(vehicleData);
-  const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
+  const [vehicle] = await db
+    .insert(schema.vehicleTable)
+    .values({ ...processedData, id: crypto.randomUUID() })
+    .returning();
 
   return createSuccessResponse(parseVehicleRecord(vehicle), 'Vehicle added successfully.');
 };
