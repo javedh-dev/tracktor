@@ -105,7 +105,7 @@
         />
         <Form.Description>
           {m.common_example_prefix()}
-          {isValidFormat(formData.dateFormat).ex || m.common_invalid_format()}
+          {isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
         </Form.Description>
       {/snippet}
     </Form.Control>

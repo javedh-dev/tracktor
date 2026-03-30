@@ -29,7 +29,8 @@ export const addFuelLog = async (
     .insert(schema.fuelLogTable)
     .values({
       ...fuelLogData,
-      vehicleId: vehicleId
+      vehicleId: vehicleId,
+      id: undefined
     })
     .returning();
   return createSuccessResponse(fuelLog[0], 'Fuel log added successfully.');
@@ -40,6 +41,16 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
   const mileageFormatConfig = await db.query.configTable.findFirst({
     where: (config, { eq }) => eq(config.key, 'mileageUnitFormat')
   });
+  const distanceUnit = (
+    await db.query.configTable.findFirst({
+      where: (config, { eq }) => eq(config.key, 'unitOfDistance')
+    })
+  )?.value;
+  const volumeUnit = (
+    await db.query.configTable.findFirst({
+      where: (config, { eq }) => eq(config.key, 'unitOfVolume')
+    })
+  )?.value;
   const mileageFormat = mileageFormatConfig?.value || 'distance-per-fuel';
 
   const fuelLogs = await db.query.fuelLogTable.findMany({
@@ -102,6 +113,9 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
     if (mileageFormat === 'fuel-per-distance') {
       // Fuel per 100 distance units (e.g., L/100km, gal/100mi)
       mileage = (totalFuel / distance) * 100;
+    } else if (mileageFormat === 'uk-mpg' && distanceUnit === 'mile' && volumeUnit === 'liter') {
+      // Miles per imperial gallon (mpg)
+      mileage = (distance / totalFuel) * 4.546;
     } else {
       // Distance per fuel unit (e.g., km/L, mpg) - default
       mileage = distance / totalFuel;
