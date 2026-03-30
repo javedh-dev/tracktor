@@ -10,8 +10,9 @@ type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
 type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
 
 function serializeVehiclePayload(vehicleData: VehicleMutationPayload) {
+  const { id: _, ...data } = vehicleData as VehicleMutationPayload & { id?: unknown };
   return {
-    ...vehicleData,
+    ...data,
     customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
   };
 }
