@@ -29,7 +29,8 @@ export const addFuelLog = async (
     .insert(schema.fuelLogTable)
     .values({
       ...fuelLogData,
-      vehicleId: vehicleId
+      vehicleId: vehicleId,
+      id: undefined
     })
     .returning();
   return createSuccessResponse(fuelLog[0], 'Fuel log added successfully.');
