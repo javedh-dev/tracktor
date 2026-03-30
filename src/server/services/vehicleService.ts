@@ -10,8 +10,9 @@ type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
 type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
 
 function serializeVehiclePayload(vehicleData: VehicleMutationPayload) {
+  const { id: _, ...data } = vehicleData as VehicleMutationPayload & { id?: unknown };
   return {
-    ...vehicleData,
+    ...data,
     customFields: vehicleData.customFields ? JSON.stringify(vehicleData.customFields) : null
   };
 }
@@ -109,10 +110,7 @@ const calculateOverallMileage = async (vehicleId: string) => {
 
 export const addVehicle = async (vehicleData: VehicleMutationPayload): Promise<ApiResponse> => {
   const processedData = serializeVehiclePayload(vehicleData);
-  const [vehicle] = await db
-    .insert(schema.vehicleTable)
-    .values({ ...processedData, id: crypto.randomUUID() })
-    .returning();
+  const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
 
   return createSuccessResponse(parseVehicleRecord(vehicle), 'Vehicle added successfully.');
 };
