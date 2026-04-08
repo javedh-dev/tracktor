@@ -47,7 +47,7 @@
     value: ProviderChannel;
     label: string;
     description: string;
-  }> = [
+  }> = $derived([
     {
       value: 'reminder',
       label: m.notif_channel_reminder(),
@@ -63,7 +63,7 @@
       label: m.notif_channel_information(),
       description: m.notif_channel_information_desc()
     }
-  ];
+  ]);
 
   let providers = $state<ProviderWithChannels[]>([]);
   let loading = $state(true);
@@ -249,7 +249,11 @@
       const successCount = result.results.filter((entry) => entry.success).length;
 
       toast.success(
-        `Sent ${result.notificationCount} notifications to ${successCount}/${result.providerCount} enabled provider${result.providerCount === 1 ? '' : 's'}`
+        m.notif_send_all_success({
+          notifCount: String(result.notificationCount),
+          successCount: String(successCount),
+          providerCount: String(result.providerCount)
+        })
       );
     } catch (error) {
       const err = error as Error;

@@ -26,6 +26,15 @@
   let formApiKeyHeader = $state('X-API-Key');
   let formHeadersText = $state('{}');
 
+  const authTypeLabel = $derived(
+    ({
+      'none': m.notif_webhook_auth_none,
+      'basic': m.notif_webhook_auth_basic,
+      'bearer': m.notif_webhook_auth_bearer,
+      'api-key': m.notif_webhook_auth_apikey
+    })[formAuthType]?.() ?? formAuthType
+  );
+
   $effect(() => {
     if (config) {
       formUrl = config.url || '';
@@ -108,7 +117,7 @@
     <Label>{m.notif_webhook_auth_type()}</Label>
     <Select.Root bind:value={formAuthType} type="single">
       <Select.Trigger class="w-full">
-        <span>{formAuthType}</span>
+        <span>{authTypeLabel}</span>
       </Select.Trigger>
       <Select.Content>
         <Select.Item value="none">{m.notif_webhook_auth_none()}</Select.Item>

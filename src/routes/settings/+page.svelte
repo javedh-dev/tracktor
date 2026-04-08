@@ -109,7 +109,7 @@
     localeOptions
   } = createSettingsOptions(m, locales);
 
-  const sidebarItems = [
+  const sidebarItems = $derived([
     {
       id: 'personalization',
       label: m.settings_tab_personalization(),
@@ -130,7 +130,7 @@
       label: m.settings_tab_notifications(),
       icon: Bell
     }
-  ];
+  ]);
 
   // Load configs on mount
   $effect(() => {

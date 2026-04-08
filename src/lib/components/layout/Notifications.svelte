@@ -15,7 +15,7 @@
   import { goto } from '$app/navigation';
   import type { Notification } from '$lib/domain/notification';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { format } from 'date-fns';
+  import { getLocale } from '$lib/paraglide/runtime.js';
   import {
     clearNotification,
     getNotifications,
@@ -174,7 +174,11 @@
 
       // Show appropriate toast message
       if (failCount === 0) {
-        toast.success(m.notif_cleared_success({ count: String(successCount) }));
+        toast.success(
+          successCount === 1
+            ? m.notif_cleared_success_one()
+            : m.notif_cleared_success_other({ count: String(successCount) })
+        );
       } else if (successCount > 0) {
         toast.warning(
           m.notif_cleared_partial({ success: String(successCount), failed: String(failCount) })
@@ -210,6 +214,8 @@
       isClearingAll = false;
     }
   };
+
+  const dateFormatter = $derived(new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }));
 
   const unreadCount = $derived(apiNotifications.filter((n) => !n.isRead).length);
   const clearableReadCount = $derived(
@@ -369,7 +375,7 @@
                     {notification.message}
                   </p>
                   <p class="text-muted-foreground text-xs">
-                    {m.notif_due_prefix({ date: format(new Date(notification.dueDate), 'PP') })}
+                    {m.notif_due_prefix({ date: dateFormatter.format(new Date(notification.dueDate)) })}
                   </p>
                 </div>
               </button>
