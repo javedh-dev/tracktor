@@ -39,12 +39,12 @@
         <div
           class="absolute bottom-4 z-10 h-8 w-8 rounded-full border-2 border-white/70 shadow-md ltr:right-4 rtl:left-4"
           style={`background-color: ${vehicle.color}`}
-          aria-label="Color"
+          aria-label={m.vehicle_details_color_aria()}
         ></div>
       {/if}
       <Dialog.Close
         class="absolute top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/85 text-white shadow-md ring-1 ring-black/10 backdrop-blur transition hover:bg-white hover:text-black focus:outline-none ltr:right-3 rtl:left-3"
-        aria-label="Close"
+        aria-label={m.vehicle_details_close_aria()}
       >
         <X class="h-4 w-4" />
       </Dialog.Close>

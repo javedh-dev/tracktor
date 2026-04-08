@@ -1,9 +1,16 @@
 <script lang="ts">
   import * as Accordion from '$lib/components/ui/accordion';
   import * as Separator from '$ui/separator';
+  import * as m from '$lib/paraglide/messages';
   import type { Snippet } from 'svelte';
 
-  const expandedValues = ['General', 'Units', 'Feature Flags', 'Scheduled delivery', 'Providers'];
+  const expandedValues = $derived([
+    m.settings_section_general(),
+    m.settings_section_units(),
+    m.settings_section_feature_flags(),
+    m.notif_scheduled_delivery(),
+    m.notif_providers()
+  ]);
 
   interface Props {
     title: string;

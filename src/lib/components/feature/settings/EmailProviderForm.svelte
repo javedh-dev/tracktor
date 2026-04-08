@@ -3,6 +3,7 @@
   import { Label } from '$ui/label';
   import { Checkbox } from '$ui/checkbox';
   import type { EmailProviderConfig } from '$lib/domain/notification-provider';
+  import * as m from '$lib/paraglide/messages';
 
   interface Props {
     config?: EmailProviderConfig;
@@ -21,7 +22,6 @@
   let formFromName = $state('');
   let formRecepient = $state('');
 
-  // Sync form state when config changes
   $effect(() => {
     if (config) {
       formHost = config.host || '';
@@ -34,7 +34,6 @@
     }
   });
 
-  // Notify parent of config changes
   $effect(() => {
     const nextConfig: Partial<EmailProviderConfig> = {
       host: formHost,
@@ -53,65 +52,62 @@
   });
 </script>
 
-<!-- SMTP Settings -->
 <div class="border-border space-y-4 rounded-lg border p-4">
-  <h4 class="text-sm font-semibold">SMTP Server Settings</h4>
+  <h4 class="text-sm font-semibold">{m.notif_email_smtp_settings()}</h4>
 
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
-      <Label>Host</Label>
+      <Label>{m.notif_email_host()}</Label>
       <Input bind:value={formHost} placeholder="smtp.gmail.com" />
     </div>
 
     <div class="space-y-2">
-      <Label>Port</Label>
+      <Label>{m.notif_email_port()}</Label>
       <Input bind:value={formPort} type="number" placeholder="587" />
     </div>
   </div>
 
   <div class="flex items-center justify-between">
     <div class="space-y-0.5">
-      <Label>Use SSL/TLS</Label>
-      <p class="text-muted-foreground text-xs">Enable secure connection</p>
+      <Label>{m.notif_email_use_ssl()}</Label>
+      <p class="text-muted-foreground text-xs">{m.notif_email_use_ssl_desc()}</p>
     </div>
     <Checkbox bind:checked={formSecure} />
   </div>
 </div>
 
-<!-- Authentication -->
 <div class="border-border space-y-4 rounded-lg border p-4">
-  <h4 class="text-sm font-semibold">Authentication</h4>
+  <h4 class="text-sm font-semibold">{m.notif_email_auth()}</h4>
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
-      <Label>Username / Email</Label>
+      <Label>{m.notif_email_username()}</Label>
       <Input bind:value={formUsername} type="email" placeholder="your@email.com" />
     </div>
 
     <div class="space-y-2">
-      <Label>Password {isEditing ? '(leave blank to keep current)' : ''}</Label>
+      <Label>{isEditing ? m.notif_email_password_keep() : m.notif_email_password()}</Label>
       <Input bind:value={formPassword} type="password" placeholder="••••••••" />
     </div>
   </div>
 </div>
 
-<!-- Sender Settings -->
 <div class="border-border space-y-4 rounded-lg border p-4">
-  <h4 class="text-sm font-semibold">Sender/Recipient Information</h4>
+  <h4 class="text-sm font-semibold">{m.notif_email_sender_info()}</h4>
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
-      <Label>From Email</Label>
+      <Label>{m.notif_email_from()}</Label>
       <Input bind:value={formFrom} type="email" placeholder="noreply@example.com" />
     </div>
 
     <div class="space-y-2">
-      <Label>From Name (Optional)</Label>
-      <Input bind:value={formFromName} placeholder="Tracktor Notifications" />
+      <Label>{m.notif_email_from_name()}</Label>
+      <Input bind:value={formFromName} placeholder={m.notif_email_from_name_placeholder()} />
     </div>
   </div>
 
   <div class="space-y-2">
-    <Label>Recepient Email</Label>
+    <Label>{m.notif_email_recipient()}</Label>
     <Input bind:value={formRecepient} type="email" placeholder="support@example.com" />
-    <p class="text-muted-foreground text-xs">Email address of the recipient</p>
+    <p class="text-muted-foreground text-xs">{m.notif_email_recipient_desc()}</p>
   </div>
 </div>

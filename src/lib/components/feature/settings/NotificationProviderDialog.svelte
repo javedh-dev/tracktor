@@ -15,6 +15,7 @@
     NotificationProviderWithParsedConfig,
     WebhookProviderConfig
   } from '$lib/domain/notification-provider';
+  import * as m from '$lib/paraglide/messages';
   import EmailProviderForm from './EmailProviderForm.svelte';
   import GotifyProviderForm from './GotifyProviderForm.svelte';
   import NotificationProviderChannels from './NotificationProviderChannels.svelte';
@@ -83,40 +84,41 @@
 <Dialog.Root {open} {onOpenChange}>
   <Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-150">
     <Dialog.Header>
-      <Dialog.Title>{editingProvider ? 'Edit' : 'Add'} Notification Provider</Dialog.Title>
+      <Dialog.Title
+        >{editingProvider ? m.notif_dialog_edit_title() : m.notif_dialog_add_title()}</Dialog.Title
+      >
       <Dialog.Description>
-        Choose a provider type, configure its destination, and subscribe it to compact channel
-        toggles. Providers are enabled by default and can be disabled from the provider cards.
+        {m.notif_dialog_desc()}
       </Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-5 py-4">
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="space-y-2">
-          <Label>Provider Name</Label>
+          <Label>{m.notif_provider_name()}</Label>
           <Input
             value={formName}
             oninput={(event) => onFormNameChange(event.currentTarget.value)}
-            placeholder="Daily digest email"
+            placeholder={m.notif_provider_name_placeholder()}
           />
         </div>
 
         <div class="space-y-2">
-          <Label>Provider Type</Label>
+          <Label>{m.notif_provider_type()}</Label>
           <Select.Root bind:value={formType} type="single" disabled={!!editingProvider}>
             <Select.Trigger class="w-full justify-between border">
               <span class="flex items-center gap-2">
                 {#if formType === 'email'}
                   <Mail class="h-4 w-4" />
-                  Email (SMTP)
+                  {m.notif_provider_type_email()}
                 {:else if formType === 'webhook'}
                   <Webhook class="h-4 w-4" />
-                  Webhook
+                  {m.notif_provider_type_webhook()}
                 {:else if formType === 'gotify'}
                   <Bell class="h-4 w-4" />
-                  Gotify
+                  {m.notif_provider_type_gotify()}
                 {:else}
-                  Select Provider Type
+                  {m.notif_provider_type_select()}
                 {/if}
               </span>
             </Select.Trigger>
@@ -124,19 +126,19 @@
               <Select.Item value="email">
                 <span class="flex items-center gap-2">
                   <Mail class="h-4 w-4" />
-                  Email (SMTP)
+                  {m.notif_provider_type_email()}
                 </span>
               </Select.Item>
               <Select.Item value="webhook">
                 <span class="flex items-center gap-2">
                   <Webhook class="h-4 w-4" />
-                  Webhook
+                  {m.notif_provider_type_webhook()}
                 </span>
               </Select.Item>
               <Select.Item value="gotify">
                 <span class="flex items-center gap-2">
                   <Bell class="h-4 w-4" />
-                  Gotify
+                  {m.notif_provider_type_gotify()}
                 </span>
               </Select.Item>
             </Select.Content>
@@ -180,12 +182,14 @@
     </div>
 
     <Dialog.Footer>
-      <Button variant="outline" onclick={onCancel} disabled={savingProvider}>Cancel</Button>
+      <Button variant="outline" onclick={onCancel} disabled={savingProvider}
+        >{m.notif_dialog_cancel()}</Button
+      >
       <Button onclick={onSave} disabled={savingProvider}>
         {#if savingProvider}
           <Loader2 class="mr-2 h-4 w-4 animate-spin" />
         {/if}
-        {editingProvider ? 'Update' : 'Create'} Provider
+        {editingProvider ? m.notif_dialog_update() : m.notif_dialog_create()}
       </Button>
     </Dialog.Footer>
   </Dialog.Content>

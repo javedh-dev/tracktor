@@ -4,6 +4,7 @@
   import Clock from '@lucide/svelte/icons/clock';
   import Check from '@lucide/svelte/icons/check';
   import X from '@lucide/svelte/icons/x';
+  import * as m from '$lib/paraglide/messages';
 
   interface Props {
     value: string;
@@ -19,39 +20,35 @@
     placeholder = '* * * * *'
   }: Props = $props();
 
-  // Common cron presets
-  const presets = [
-    { label: 'Every minute', value: '* * * * *' },
-    { label: 'Every 5 minutes', value: '*/5 * * * *' },
-    { label: 'Every 15 minutes', value: '*/15 * * * *' },
-    { label: 'Every 30 minutes', value: '*/30 * * * *' },
-    { label: 'Every hour', value: '0 * * * *' },
-    { label: 'Every 2 hours', value: '0 */2 * * *' },
-    { label: 'Every 6 hours', value: '0 */6 * * *' },
-    { label: 'Every 12 hours', value: '0 */12 * * *' },
-    { label: 'Daily at midnight', value: '0 0 * * *' },
-    { label: 'Daily at 2:00 AM', value: '0 2 * * *' },
-    { label: 'Daily at 8:00 AM', value: '0 8 * * *' },
-    { label: 'Daily at noon', value: '0 12 * * *' },
-    { label: 'Weekly (Monday)', value: '0 0 * * 1' },
-    { label: 'Monthly (1st)', value: '0 0 1 * *' }
-  ];
+  const presets = $derived([
+    { label: m.notif_cron_every_minute(), value: '* * * * *' },
+    { label: m.notif_cron_every_5_min(), value: '*/5 * * * *' },
+    { label: m.notif_cron_every_15_min(), value: '*/15 * * * *' },
+    { label: m.notif_cron_every_30_min(), value: '*/30 * * * *' },
+    { label: m.notif_cron_every_hour(), value: '0 * * * *' },
+    { label: m.notif_cron_every_2_hours(), value: '0 */2 * * *' },
+    { label: m.notif_cron_every_6_hours(), value: '0 */6 * * *' },
+    { label: m.notif_cron_every_12_hours(), value: '0 */12 * * *' },
+    { label: m.notif_cron_daily_midnight(), value: '0 0 * * *' },
+    { label: m.notif_cron_daily_2am(), value: '0 2 * * *' },
+    { label: m.notif_cron_daily_8am(), value: '0 8 * * *' },
+    { label: m.notif_cron_daily_noon(), value: '0 12 * * *' },
+    { label: m.notif_cron_weekly_monday(), value: '0 0 * * 1' },
+    { label: m.notif_cron_monthly_1st(), value: '0 0 1 * *' }
+  ]);
 
-  // Basic cron validation
   function validateCron(expr: string): { valid: boolean; message: string } {
     if (!expr || expr.trim() === '') {
-      return { valid: false, message: 'Expression required' };
+      return { valid: false, message: m.notif_cron_expression_required() };
     }
 
     const parts = expr.trim().split(/\s+/);
     if (parts.length !== 5) {
-      return { valid: false, message: 'Must have 5 parts' };
+      return { valid: false, message: m.notif_cron_must_have_5_parts() };
     }
 
-    // Basic validation for each part
     const [minute, hour, day, month, weekday] = parts;
 
-    // Check if parts contain valid characters
     const validPattern = /^[\d*/,-]+$/;
     if (
       !validPattern.test(minute) ||
@@ -60,13 +57,12 @@
       !validPattern.test(month) ||
       !validPattern.test(weekday)
     ) {
-      return { valid: false, message: 'Invalid characters' };
+      return { valid: false, message: m.notif_cron_invalid_chars() };
     }
 
-    return { valid: true, message: 'Valid expression' };
+    return { valid: true, message: m.notif_cron_valid() };
   }
 
-  // Get next execution times (simplified - just for display)
   function getNextExecutionHint(expr: string): string {
     const preset = presets.find((p) => p.value === expr);
     if (preset) {
@@ -74,25 +70,24 @@
     }
 
     const parts = expr.trim().split(/\s+/);
-    if (parts.length !== 5) return 'Invalid expression';
+    if (parts.length !== 5) return m.notif_cron_invalid();
 
     const [minute, hour, day, month, weekday] = parts;
 
-    // Simple interpretation
     if (minute === '*' && hour === '*') {
-      return 'Every minute';
+      return m.notif_cron_every_minute();
     }
     if (minute.startsWith('*/') && hour === '*') {
-      return `Every ${minute.slice(2)} minutes`;
+      return m.notif_cron_every_n_minutes({ n: minute.slice(2) });
     }
     if (hour === '*') {
-      return `Every hour at minute ${minute}`;
+      return m.notif_cron_hourly_at_minute({ n: minute });
     }
     if (day === '*' && month === '*' && weekday === '*') {
-      return `Daily at ${hour}:${minute.padStart(2, '0')}`;
+      return m.notif_cron_daily_at({ time: `${hour}:${minute.padStart(2, '0')}` });
     }
 
-    return 'Custom schedule';
+    return m.notif_cron_custom();
   }
 
   let validation = $derived(validateCron(value));
@@ -116,7 +111,7 @@
     <Select.Root bind:value={selectedPreset} type="single" {disabled}>
       <Select.Trigger class="w-35">
         <Clock class="mr-2 h-4 w-4" />
-        Presets
+        {m.notif_cron_presets()}
       </Select.Trigger>
       <Select.Content>
         {#each presets as preset}

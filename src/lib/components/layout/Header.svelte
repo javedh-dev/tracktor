@@ -37,7 +37,7 @@
     <a
       href="/"
       class="focus-visible:ring-ring text-primary hover:text-primary/80 inline-flex items-center gap-2 rounded-md p-1 text-2xl font-semibold transition focus-visible:ring-1 focus-visible:outline-none"
-      aria-label="Go to home"
+      aria-label={m.header_home_aria()}
       id="header-logo-link"
     >
       <LabelWithIcon
@@ -61,8 +61,8 @@
             onclick={() => {
               goto('/settings');
             }}
-            aria-label="Open settings"
-            title="Settings"
+            aria-label={m.header_settings_aria()}
+            title={m.settings_title()}
           >
             <Settings class="text-primary h-[1.2rem] w-[1.2rem]" />
           </Button>
@@ -71,8 +71,8 @@
               <DropdownMenu.Trigger
                 id="account-menu-trigger"
                 class="focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                aria-label="Account menu"
-                title="Account"
+                aria-label={m.header_account_aria()}
+                title={m.header_account_title()}
               >
                 <CircleUser class="text-primary h-[1.2rem] w-[1.2rem]" />
               </DropdownMenu.Trigger>

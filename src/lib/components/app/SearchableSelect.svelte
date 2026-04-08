@@ -11,14 +11,18 @@
   let {
     options,
     name,
+    label,
     value = $bindable(),
     icon: Icon
   }: {
     options: { value: string; label: string }[];
     name: string;
+    label?: string;
     value: string;
     icon: Component;
   } = $props();
+
+  const displayName = $derived(label ?? name);
 
   let open = $state(false);
   let triggerRef = $state<HTMLButtonElement>(null!);
@@ -49,7 +53,9 @@
       >
         <div class="flex items-center gap-2 overflow-hidden font-normal">
           <Icon class="h-5 w-5 opacity-50" />
-          <span class="">{selectedValue || value || m.common_select_placeholder({ name })}</span>
+          <span class=""
+            >{selectedValue || value || m.common_select_placeholder({ name: displayName })}</span
+          >
         </div>
 
         <ChevronsUpDownIcon class="ml-2 size-4 shrink-0 opacity-50" />
@@ -60,7 +66,7 @@
     <Command.Root>
       <Command.Input
         id="searchable-select-input"
-        placeholder={m.common_search_placeholder({ name })}
+        placeholder={m.common_search_placeholder({ name: displayName })}
       />
       <Command.List id="searchable-select-list">
         <Command.Empty>{m.common_no_match_found()}</Command.Empty>
