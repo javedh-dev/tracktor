@@ -375,7 +375,9 @@
                     {notification.message}
                   </p>
                   <p class="text-muted-foreground text-xs">
-                    {m.notif_due_prefix({ date: dateFormatter.format(new Date(notification.dueDate)) })}
+                    {m.notif_due_prefix({
+                      date: dateFormatter.format(new Date(notification.dueDate))
+                    })}
                   </p>
                 </div>
               </button>

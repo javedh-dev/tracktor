@@ -27,12 +27,12 @@
   let formHeadersText = $state('{}');
 
   const authTypeLabel = $derived(
-    ({
-      'none': m.notif_webhook_auth_none,
-      'basic': m.notif_webhook_auth_basic,
-      'bearer': m.notif_webhook_auth_bearer,
+    {
+      none: m.notif_webhook_auth_none,
+      basic: m.notif_webhook_auth_basic,
+      bearer: m.notif_webhook_auth_bearer,
       'api-key': m.notif_webhook_auth_apikey
-    })[formAuthType]?.() ?? formAuthType
+    }[formAuthType]?.() ?? formAuthType
   );
 
   $effect(() => {
