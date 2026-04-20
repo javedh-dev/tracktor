@@ -40,6 +40,11 @@ jobs:
           tags: |
             type=ref,event=branch
 
+      - name: Resolve branch version
+        id: branch-version
+        run: |
+          echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image (amd64 only)
         uses: docker/build-push-action@v6
         with:
@@ -48,6 +53,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ steps.branch-version.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64

@@ -1,6 +1,8 @@
 # Stage 1: Build the application
 FROM node:22-alpine AS builder
 
+ARG APP_VERSION
+
 # Set working directory
 WORKDIR /app
 
@@ -25,6 +27,8 @@ RUN pnpm prune --prod
 # Stage 2: Create the production image
 FROM node:22-alpine
 
+ARG APP_VERSION
+
 # Set working directory
 WORKDIR /app
 
@@ -43,6 +47,7 @@ RUN mkdir -p /data/logs
 RUN mkdir -p /data/uploads
 
 # Set environment variables
+ENV APP_VERSION=${APP_VERSION}
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000

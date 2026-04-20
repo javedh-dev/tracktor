@@ -21,4 +21,5 @@ function getBranchName() {
   }
 }
 
-export const appVersion = env.NODE_ENV === 'production' ? packageVersion : getBranchName();
+export const appVersion =
+  env.APP_VERSION || (env.NODE_ENV === 'production' ? packageVersion : getBranchName());
