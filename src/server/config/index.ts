@@ -5,4 +5,5 @@ export const appAsciiArt = `
                      / /_/ /  / /_/ / /__/ ,< / /_/ /_/ / /        
                      \\__/_/   \\__,_/\\___/_/|_|\\__/\\____/_/         
 `;
+export { appVersion, packageVersion } from './appVersion';
 export { default as logger } from './logger';

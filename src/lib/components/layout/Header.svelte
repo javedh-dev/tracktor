@@ -17,9 +17,12 @@
   import Notifications from './Notifications.svelte';
   import * as m from '$lib/paraglide/messages';
   import Button from '../ui/button/button.svelte';
+  import Badge from '$ui/badge/badge.svelte';
   import Settings from '@lucide/svelte/icons/settings';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+
+  let { appVersion = '' }: { appVersion?: string } = $props();
 
   // Show notifications only on dashboard routes when a vehicle is selected
   const showNotifications = $derived(
@@ -40,13 +43,18 @@
       aria-label="Go to home"
       id="header-logo-link"
     >
-      <LabelWithIcon
-        icon={Tractor}
-        iconClass="h-8 w-8"
-        style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
-        id="header-logo"
-        label={m.app_name()}
-      />
+      <div class="flex items-center gap-2">
+        <LabelWithIcon
+          icon={Tractor}
+          iconClass="h-8 w-8"
+          style="text-primary flex flex-row items-center gap-2 text-2xl font-semibold"
+          id="header-logo"
+          label={m.app_name()}
+        />
+        <Badge variant="secondary" class="rounded-full px-2 py-0.5 text-[11px] font-medium">
+          {appVersion}
+        </Badge>
+      </div>
     </a>
     <div id="header-actions" class="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
       <div class="header-toolbar flex items-center gap-2">

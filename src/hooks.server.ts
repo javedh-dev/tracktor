@@ -12,7 +12,7 @@ import {
 
 import { MiddlewareChain } from '$server/middlewares/base';
 import { initializeDatabase } from '$server/db/init';
-import { appAsciiArt, logger } from '$server/config';
+import { appAsciiArt, appVersion, logger } from '$server/config';
 import { env } from '$lib/config/env.server';
 import { ensureAppDirectories } from '$server/utils/fs';
 import { initializeNotificationScheduler } from '$server/services/notificationSchedulerService';
@@ -20,6 +20,7 @@ import { initializeNotificationScheduler } from '$server/services/notificationSc
 const middlewareChain = new MiddlewareChain();
 
 const envSnapshot = () => ({
+  APP_VERSION: appVersion,
   LOG_LEVEL: env.LOG_LEVEL,
   LOG_DIR: env.LOG_DIR,
   NODE_ENV: env.NODE_ENV,
@@ -41,6 +42,7 @@ const initPromise = (async () => {
 
   try {
     logger.info(appAsciiArt);
+    logger.info(`Starting Tracktor v${appVersion}`);
     logEnvSnapshot();
   } catch (error) {
     logger.error('Failed to log startup banner', error);

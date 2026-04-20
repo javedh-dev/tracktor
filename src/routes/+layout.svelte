@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { LayoutProps } from './$types';
   import { locales, localizeHref } from '$lib/paraglide/runtime';
   import { ModeWatcher } from 'mode-watcher';
   import '../styles/app.css';
@@ -16,7 +17,7 @@
   import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
   import { app_new_update_available } from '$lib/paraglide/messages';
 
-  let { children } = $props();
+  let { children, data }: LayoutProps = $props();
   let demoMode = env.DEMO_MODE;
   let customCss = $state('');
   let isDashboardTransition = $derived(
@@ -122,11 +123,12 @@
   </div>
 {:else}
   <div id="app-container" class="flex min-h-svh w-full flex-col">
-    <Header />{@render children()}
+    <Header appVersion={data.appVersion} />
+    <main class="flex-1">{@render children()}</main>
   </div>
 {/if}
 <div style="display:none">
-  {#each locales as locale}
+  {#each locales as locale (locale)}
     <a href={localizeHref(page.url.pathname, { locale })}>
       {locale}
     </a>

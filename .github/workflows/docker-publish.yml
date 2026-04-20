@@ -3,7 +3,7 @@ name: Docker Build and Push
 on:
   push:
     branches: [main, dev]
-    tags: ['*.*.*']
+    tags: ['*.*.*', 'v*.*.*']
 
 env:
   REGISTRY: ghcr.io
@@ -57,12 +57,61 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release version
+        id: release-version
+        run: |
+          echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve source branch
+        id: release-branch
+        run: |
+          branches="$(git branch -r --contains "$GITHUB_SHA" | sed 's/^ *//' | grep '^origin/' | grep -v 'origin/HEAD' | sed 's#^origin/##')"
+          if printf '%s\n' "$branches" | grep -qx 'main'; then
+            branch='main'
+          elif printf '%s\n' "$branches" | grep -qx 'dev'; then
+            branch='dev'
+          else
+            branch="$(printf '%s\n' "$branches" | head -n 1)"
+          fi
+
+          if [ -z "$branch" ]; then
+            echo 'Unable to determine the source branch for this release tag.' >&2
+            exit 1
+          fi
+
+          echo "value=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout source branch
+        run: git checkout "${{ steps.release-branch.outputs.value }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Update package version
+        run: npm pkg set version="${{ steps.release-version.outputs.value }}"
+
+      - name: Commit version bump
+        run: |
+          if git diff --quiet package.json; then
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.release-version.outputs.value }}"
+          git push origin "HEAD:${{ steps.release-branch.outputs.value }}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
