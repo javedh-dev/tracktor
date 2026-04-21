@@ -6,6 +6,7 @@
   import Button from '$ui/button/button.svelte';
   import { Switch } from '$ui/switch';
   import { Label } from '$ui/label';
+  import * as m from '$lib/paraglide/messages';
 
   interface Props {
     processingEnabled: boolean;
@@ -36,9 +37,9 @@
   <div class="space-y-2">
     <div class="flex items-center justify-between gap-4">
       <div class="space-y-0.5">
-        <Label for="notification-processing-schedule">Processing schedule</Label>
+        <Label for="notification-processing-schedule">{m.notif_processing_schedule()}</Label>
         <p class="text-muted-foreground text-xs">
-          Run provider notification delivery on a schedule.
+          {m.notif_processing_schedule_desc()}
         </p>
       </div>
       <Switch bind:checked={processingEnabled} {disabled} />
@@ -64,7 +65,7 @@
             {:else}
               <Send class="h-4 w-4" />
             {/if}
-            Send Now
+            {m.notif_send_now()}
           </Button>
         </div>
       {/if}

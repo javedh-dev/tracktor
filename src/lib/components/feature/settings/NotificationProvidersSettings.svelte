@@ -14,6 +14,7 @@
     WebhookProviderConfig
   } from '$lib/domain/notification-provider';
   import * as providerService from '$lib/services/notification-provider.service';
+  import * as m from '$lib/paraglide/messages';
   import Button from '$ui/button/button.svelte';
   import SettingFormSection from './SettingFormSection.svelte';
 
@@ -46,23 +47,23 @@
     value: ProviderChannel;
     label: string;
     description: string;
-  }> = [
+  }> = $derived([
     {
       value: 'reminder',
-      label: 'Reminder',
-      description: 'Due dates and reminder-style notifications'
+      label: m.notif_channel_reminder(),
+      description: m.notif_channel_reminder_desc()
     },
     {
       value: 'alert',
-      label: 'Alert',
-      description: 'Urgent or expiring items that need attention'
+      label: m.notif_channel_alert(),
+      description: m.notif_channel_alert_desc()
     },
     {
       value: 'information',
-      label: 'Information',
-      description: 'General informational updates'
+      label: m.notif_channel_information(),
+      description: m.notif_channel_information_desc()
     }
-  ];
+  ]);
 
   let providers = $state<ProviderWithChannels[]>([]);
   let loading = $state(true);
@@ -90,7 +91,7 @@
       loading = true;
       providers = (await providerService.getProviders()) as ProviderWithChannels[];
     } catch {
-      toast.error('Failed to load notification providers');
+      toast.error(m.notif_load_failed());
     } finally {
       loading = false;
     }
@@ -160,12 +161,12 @@
     const providerType = formType ?? editingProvider?.type;
 
     if (!providerType || !config) {
-      toast.error('Please select a provider type');
+      toast.error(m.notif_select_provider_type());
       return;
     }
 
     if (formChannels.length === 0) {
-      toast.error('Select at least one notification channel');
+      toast.error(m.notif_select_channel());
       return;
     }
 
@@ -181,7 +182,7 @@
         };
 
         await providerService.updateProvider(editingProvider.id, updatePayload);
-        toast.success('Provider updated successfully');
+        toast.success(m.notif_provider_updated());
       } else {
         const createPayload: CreateNotificationProvider = {
           name: formName,
@@ -192,30 +193,30 @@
         };
 
         await providerService.createProvider(createPayload);
-        toast.success('Provider created successfully');
+        toast.success(m.notif_provider_created());
       }
 
       dialogOpen = false;
       await loadProviders();
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to save provider');
+      toast.error(err.message || m.notif_save_provider_failed());
     } finally {
       savingProvider = false;
     }
   }
 
   async function handleDelete(provider: ProviderWithChannels) {
-    if (!confirm(`Are you sure you want to delete "${provider.name}"?`)) {
+    if (!confirm(m.notif_confirm_delete({ name: provider.name }))) {
       return;
     }
 
     try {
       await providerService.deleteProvider(provider.id);
-      toast.success('Provider deleted successfully');
+      toast.success(m.notif_provider_deleted());
       await loadProviders();
     } catch {
-      toast.error('Failed to delete provider');
+      toast.error(m.notif_provider_delete_failed());
     }
   }
 
@@ -235,7 +236,7 @@
       );
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to update provider');
+      toast.error(err.message || m.notif_update_provider_failed());
     } finally {
       togglingProviderId = null;
     }
@@ -248,11 +249,15 @@
       const successCount = result.results.filter((entry) => entry.success).length;
 
       toast.success(
-        `Sent ${result.notificationCount} notifications to ${successCount}/${result.providerCount} enabled provider${result.providerCount === 1 ? '' : 's'}`
+        m.notif_send_all_success({
+          notifCount: String(result.notificationCount),
+          successCount: String(successCount),
+          providerCount: String(result.providerCount)
+        })
       );
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to send notifications');
+      toast.error(err.message || m.notif_send_all_failed());
     } finally {
       sendingNotifications = false;
     }
@@ -261,8 +266,8 @@
 
 <div class="space-y-4">
   <SettingFormSection
-    title="Scheduled delivery"
-    subtitle="In-app notifications stay real-time. This schedule only controls provider delivery."
+    title={m.notif_scheduled_delivery()}
+    subtitle={m.notif_scheduled_delivery_desc()}
   >
     <NotificationDeliveryPanel
       bind:processingEnabled={notificationProcessingEnabled}
@@ -274,19 +279,16 @@
     />
   </SettingFormSection>
 
-  <SettingFormSection
-    title="Providers"
-    subtitle="Create, edit, test, and enable notification providers."
-  >
+  <SettingFormSection title={m.notif_providers()} subtitle={m.notif_providers_desc()}>
     <div class="flex items-center justify-between gap-4">
       <div>
         <p class="text-muted-foreground text-sm">
-          Each provider can subscribe to Reminder, Alert, and Information channels.
+          {m.notif_providers_channels_info()}
         </p>
       </div>
       <Button onclick={openCreateDialog} size="sm" {disabled}>
         <Plus class="mr-2 h-4 w-4" />
-        Add Provider
+        {m.notif_add_provider()}
       </Button>
     </div>
 

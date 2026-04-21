@@ -14,7 +14,7 @@
   import { toast } from 'svelte-sonner';
   import { configStore } from '$lib/stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
+  import { demo_banner, default_login, app_name } from '$lib/paraglide/messages/_index.js';
   import { app_new_update_available } from '$lib/paraglide/messages';
 
   let { children, data }: LayoutProps = $props();
@@ -66,6 +66,10 @@
     });
   });
 </script>
+
+<svelte:head>
+  <title>{app_name()}</title>
+</svelte:head>
 
 <ModeWatcher />
 <Toaster position="bottom-right" richColors expand />

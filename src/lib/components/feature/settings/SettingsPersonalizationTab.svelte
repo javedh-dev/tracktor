@@ -69,6 +69,7 @@
           bind:value={$formData.timezone}
           options={getTimezoneOptions()}
           icon={Earth}
+          label={m.settings_label_timezone()}
           {...props}
         />
       {/snippet}
@@ -84,6 +85,7 @@
           bind:value={$formData.currency}
           icon={Currency}
           options={currencyOptions}
+          label={m.settings_label_currency()}
           {...props}
         />
       {/snippet}
@@ -119,7 +121,7 @@
         >
         <Textarea
           {...props}
-          placeholder="Add your custom CSS here..."
+          placeholder={m.settings_custom_css_placeholder()}
           class="mono h-40 resize-none"
           bind:value={$formData.customCss}
         />

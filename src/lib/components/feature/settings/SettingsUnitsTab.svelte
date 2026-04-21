@@ -74,14 +74,14 @@
   />
   <div class="space-y-3 lg:col-span-2">
     <div class="space-y-1">
-      <p class="text-sm font-medium">Fuel types</p>
-      <p class="text-muted-foreground text-xs">Choose the measurement for each fuel.</p>
+      <p class="text-sm font-medium">{m.settings_fuel_types_label()}</p>
+      <p class="text-muted-foreground text-xs">{m.settings_fuel_types_desc()}</p>
     </div>
     <div class="grid gap-4 lg:grid-cols-3">
       <SettingsSelectField
         {form}
         name="unitOfVolume"
-        label="Petrol/Diesel"
+        label={m.fuel_type_label_petrol_diesel()}
         description={m.settings_desc_unit_volume()}
         icon={Currency}
         options={uovOptions}
@@ -92,7 +92,7 @@
       <SettingsSelectField
         {form}
         name="unitOfLpg"
-        label="LPG"
+        label={m.fuel_type_label_lpg()}
         description={m.settings_desc_unit_volume()}
         icon={Fuel}
         options={gasUnitOptions}
@@ -103,7 +103,7 @@
       <SettingsSelectField
         {form}
         name="unitOfCng"
-        label="CNG"
+        label={m.fuel_type_label_cng()}
         description={m.settings_desc_unit_volume()}
         icon={Fuel}
         options={gasUnitOptions}

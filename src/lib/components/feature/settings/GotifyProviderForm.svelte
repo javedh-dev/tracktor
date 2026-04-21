@@ -2,6 +2,7 @@
   import Input from '$appui/input.svelte';
   import { Label } from '$ui/label';
   import type { GotifyProviderConfig } from '$lib/domain/notification-provider';
+  import * as m from '$lib/paraglide/messages';
 
   interface Props {
     config?: GotifyProviderConfig;
@@ -15,7 +16,6 @@
   let formAppToken = $state('');
   let formPriority = $state(5);
 
-  // Sync form state when config changes
   $effect(() => {
     if (config) {
       formServerUrl = config.serverUrl || '';
@@ -23,7 +23,6 @@
     }
   });
 
-  // Notify parent of config changes
   $effect(() => {
     onConfigChange({
       serverUrl: formServerUrl,
@@ -33,29 +32,24 @@
   });
 </script>
 
-<!-- Gotify Settings -->
 <div class="border-border space-y-4 rounded-lg border p-4">
-  <h4 class="text-sm font-semibold">Gotify Server Configuration</h4>
+  <h4 class="text-sm font-semibold">{m.notif_gotify_config()}</h4>
 
   <div class="space-y-2">
-    <Label>Server URL</Label>
+    <Label>{m.notif_gotify_url()}</Label>
     <Input bind:value={formServerUrl} type="url" placeholder="https://gotify.example.com" />
-    <p class="text-muted-foreground text-xs">URL of your Gotify server instance</p>
+    <p class="text-muted-foreground text-xs">{m.notif_gotify_url_desc()}</p>
   </div>
 
   <div class="space-y-2">
-    <Label>App Token {isEditing ? '(leave blank to keep current)' : ''}</Label>
+    <Label>{isEditing ? m.notif_gotify_token_keep() : m.notif_gotify_token()}</Label>
     <Input bind:value={formAppToken} type="password" placeholder="••••••••" />
-    <p class="text-muted-foreground text-xs">
-      Application token from your Gotify app (not the client token)
-    </p>
+    <p class="text-muted-foreground text-xs">{m.notif_gotify_token_desc()}</p>
   </div>
 
   <div class="space-y-2">
-    <Label>Priority (0-10)</Label>
+    <Label>{m.notif_gotify_priority()}</Label>
     <Input bind:value={formPriority} type="number" min="0" max="10" placeholder="5" />
-    <p class="text-muted-foreground text-xs">
-      Message priority level. Higher priority = more prominent notification
-    </p>
+    <p class="text-muted-foreground text-xs">{m.notif_gotify_priority_desc()}</p>
   </div>
 </div>

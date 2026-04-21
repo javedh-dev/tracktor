@@ -109,7 +109,7 @@
     localeOptions
   } = createSettingsOptions(m, locales);
 
-  const sidebarItems = [
+  const sidebarItems = $derived([
     {
       id: 'personalization',
       label: m.settings_tab_personalization(),
@@ -127,10 +127,10 @@
     },
     {
       id: 'notifications',
-      label: 'Notifications',
+      label: m.settings_tab_notifications(),
       icon: Bell
     }
-  ];
+  ]);
 
   // Load configs on mount
   $effect(() => {
@@ -221,12 +221,12 @@
         {#if activeSection === 'personalization'}
           <SettingsSection
             title={m.settings_tab_personalization()}
-            description="Customize your experience with themes, languages, and formats."
+            description={m.settings_personalization_desc()}
           >
             <fieldset class="space-y-6" disabled={processing}>
               <SettingFormSection
-                title="General"
-                subtitle="Customize appearance, localization, and display formats"
+                title={m.settings_section_general()}
+                subtitle={m.settings_section_general_desc()}
               >
                 <SettingsPersonalizationTab
                   {form}
@@ -246,14 +246,11 @@
 
         <!-- Units Section -->
         {#if activeSection === 'units'}
-          <SettingsSection
-            title={m.settings_tab_units()}
-            description="Configure measurement units for distance, volume, and fuel types."
-          >
+          <SettingsSection title={m.settings_tab_units()} description={m.settings_units_desc()}>
             <fieldset class="space-y-6" disabled={processing}>
               <SettingFormSection
-                title="Units"
-                subtitle="Choose preferred units for distance, mileage, and fuel types"
+                title={m.settings_section_units()}
+                subtitle={m.settings_section_units_desc()}
               >
                 <SettingsUnitsTab
                   {form}
@@ -278,8 +275,8 @@
           >
             <fieldset class="space-y-6" disabled={processing}>
               <SettingFormSection
-                title="Feature Flags"
-                subtitle="Enable or disable major app modules"
+                title={m.settings_section_feature_flags()}
+                subtitle={m.settings_section_feature_flags_desc()}
               >
                 <SettingsFeaturesTab {form} {formData} {processing} messages={m} />
               </SettingFormSection>
@@ -290,8 +287,8 @@
         <!-- Notifications Section -->
         {#if activeSection === 'notifications'}
           <SettingsSection
-            title="Notifications"
-            description="Configure provider subscriptions and the daily processing time for scheduled delivery."
+            title={m.settings_tab_notifications()}
+            description={m.settings_notifications_desc()}
           >
             <fieldset class="space-y-6" disabled={processing}>
               <NotificationProvidersSettings
@@ -316,7 +313,7 @@
           {#if hasErrors}
             <div class="bg-destructive/10 border-destructive/50 rounded-lg border p-4">
               <h3 class="text-destructive mb-2 text-sm font-semibold">
-                Please fix the following errors:
+                {m.settings_error_fix_errors()}
               </h3>
               <ul class="text-destructive list-inside list-disc space-y-1 text-sm">
                 {#each errorEntries as [field, errorArray]}

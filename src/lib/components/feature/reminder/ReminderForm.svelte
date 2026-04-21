@@ -9,7 +9,8 @@
     REMINDER_RECURRENCE_TYPES,
     reminderSchema,
     getReminderScheduleLabel,
-    getRecurrenceTypeLabel
+    getRecurrenceTypeLabel,
+    getReminderTypeLabel
   } from '$lib/domain/reminder';
   import { superForm, defaults } from 'sveltekit-superforms';
   import Repeat from '@lucide/svelte/icons/repeat';
@@ -115,14 +116,15 @@
               <div class="flex items-center gap-2">
                 <Layers class="h-4 w-4" />
                 <span
-                  >{REMINDER_TYPES[$formData.type as keyof typeof REMINDER_TYPES] ||
-                    'Select type'}</span
+                  >{$formData.type
+                    ? getReminderTypeLabel($formData.type, m)
+                    : m.common_select_placeholder({ name: m.reminder_form_type_label() })}</span
                 >
               </div>
             </Select.Trigger>
             <Select.Content>
-              {#each Object.entries(REMINDER_TYPES) as [value, label]}
-                <Select.Item {value}>{label}</Select.Item>
+              {#each Object.keys(REMINDER_TYPES) as value}
+                <Select.Item {value}>{getReminderTypeLabel(value, m)}</Select.Item>
               {/each}
             </Select.Content>
           </Select.Root>
