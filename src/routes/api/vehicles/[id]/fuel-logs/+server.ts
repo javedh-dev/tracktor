@@ -46,6 +46,12 @@ export const POST: RequestHandler = async (event) => {
       }
     }
 
+    if (body.rate !== undefined && body.rate !== null) {
+      if (typeof body.rate !== 'number' || body.rate <= 0) {
+        throw error(400, 'Rate must be a positive number');
+      }
+    }
+
     if (typeof body.cost !== 'number' || body.cost <= 0) {
       throw error(400, 'Cost must be a positive number');
     }

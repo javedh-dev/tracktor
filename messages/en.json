@@ -181,6 +181,7 @@
   "form_odometer_desc": "Current vehicle odometer reading",
   "form_volume_fuel": "Volume of fuel",
   "form_volume_energy": "Energy consumed",
+  "form_rate": "Rate",
   "form_cost": "Cost",
   "form_cost_desc": "Cost of refill",
   "form_cost_desc_ev": "Cost of charging",

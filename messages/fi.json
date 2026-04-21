@@ -180,6 +180,7 @@
   "form_odometer_desc": "Nykyisen ajoneuvon matkamittarilukema",
   "form_volume_fuel": "Polttoainemäärä",
   "form_volume_energy": "Ladattu sähkömäärä",
+  "form_rate": "Yksikköhinta",
   "form_cost": "Kustannus",
   "form_cost_desc": "Tankkauksen kustannus",
   "form_cost_desc_ev": "Latauksen kustannus",

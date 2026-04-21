@@ -15,6 +15,7 @@ type FuelLogPayload = {
   filled: boolean;
   missedLast: boolean;
   fuelAmount: number | null;
+  rate: number | null;
   cost: number;
   notes: string | null;
   attachment: string | null;

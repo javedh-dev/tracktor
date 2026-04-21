@@ -172,6 +172,7 @@
   "form_odometer_desc": "Aktueller Kilometerzählerstand",
   "form_volume_fuel": "Kraftstoffvolumen",
   "form_volume_energy": "Verbrauchte Energie",
+  "form_rate": "Einheitspreis",
   "form_cost": "Kosten",
   "form_cost_desc": "Kosten der Betankung",
   "form_cost_desc_ev": "Kosten des Ladens",

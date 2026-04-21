@@ -179,6 +179,7 @@
   "form_odometer_desc": "Lecture actuelle de l'odomètre",
   "form_volume_fuel": "Volume de carburant",
   "form_volume_energy": "Énergie consommée",
+  "form_rate": "Prix unitaire",
   "form_cost": "Coût",
   "form_cost_desc": "Coût du remplissage",
   "form_cost_desc_ev": "Coût de la recharge",

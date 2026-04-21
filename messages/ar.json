@@ -180,6 +180,7 @@
   "form_odometer_desc": "قراءة عداد المسافة الحالية للمركبة",
   "form_volume_fuel": "حجم الوقود",
   "form_volume_energy": "الطاقة المستهلكة",
+  "form_rate": "سعر الوحدة",
   "form_cost": "التكلفة",
   "form_cost_desc": "تكلفة التعبئة",
   "form_cost_desc_ev": "تكلفة الشحن",

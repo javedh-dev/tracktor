@@ -41,8 +41,16 @@ export const PUT: RequestHandler = async (event) => {
       }
     }
 
-    if (body.cost && (typeof body.cost !== 'number' || body.cost <= 0)) {
-      throw error(400, 'Cost must be a positive number');
+    if (body.rate !== undefined && body.rate !== null) {
+      if (typeof body.rate !== 'number' || body.rate <= 0) {
+        throw error(400, 'Rate must be a positive number');
+      }
+    }
+
+    if (body.cost !== undefined && body.cost !== null) {
+      if (typeof body.cost !== 'number' || body.cost <= 0) {
+        throw error(400, 'Cost must be a positive number');
+      }
     }
 
     const result = await fuelLogService.updateFuelLog(id, logId, body);

@@ -181,6 +181,7 @@
   "form_odometer_desc": "Aktuális kilométeróra állás",
   "form_volume_fuel": "Üzemanyag mennyisége",
   "form_volume_energy": "Felhasznált energia",
+  "form_rate": "Egységár",
   "form_cost": "Költség",
   "form_cost_desc": "Tankolás költsége",
   "form_cost_desc_ev": "Töltés költsége",

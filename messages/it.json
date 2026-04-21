@@ -180,6 +180,7 @@
   "form_odometer_desc": "Lettura corrente del contachilometri del veicolo",
   "form_volume_fuel": "Volume di carburante",
   "form_volume_energy": "Energia consumata",
+  "form_rate": "Prezzo unitario",
   "form_cost": "Costo",
   "form_cost_desc": "Costo del rifornimento",
   "form_cost_desc_ev": "Costo della ricarica",

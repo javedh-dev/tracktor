@@ -179,6 +179,7 @@
   "form_odometer_desc": "वर्तमान ओडोमीटर रीडिंग",
   "form_volume_fuel": "ईंधन की मात्रा",
   "form_volume_energy": "खपत ऊर्जा",
+  "form_rate": "दर",
   "form_cost": "खर्च",
   "form_cost_desc": "रिफिल की लागत",
   "form_cost_desc_ev": "चार्जिंग की लागत",

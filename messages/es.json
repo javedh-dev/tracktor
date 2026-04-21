@@ -179,6 +179,7 @@
   "form_odometer_desc": "Lectura actual del odómetro",
   "form_volume_fuel": "Volumen de combustible",
   "form_volume_energy": "Energía consumida",
+  "form_rate": "Tarifa",
   "form_cost": "Costo",
   "form_cost_desc": "Costo del llenado",
   "form_cost_desc_ev": "Costo de la carga",

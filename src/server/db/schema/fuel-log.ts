@@ -15,6 +15,7 @@ export const fuelLogTable = table('fuel_logs', {
   date: t.text().notNull(),
   odometer: t.integer(),
   fuelAmount: t.real(),
+  rate: t.real(),
   cost: t.real().notNull(),
   filled: t.integer({ mode: 'boolean' }).notNull(),
   missedLast: t.integer({ mode: 'boolean' }).notNull(),

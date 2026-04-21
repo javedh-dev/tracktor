@@ -131,6 +131,7 @@ export const importFuelLogsFromCsv = async (
         date: parsedDate,
         odometer,
         fuelAmount,
+        rate: null,
         cost,
         filled,
         missedLast,
