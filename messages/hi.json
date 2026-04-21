@@ -162,6 +162,7 @@
   "fuel_add_title": "फ्यूल लॉग जोड़ें",
   "col_date": "तिथि",
   "col_odometer": "ओडोमीटर",
+  "col_distance_driven": "चलाई गई दूरी",
   "col_filled": "भराव",
   "col_missed_last": "पिछला छूटा",
   "col_fuel_amount": "ईंधन मात्रा",

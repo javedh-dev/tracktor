@@ -162,6 +162,7 @@
   "fuel_add_title": "Ajouter un journal de carburant",
   "col_date": "Date",
   "col_odometer": "Odomètre",
+  "col_distance_driven": "Distance parcourue",
   "col_filled": "Rempli",
   "col_missed_last": "Dernier manqué",
   "col_fuel_amount": "Quantité de carburant",

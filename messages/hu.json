@@ -164,6 +164,7 @@
   "fuel_add_title": "Tankolás hozzáadása",
   "col_date": "Dátum",
   "col_odometer": "Km-óra",
+  "col_distance_driven": "Megtett távolság",
   "col_filled": "Tele tank",
   "col_missed_last": "Előző kimaradt",
   "col_fuel_amount": "Mennyiség",

@@ -163,6 +163,7 @@
   "fuel_add_title": "Lisää tankkaus",
   "col_date": "Päivämäärä",
   "col_odometer": "Matkamittari",
+  "col_distance_driven": "Ajettu matka",
   "col_filled": "Täysi tankki",
   "col_missed_last": "Edellinen ohitettu",
   "col_fuel_amount": "Polttoainemäärä",

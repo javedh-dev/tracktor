@@ -6,6 +6,7 @@ export interface FuelLog {
   vehicleId: string;
   date: Date;
   odometer: number | null;
+  distanceDriven?: number | null;
   filled: boolean;
   missedLast: boolean;
   fuelAmount: number | null;

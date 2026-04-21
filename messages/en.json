@@ -164,6 +164,7 @@
   "fuel_add_title": "Add Fuel Log",
   "col_date": "Date",
   "col_odometer": "Odometer",
+  "col_distance_driven": "Distance Driven",
   "col_filled": "Filled",
   "col_missed_last": "Missed Last",
   "col_fuel_amount": "Fuel Amount",

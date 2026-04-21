@@ -162,6 +162,7 @@
   "fuel_add_title": "Agregar registro de combustible",
   "col_date": "Fecha",
   "col_odometer": "Odómetro",
+  "col_distance_driven": "Distancia recorrida",
   "col_filled": "Llenado",
   "col_missed_last": "Último omitido",
   "col_fuel_amount": "Cantidad de combustible",

@@ -163,6 +163,7 @@
   "fuel_add_title": "إضافة سجل وقود",
   "col_date": "التاريخ",
   "col_odometer": "عداد المسافة",
+  "col_distance_driven": "المسافة المقطوعة",
   "col_filled": "مملوء",
   "col_missed_last": "أفتقدت الأخير",
   "col_fuel_amount": "كمية الوقود",

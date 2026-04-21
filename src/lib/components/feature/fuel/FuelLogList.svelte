@@ -33,6 +33,7 @@
   import { vehicleStore } from '$stores/vehicle.svelte';
   import {
     col_date,
+    col_distance_driven,
     col_odometer,
     col_filled,
     col_missed_last,
@@ -78,6 +79,18 @@
           style: 'justify-center'
         }),
       cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
+    },
+    {
+      accessorKey: 'distanceDriven',
+      header: () =>
+        renderComponent(LabelWithIcon, {
+          icon: CircleGauge,
+          iconClass: 'h-4 w-4 ',
+          label: col_distance_driven(),
+          style: 'justify-center'
+        }),
+      cell: ({ row }) =>
+        renderSnippet(distanceDrivenCell, { value: row.getValue('distanceDriven') })
     },
     {
       accessorKey: 'filled',
@@ -204,6 +217,10 @@
 {/snippet}
 
 {#snippet odometerCell(params: any)}
+  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
+{/snippet}
+
+{#snippet distanceDrivenCell(params: any)}
   <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
 {/snippet}
 

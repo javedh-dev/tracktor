@@ -155,6 +155,7 @@
   "fuel_add_title": "Kraftstoffprotokoll hinzufügen",
   "col_date": "Datum",
   "col_odometer": "Kilometerzähler",
+  "col_distance_driven": "Gefahrene Strecke",
   "col_filled": "Gefüllt",
   "col_missed_last": "Zuletzt verpasst",
   "col_fuel_amount": "Kraftstoffmenge",

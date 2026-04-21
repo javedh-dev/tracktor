@@ -163,6 +163,7 @@
   "fuel_add_title": "Aggiungi Rifornimento",
   "col_date": "Data",
   "col_odometer": "Contachilometri",
+  "col_distance_driven": "Distanza percorsa",
   "col_filled": "Pieno",
   "col_missed_last": "Ultimo Mancato",
   "col_fuel_amount": "Quantità di Carburante",

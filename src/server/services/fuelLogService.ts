@@ -59,8 +59,22 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
     orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
   });
 
-  // Calculate mileage
-  const mileageData = fuelLogs.map((log, index, arr) => {
+  const fuelLogsWithMetrics = fuelLogs.map((log, index, arr) => {
+    let distanceDriven: number | null = null;
+
+    if (index > 0 && !log.missedLast && log.odometer !== null) {
+      const previousLog = arr[index - 1];
+
+      if (previousLog?.odometer !== null) {
+        const distance = log.odometer - previousLog.odometer;
+
+        if (distance > 0) {
+          distanceDriven = parseFloat(distance.toFixed(2));
+        }
+      }
+    }
+
+    // Calculate mileage
     // mileage can only be calculated for a full tank and a previous log is needed
     // also need valid odometer and fuel amount values
     if (
@@ -70,7 +84,7 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
       log.odometer === null ||
       log.fuelAmount === null
     ) {
-      return { ...log, mileage: null };
+      return { ...log, distanceDriven, mileage: null };
     }
 
     // find the previous full tank log that serves as a starting point
@@ -88,7 +102,7 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 
     // if there is no valid starting log, mileage can't be calculated
     if (startIndex === -1) {
-      return { ...log, mileage: null };
+      return { ...log, distanceDriven, mileage: null };
     }
 
     const startLog = arr[startIndex]!;
@@ -106,7 +120,7 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
 
     // avoid division by zero and ensure distance is positive
     if (totalFuel === 0 || distance <= 0) {
-      return { ...log, mileage: null };
+      return { ...log, distanceDriven, mileage: null };
     }
 
     // Calculate mileage based on format
@@ -122,9 +136,9 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
       mileage = distance / totalFuel;
     }
 
-    return { ...log, mileage: parseFloat(mileage.toFixed(2)) };
+    return { ...log, distanceDriven, mileage: parseFloat(mileage.toFixed(2)) };
   });
-  return createSuccessResponse(mileageData);
+  return createSuccessResponse(fuelLogsWithMetrics);
 };
 
 export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
