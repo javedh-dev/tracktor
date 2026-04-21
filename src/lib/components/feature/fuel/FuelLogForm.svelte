@@ -149,7 +149,13 @@
       <Form.Control>
         {#snippet children({ props })}
           <FormLabel description={form_odometer_desc()}>{form_odometer()}</FormLabel>
-          <Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
+          <Input
+            {...props}
+            bind:value={$formData.odometer}
+            icon={CircleGauge}
+            type="number"
+            step=".01"
+          />
         {/snippet}
       </Form.Control>
       <!-- <Form.Description>Model of the vehicle</Form.Description> -->
@@ -169,7 +175,7 @@
             bind:value={$formData.fuelAmount}
             icon={Fuel}
             type="number"
-            step=".01"
+            step=".001"
             placeholder={`${volumeLabel} (${getFuelUnit(selectedVehicle?.fuelType as string)})`}
           />
         {/snippet}
@@ -185,7 +191,7 @@
               ? form_cost_desc_ev()
               : form_cost_desc()}>{form_cost()}</FormLabel
           >
-          <Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
+          <Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".001" />
         {/snippet}
       </Form.Control>
       <!-- <Form.Description>Model of the vehicle</Form.Description> -->

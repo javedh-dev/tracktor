@@ -154,7 +154,7 @@
           <FormLabel description={m.maintenance_form_cost_desc()}>
             {m.maintenance_form_cost_label()}
           </FormLabel>
-          <Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".01" />
+          <Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".001" />
         {/snippet}
       </Form.Control>
       <!-- <Form.Description>Model of the vehicle</Form.Description> -->
