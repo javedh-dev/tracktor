@@ -43,7 +43,7 @@ async function addFuelLogColumns(): Promise<void> {
 
   if (!hasMissedLastColumn) {
     logger.info("Adding 'missed_last' column to fuel_logs table...");
-    await db.run(sql`ALTER TABLE fuel_logsADD COLUMN missed_last INTEGER DEFAULT 0 NOT NULL`);
+    await db.run(sql`ALTER TABLE fuel_logs ADD COLUMN missed_last INTEGER DEFAULT 0 NOT NULL`);
     logger.info("Successfully added 'missed_last' column");
   }
 }

@@ -6,7 +6,7 @@ import { withRouteErrorHandling } from '$server/utils/route-handler';
 // POST /api/auth/register - Register a new user
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Register POST error:', async () => {
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Validate request body
     if (!body.username || !body.password) {

@@ -9,8 +9,8 @@
     overview_chart_mileage_title
   } from '$lib/paraglide/messages/_index.js';
 
-  const selectedVehicle = vehicleStore.vehicles?.find(
-    (vehicle: any) => vehicle.id === vehicleStore.selectedId
+  const selectedVehicle = $derived(
+    vehicleStore.vehicles?.find((vehicle: any) => vehicle.id === vehicleStore.selectedId)
   );
 </script>
 

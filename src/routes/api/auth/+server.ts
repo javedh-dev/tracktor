@@ -7,7 +7,7 @@ import { withRouteErrorHandling } from '$server/utils/route-handler';
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Auth POST error:', async () => {
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Validate request body
     if (!body.username || !body.password) {

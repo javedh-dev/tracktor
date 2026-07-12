@@ -12,7 +12,7 @@ export const GET: RequestHandler = async (event) => {
 
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Notification providers POST error:', async () => {
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     const result = await providerService.addProvider(body);
     return json(result, { status: 201 });

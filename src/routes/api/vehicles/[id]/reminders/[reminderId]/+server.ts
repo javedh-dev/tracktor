@@ -24,7 +24,7 @@ export const PUT: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID and reminder ID are required');
     }
 
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     const result = await reminderService.updateReminder(id, reminderId, body);
     return json(result);

@@ -256,7 +256,7 @@ const formatMileage = (mileage: number, vehicleType: string): string => {
 };
 
 const roundNumber = (num: number, decimal: number = 2): number => {
-  return Number(num.toFixed(2));
+  return Number(num.toFixed(decimal));
 };
 
 export {

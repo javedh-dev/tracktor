@@ -17,7 +17,7 @@ export const PUT: RequestHandler = async (event) => {
       throw error(401, 'Invalid session');
     }
 
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Validate request body
     if (!body.username && !body.newPassword) {

@@ -24,7 +24,7 @@ export const POST: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID is required');
     }
 
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     if (!body.dueDate || !body.type || !body.remindSchedule) {
       throw error(400, 'Due date, type, and remind schedule are required');

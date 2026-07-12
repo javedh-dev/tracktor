@@ -7,7 +7,6 @@ declare global {
       message: string;
     }
     interface Locals {
-      requestBody?: any;
       user?: {
         id: string;
         username: string;

@@ -7,7 +7,7 @@ import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Notification provider test POST error:', async () => {
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
     const providerId = event.params.id;
 
     if (!providerId) {

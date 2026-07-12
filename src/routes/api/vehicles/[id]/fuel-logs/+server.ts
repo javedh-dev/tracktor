@@ -26,7 +26,7 @@ export const POST: RequestHandler = async (event) => {
     }
 
     // Use body from locals if available (from middleware), otherwise parse it
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Basic validation for required fields
     if (!body.date || body.cost === undefined || body.cost === null) {

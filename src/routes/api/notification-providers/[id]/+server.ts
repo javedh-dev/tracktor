@@ -24,7 +24,7 @@ export const PUT: RequestHandler = async (event) => {
       throw error(400, 'Provider ID is required');
     }
 
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     const result = await providerService.updateProvider(id, body);
     return json(result);
