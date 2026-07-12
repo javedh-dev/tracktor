@@ -27,13 +27,7 @@
   import * as m from '$lib/paraglide/messages';
 
   type FuelLogColumnKey =
-    | 'date'
-    | 'odometer'
-    | 'fuelAmount'
-    | 'cost'
-    | 'filled'
-    | 'missedLast'
-    | 'notes';
+    'date' | 'odometer' | 'fuelAmount' | 'cost' | 'filled' | 'missedLast' | 'notes';
 
   interface ColumnDefinition {
     key: FuelLogColumnKey;

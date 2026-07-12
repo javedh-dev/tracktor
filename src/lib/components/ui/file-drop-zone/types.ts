@@ -2,9 +2,7 @@ import type { WithChildren } from 'bits-ui';
 import type { HTMLInputAttributes } from 'svelte/elements';
 
 export type FileRejectedReason =
-  | 'Maximum file size exceeded'
-  | 'File type not allowed'
-  | 'Maximum files uploaded';
+  'Maximum file size exceeded' | 'File type not allowed' | 'Maximum files uploaded';
 
 export type FileDropZonePropsWithoutHTML = WithChildren<{
   ref?: HTMLInputElement | null;

@@ -1,6 +1,8 @@
 allowBuilds:
   bcrypt: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - helmet@8.3.0
 onlyBuiltDependencies:
   - bcrypt
   - better-sqlite3
