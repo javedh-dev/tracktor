@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Routing and API Surface"
+openwiki_generated: true
+---
+
 # Routing and API Surface
 
 Tracktor uses SvelteKit file-system routing. Pages live under `src/routes/`, API endpoints under `src/routes/api/`, and authentication flows under `src/routes/(auth)/`.

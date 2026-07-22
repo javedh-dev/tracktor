@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Domain and Data Models"
+openwiki_generated: true
+---
+
 # Domain and Data Models
 
 Tracktor's business entities are defined as TypeScript interfaces and Zod schemas in `src/lib/domain/`. The server uses matching Drizzle ORM tables in `src/server/db/schema/`.

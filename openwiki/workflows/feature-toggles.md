@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Feature Toggles Workflow"
+openwiki_generated: true
+---
+
 # Feature Toggles Workflow
 
 Tracktor can disable entire feature areas from the Settings page. Toggles are stored in the `configs` table and consumed by both server and client code.
