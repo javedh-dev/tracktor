@@ -1,15 +1,12 @@
 import { sqliteTable as table } from 'drizzle-orm/sqlite-core';
 import * as t from 'drizzle-orm/sqlite-core';
 import { vehicleTable } from './vehicle';
-import { timestamps } from './audit';
+import { timestamps, idColumn, recurrenceColumns } from './audit';
 
 export const reminderTable = table(
   'reminders',
   {
-    id: t
-      .text()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+    ...idColumn,
     vehicleId: t
       .text()
       .notNull()
@@ -17,8 +14,7 @@ export const reminderTable = table(
     type: t.text().notNull(),
     dueDate: t.text().notNull(),
     remindSchedule: t.text().notNull(),
-    recurrenceType: t.text().notNull().default('none'),
-    recurrenceInterval: t.integer().notNull().default(1),
+    ...recurrenceColumns,
     recurrenceEndDate: t.text(),
     note: t.text(),
     isCompleted: t.integer({ mode: 'boolean' }).notNull().default(false),

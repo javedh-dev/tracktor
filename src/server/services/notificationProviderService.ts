@@ -61,7 +61,7 @@ async function getProviderRecord(providerId: string): Promise<ProviderRecord> {
   return requireRecord(provider, 'Provider not found');
 }
 
-export const getProvidersByUserId = async () => {
+export const getAllProviders = async () => {
   const providers = await db.query.notificationProviderTable.findMany({
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
@@ -153,7 +153,8 @@ export const getEnabledProvidersForChannels = async (channels: NotificationChann
 
 export const getEnabledProvidersByType = async (type: string) => {
   const providers = await db.query.notificationProviderTable.findMany({
-    where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true))
+    where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true)),
+    orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
   return providers.map(parseProvider);

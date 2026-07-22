@@ -1,15 +1,12 @@
 import { sqliteTable as table } from 'drizzle-orm/sqlite-core';
 import * as t from 'drizzle-orm/sqlite-core';
 import { vehicleTable } from './vehicle';
-import { timestamps } from './audit';
+import { timestamps, idColumn } from './audit';
 
 export const fuelLogTable = table(
   'fuel_logs',
   {
-    id: t
-      .text()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+    ...idColumn,
     vehicleId: t
       .text()
       .notNull()

@@ -1,10 +1,17 @@
 import { serverEnv } from '$lib/config/env.server';
 import type { RequestEvent } from '@sveltejs/kit';
 import { BaseMiddleware, type MiddlewareResult } from './base';
+import type { ApiResponse } from '$lib';
+
+function corsHeaders(request: Request): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': CorsMiddleware.getCorsOrigin(request),
+    'Access-Control-Allow-Credentials': 'true'
+  };
+}
 
 export class CorsMiddleware extends BaseMiddleware {
   protected async process(event: RequestEvent): Promise<MiddlewareResult> {
-    // Handle CORS preflight requests
     if (event.request.method === 'OPTIONS') {
       return {
         response: this.handleCorsOptions(event.request),
@@ -18,23 +25,45 @@ export class CorsMiddleware extends BaseMiddleware {
   public static getCorsOrigin(request: Request): string {
     const requestOrigin = request.headers.get('origin');
 
-    // If no origin header (e.g., same-origin requests), allow it
     if (!requestOrigin) {
       return '*';
     }
 
-    // If wildcard is configured, allow any origin
     if (serverEnv?.CORS_ORIGINS.includes('*')) {
       return '*';
     }
 
-    // Check if request origin is in allowed origins
     if (serverEnv?.CORS_ORIGINS.includes(requestOrigin)) {
       return requestOrigin;
     }
 
-    // Default to first configured origin if request origin is not allowed
     return serverEnv?.CORS_ORIGINS[0] || '*';
+  }
+
+  public static createErrorResponse(
+    message: string,
+    status: number,
+    request: Request,
+    error?: Error
+  ): Response {
+    const errorResponse: ApiResponse = {
+      success: false,
+      message,
+      errors: error ? [error] : []
+    };
+
+    return new Response(JSON.stringify(errorResponse), {
+      status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders(request)
+      }
+    });
+  }
+
+  public static addCorsHeaders(response: Response, request: Request): void {
+    response.headers.set('Access-Control-Allow-Origin', CorsMiddleware.getCorsOrigin(request));
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
 
   private handleCorsOptions(request: Request): Response {
@@ -48,10 +77,5 @@ export class CorsMiddleware extends BaseMiddleware {
         'Access-Control-Max-Age': '86400'
       }
     });
-  }
-
-  public static addCorsHeaders(response: Response, request: Request): void {
-    response.headers.set('Access-Control-Allow-Origin', CorsMiddleware.getCorsOrigin(request));
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
 }

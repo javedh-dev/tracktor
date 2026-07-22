@@ -259,7 +259,7 @@ All verified zero-references:
 - [x] Phase 3.2 — Mileage/odometer engine
 - [x] Phase 3.3 — Notification sync redesign
 - [x] Phase 3.4 — CRUD skeleton + config service
-- [ ] Phase 3.5 — Auth middleware & misc
+- [x] Phase 3.5 — Auth middleware & misc
 - [ ] Phase 4 — Client factories
 - [ ] Phase 5 — Settings & component decomposition
 - [ ] Phase 6 — DB & infra cleanup

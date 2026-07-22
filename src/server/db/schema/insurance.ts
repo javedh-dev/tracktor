@@ -1,15 +1,12 @@
 import { sqliteTable as table } from 'drizzle-orm/sqlite-core';
 import * as t from 'drizzle-orm/sqlite-core';
 import { vehicleTable } from './vehicle';
-import { timestamps } from './audit';
+import { timestamps, idColumn, recurrenceColumns } from './audit';
 
 export const insuranceTable = table(
   'insurances',
   {
-    id: t
-      .text()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+    ...idColumn,
     vehicleId: t
       .text()
       .notNull()
@@ -18,8 +15,7 @@ export const insuranceTable = table(
     policyNumber: t.text().notNull(),
     startDate: t.text().notNull(),
     endDate: t.text(),
-    recurrenceType: t.text().notNull().default('none'),
-    recurrenceInterval: t.integer().notNull().default(1),
+    ...recurrenceColumns,
     cost: t.real().notNull(),
     notes: t.text(),
     attachment: t.text(),

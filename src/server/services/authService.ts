@@ -13,8 +13,13 @@ import {
 } from '../utils/session';
 import { requireRecord } from './service-response.helper';
 
+const BCRYPT_SALT_ROUNDS = 10;
+
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+}
+
 export const createUser = async (username: string, password: string) => {
-  // Check if user already exists
   const existingUser = await db.query.usersTable.findFirst({
     where: (users, { eq }) => eq(users.username, username)
   });
@@ -23,7 +28,7 @@ export const createUser = async (username: string, password: string) => {
     throw new AppError('Username already exists', Status.BAD_REQUEST);
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await hashPassword(password);
   const userId = crypto.randomUUID();
 
   await db.insert(schema.usersTable).values({
@@ -40,8 +45,9 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
     where: (users, { eq }) => eq(users.username, username)
   });
 
+  const passwordHash = await hashPassword(password);
+
   if (!existingUser) {
-    const passwordHash = await bcrypt.hash(password, 10);
     const userId = crypto.randomUUID();
 
     await db.insert(schema.usersTable).values({
@@ -50,7 +56,6 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
       passwordHash
     });
   } else {
-    const passwordHash = await bcrypt.hash(password, 10);
     await db
       .update(schema.usersTable)
       .set({ passwordHash })
@@ -95,10 +100,10 @@ export const validateSession = async (sessionToken: string): Promise<{ user: Use
 };
 
 export const getUsersCount = async () => {
-  const users = await db.select().from(schema.usersTable);
+  const [user] = await db.select({ id: schema.usersTable.id }).from(schema.usersTable).limit(1);
   return {
-    count: users.length,
-    hasUsers: users.length > 0
+    count: user ? 1 : 0,
+    hasUsers: !!user
   };
 };
 
@@ -139,7 +144,7 @@ export const updateUserProfile = async (
       throw new AppError('Current password is incorrect', Status.UNAUTHORIZED);
     }
 
-    updates.passwordHash = await bcrypt.hash(data.newPassword, 10);
+    updates.passwordHash = await hashPassword(data.newPassword);
   }
 
   if (Object.keys(updates).length === 0) {

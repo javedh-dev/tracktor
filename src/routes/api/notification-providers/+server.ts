@@ -4,7 +4,7 @@ import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handle
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Notification providers GET error:', async () => {
-    const result = await providerService.getProvidersByUserId();
+    const result = await providerService.getAllProviders();
     return jsonResponse(result);
   });
 };
