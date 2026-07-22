@@ -11,8 +11,11 @@
   import * as m from '$lib/paraglide/messages';
   import { saveConfig } from '$lib/services/config.service';
   import { rawConfigToFormData, formDataToConfigs } from '$helper/config.helper';
-  import { createSettingsConfigSchema, createSettingsOptions } from '$helper/settings-form.helper';
-  import type { SettingsFormShape } from '$lib/types/settings';
+  import {
+    createSettingsConfigSchema,
+    createSettingsOptions,
+    type SettingsConfig
+  } from '$helper/settings-form.helper';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { locales, getLocale, setLocale } from '$lib/paraglide/runtime.js';
   import Settings from '@lucide/svelte/icons/settings';
@@ -46,7 +49,7 @@
           themeStore.setTheme(f.data.theme as any);
         }
 
-        const updatedConfig = formDataToConfigs(f.data as SettingsFormShape, configStore.rawConfig);
+        const updatedConfig = formDataToConfigs(f.data as SettingsConfig, configStore.rawConfig);
 
         // Persist configuration before applying a locale change
         await saveConfig(updatedConfig);
@@ -85,7 +88,7 @@
         ({
           ...current,
           notificationProcessingSchedule: value
-        }) as SettingsFormShape
+        }) as SettingsConfig
     );
   };
 
@@ -143,7 +146,7 @@
       const configData = rawConfigToFormData(
         configStore.rawConfig,
         configStore.configs
-      ) as SettingsFormShape;
+      ) as SettingsConfig;
       // Add current theme to form data (theme is client-side only)
       configData.theme = themeStore.theme;
       notificationProcessingEnabled = configData.notificationProcessingEnabled !== false;

@@ -12,73 +12,59 @@
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import { toast } from 'svelte-sonner';
-  import { superForm, defaults } from 'sveltekit-superforms';
-  import { zod4 } from 'sveltekit-superforms/adapters';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { saveMaintenanceLogWithAttachment } from '$lib/services/maintenance.service';
+  import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
-  import { vehicleStore } from '$stores/vehicle.svelte';
   import { FileDropZone, AutocompleteInput } from '$lib/components/app';
   import { getServiceCenterSuggestions } from '$lib/services/autocomplete.service';
   import * as m from '$lib/paraglide/messages';
 
   let { data } = $props();
 
-  let attachment = $state<File>();
-  let removeExistingAttachment = $state(false);
-  let processing = $state(false);
   let serviceCenterSuggestions = $state<string[]>([]);
   let loadingSuggestions = $state(false);
 
-  // For showing existing attachment when editing
   const existingAttachmentUrl = $derived(
     data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
   );
 
-  const form = superForm(defaults(zod4(maintenanceSchema)), {
-    validators: zod4(maintenanceSchema),
-    SPA: true,
-    resetForm: false,
+  const sf = createSheetForm({
+    schema: maintenanceSchema,
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
-        processing = true;
+        sf.processing = true;
         saveMaintenanceLogWithAttachment(
           { ...f.data, date: parseDate(f.data.date) },
-          attachment,
-          removeExistingAttachment
+          sf.attachment,
+          sf.removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
             toast.success(data ? m.maintenance_toast_updated() : m.maintenance_toast_saved());
-            attachment = undefined;
+            sf.attachment = undefined;
             sheetStore.closeSheet(maintenanceStore.refreshMaintenanceLogs);
           } else {
             toast.error(`${m.maintenance_toast_error_prefix()}${res.error}`);
           }
-          processing = false;
+          sf.processing = false;
         });
       } else {
         toast.error(`${m.maintenance_form_error_fix()} ${JSON.stringify(f.errors)}`);
       }
     }
   });
-  const { form: formData, enhance } = form;
+
+  const { form, enhance } = sf;
+  const formData: any = sf.formData;
 
   $effect(() => {
+    sf.resetAttachment();
     if (data) {
       formData.set({ ...data, date: formatDate(data.date), attachment: null });
-      // Reset attachment state when editing existing record
-      attachment = undefined;
-      removeExistingAttachment = false;
     }
-    formData.update((fd) => {
-      return {
-        ...fd,
-        vehicleId: vehicleStore.selectedId || ''
-      };
-    });
+    sf.setVehicleId();
   });
 
-  // Load autocomplete suggestions
   $effect(() => {
     loadingSuggestions = true;
     getServiceCenterSuggestions().then((suggestions) => {
@@ -89,17 +75,16 @@
 </script>
 
 <form id="maintenance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
-  <fieldset class="flex flex-col gap-4" disabled={processing}>
-    <!-- <div class="flex w-full flex-row gap-4"> -->
+  <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
     <Form.Field {form} name="attachment" class="w-full">
       <Form.Control>
         <FormLabel description={m.maintenance_form_attachment_desc()}>
           {m.maintenance_form_attachment_label()}
         </FormLabel>
         <FileDropZone
-          bind:file={attachment}
+          bind:file={sf.attachment}
           existingFileUrl={existingAttachmentUrl}
-          bind:removeExisting={removeExistingAttachment}
+          bind:removeExisting={sf.removeExistingAttachment}
           variant="attachment"
           accept="application/pdf,image/*"
         />
@@ -125,7 +110,6 @@
           <Input {...props} bind:value={$formData.odometer} icon={CircleGauge} type="number" />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
 
@@ -144,7 +128,6 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
 
@@ -157,7 +140,6 @@
           <Input {...props} bind:value={$formData.cost} icon={Banknote} type="number" step=".001" />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
 
@@ -175,9 +157,8 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
-    <SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
+    <SubmitButton processing={sf.processing} class="w-full">{m.common_submit()}</SubmitButton>
   </fieldset>
 </form>

@@ -7,14 +7,13 @@
   import { formatDate, parseDate } from '$lib/helper/format.helper';
   import { saveInsuranceWithAttachment } from '$lib/services/insurance.service';
   import { insuranceStore } from '$stores/insurance.svelte';
+  import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import * as m from '$lib/paraglide/messages';
   import {
     insuranceSchema,
     INSURANCE_RECURRENCE_TYPES,
     getInsuranceRecurrenceTypeLabel
   } from '$lib/domain/insurance';
-  import * as Select from '$ui/select/index.js';
-  import Repeat from '@lucide/svelte/icons/repeat';
   import { FileDropZone, AutocompleteInput } from '$lib/components/app';
   import { getInsuranceProviderSuggestions } from '$lib/services/autocomplete.service';
   import Banknote from '@lucide/svelte/icons/banknote';
@@ -22,32 +21,24 @@
   import IdCard from '@lucide/svelte/icons/id-card';
   import Building2 from '@lucide/svelte/icons/building-2';
   import SubmitButton from '$appui/SubmitButton.svelte';
+  import RecurrenceFields from '$lib/components/feature/shared/RecurrenceFields.svelte';
   import { toast } from 'svelte-sonner';
-  import { superForm, defaults } from 'sveltekit-superforms';
-  import { zod4 } from 'sveltekit-superforms/adapters';
   import { sheetStore } from '$stores/sheet.svelte';
-  import { vehicleStore } from '$stores/vehicle.svelte';
 
   let { data } = $props();
 
-  let attachment = $state<File>();
-  let removeExistingAttachment = $state(false);
-  let processing = $state(false);
   let insuranceProviderSuggestions = $state<string[]>([]);
   let loadingSuggestions = $state(false);
 
-  // For showing existing attachment when editing
   const existingAttachmentUrl = $derived(
     data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
   );
 
-  const form = superForm(defaults(zod4(insuranceSchema)), {
-    validators: zod4(insuranceSchema),
-    SPA: true,
-    resetForm: false,
+  const sf = createSheetForm({
+    schema: insuranceSchema,
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
-        processing = true;
+        sf.processing = true;
         saveInsuranceWithAttachment(
           {
             ...f.data,
@@ -55,28 +46,33 @@
             endDate:
               f.data.recurrenceType !== 'none' || !f.data.endDate ? null : parseDate(f.data.endDate)
           },
-          attachment,
-          removeExistingAttachment
+          sf.attachment,
+          sf.removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
             toast.success(m[data ? 'insurance_toast_updated' : 'insurance_toast_saved']());
-            attachment = undefined;
+            sf.attachment = undefined;
             sheetStore.closeSheet(() => insuranceStore.refreshInsurances());
           } else {
             toast.error(m.insurance_toast_error_prefix() + res.error);
           }
-          processing = false;
+          sf.processing = false;
         });
       } else {
         toast.error(m.insurance_form_error_fix());
-        f.errors._errors?.forEach((err) => toast.error(err));
+        if (f.errors?._errors) {
+          f.errors._errors.forEach((err: string) => toast.error(err));
+        }
         console.error('Form validation errors:', f.errors);
       }
     }
   });
-  const { form: formData, enhance } = form;
+
+  const { form, enhance } = sf;
+  const formData: any = sf.formData;
 
   $effect(() => {
+    sf.resetAttachment();
     if (data) {
       formData.set({
         ...data,
@@ -84,19 +80,10 @@
         endDate: data.endDate ? formatDate(data.endDate) : '',
         attachment: null
       });
-      // Reset attachment state when editing existing record
-      attachment = undefined;
-      removeExistingAttachment = false;
     }
-    formData.update((fd) => {
-      return {
-        ...fd,
-        vehicleId: vehicleStore.selectedId || ''
-      };
-    });
+    sf.setVehicleId();
   });
 
-  // Load autocomplete suggestions
   $effect(() => {
     loadingSuggestions = true;
     getInsuranceProviderSuggestions().then((suggestions) => {
@@ -107,16 +94,16 @@
 </script>
 
 <form id="insurance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
-  <fieldset class="flex flex-col gap-4" disabled={processing}>
+  <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
     <Form.Field {form} name="attachment" class="w-full">
       <Form.Control>
         <FormLabel description={m.insurance_form_attachment_desc()}
           >{m.insurance_form_attachment_label()}</FormLabel
         >
         <FileDropZone
-          bind:file={attachment}
+          bind:file={sf.attachment}
           existingFileUrl={existingAttachmentUrl}
-          bind:removeExisting={removeExistingAttachment}
+          bind:removeExisting={sf.removeExistingAttachment}
           variant="attachment"
           accept="application/pdf,image/*"
         />
@@ -164,65 +151,22 @@
       <Form.FieldErrors />
     </Form.Field>
 
-    <Form.Field {form} name="recurrenceType" class="w-full">
-      <Form.Control>
-        {#snippet children({ props })}
-          <FormLabel description={m.insurance_form_recurrence_type_desc()}
-            >{m.insurance_form_recurrence_type_label()}</FormLabel
-          >
-          <Select.Root bind:value={$formData.recurrenceType} type="single">
-            <Select.Trigger {...props} class="w-full">
-              <div class="flex items-center gap-2">
-                <Repeat class="h-4 w-4" />
-                <span>
-                  {$formData.recurrenceType
-                    ? getInsuranceRecurrenceTypeLabel($formData.recurrenceType, m)
-                    : 'Select recurrence'}
-                </span>
-              </div>
-            </Select.Trigger>
-            <Select.Content>
-              {#each Object.keys(INSURANCE_RECURRENCE_TYPES) as value}
-                <Select.Item {value}>{getInsuranceRecurrenceTypeLabel(value, m)}</Select.Item>
-              {/each}
-            </Select.Content>
-          </Select.Root>
-        {/snippet}
-      </Form.Control>
-      <Form.FieldErrors />
-    </Form.Field>
-
-    {#if $formData.recurrenceType === 'yearly' || $formData.recurrenceType === 'monthly'}
-      <Form.Field {form} name="recurrenceInterval" class="w-full">
-        <Form.Control>
-          {#snippet children({ props })}
-            <FormLabel description={m.insurance_form_recurrence_interval_desc()}>
-              {m.recurrence_renew_every()}
-              {$formData.recurrenceInterval || 1}
-              {$formData.recurrenceType === 'yearly'
-                ? m.recurrence_interval_years()
-                : m.recurrence_interval_months()}
-            </FormLabel>
-            <Input {...props} bind:value={$formData.recurrenceInterval} type="number" min="1" />
-          {/snippet}
-        </Form.Control>
-        <Form.FieldErrors />
-      </Form.Field>
-    {/if}
-
-    {#if $formData.recurrenceType === 'none'}
-      <Form.Field {form} name="endDate" class="w-full">
-        <Form.Control>
-          {#snippet children({ props })}
-            <FormLabel description={m.insurance_form_end_date_desc()}
-              >{m.insurance_form_end_date_label()}</FormLabel
-            >
-            <Input {...props} bind:value={$formData.endDate} icon={Calendar1} type="calendar" />
-          {/snippet}
-        </Form.Control>
-        <Form.FieldErrors />
-      </Form.Field>
-    {/if}
+    <RecurrenceFields
+      {form}
+      formData={sf.formData}
+      recurrenceTypes={INSURANCE_RECURRENCE_TYPES}
+      getLabel={getInsuranceRecurrenceTypeLabel}
+      endDateField="endDate"
+      intervalShowMode="yearly_monthly"
+      endDateShowMode="none"
+      {m}
+      recurrenceTypeLabel={m.insurance_form_recurrence_type_label()}
+      recurrenceTypeDesc={m.insurance_form_recurrence_type_desc()}
+      intervalLabel={m.recurrence_renew_every()}
+      intervalDesc={m.insurance_form_recurrence_interval_desc()}
+      endDateLabel={m.insurance_form_end_date_label()}
+      endDateDesc={m.insurance_form_end_date_desc()}
+    />
 
     <Form.Field {form} name="cost" class="w-full">
       <Form.Control>
@@ -252,6 +196,6 @@
       </Form.Control>
       <Form.FieldErrors />
     </Form.Field>
-    <SubmitButton {processing} class="w-full">{m.common_submit()}</SubmitButton>
+    <SubmitButton processing={sf.processing} class="w-full">{m.common_submit()}</SubmitButton>
   </fieldset>
 </form>

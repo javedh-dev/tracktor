@@ -14,6 +14,7 @@
   } from '$lib/helper/format.helper';
   import { saveFuelLogWithAttachment } from '$lib/services/fuel.service';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
+  import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { FileDropZone } from '$lib/components/app';
   import { fuelSchema } from '$lib/domain/fuel';
   import Banknote from '@lucide/svelte/icons/banknote';
@@ -23,8 +24,6 @@
   import SubmitButton from '$appui/SubmitButton.svelte';
 
   import { toast } from 'svelte-sonner';
-  import { superForm, defaults } from 'sveltekit-superforms';
-  import { zod4 } from 'sveltekit-superforms/adapters';
   import { sheetStore } from '$stores/sheet.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import {
@@ -57,54 +56,48 @@
   type CalculatedField = 'fuelAmount' | 'rate' | 'cost';
   const calculatedFields: CalculatedField[] = ['fuelAmount', 'rate', 'cost'];
 
-  let attachment = $state<File>();
-  let removeExistingAttachment = $state(false);
-  let processing = $state(false);
   let derivedField = $state<CalculatedField | null>(null);
-  // Get the selected vehicle to determine fuel type and units
+
+  const existingAttachmentUrl = $derived(
+    data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
+  );
+
+  const sf = createSheetForm({
+    schema: fuelSchema,
+    validationMethod: 'onsubmit',
+    onUpdated: async ({ form: f }) => {
+      if (f.valid) {
+        sf.processing = true;
+        saveFuelLogWithAttachment(
+          { ...f.data, date: parseDate(f.data.date) },
+          sf.attachment,
+          sf.removeExistingAttachment
+        ).then((res) => {
+          if (res.status == 'OK') {
+            toast.success(data ? fuel_toast_updated() : fuel_toast_saved());
+            sf.attachment = undefined;
+            sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
+          } else {
+            toast.error(`${fuel_toast_error_prefix()}${res.error}`);
+          }
+          sf.processing = false;
+        });
+      }
+    }
+  });
+
+  const { form, enhance } = sf;
+  const formData: any = sf.formData;
+
   const selectedVehicle = $derived(
     vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
   );
-  // const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
   const volumeLabel = $derived(
     selectedVehicle?.fuelType === 'electric' ? form_volume_energy() : form_volume_fuel()
   );
   const rateDescription = $derived(
     `${getCurrencySymbol()} / ${getFuelUnit(selectedVehicle?.fuelType as string)}`
   );
-
-  // For showing existing attachment when editing
-  const existingAttachmentUrl = $derived(
-    data?.attachment ? withBase(`/api/files/${data.attachment}`) : undefined
-  );
-
-  const form = superForm(defaults(zod4(fuelSchema)), {
-    validators: zod4(fuelSchema),
-    SPA: true,
-    resetForm: false,
-    validationMethod: 'onsubmit',
-    onUpdated: async ({ form: f }) => {
-      if (f.valid) {
-        processing = true;
-        saveFuelLogWithAttachment(
-          { ...f.data, date: parseDate(f.data.date) },
-          attachment,
-          removeExistingAttachment
-        ).then((res) => {
-          if (res.status == 'OK') {
-            toast.success(data ? fuel_toast_updated() : fuel_toast_saved());
-            attachment = undefined;
-            sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
-          } else {
-            toast.error(`${fuel_toast_error_prefix()}${res.error}`);
-          }
-          processing = false;
-        });
-      }
-    }
-  });
-
-  const { form: formData, enhance } = form;
 
   const hasPositiveNumber = (value: number | null | undefined): value is number =>
     typeof value === 'number' && Number.isFinite(value) && value > 0;
@@ -118,11 +111,9 @@
     if (field === 'cost') {
       return roundTo((values.fuelAmount || 0) * (values.rate || 0), 2);
     }
-
     if (field === 'fuelAmount') {
       return hasPositiveNumber(values.rate) ? roundTo((values.cost || 0) / values.rate, 3) : 0;
     }
-
     return hasPositiveNumber(values.fuelAmount)
       ? roundTo((values.cost || 0) / values.fuelAmount, 3)
       : 0;
@@ -134,37 +125,30 @@
 
     if (derivedField) {
       const currentDerivedField = derivedField;
-
-      if (source === derivedField) {
-        return;
-      }
-
+      if (source === derivedField) return;
       const sourceFields = calculatedFields.filter((field) => field !== currentDerivedField);
       if (sourceFields.every((field) => hasPositiveNumber(values[field]))) {
-        formData.update((fd) => ({
+        formData.update((fd: any) => ({
           ...fd,
           [currentDerivedField]: getCalculatedValue(currentDerivedField, values)
         }));
       } else {
-        formData.update((fd) => ({ ...fd, [currentDerivedField]: 0 }));
+        formData.update((fd: any) => ({ ...fd, [currentDerivedField]: 0 }));
         derivedField = null;
       }
-
       return;
     }
 
     const missingField = calculatedFields.find((field) => !hasPositiveNumber(values[field]));
-    if (!missingField) {
-      return;
-    }
-
+    if (!missingField) return;
     const sourceFields = calculatedFields.filter((field) => field !== missingField);
-    if (!sourceFields.every((field) => hasPositiveNumber(values[field]))) {
-      return;
-    }
+    if (!sourceFields.every((field) => hasPositiveNumber(values[field]))) return;
 
     derivedField = missingField;
-    formData.update((fd) => ({ ...fd, [missingField]: getCalculatedValue(missingField, values) }));
+    formData.update((fd: any) => ({
+      ...fd,
+      [missingField]: getCalculatedValue(missingField, values)
+    }));
   }
 
   function queueCalculatedFieldUpdate(source: CalculatedField) {
@@ -172,6 +156,7 @@
   }
 
   $effect(() => {
+    sf.resetAttachment();
     if (data) {
       formData.set({
         ...data,
@@ -183,13 +168,10 @@
         rate: data.rate !== null && data.rate !== undefined ? roundTo(data.rate, 3) : null,
         cost: data.cost !== null && data.cost !== undefined ? roundNumber(data.cost) : null,
         odometer: data.odometer,
-        attachment: null // Don't include attachment in form data, handle separately
+        attachment: null
       });
-      // Reset attachment state when editing existing record
-      attachment = undefined;
-      removeExistingAttachment = false;
+      derivedField = null;
     } else {
-      // Initialize form with empty/default values for new entry
       formData.set({
         id: null,
         vehicleId: vehicleStore.selectedId || '',
@@ -204,18 +186,12 @@
         attachment: null
       });
     }
-    derivedField = null;
-    formData.update((fd) => {
-      return {
-        ...fd,
-        vehicleId: vehicleStore.selectedId || ''
-      };
-    });
+    sf.setVehicleId();
   });
 </script>
 
 <form id="fuel-log-form" use:enhance onsubmit={(e) => e.preventDefault()}>
-  <fieldset class="flex flex-col gap-4" disabled={processing}>
+  <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
     <Form.Field {form} name="date" class="w-full">
       <Form.Control>
         {#snippet children({ props })}
@@ -238,7 +214,6 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
     <Form.Field {form} name="fuelAmount" class="w-full">
@@ -262,7 +237,6 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
     <Form.Field {form} name="rate" class="w-full">
@@ -302,7 +276,6 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
     <div class="flex w-full flex-row justify-around gap-4">
@@ -350,21 +323,20 @@
           />
         {/snippet}
       </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
       <Form.FieldErrors />
     </Form.Field>
     <Form.Field {form} name="attachment" class="w-full">
       <Form.Control>
         <FormLabel description={form_attachment()}>{form_attachment()}</FormLabel>
         <FileDropZone
-          bind:file={attachment}
+          bind:file={sf.attachment}
           existingFileUrl={existingAttachmentUrl}
-          bind:removeExisting={removeExistingAttachment}
+          bind:removeExisting={sf.removeExistingAttachment}
           variant="attachment"
           accept="application/pdf,image/*"
         />
       </Form.Control>
     </Form.Field>
-    <SubmitButton {processing} class="w-full">{common_submit()}</SubmitButton>
+    <SubmitButton processing={sf.processing} class="w-full">{common_submit()}</SubmitButton>
   </fieldset>
 </form>

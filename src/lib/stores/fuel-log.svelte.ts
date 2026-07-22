@@ -1,32 +1,28 @@
 import type { FuelLog } from '$lib/domain';
-import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '$lib/response';
 import { compareDesc } from 'date-fns';
 import { vehicleStore } from './vehicle.svelte';
+import { createEntityStore } from './entity-store.svelte';
 
-class FuelLogStore {
-  fuelLogs = $state<FuelLog[]>();
-  processing = $state(false);
-  error = $state<string>();
+const { items, processing, error, refresh } = createEntityStore<FuelLog>({
+  buildPath: () =>
+    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/fuel-logs` : undefined,
+  sort: (a, b) => {
+    const dateDiff = compareDesc(a.date, b.date);
+    if (dateDiff !== 0) return dateDiff;
+    return (b.odometer ?? 0) - (a.odometer ?? 0);
+  },
+  errorMessage: 'Failed to fetch Fuel Logs'
+});
 
-  refreshFuelLogs = () => {
-    if (!vehicleStore.selectedId) return;
-    this.processing = true;
-    apiClient
-      .get<ApiResponse>(`/vehicles/${vehicleStore.selectedId}/fuel-logs`)
-      .then(({ data: res }) => {
-        const logs: FuelLog[] = res.data;
-        logs.sort((a, b) => {
-          const dateDiff = compareDesc(a.date, b.date);
-          if (dateDiff !== 0) return dateDiff;
-          return (b.odometer ?? 0) - (a.odometer ?? 0);
-        });
-        this.fuelLogs = logs;
-        this.error = undefined;
-      })
-      .catch((err) => (this.error = 'Failed to fetch Fuel Logs'))
-      .finally(() => (this.processing = false));
-  };
-}
-
-export const fuelLogStore = new FuelLogStore();
+export const fuelLogStore = {
+  get fuelLogs() {
+    return items;
+  },
+  get processing() {
+    return processing;
+  },
+  get error() {
+    return error;
+  },
+  refreshFuelLogs: refresh
+};

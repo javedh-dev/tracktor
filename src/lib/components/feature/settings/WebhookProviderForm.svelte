@@ -46,7 +46,7 @@
     }
   });
 
-  $effect(() => {
+  function emitConfig() {
     const authCredentials: WebhookAuthCredentials = {};
     if (formAuthType === 'basic') {
       authCredentials.username = formUsername;
@@ -61,8 +61,8 @@
     let headers: Record<string, string> = {};
     try {
       headers = JSON.parse(formHeadersText);
-    } catch (e) {
-      console.error('Invalid JSON for headers:', e);
+    } catch {
+      // partial JSON during typing is expected
     }
 
     onConfigChange({
@@ -72,7 +72,7 @@
       authType: formAuthType,
       authCredentials: Object.keys(authCredentials).length > 0 ? authCredentials : undefined
     });
-  });
+  }
 </script>
 
 <div class="border-border space-y-4 rounded-lg border p-4">
@@ -80,12 +80,17 @@
 
   <div class="space-y-2">
     <Label>{m.notif_webhook_url()}</Label>
-    <Input bind:value={formUrl} type="url" placeholder="https://example.com/webhook" />
+    <Input
+      bind:value={formUrl}
+      oninput={emitConfig}
+      type="url"
+      placeholder="https://example.com/webhook"
+    />
   </div>
 
   <div class="space-y-2">
     <Label>{m.notif_webhook_method()}</Label>
-    <Select.Root bind:value={formMethod} type="single">
+    <Select.Root bind:value={formMethod} type="single" onValueChange={emitConfig}>
       <Select.Trigger class="w-full">
         <span>{formMethod}</span>
       </Select.Trigger>
@@ -101,6 +106,7 @@
     <Label>{m.notif_webhook_headers()}</Label>
     <Textarea
       bind:value={formHeadersText}
+      oninput={emitConfig}
       class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       placeholder={JSON.stringify({ 'Content-Type': 'application/json' }, null, 2)}
     />
@@ -115,7 +121,7 @@
 
   <div class="space-y-2">
     <Label>{m.notif_webhook_auth_type()}</Label>
-    <Select.Root bind:value={formAuthType} type="single">
+    <Select.Root bind:value={formAuthType} type="single" onValueChange={emitConfig}>
       <Select.Trigger class="w-full">
         <span>{authTypeLabel}</span>
       </Select.Trigger>
@@ -131,27 +137,32 @@
   {#if formAuthType === 'basic'}
     <div class="space-y-2">
       <Label>{m.notif_webhook_username()}</Label>
-      <Input bind:value={formUsername} placeholder="username" />
+      <Input bind:value={formUsername} oninput={emitConfig} placeholder="username" />
     </div>
 
     <div class="space-y-2">
       <Label>{isEditing ? m.notif_email_password_keep() : m.notif_email_password()}</Label>
-      <Input bind:value={formPassword} type="password" placeholder="••••••••" />
+      <Input
+        bind:value={formPassword}
+        oninput={emitConfig}
+        type="password"
+        placeholder="••••••••"
+      />
     </div>
   {:else if formAuthType === 'bearer'}
     <div class="space-y-2">
       <Label>{isEditing ? m.notif_webhook_bearer_keep() : m.notif_webhook_auth_bearer()}</Label>
-      <Input bind:value={formToken} type="password" placeholder="••••••••" />
+      <Input bind:value={formToken} oninput={emitConfig} type="password" placeholder="••••••••" />
     </div>
   {:else if formAuthType === 'api-key'}
     <div class="space-y-2">
       <Label>{isEditing ? m.notif_webhook_apikey_keep() : m.notif_webhook_auth_apikey()}</Label>
-      <Input bind:value={formApiKey} type="password" placeholder="••••••••" />
+      <Input bind:value={formApiKey} oninput={emitConfig} type="password" placeholder="••••••••" />
     </div>
 
     <div class="space-y-2">
       <Label>{m.notif_webhook_apikey_header()}</Label>
-      <Input bind:value={formApiKeyHeader} placeholder="X-API-Key" />
+      <Input bind:value={formApiKeyHeader} oninput={emitConfig} placeholder="X-API-Key" />
     </div>
   {/if}
 </div>
