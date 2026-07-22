@@ -11,8 +11,6 @@ concurrency:
   group: openwiki-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  BRANCH_FILTER: dev
 
 permissions:
   contents: write
@@ -20,7 +18,6 @@ permissions:
 
 jobs:
   openwiki-update:
-    if: github.ref_name == 'dev'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
