@@ -76,7 +76,8 @@ export function createSettingsOptions(
     de: 'Deutsch',
     it: 'Italiano',
     hu: 'Magyar',
-    fi: 'Suomi'
+    fi: 'Suomi',
+    ro: 'Română'
   };
 
   return {
