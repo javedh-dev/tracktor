@@ -1,18 +1,14 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq, and } from 'drizzle-orm';
+import { z } from 'zod';
 import type { ApiResponse } from '$lib/response';
+import { maintenanceSchema } from '$lib/domain/maintenance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
 
-type MaintenanceLogPayload = {
-  date: string;
-  odometer: number;
-  serviceCenter: string;
-  cost: number;
-  notes: string | null;
-  attachment: string | null;
-};
+type MaintenanceLogPayload = Omit<z.infer<typeof maintenanceSchema>, 'id' | 'vehicleId'>;
+type MaintenanceLogUpdatePayload = Partial<MaintenanceLogPayload>;
 
 export const addMaintenanceLog = async (
   vehicleId: string,
@@ -53,7 +49,7 @@ export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> =>
 export const updateMaintenanceLog = async (
   vehicleId: string,
   id: string,
-  maintenanceLogData: MaintenanceLogPayload
+  maintenanceLogData: MaintenanceLogUpdatePayload
 ): Promise<ApiResponse> => {
   const existingLog = requireRecord(
     await db.query.maintenanceLogTable.findFirst({

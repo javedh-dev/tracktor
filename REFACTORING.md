@@ -244,16 +244,17 @@ All verified zero-references:
 ## Running totals
 
 - Dead code: ~600 lines removed (Phase 1)
+- Route boilerplate: ~350 lines of hand-rolled validation removed (Phase 2)
 - Duplication recovered: ~270 forms + ~120 services + ~90 stores + ~80 server CRUD + ~100 mileage + ~160 route boilerplate + ~100 recurrence UI ≈ **~900 lines**
 - Production bugs fixed: 10 (Phase 0)
-- Net effect: ~1,500 lines removed, 5 error conventions → 1, 4 mileage algorithms → 1, 3 settings shapes → 1, 15 ad-hoc validators → schema-driven
+- Net effect: ~1,850 lines removed, 6 entity schemas now drive validation, 15 ad-hoc validators → schema-driven
 
 ## Progress log
 
 - [x] Plan document created
 - [x] Phase 0 — Critical bug fixes (commit 2c1f23f)
-- [x] Phase 1 — Dead code deletion (commit <pending>)
-- [ ] Phase 2 — Validation unification
+- [x] Phase 1 — Dead code deletion (commit 07dfdf3)
+- [x] Phase 2 — Validation unification (commit <pending>)
 - [ ] Phase 3 — Server services + notification redesign
 - [ ] Phase 4 — Client factories
 - [ ] Phase 5 — Settings & component decomposition

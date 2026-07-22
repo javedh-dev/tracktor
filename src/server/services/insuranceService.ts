@@ -1,23 +1,15 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 import type { ApiResponse } from '$lib/response';
-import type { Insurance } from '$lib/domain/insurance';
+import { insuranceSchema } from '$lib/domain/insurance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
 
-type InsurancePayload = {
-  provider: string;
-  policyNumber: string;
-  startDate: string;
-  endDate: string | null;
-  recurrenceType: Insurance['recurrenceType'];
-  recurrenceInterval: number;
-  cost: number;
-  notes: string | null;
-  attachment: string | null;
-};
+type InsurancePayload = Omit<z.infer<typeof insuranceSchema>, 'id' | 'vehicleId'>;
+type InsuranceUpdatePayload = Partial<InsurancePayload>;
 
 export const addInsurance = async (
   vehicleId: string,
@@ -61,7 +53,7 @@ export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
 export const updateInsurance = async (
   vehicleId: string,
   id: string,
-  insuranceData: InsurancePayload
+  insuranceData: InsuranceUpdatePayload
 ): Promise<ApiResponse> => {
   requireRecord(
     await db.query.insuranceTable.findFirst({

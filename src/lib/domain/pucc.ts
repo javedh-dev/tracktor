@@ -41,29 +41,41 @@ const puccRecurrenceOptions = Object.keys(
   PUCC_RECURRENCE_TYPES
 ) as (keyof typeof PUCC_RECURRENCE_TYPES)[];
 
-export const pollutionCertificateSchema = z.object({
-  id: z.string().nullable(),
-  vehicleId: z.uuid(),
-  certificateNumber: z
-    .string()
-    .min(2, 'It must be more than 1 character.')
-    .max(50, 'It must be less than 50 characters.'),
-  issueDate: apiDateString,
-  expiryDate: optionalApiDateString,
-  recurrenceType: z
-    .enum(
-      puccRecurrenceOptions as [
-        keyof typeof PUCC_RECURRENCE_TYPES,
-        ...Array<keyof typeof PUCC_RECURRENCE_TYPES>
-      ]
-    )
-    .default('none'),
-  recurrenceInterval: z.number().int().positive().default(1),
-  testingCenter: z
-    .string()
-    .min(2, 'It must be more than 1 character.')
-    .max(100, 'It must be less than 100 characters.'),
-  notes: z.string().nullable(),
-  attachment: z.string().nullable()
-});
+export const pollutionCertificateSchema = z
+  .object({
+    id: z.string().nullable(),
+    vehicleId: z.uuid(),
+    certificateNumber: z
+      .string()
+      .min(2, 'It must be more than 1 character.')
+      .max(50, 'It must be less than 50 characters.'),
+    issueDate: apiDateString,
+    expiryDate: optionalApiDateString,
+    recurrenceType: z
+      .enum(
+        puccRecurrenceOptions as [
+          keyof typeof PUCC_RECURRENCE_TYPES,
+          ...Array<keyof typeof PUCC_RECURRENCE_TYPES>
+        ]
+      )
+      .default('none'),
+    recurrenceInterval: z.number().int().positive().default(1),
+    testingCenter: z
+      .string()
+      .min(2, 'It must be more than 1 character.')
+      .max(100, 'It must be less than 100 characters.'),
+    notes: z.string().nullable(),
+    attachment: z.string().nullable()
+  })
+  .refine(
+    (data) => {
+      if (data.recurrenceType === undefined) return true;
+      if (data.recurrenceType !== 'none') return true;
+      if (data.expiryDate === undefined) return true;
+      if (!data.expiryDate) return false;
+      if (!data.issueDate) return true;
+      return new Date(data.expiryDate) > new Date(data.issueDate);
+    },
+    { message: 'Expiry date must be after issue date when recurrence is fixed' }
+  );
 export type PollutionCertificateSchema = typeof pollutionCertificateSchema;

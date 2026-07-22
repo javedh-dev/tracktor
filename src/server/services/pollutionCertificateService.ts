@@ -1,22 +1,18 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 import type { ApiResponse } from '$lib/response';
-import type { PollutionCertificate } from '$lib/domain/pucc';
+import { pollutionCertificateSchema } from '$lib/domain/pucc';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
 
-type PollutionCertificatePayload = {
-  certificateNumber: string;
-  issueDate: string;
-  expiryDate: string | null;
-  recurrenceType: PollutionCertificate['recurrenceType'];
-  recurrenceInterval: number;
-  testingCenter: string;
-  notes: string | null;
-  attachment: string | null;
-};
+type PollutionCertificatePayload = Omit<
+  z.infer<typeof pollutionCertificateSchema>,
+  'id' | 'vehicleId'
+>;
+type PollutionCertificateUpdatePayload = Partial<PollutionCertificatePayload>;
 
 export const addPollutionCertificate = async (
   vehicleId: string,
@@ -62,7 +58,7 @@ export const getPollutionCertificateById = async (id: string): Promise<ApiRespon
 export const updatePollutionCertificate = async (
   vehicleId: string,
   id: string,
-  pollutionCertificateData: PollutionCertificatePayload
+  pollutionCertificateData: PollutionCertificateUpdatePayload
 ): Promise<ApiResponse> => {
   requireRecord(
     await db.query.pollutionCertificateTable.findFirst({

@@ -19,6 +19,8 @@ type ReminderPayload = {
   isCompleted?: boolean;
 };
 
+type ReminderUpdatePayload = Partial<ReminderPayload>;
+
 function reminderRecordToPayload(
   reminder: typeof schema.reminderTable.$inferSelect
 ): ReminderPayload {
@@ -42,7 +44,10 @@ const sanitizeNote = (note: unknown) => {
   return null;
 };
 
-const normalizeReminderPayload = (data: ReminderPayload, fallback?: Partial<ReminderPayload>) => {
+const normalizeReminderPayload = (
+  data: Partial<ReminderPayload>,
+  fallback?: Partial<ReminderPayload>
+) => {
   const merged = { ...fallback, ...data };
   const { type, remindSchedule, dueDate, recurrenceType, recurrenceInterval, recurrenceEndDate } =
     merged;
@@ -124,7 +129,7 @@ export const getReminderById = async (id: string): Promise<ApiResponse> => {
 export const updateReminder = async (
   vehicleId: string,
   id: string,
-  reminderData: ReminderPayload
+  reminderData: ReminderUpdatePayload
 ): Promise<ApiResponse> => {
   const reminder = requireRecord(
     await db.query.reminderTable.findFirst({

@@ -1,5 +1,5 @@
-import { error, json } from '@sveltejs/kit';
-import { ZodError } from 'zod';
+import { error, json, type RequestEvent } from '@sveltejs/kit';
+import { z, ZodError } from 'zod';
 import { AppError } from '$server/exceptions/AppError';
 
 export function rethrowRouteError(err: unknown, fallbackMessage = 'Internal server error'): never {
@@ -16,6 +16,26 @@ export function rethrowRouteError(err: unknown, fallbackMessage = 'Internal serv
   }
 
   throw error(500, fallbackMessage);
+}
+
+export async function parseBody<T>(
+  event: RequestEvent,
+  schema: z.ZodType<T>,
+  overrides?: Record<string, unknown>
+): Promise<T> {
+  const body = await event.request.json();
+  const input = overrides ? { ...body, ...overrides } : body;
+  const result = schema.safeParse(input);
+  if (!result.success) {
+    const messages = result.error.issues
+      .map((issue) => {
+        const path = issue.path.length ? `${issue.path.join('.')}: ` : '';
+        return `${path}${issue.message}`;
+      })
+      .join('; ');
+    throw error(400, `Validation failed: ${messages}`);
+  }
+  return result.data;
 }
 
 export async function withRouteErrorHandling<T>(

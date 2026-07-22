@@ -1,7 +1,9 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 import type { ApiResponse } from '$lib/response';
+import { fuelSchema } from '$lib/domain/fuel';
 import {
   validateVehicleExists,
   validateVehicleExistsByLicensePlate,
@@ -9,17 +11,8 @@ import {
 } from '../utils/serviceUtils';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
 
-type FuelLogPayload = {
-  date: string;
-  odometer: number | null;
-  filled: boolean;
-  missedLast: boolean;
-  fuelAmount: number | null;
-  rate: number | null;
-  cost: number;
-  notes: string | null;
-  attachment: string | null;
-};
+type FuelLogPayload = Omit<z.infer<typeof fuelSchema>, 'id' | 'vehicleId'>;
+type FuelLogUpdatePayload = Partial<FuelLogPayload>;
 
 export const addFuelLog = async (
   vehicleId: string,
@@ -155,7 +148,7 @@ export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
 export const updateFuelLog = async (
   vehicleId: string,
   id: string,
-  fuelLogData: FuelLogPayload
+  fuelLogData: FuelLogUpdatePayload
 ): Promise<ApiResponse> => {
   // Validate that the fuel log exists and belongs to the specified vehicle
   requireRecord(
