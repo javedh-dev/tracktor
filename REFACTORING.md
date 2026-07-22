@@ -251,7 +251,7 @@ All verified zero-references:
 ## Progress log
 
 - [x] Plan document created
-- [ ] Phase 0 — Critical bug fixes
+- [x] Phase 0 — Critical bug fixes (commit 2c1f23f)
 - [ ] Phase 1 — Dead code deletion
 - [ ] Phase 2 — Validation unification
 - [ ] Phase 3 — Server services + notification redesign

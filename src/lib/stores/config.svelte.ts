@@ -49,6 +49,20 @@ class ConfigStore {
   processing = $state(false);
   error = $state<string>();
 
+  setConfigs = (configData: Config[]) => {
+    this.rawConfig = configData;
+    applyRawConfigs(this.configs, configData);
+
+    // Update paraglide locale without reloading
+    try {
+      if (this.configs.locale) {
+        setLocale(this.configs.locale as any, { reload: false });
+      }
+    } catch (_) {
+      /* noop */
+    }
+  };
+
   getCustomCss = async (): Promise<string> => {
     this.processing = true;
     return apiClient
