@@ -1,48 +1,32 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { fuelSchema } from '$lib/domain/fuel';
 import { computeMileagePerWindow, type FuelLogInput } from '$lib/domain/fuel/mileage';
-import {
-  validateVehicleExists,
-  validateVehicleExistsByLicensePlate,
-  performDelete
-} from '../utils/serviceUtils';
-import { requireRecord } from './service-response.helper';
+import { validateVehicleExistsByLicensePlate } from '../utils/serviceUtils';
+import { getConfigsByKeys } from './configService';
+import { createOwnedEntityService } from '../utils/entity-service-factory';
 
 type FuelLogPayload = Omit<z.infer<typeof fuelSchema>, 'id' | 'vehicleId'>;
 type FuelLogUpdatePayload = Partial<FuelLogPayload>;
 
-export const addFuelLog = async (vehicleId: string, fuelLogData: FuelLogPayload) => {
-  await validateVehicleExists(vehicleId);
-  const fuelLog = await db
-    .insert(schema.fuelLogTable)
-    .values({
-      ...fuelLogData,
-      vehicleId: vehicleId,
-      id: undefined
-    })
-    .returning();
-  return fuelLog[0];
-};
+const { add, getById, update, remove } = createOwnedEntityService<
+  FuelLogPayload,
+  FuelLogUpdatePayload
+>({
+  table: schema.fuelLogTable,
+  entityName: 'Fuel log'
+});
+
+export const addFuelLog = add;
+export const getFuelLogById = getById;
+export const updateFuelLog = update;
+export const deleteFuelLog = remove;
 
 export const getFuelLogs = async (vehicleId: string) => {
-  // Fetch mileage unit format config
-  const mileageFormatConfig = await db.query.configTable.findFirst({
-    where: (config, { eq }) => eq(config.key, 'mileageUnitFormat')
-  });
-  const distanceUnit = (
-    await db.query.configTable.findFirst({
-      where: (config, { eq }) => eq(config.key, 'unitOfDistance')
-    })
-  )?.value;
-  const volumeUnit = (
-    await db.query.configTable.findFirst({
-      where: (config, { eq }) => eq(config.key, 'unitOfVolume')
-    })
-  )?.value;
-  const mileageFormat = mileageFormatConfig?.value || 'distance-per-fuel';
+  const configs = await getConfigsByKeys(['mileageUnitFormat', 'unitOfDistance', 'unitOfVolume']);
+  const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
+  const mileageFormat = configMap.mileageUnitFormat || 'distance-per-fuel';
 
   const fuelLogs = await db.query.fuelLogTable.findMany({
     where: (log, { eq }) => eq(log.vehicleId, vehicleId),
@@ -68,6 +52,9 @@ export const getFuelLogs = async (vehicleId: string) => {
     let mileage: number | null = null;
 
     if (rawMileage !== null) {
+      const distanceUnit = configMap.unitOfDistance;
+      const volumeUnit = configMap.unitOfVolume;
+
       if (mileageFormat === 'fuel-per-distance') {
         mileage = (1 / rawMileage) * 100;
       } else if (mileageFormat === 'uk-mpg' && distanceUnit === 'mile' && volumeUnit === 'liter') {
@@ -81,44 +68,6 @@ export const getFuelLogs = async (vehicleId: string) => {
     return { ...log, distanceDriven, mileage };
   });
   return fuelLogsWithMetrics;
-};
-
-export const getFuelLogById = async (id: string) => {
-  const fuelLog = requireRecord(
-    await db.query.fuelLogTable.findFirst({
-      where: (log, { eq }) => eq(log.id, id)
-    }),
-    `No Fuel Logs found for id : ${id}`
-  );
-
-  return fuelLog;
-};
-
-export const updateFuelLog = async (
-  vehicleId: string,
-  id: string,
-  fuelLogData: FuelLogUpdatePayload
-) => {
-  // Validate that the fuel log exists and belongs to the specified vehicle
-  requireRecord(
-    await db.query.fuelLogTable.findFirst({
-      where: (log, { eq, and }) => and(eq(log.vehicleId, vehicleId), eq(log.id, id))
-    }),
-    `No Fuel Log found for id: ${id}`
-  );
-
-  const updatedLog = await db
-    .update(schema.fuelLogTable)
-    .set({
-      ...fuelLogData
-    })
-    .where(eq(schema.fuelLogTable.id, id))
-    .returning();
-  return updatedLog[0];
-};
-
-export const deleteFuelLog = async (id: string) => {
-  return await performDelete(schema.fuelLogTable, id, 'Fuel log');
 };
 
 export const addFuelLogByLicensePlate = async (
