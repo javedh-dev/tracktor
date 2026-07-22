@@ -125,34 +125,3 @@ export function createSettingsOptions(
     }))
   };
 }
-
-export function createSettingsFieldSectionMap(
-  includeNotifications = false
-): Record<string, string> {
-  const fieldMap: Record<string, string> = {
-    dateFormat: 'personalization',
-    locale: 'personalization',
-    unitOfDistance: 'units',
-    unitOfVolume: 'units',
-    unitOfLpg: 'units',
-    unitOfCng: 'units',
-    mileageUnitFormat: 'units',
-    timezone: 'personalization',
-    currency: 'personalization',
-    theme: 'personalization',
-    customCss: 'personalization',
-    featureFuelLog: 'features',
-    featureMaintenance: 'features',
-    featurePucc: 'features',
-    featureReminders: 'features',
-    featureInsurance: 'features',
-    featureOverview: 'features',
-    notificationProcessingEnabled: 'notifications'
-  };
-
-  if (includeNotifications) {
-    fieldMap.notificationProcessingSchedule = 'notifications';
-  }
-
-  return fieldMap;
-}

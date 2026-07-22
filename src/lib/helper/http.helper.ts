@@ -37,7 +37,6 @@ class HttpClient {
     'Content-Type': 'application/json'
   };
   private timeout: number = 10000;
-  private requestInterceptors: ((req: RequestConfig) => boolean)[] = [];
 
   constructor(config?: { baseURL?: string; headers?: Record<string, string>; timeout?: number }) {
     if (config?.baseURL) this.baseURL = config.baseURL;
@@ -65,16 +64,6 @@ class HttpClient {
     url: string,
     config: RequestConfig = {}
   ): Promise<Response<T>> {
-    if (!config.skipInterceptors) {
-      this.requestInterceptors.forEach((intercept) => {
-        const isSuccessful = intercept(config);
-        if (!isSuccessful) {
-          console.warn('Request cancelled by interceptor:', config);
-          throw new HttpError('Request cancelled by interceptor', config);
-        }
-      });
-    }
-
     const {
       method = 'GET',
       headers = {},
@@ -192,66 +181,6 @@ class HttpClient {
   ): Promise<Response<T>> {
     return this.makeRequest<T>(url, { ...config, method: 'DELETE' });
   }
-
-  // Axios-like static methods
-  static async get<T = any>(url: string, config?: RequestConfig): Promise<Response<T>> {
-    const client = new HttpClient();
-    return client.get<T>(url, config);
-  }
-
-  static async post<T = any>(
-    url: string,
-    data?: any,
-    config?: RequestConfig
-  ): Promise<Response<T>> {
-    const client = new HttpClient();
-    return client.post<T>(url, data, config);
-  }
-
-  static async put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<Response<T>> {
-    const client = new HttpClient();
-    return client.put<T>(url, data, config);
-  }
-
-  static async patch<T = any>(
-    url: string,
-    data?: any,
-    config?: RequestConfig
-  ): Promise<Response<T>> {
-    const client = new HttpClient();
-    return client.patch<T>(url, data, config);
-  }
-
-  static async delete<T = any>(url: string, config?: RequestConfig): Promise<Response<T>> {
-    const client = new HttpClient();
-    return client.delete<T>(url, config);
-  }
-
-  addRequestInterceptor = (interceptor: (req: RequestConfig) => boolean) => {
-    this.requestInterceptors.push(interceptor);
-  };
-
-  // Interceptors (simplified version)
-  setDefaultHeader(key: string, value: string): void {
-    this.defaultHeaders[key] = value;
-  }
-
-  removeDefaultHeader(key: string): void {
-    delete this.defaultHeaders[key];
-  }
-
-  setBaseURL(baseURL: string): void {
-    this.baseURL = baseURL;
-  }
-
-  setTimeout(timeout: number): void {
-    this.timeout = timeout;
-  }
 }
 
-// Create default instance
-const http = new HttpClient();
-
-// Export both the class and default instance
 export { HttpClient, HttpError, type RequestConfig, type Response };
-export default http;

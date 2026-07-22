@@ -1,9 +1,6 @@
-import { getContext, setContext } from 'svelte';
 import { type ThemeName, type ThemeConfig } from '$lib/types/theme';
 import { themes } from '$lib/config/themes';
 import { getStoredTheme, saveTheme, applyThemeColors, setThemeClass } from '$lib/utils/theme';
-
-const THEME_KEY = Symbol('theme');
 
 interface ThemeStore {
   theme: ThemeName;
@@ -70,12 +67,3 @@ function createThemeStore(): ThemeStore {
 }
 
 export const themeStore = createThemeStore();
-
-// Context helpers for components
-export function setThemeContext(store: ThemeStore) {
-  return setContext(THEME_KEY, store);
-}
-
-export function getThemeContext(): ThemeStore {
-  return getContext<ThemeStore>(THEME_KEY);
-}

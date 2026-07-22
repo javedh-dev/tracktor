@@ -277,16 +277,3 @@ export {
   roundNumber,
   parseWithFormat
 };
-
-export const cleanup = (obj: Record<string, any>): Record<string, any> => {
-  const result: Record<string, any> = { ...obj };
-  for (const key in result) {
-    if (
-      result.hasOwnProperty(key) &&
-      (String(result[key]).trim() === '' || result[key] === undefined)
-    ) {
-      result[key] = null;
-    }
-  }
-  return result;
-};
