@@ -23,6 +23,6 @@ export const POST: RequestHandler = async (event) => {
     }
 
     const result = await authService.createUser(body.username, body.password);
-    return json(result);
+    return json(result, { status: 201 });
   });
 };

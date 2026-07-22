@@ -56,7 +56,7 @@ export const POST: RequestHandler = async (event) => {
     }
 
     // Set default recurrence values if not provided
-    body.recurrenceType = body.recurrenceType || 'no_end';
+    body.recurrenceType = body.recurrenceType || 'none';
     body.recurrenceInterval = body.recurrenceInterval || 1;
 
     const result = await insuranceService.addInsurance(id, body);

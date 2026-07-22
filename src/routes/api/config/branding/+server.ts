@@ -4,7 +4,7 @@ import { getAppConfigByKey } from '$server/services/configService';
 import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (_) => {
-  return withRouteErrorHandling('Custom CSS GET error:', async () => {
+  return withRouteErrorHandling('Branding GET error:', async () => {
     const result = await getAppConfigByKey('customCss');
     return json(result);
   });

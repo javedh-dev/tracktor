@@ -1,5 +1,5 @@
-import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
+import { apiDateString, optionalApiDateString } from './shared';
 
 export const INSURANCE_RECURRENCE_TYPES = {
   none: 'none',
@@ -53,15 +53,8 @@ export const insuranceSchema = z.object({
     .string()
     .min(2, 'It must be more than 1 character.')
     .max(50, 'It must be less than 50 characters.'),
-  startDate: z.string().refine((val) => {
-    try {
-      parseDate(val);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Invalid date format'),
-  endDate: z.string().nullable().optional(),
+  startDate: apiDateString,
+  endDate: optionalApiDateString,
   recurrenceType: z
     .enum(
       insuranceRecurrenceOptions as [

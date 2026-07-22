@@ -3,8 +3,8 @@ import type { MaintenanceLog } from '$lib/domain/maintenance';
 import { format } from 'date-fns';
 
 interface VehicleInfo {
-  licensePlate: string;
-  name: string;
+  licensePlate: string | null;
+  label: string;
 }
 
 export const generateMaintenanceLogsPdf = (
@@ -22,9 +22,11 @@ export const generateMaintenanceLogsPdf = (
 
       doc.fontSize(20).text('Maintenance Log Report', { align: 'center' });
       doc.moveDown();
-      doc.fontSize(12).text(`Vehicle: ${vehicleInfo.name} (${vehicleInfo.licensePlate})`, {
-        align: 'center'
-      });
+      doc
+        .fontSize(12)
+        .text(`Vehicle: ${vehicleInfo.label} (${vehicleInfo.licensePlate || 'N/A'})`, {
+          align: 'center'
+        });
       doc.text(`Generated: ${format(new Date(), 'yyyy-MM-dd HH:mm')}`, { align: 'center' });
       doc.moveDown(2);
 

@@ -25,6 +25,6 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     const result = await notificationService.markAllNotificationsAsRead(id);
-    return json(result, { status: 201 });
+    return json(result);
   });
 };

@@ -22,15 +22,21 @@ export const GET: RequestHandler = async (event) => {
     const logsResult = await maintenanceLogService.getMaintenanceLogs(vehicleId);
     const maintenanceLogs = logsResult.data || [];
 
-    const pdfBuffer: any = await generateMaintenanceLogsPdf(maintenanceLogs, {
+    const vehicleLabel =
+      [vehicle.make, vehicle.model].filter(Boolean).join(' ') || 'Unknown Vehicle';
+    const safePlate = vehicle.licensePlate
+      ? vehicle.licensePlate.replace(/[^a-zA-Z0-9]/g, '-')
+      : 'vehicle';
+
+    const pdfBuffer: Buffer = await generateMaintenanceLogsPdf(maintenanceLogs, {
       licensePlate: vehicle.licensePlate,
-      name: vehicle.name
+      label: vehicleLabel
     });
 
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="maintenance-log-${vehicle.licensePlate}.pdf"`
+        'Content-Disposition': `attachment; filename="maintenance-log-${safePlate}.pdf"`
       }
     });
   });

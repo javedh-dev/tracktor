@@ -61,9 +61,7 @@
           removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
-            toast.success(
-              m[puccStore.editMode ? 'pollution_toast_updated' : 'pollution_toast_saved']()
-            );
+            toast.success(m[data ? 'pollution_toast_updated' : 'pollution_toast_saved']());
             attachment = undefined;
             sheetStore.closeSheet(puccStore.refreshPuccs);
           } else {

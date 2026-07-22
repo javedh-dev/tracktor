@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import * as maintenanceLogService from '$server/services/maintenanceLogService';
+import { validateVehicleExists } from '$server/utils/serviceUtils';
 import { withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
@@ -11,6 +12,7 @@ export const GET: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID is required');
     }
 
+    await validateVehicleExists(id);
     const result = await maintenanceLogService.getMaintenanceLogs(id);
     return json(result);
   });

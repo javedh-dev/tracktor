@@ -1,6 +1,6 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type { ApiResponse } from '$lib/response';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
@@ -44,27 +44,46 @@ export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> =>
     await db.query.maintenanceLogTable.findFirst({
       where: (logs, { eq }) => eq(logs.id, id)
     }),
-    `No Maintenence log found for id : ${id}`
+    `No Maintenance log found for id : ${id}`
   );
 
   return createSuccessResponse(maintenanceLog);
 };
 
 export const updateMaintenanceLog = async (
+  vehicleId: string,
   id: string,
   maintenanceLogData: MaintenanceLogPayload
 ): Promise<ApiResponse> => {
-  await getMaintenanceLogById(id);
+  const existingLog = requireRecord(
+    await db.query.maintenanceLogTable.findFirst({
+      where: (logs, { eq, and }) => and(eq(logs.vehicleId, vehicleId), eq(logs.id, id))
+    }),
+    `No Maintenance log found for id : ${id} on vehicle ${vehicleId}`
+  );
+
   const updatedLog = await db
     .update(schema.maintenanceLogTable)
     .set({
       ...maintenanceLogData
     })
-    .where(eq(schema.maintenanceLogTable.id, id))
+    .where(
+      and(
+        eq(schema.maintenanceLogTable.vehicleId, vehicleId),
+        eq(schema.maintenanceLogTable.id, id)
+      )
+    )
     .returning();
   return createSuccessResponse(updatedLog[0], 'Maintenance log updated successfully.');
 };
 
-export const deleteMaintenanceLog = async (id: string): Promise<ApiResponse> => {
+export const deleteMaintenanceLog = async (vehicleId: string, id: string): Promise<ApiResponse> => {
+  await requireRecord(
+    await db.query.maintenanceLogTable.findFirst({
+      where: (logs, { eq, and }) => and(eq(logs.vehicleId, vehicleId), eq(logs.id, id))
+    }),
+    `No Maintenance log found for id : ${id} on vehicle ${vehicleId}`
+  );
+
   return await performDelete(schema.maintenanceLogTable, id, 'Maintenance log');
 };

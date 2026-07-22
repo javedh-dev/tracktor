@@ -17,7 +17,7 @@ import logger from '$server/config/logger';
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { decrypt, encrypt } from '$server/utils/encryption';
+import { decryptWithSecret, encryptWithSecret } from '$server/services/crypto.service';
 import { eq } from 'drizzle-orm';
 import { resolveUpdatedConfig } from './notification-provider-service.helper';
 import { createSuccessResponse, requireRecord } from './service-response.helper';
@@ -35,7 +35,7 @@ function parseChannels(rawChannels: string): NotificationChannel[] {
 
 function parseProvider(provider: ProviderRecord): NotificationProviderWithParsedConfig {
   try {
-    const config = notificationProviderConfigSchema.parse(decrypt(provider.config));
+    const config = notificationProviderConfigSchema.parse(decryptWithSecret(provider.config));
     const channels = parseChannels(provider.channels);
     const type = notificationProviderTypeSchema.parse(provider.type) as NotificationProviderType;
 
@@ -87,7 +87,7 @@ export const addProvider = async (
     .values({
       name: validated.name,
       type: validated.type,
-      config: encrypt(validatedConfig),
+      config: encryptWithSecret(validatedConfig),
       channels: JSON.stringify(validated.channels),
       isEnabled: validated.isEnabled
     })
@@ -114,9 +114,11 @@ export const updateProvider = async (
   if (validated.channels !== undefined) updateData.channels = JSON.stringify(validated.channels);
 
   if (validated.config !== undefined) {
-    const existingConfig = notificationProviderConfigSchema.parse(decrypt(existingProvider.config));
+    const existingConfig = notificationProviderConfigSchema.parse(
+      decryptWithSecret(existingProvider.config)
+    );
     const mergedConfig = resolveUpdatedConfig(existingConfig, validated.config);
-    updateData.config = encrypt(notificationProviderConfigSchema.parse(mergedConfig));
+    updateData.config = encryptWithSecret(notificationProviderConfigSchema.parse(mergedConfig));
   }
 
   const [updatedProvider] = await db

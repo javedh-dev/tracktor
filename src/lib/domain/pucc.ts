@@ -1,5 +1,5 @@
-import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
+import { apiDateString, optionalApiDateString } from './shared';
 
 export const PUCC_RECURRENCE_TYPES = {
   none: 'none',
@@ -48,15 +48,8 @@ export const pollutionCertificateSchema = z.object({
     .string()
     .min(2, 'It must be more than 1 character.')
     .max(50, 'It must be less than 50 characters.'),
-  issueDate: z.string().refine((val) => {
-    try {
-      parseDate(val);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Invalid date format'),
-  expiryDate: z.string().nullable().optional(),
+  issueDate: apiDateString,
+  expiryDate: optionalApiDateString,
   recurrenceType: z
     .enum(
       puccRecurrenceOptions as [

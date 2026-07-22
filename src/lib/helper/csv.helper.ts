@@ -64,8 +64,6 @@ export const importFuelLogsFromCsv = async (
   vehicleId: string,
   dateFormat: string
 ): Promise<{ imported: number; failed: number; errors: string[] }> => {
-  // Simulate delay for demo purposes
-  await new Promise((resolve) => setTimeout(resolve, 200000));
   const { parseWithFormat } = await import('$lib/helper/format.helper');
   const { saveFuelLog } = await import('$lib/services/fuel.service');
   const { parseDate } = await import('$lib/helper/format.helper');

@@ -82,7 +82,7 @@ export const DELETE: RequestHandler = async (event) => {
     event.cookies.set('session', '', {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: env.HTTP_MODE === 'https',
       sameSite: 'lax',
       maxAge: 0 // Expire immediately
     });

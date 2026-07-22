@@ -18,8 +18,11 @@ export const GET: RequestHandler = async (event) => {
 
 export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Maintenance log PUT error:', async () => {
-    const { logId } = event.params;
+    const { id: vehicleId, logId } = event.params;
 
+    if (!vehicleId) {
+      throw error(400, 'Vehicle ID is required');
+    }
     if (!logId) {
       throw error(400, 'Maintenance log ID is required');
     }
@@ -39,20 +42,23 @@ export const PUT: RequestHandler = async (event) => {
       throw error(400, 'Cost must be a non-negative number');
     }
 
-    const result = await maintenanceLogService.updateMaintenanceLog(logId, body);
+    const result = await maintenanceLogService.updateMaintenanceLog(vehicleId, logId, body);
     return json(result);
   });
 };
 
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Maintenance log DELETE error:', async () => {
-    const { logId } = event.params;
+    const { id: vehicleId, logId } = event.params;
 
+    if (!vehicleId) {
+      throw error(400, 'Vehicle ID is required');
+    }
     if (!logId) {
       throw error(400, 'Maintenance log ID is required');
     }
 
-    const result = await maintenanceLogService.deleteMaintenanceLog(logId);
+    const result = await maintenanceLogService.deleteMaintenanceLog(vehicleId, logId);
     return json(result);
   });
 };

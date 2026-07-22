@@ -2,15 +2,12 @@ import type { PollutionCertificate } from '$lib/domain';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '$lib/response';
 import { vehicleStore } from './vehicle.svelte';
-import { onMount } from 'svelte';
 
 class PuccStore {
   pollutionCerts = $state<PollutionCertificate[]>();
   vehicleId = $derived<string | undefined>(vehicleStore.selectedId);
   selectedId = $state<string>();
   processing = $state(false);
-  openSheet = $state(false);
-  editMode = $state(false);
   error = $state<string>();
 
   refreshPuccs = () => {
@@ -26,14 +23,7 @@ class PuccStore {
       .finally(() => (this.processing = false));
   };
 
-  openForm = (state: boolean, id?: string | null, vehicleId?: string) => {
-    this.openSheet = state;
-    if (id) {
-      this.selectedId = id;
-      this.vehicleId = vehicleId;
-      this.editMode = true;
-    }
-  };
+  // openForm removed - use sheetStore.openSheet() instead
 }
 
 export const puccStore = new PuccStore();
