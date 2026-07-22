@@ -3,7 +3,7 @@ import { compareDesc } from 'date-fns';
 import { vehicleStore } from './vehicle.svelte';
 import { createEntityStore } from './entity-store.svelte';
 
-const { items, processing, error, refresh } = createEntityStore<FuelLog>({
+const entityStore = createEntityStore<FuelLog>({
   buildPath: () =>
     vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/fuel-logs` : undefined,
   sort: (a, b) => {
@@ -16,13 +16,13 @@ const { items, processing, error, refresh } = createEntityStore<FuelLog>({
 
 export const fuelLogStore = {
   get fuelLogs() {
-    return items;
+    return entityStore.items;
   },
   get processing() {
-    return processing;
+    return entityStore.processing;
   },
   get error() {
-    return error;
+    return entityStore.error;
   },
-  refreshFuelLogs: refresh
+  refreshFuelLogs: entityStore.refresh
 };

@@ -7,7 +7,7 @@ function parseReminder(raw: unknown): Reminder {
   return { ...r, dueDate: new Date(r.dueDate) };
 }
 
-const { items, processing, error, refresh, clear } = createEntityStore<Reminder>({
+const entityStore = createEntityStore<Reminder>({
   buildPath: () =>
     vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/reminders` : undefined,
   map: parseReminder,
@@ -17,14 +17,14 @@ const { items, processing, error, refresh, clear } = createEntityStore<Reminder>
 
 export const reminderStore = {
   get reminders() {
-    return items;
+    return entityStore.items;
   },
   get processing() {
-    return processing;
+    return entityStore.processing;
   },
   get error() {
-    return error;
+    return entityStore.error;
   },
-  refreshReminders: refresh,
-  clear
+  refreshReminders: entityStore.refresh,
+  clear: entityStore.clear
 };
