@@ -4,6 +4,7 @@ import { seedData } from './seeders';
 import { logger } from '$server/config';
 import { resolve } from 'path';
 import { applyPatches } from './patch';
+import { env } from '$lib/config/env.server';
 
 /**
  * Initialize the database by running migrations and seeding data
@@ -15,7 +16,7 @@ export async function initializeDatabase(): Promise<void> {
     // Run migrations
     logger.info('Running database migrations...');
     await migrate(db, {
-      migrationsFolder: resolve(process.cwd(), 'migrations'),
+      migrationsFolder: resolve(env.NODE_ENV==='production'?process.cwd():'src/server/db', 'migrations'),
       migrationsTable: '_migrations'
     });
     logger.info('Database migrations completed successfully');

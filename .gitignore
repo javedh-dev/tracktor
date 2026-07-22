@@ -30,3 +30,4 @@ uploads/
 src/lib/paraglide
 project.inlang/cache/
 .opencode
+.app/
