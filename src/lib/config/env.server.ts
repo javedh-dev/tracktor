@@ -25,7 +25,7 @@ function getCorsOrigins(origins?: string): string[] {
 
 function getDBPath(): string | undefined {
   switch (privateEnv.NODE_ENV) {
-    case 'dev':
+    case 'development':
       return './tracktor.dev.db';
     case 'test':
       return './tracktor.test.db';
@@ -40,7 +40,7 @@ function getDBPath(): string | undefined {
  * Includes all environment variables
  */
 export const serverEnv = {
-  NODE_ENV: privateEnv.NODE_ENV || 'dev',
+  NODE_ENV: privateEnv.NODE_ENV || 'development',
   DB_PATH: privateEnv.DB_PATH || getDBPath(),
   UPLOADS_DIR: privateEnv.UPLOADS_DIR || './uploads',
   CORS_ORIGINS: getCorsOrigins(privateEnv.CORS_ORIGINS),
@@ -64,6 +64,6 @@ export const env = {
 } as const;
 
 // Environment helpers
-export const isDevelopment = env.NODE_ENV === 'dev';
+export const isDevelopment = env.NODE_ENV === 'development';
 export const isProduction = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';

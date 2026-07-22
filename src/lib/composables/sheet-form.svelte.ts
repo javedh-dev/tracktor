@@ -35,9 +35,12 @@ export function createSheetForm(config: {
   }
 
   return {
-    processing,
-    attachment,
-    removeExistingAttachment,
+    get processing() { return processing; },
+    set processing(v) { processing = v; },
+    get attachment() { return attachment; },
+    set attachment(v) { attachment = v; },
+    get removeExistingAttachment() { return removeExistingAttachment; },
+    set removeExistingAttachment(v) { removeExistingAttachment = v; },
     form,
     formData,
     enhance,

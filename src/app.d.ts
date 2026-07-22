@@ -21,7 +21,7 @@ declare global {
 // Environment variable types for better type safety
 declare namespace NodeJS {
   interface ProcessEnv {
-    NODE_ENV: 'dev' | 'production' | 'test';
+    NODE_ENV: 'development' | 'production' | 'test';
     SERVER_HOST: string;
     SERVER_PORT: string;
     DB_PATH: string;
