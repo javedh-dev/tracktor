@@ -15,19 +15,3 @@ export class AppError extends Error {
     this.status = status;
   }
 }
-
-export const statusFromError = (error: Error) => {
-  if (error instanceof AppError) return error.status;
-
-  // Handle Drizzle/SQLite specific errors
-  if (error.message.includes('UNIQUE constraint failed')) {
-    return Status.CONFLICT;
-  }
-
-  // Handle validation errors
-  if (error.name === 'ValidationError' || error.name === 'AppValidationError') {
-    return Status.BAD_REQUEST;
-  }
-
-  return Status.INTERNAL_SERVER_ERROR;
-};

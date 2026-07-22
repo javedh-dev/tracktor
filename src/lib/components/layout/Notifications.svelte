@@ -12,16 +12,10 @@
   import X from '@lucide/svelte/icons/x';
 
   import { browser } from '$app/environment';
-  import { goto } from '$app/navigation';
   import type { Notification } from '$lib/domain/notification';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { notificationStore } from '$stores/notification.svelte';
   import { getLocale } from '$lib/paraglide/runtime.js';
-  import {
-    clearNotification,
-    getNotifications,
-    markAllNotificationsAsRead
-  } from '$services/notification.service';
-  import { toast } from 'svelte-sonner';
   import { authStore } from '$lib/stores/auth.svelte';
   import * as DropdownMenu from '../ui/dropdown-menu';
   import Button from '../ui/button/button.svelte';
@@ -70,157 +64,13 @@
     }
   };
 
-  let markingAsReadIds: Record<string, boolean> = {};
-  let apiNotifications = $state<Notification[]>([]);
-  let isLoadingNotifications = $state(false);
-  let isClearingAll = $state(false);
   let isDropdownOpen = $state(false);
 
-  const fetchNotifications = async (vehicleId: string) => {
-    isLoadingNotifications = true;
-    try {
-      const response = await getNotifications(vehicleId);
-      if (response.status === 'OK' && response.data) {
-        apiNotifications = response.data;
-      } else {
-        apiNotifications = [];
-      }
-    } catch (err) {
-      console.error('Failed to fetch notifications:', err);
-      apiNotifications = [];
-    } finally {
-      isLoadingNotifications = false;
-    }
-  };
-
-  const setMarkingAsReadLoading = (id: string, state: boolean) => {
-    if (state) {
-      markingAsReadIds = { ...markingAsReadIds, [id]: true };
-      return;
-    }
-    markingAsReadIds = Object.fromEntries(
-      Object.entries(markingAsReadIds).filter(([key]) => key !== id)
-    );
-  };
-
-  const isNotificationMarkingAsRead = (id?: string) => (id ? Boolean(markingAsReadIds[id]) : false);
-
   const handleNotificationClick = async (notification: Notification) => {
-    // Close the dropdown immediately
     isDropdownOpen = false;
-
-    // Only mark as read if it's unread
-    if (!notification.isRead && vehicleStore.selectedId && notification.id) {
-      if (isNotificationMarkingAsRead(notification.id)) return;
-      setMarkingAsReadLoading(notification.id, true);
-      try {
-        const { markNotificationAsRead: markAsReadService } =
-          await import('$services/notification.service');
-        const response = await markAsReadService(vehicleStore.selectedId, notification.id);
-        if (response.status === 'OK') {
-          // Update local state
-          apiNotifications = apiNotifications.map((n) =>
-            n.id === notification.id ? { ...n, isRead: true } : n
-          );
-        }
-      } catch (err) {
-        console.error('Failed to mark as read:', err);
-      } finally {
-        setMarkingAsReadLoading(notification.id, false);
-      }
-    }
-
-    // Navigate to the appropriate page based on notification type
-    const navigationMap: Record<NotificationType, string> = {
-      information: '/dashboard',
-      insurance: '/dashboard/insurance',
-      pollution: '/dashboard/pollution',
-      reminder: '/dashboard/reminders',
-      maintenance: '/dashboard/maintenance',
-      registration: '/dashboard', // Default to dashboard for now
-      alert: '/dashboard' // Default to dashboard for now
-    };
-
-    const targetPath = navigationMap[notification.type];
-    if (targetPath) {
-      await goto(targetPath);
-    }
+    await notificationStore.markAsRead(notification);
+    await notificationStore.navigate(notification);
   };
-
-  const handleClearAllRead = async () => {
-    if (!vehicleStore.selectedId || isClearingAll) return;
-
-    const readNotifications = apiNotifications.filter((n) => n.isRead && n.channel !== 'alert');
-    if (readNotifications.length === 0) return;
-
-    isClearingAll = true;
-    try {
-      const clearPromises = readNotifications.map((notification) =>
-        clearNotification(vehicleStore.selectedId!, notification.id!)
-      );
-
-      const results = await Promise.allSettled(clearPromises);
-
-      // Count successful deletions
-      const successCount = results.filter((r) => r.status === 'fulfilled').length;
-      const failCount = results.filter((r) => r.status === 'rejected').length;
-
-      // Remove successfully deleted notifications from local state
-      const clearedIds = readNotifications
-        .map((n) => n.id)
-        .filter((_, index) => results[index].status === 'fulfilled');
-
-      apiNotifications = apiNotifications.filter((n) => !clearedIds.includes(n.id));
-
-      // Show appropriate toast message
-      if (failCount === 0) {
-        toast.success(
-          successCount === 1
-            ? m.notif_cleared_success_one()
-            : m.notif_cleared_success_other({ count: String(successCount) })
-        );
-      } else if (successCount > 0) {
-        toast.warning(
-          m.notif_cleared_partial({ success: String(successCount), failed: String(failCount) })
-        );
-      } else {
-        toast.error(m.notif_clear_failed());
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : m.notif_clear_failed();
-      toast.error(message);
-    } finally {
-      isClearingAll = false;
-    }
-  };
-
-  const handleMarkAllAsRead = async () => {
-    if (!vehicleStore.selectedId || unreadCount === 0 || isClearingAll) return;
-
-    isClearingAll = true;
-    try {
-      const response = await markAllNotificationsAsRead(vehicleStore.selectedId);
-      if (response.status === 'OK') {
-        apiNotifications = apiNotifications.map((notification) => ({
-          ...notification,
-          isRead: true
-        }));
-        toast.success(m.notif_all_marked_read());
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : m.notif_mark_read_failed();
-      toast.error(message);
-    } finally {
-      isClearingAll = false;
-    }
-  };
-
-  const dateFormatter = $derived(new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }));
-
-  const unreadCount = $derived(apiNotifications.filter((n) => !n.isRead).length);
-  const clearableReadCount = $derived(
-    apiNotifications.filter((n) => n.isRead && n.channel !== 'alert').length
-  );
 
   let hydratedVehicleId: string | undefined;
 
@@ -229,13 +79,15 @@
     const selectedId = vehicleStore.selectedId;
     if (!selectedId) {
       hydratedVehicleId = undefined;
-      apiNotifications = [];
+      notificationStore.apiNotifications = [];
       return;
     }
     if (hydratedVehicleId === selectedId) return;
     hydratedVehicleId = selectedId;
-    fetchNotifications(selectedId);
+    notificationStore.fetch(selectedId);
   });
+
+  const dateFormatter = $derived(new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }));
 </script>
 
 <DropdownMenu.Root bind:open={isDropdownOpen}>
@@ -246,12 +98,12 @@
     title={m.notifications_title()}
   >
     <Bell class="text-primary h-[1.15rem] w-[1.15rem]" />
-    {#if unreadCount > 0}
+    {#if notificationStore.unreadCount > 0}
       <span
         id="notification-badge"
         class="notification-count bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[0.65rem] leading-none font-semibold"
       >
-        {unreadCount > 9 ? '9+' : unreadCount}
+        {notificationStore.unreadCount > 9 ? '9+' : notificationStore.unreadCount}
       </span>
     {/if}
   </DropdownMenu.Trigger>
@@ -259,30 +111,30 @@
     <div id="notifications-header" class="flex items-center justify-between px-2 py-1.5">
       <span class="text-sm font-semibold">{m.notifications_title()}</span>
       <div class="flex items-center gap-2">
-        {#if unreadCount > 0}
+        {#if notificationStore.unreadCount > 0}
           <Button
             variant="ghost"
             size="sm"
             title={m.notifications_mark_all_read_aria()}
             aria-label={m.notifications_mark_all_read_aria()}
-            disabled={isClearingAll}
-            onclick={handleMarkAllAsRead}
+            disabled={notificationStore.isClearingAll}
+            onclick={() => notificationStore.markAllAsRead()}
             class="h-7 px-2"
           >
             <span class="text-xs">{m.notif_button_mark_all_read()}</span>
           </Button>
         {/if}
-        {#if clearableReadCount > 0}
+        {#if notificationStore.clearableReadCount > 0}
           <Button
             variant="ghost"
             size="sm"
             title={m.notif_button_clear_all_read_title()}
             aria-label={m.notif_button_clear_all_read_title()}
-            disabled={isClearingAll}
-            onclick={handleClearAllRead}
+            disabled={notificationStore.isClearingAll}
+            onclick={() => notificationStore.clearAllRead()}
             class="h-7 px-2"
           >
-            {#if isClearingAll}
+            {#if notificationStore.isClearingAll}
               <Loader2 class="h-3.5 w-3.5 animate-spin" />
             {:else}
               <X class="h-3.5 w-3.5" />
@@ -290,12 +142,12 @@
             <span class="ml-1 text-xs">{m.notif_button_clear_read()}</span>
           </Button>
         {/if}
-        {#if unreadCount > 0}
+        {#if notificationStore.unreadCount > 0}
           <span
             id="notifications-count-badge"
             class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold"
           >
-            {unreadCount}
+            {notificationStore.unreadCount}
             {m.notifications_new()}
           </span>
         {/if}
@@ -309,14 +161,14 @@
         <AlertTriangle class="h-4 w-4" />
         <span>{m.notifications_select_vehicle_hint()}</span>
       </div>
-    {:else if isLoadingNotifications}
+    {:else if notificationStore.isLoadingNotifications}
       <div
         class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
       >
         <Loader2 class="h-4 w-4 animate-spin" />
         <span>{m.notifications_syncing()}</span>
       </div>
-    {:else if apiNotifications.length === 0}
+    {:else if notificationStore.apiNotifications.length === 0}
       <div
         class="notifications-success text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
       >
@@ -326,10 +178,8 @@
     {:else}
       <div id="notifications-list-container" class="max-h-80 space-y-3 overflow-auto px-1 py-2">
         <ul id="notifications-api-list" class="space-y-2">
-          {#each apiNotifications as notification (notification.id)}
-            {@const displayType =
-              notification.channel === 'information' ? 'information' : notification.type}
-            {@const notifStyle = notificationTypeStyles[displayType]}
+          {#each notificationStore.apiNotifications as notification (notification.id)}
+            {@const notifStyle = notificationTypeStyles[notification.type]}
             {@const NotifIcon = notifStyle.icon}
             <li id="notification-api-{notification.id}" class="relative">
               <button
@@ -337,16 +187,13 @@
                 onclick={() => handleNotificationClick(notification)}
                 class="notification-item border-border/50 bg-background/90 hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-left shadow-sm transition-colors"
               >
-                <!-- Read/Unread indicator dot in top-right corner -->
                 <div class="absolute top-2 right-2">
                   {#if notification.isRead}
-                    <!-- Hollow gray dot for read notifications -->
                     <div
                       class="border-muted-foreground/40 h-2 w-2 rounded-full border-2"
                       title={m.notif_status_read()}
                     ></div>
                   {:else}
-                    <!-- Solid blue dot for unread notifications -->
                     <div
                       class="bg-primary h-2 w-2 rounded-full"
                       title={m.notif_status_unread()}

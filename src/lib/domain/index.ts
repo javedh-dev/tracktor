@@ -9,12 +9,6 @@ export type Response<DataType> = {
   error?: string;
 };
 
-export enum Status {
-  LOADING,
-  DONE,
-  ERROR
-}
-
 // Re-export types from other modules
 export type { FuelLog, FuelSchema } from './fuel';
 export type { Vehicle, VehicleSchema } from './vehicle';

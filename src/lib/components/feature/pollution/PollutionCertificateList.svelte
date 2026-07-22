@@ -14,7 +14,7 @@
   import PuccContextMenu from './PuccContextMenu.svelte';
   import { puccStore } from '$stores/pucc.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import ResourceState from '$appui/ResourceState.svelte';
+  import StoreResourceState from '$appui/StoreResourceState.svelte';
   import { getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
   import type { PollutionCertificate } from '$lib/domain/pucc';
   import * as m from '$lib/paraglide/messages';
@@ -27,18 +27,29 @@
     return getNextDueDate(new Date(baseDate), pucc.recurrenceType, pucc.recurrenceInterval);
   };
 
+  let lastVehicleId: string | undefined;
+
   $effect(() => {
-    if (vehicleStore.selectedId) puccStore.refreshPuccs();
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
+      puccStore.refreshPuccs();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
+    }
   });
 </script>
 
-{#if puccStore.processing}
-  <FeatureRecordCardSkeleton containerId="pollution-list-skeleton" />
-{:else if puccStore.error}
-  <ResourceState state="error" message={puccStore.error} />
-{:else if puccStore.pollutionCerts?.length === 0}
-  <ResourceState state="empty" message={m.pollution_list_empty()} />
-{:else}
+<StoreResourceState
+  processing={puccStore.processing}
+  error={puccStore.error}
+  data={puccStore.pollutionCerts}
+  emptyMessage={m.pollution_list_empty()}
+>
+  {#snippet skeleton()}
+    <FeatureRecordCardSkeleton containerId="pollution-list-skeleton" />
+  {/snippet}
   {#each puccStore.pollutionCerts as pucc (pucc.id)}
     {@const nextDue = getNextPuccDue(pucc)}
     <FeatureRecordCard
@@ -132,4 +143,4 @@
       {/if}
     </FeatureRecordCard>
   {/each}
-{/if}
+</StoreResourceState>

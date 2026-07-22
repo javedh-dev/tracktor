@@ -22,7 +22,8 @@ const DEFAULT_CONFIGS: Configs = {
   featureInsurance: true,
   featureOverview: true,
   notificationProcessingEnabled: true,
-  notificationProcessingSchedule: '0 9 * * *'
+  notificationProcessingSchedule: '0 9 * * *',
+  theme: 'light'
 };
 
 /**
@@ -48,6 +49,20 @@ class ConfigStore {
   rawConfig = $state<Config[]>([]);
   processing = $state(false);
   error = $state<string>();
+
+  setConfigs = (configData: Config[]) => {
+    this.rawConfig = configData;
+    applyRawConfigs(this.configs, configData);
+
+    // Update paraglide locale without reloading
+    try {
+      if (this.configs.locale) {
+        setLocale(this.configs.locale as any, { reload: false });
+      }
+    } catch (_) {
+      /* noop */
+    }
+  };
 
   getCustomCss = async (): Promise<string> => {
     this.processing = true;

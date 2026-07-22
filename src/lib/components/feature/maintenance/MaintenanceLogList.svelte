@@ -1,28 +1,29 @@
 <script lang="ts">
-  import {
-    formatTableCurrency,
-    formatTableDate,
-    formatTableDistance,
-    formatTableText
-  } from '$helper/table-cell.helper';
+  import { formatTableText } from '$helper/table-cell.helper';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
   import Notebook from '@lucide/svelte/icons/notebook';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Paperclip from '@lucide/svelte/icons/paperclip';
-  import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
   import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-  import ResourceState from '$appui/ResourceState.svelte';
+  import StoreResourceState from '$appui/StoreResourceState.svelte';
   import MaintenanceContextMenu from './MaintenanceContextMenu.svelte';
   import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import DateCell from '$lib/components/feature/shared/DateCell.svelte';
+  import OdometerCell from '$lib/components/feature/shared/OdometerCell.svelte';
+  import CostCell from '$lib/components/feature/shared/CostCell.svelte';
+  import NotesCell from '$lib/components/feature/shared/NotesCell.svelte';
+  import AttachmentCell from '$lib/components/feature/shared/AttachmentCell.svelte';
   import * as m from '$lib/paraglide/messages';
+
+  let lastVehicleId: string | undefined;
 
   const columns: ColumnDef<MaintenanceLog>[] = [
     {
@@ -34,7 +35,7 @@
           label: m.col_date(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
+      cell: ({ row }) => renderComponent(DateCell, { value: row.getValue('date') })
     },
     {
       accessorKey: 'odometer',
@@ -45,7 +46,7 @@
           label: m.col_odometer(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
+      cell: ({ row }) => renderComponent(OdometerCell, { value: row.getValue('odometer') })
     },
     {
       accessorKey: 'serviceCenter',
@@ -57,9 +58,7 @@
           style: 'justify-start'
         }),
       cell: ({ row }) =>
-        renderSnippet(serviceCenterCell, {
-          value: row.getValue('serviceCenter')
-        })
+        renderSnippet(serviceCenterCell, { value: row.getValue('serviceCenter') as string | null })
     },
     {
       accessorKey: 'cost',
@@ -70,7 +69,7 @@
           label: m.col_cost(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
+      cell: ({ row }) => renderComponent(CostCell, { value: row.getValue('cost') })
     },
     {
       accessorKey: 'notes',
@@ -81,7 +80,7 @@
           label: m.col_notes(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
+      cell: ({ row }) => renderComponent(NotesCell, { value: row.getValue('notes') })
     },
     {
       accessorKey: 'attachment',
@@ -92,7 +91,8 @@
           label: m.col_attachment(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(attachmentCell, { value: row.getValue('attachment') })
+      cell: ({ row }) =>
+        renderComponent(AttachmentCell, { value: row.getValue('attachment') as string | null })
     },
     {
       id: 'actions',
@@ -107,49 +107,31 @@
   ];
 
   $effect(() => {
-    if (vehicleStore.selectedId) maintenanceStore.refreshMaintenanceLogs();
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
+      maintenanceStore.refreshMaintenanceLogs();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
+    }
   });
 </script>
 
-{#if maintenanceStore.processing}
-  <TableSkeleton containerId="maintenance-log-list-skeleton" />
-{:else if maintenanceStore.error}
-  <ResourceState state="error" message={maintenanceStore.error} />
-{:else if maintenanceStore.maintenanceLogs?.length === 0}
-  <ResourceState state="empty" message={m.maintenance_list_empty()} />
-{:else}
+<StoreResourceState
+  processing={maintenanceStore.processing}
+  error={maintenanceStore.error}
+  data={maintenanceStore.maintenanceLogs}
+  emptyMessage={m.maintenance_list_empty()}
+>
+  {#snippet skeleton()}
+    <TableSkeleton containerId="maintenance-log-list-skeleton" />
+  {/snippet}
   <div id="maintenance-log-table" class="maintenance-log-table">
     <AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
   </div>
-{/if}
+</StoreResourceState>
 
-{#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
-{/snippet}
-
-{#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
-{/snippet}
-
-{#snippet serviceCenterCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
-{/snippet}
-
-{#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
-{/snippet}
-
-{#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
-{/snippet}
-
-{#snippet attachmentCell(params: any)}
-  <div class="flex flex-row justify-center">
-    {#if params.value}
-      {@const fileName = params.value}
-      <AttachmentLink {fileName} />
-    {:else}
-      <span class="text-muted-foreground">-</span>
-    {/if}
-  </div>
+{#snippet serviceCenterCell({ value }: { value: string | null })}
+  <div class="flex flex-row justify-start">{formatTableText(value)}</div>
 {/snippet}

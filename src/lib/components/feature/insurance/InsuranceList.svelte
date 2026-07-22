@@ -15,12 +15,12 @@
   import InsuranceContextMenu from './InsuranceContextMenu.svelte';
   import { insuranceStore } from '$stores/insurance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import ResourceState from '$appui/ResourceState.svelte';
+  import StoreResourceState from '$appui/StoreResourceState.svelte';
   import { getInsuranceRecurrenceTypeLabel } from '$lib/domain/insurance';
   import type { Insurance } from '$lib/domain/insurance';
   import * as m from '$lib/paraglide/messages';
 
-  let vehicleId = $derived(vehicleStore.selectedId);
+  let lastVehicleId: string | undefined;
 
   const getNextInsuranceDue = (ins: Insurance) => {
     const baseDate = ins.endDate ?? ins.startDate;
@@ -31,17 +31,26 @@
   };
 
   $effect(() => {
-    if (vehicleId) insuranceStore.refreshInsurances();
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
+      insuranceStore.refreshInsurances();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
+    }
   });
 </script>
 
-{#if insuranceStore.processing}
-  <FeatureRecordCardSkeleton />
-{:else if insuranceStore.error}
-  <ResourceState state="error" message={insuranceStore.error} />
-{:else if insuranceStore.insurances?.length === 0}
-  <ResourceState state="empty" message={m.insurance_list_empty()} />
-{:else}
+<StoreResourceState
+  processing={insuranceStore.processing}
+  error={insuranceStore.error}
+  data={insuranceStore.insurances}
+  emptyMessage={m.insurance_list_empty()}
+>
+  {#snippet skeleton()}
+    <FeatureRecordCardSkeleton />
+  {/snippet}
   {#each insuranceStore.insurances as ins (ins.id)}
     {@const nextDue = getNextInsuranceDue(ins)}
     <FeatureRecordCard
@@ -125,4 +134,4 @@
       {/if}
     </FeatureRecordCard>
   {/each}
-{/if}
+</StoreResourceState>

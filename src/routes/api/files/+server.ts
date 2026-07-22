@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
 import { resolveUploadFilePath, sanitizeUploadFilename } from '$server/utils/file-route';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 import { writeFile } from 'fs/promises';
 
 export const POST: RequestHandler = async (event) => {
@@ -42,6 +42,6 @@ export const POST: RequestHandler = async (event) => {
       }
     };
 
-    return json(result);
+    return jsonResponse(result);
   });
 };

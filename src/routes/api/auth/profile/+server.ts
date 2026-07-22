@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 // PUT /api/auth/profile - Update current user's profile (username/password)
 export const PUT: RequestHandler = async (event) => {
@@ -39,6 +39,6 @@ export const PUT: RequestHandler = async (event) => {
       newPassword: body.newPassword
     });
 
-    return json(result);
+    return jsonResponse(result);
   });
 };

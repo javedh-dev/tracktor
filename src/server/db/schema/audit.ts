@@ -11,3 +11,15 @@ export const timestamps = {
     .$onUpdateFn(() => sql`CURRENT_TIMESTAMP`)
     .notNull()
 };
+
+export const idColumn = {
+  id: t
+    .text()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID())
+};
+
+export const recurrenceColumns = {
+  recurrenceType: t.text().notNull().default('none'),
+  recurrenceInterval: t.integer().notNull().default(1)
+};

@@ -34,8 +34,8 @@
     }
   });
 
-  $effect(() => {
-    const nextConfig: Partial<EmailProviderConfig> = {
+  function emitConfig() {
+    onConfigChange({
       host: formHost,
       port: formPort,
       secure: formSecure,
@@ -46,10 +46,8 @@
       from: formFrom,
       fromName: formFromName || undefined,
       recepient: formRecepient || undefined
-    };
-
-    onConfigChange(nextConfig);
-  });
+    });
+  }
 </script>
 
 <div class="border-border space-y-4 rounded-lg border p-4">
@@ -58,12 +56,12 @@
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
       <Label>{m.notif_email_host()}</Label>
-      <Input bind:value={formHost} placeholder="smtp.gmail.com" />
+      <Input bind:value={formHost} oninput={emitConfig} placeholder="smtp.gmail.com" />
     </div>
 
     <div class="space-y-2">
       <Label>{m.notif_email_port()}</Label>
-      <Input bind:value={formPort} type="number" placeholder="587" />
+      <Input bind:value={formPort} oninput={emitConfig} type="number" placeholder="587" />
     </div>
   </div>
 
@@ -72,7 +70,7 @@
       <Label>{m.notif_email_use_ssl()}</Label>
       <p class="text-muted-foreground text-xs">{m.notif_email_use_ssl_desc()}</p>
     </div>
-    <Checkbox bind:checked={formSecure} />
+    <Checkbox bind:checked={formSecure} onCheckedChange={emitConfig} />
   </div>
 </div>
 
@@ -81,12 +79,22 @@
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
       <Label>{m.notif_email_username()}</Label>
-      <Input bind:value={formUsername} type="email" placeholder="your@email.com" />
+      <Input
+        bind:value={formUsername}
+        oninput={emitConfig}
+        type="email"
+        placeholder="your@email.com"
+      />
     </div>
 
     <div class="space-y-2">
       <Label>{isEditing ? m.notif_email_password_keep() : m.notif_email_password()}</Label>
-      <Input bind:value={formPassword} type="password" placeholder="••••••••" />
+      <Input
+        bind:value={formPassword}
+        oninput={emitConfig}
+        type="password"
+        placeholder="••••••••"
+      />
     </div>
   </div>
 </div>
@@ -96,18 +104,32 @@
   <div class="grid gap-4 sm:grid-cols-2">
     <div class="space-y-2">
       <Label>{m.notif_email_from()}</Label>
-      <Input bind:value={formFrom} type="email" placeholder="noreply@example.com" />
+      <Input
+        bind:value={formFrom}
+        oninput={emitConfig}
+        type="email"
+        placeholder="noreply@example.com"
+      />
     </div>
 
     <div class="space-y-2">
       <Label>{m.notif_email_from_name()}</Label>
-      <Input bind:value={formFromName} placeholder={m.notif_email_from_name_placeholder()} />
+      <Input
+        bind:value={formFromName}
+        oninput={emitConfig}
+        placeholder={m.notif_email_from_name_placeholder()}
+      />
     </div>
   </div>
 
   <div class="space-y-2">
     <Label>{m.notif_email_recipient()}</Label>
-    <Input bind:value={formRecepient} type="email" placeholder="support@example.com" />
+    <Input
+      bind:value={formRecepient}
+      oninput={emitConfig}
+      type="email"
+      placeholder="support@example.com"
+    />
     <p class="text-muted-foreground text-xs">{m.notif_email_recipient_desc()}</p>
   </div>
 </div>

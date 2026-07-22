@@ -1,5 +1,6 @@
 import type { Notification } from '$lib/domain/notification';
 import { env } from '$lib/config/env.server';
+import { formatDate, getDaysUntil, NOTIFICATION_TYPE_META } from './notification-service.helper';
 
 export interface NotificationGroup {
   type: string;
@@ -8,96 +9,13 @@ export interface NotificationGroup {
   color: string;
 }
 
-/**
- * Group notifications by type
- */
-export function groupNotifications(notifications: Notification[]): NotificationGroup[] {
-  const groups: Record<string, Notification[]> = {};
-
-  notifications.forEach((notification) => {
-    if (!groups[notification.type]) {
-      groups[notification.type] = [];
-    }
-    groups[notification.type].push(notification);
-  });
-
-  return Object.entries(groups).map(([type, notifs]) => ({
-    type,
-    notifications: notifs,
-    ...getTypeMetadata(type)
-  }));
-}
-
-/**
- * Get metadata for notification type (label, icon, colors)
- */
-function getTypeMetadata(type: string): {
-  label: string;
-  color: string;
-} {
-  const metadata: Record<string, { label: string; color: string }> = {
-    reminder: {
-      label: 'Reminders',
-      color: '#2563eb'
-    },
-    alert: {
-      label: 'Alerts',
-      color: '#dc2626'
-    },
-    information: {
-      label: 'Information',
-      color: '#0284c7'
-    },
-    maintenance: {
-      label: 'Maintenance',
-      color: '#7c3aed'
-    },
-    insurance: {
-      label: 'Insurance',
-      color: '#059669'
-    },
-    pollution: {
-      label: 'Pollution Certificate',
-      color: '#0891b2'
-    },
-    registration: {
-      label: 'Registration',
-      color: '#ea580c'
-    }
-  };
-
-  return (
-    metadata[type] || {
-      label: type.charAt(0).toUpperCase() + type.slice(1),
-      color: '#6b7280'
-    }
-  );
-}
-
-/**
- * Format a date in a human-readable format
- */
-function formatDate(dateString: string | Date): string {
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-}
-
-/**
- * Calculate days until due date
- */
 function getDaysUntilDue(dueDate: string | Date): {
   days: number;
   label: string;
   urgent: boolean;
 } {
   const due = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
-  const now = new Date();
-  const diffTime = due.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = getDaysUntil(due);
 
   if (diffDays < 0) {
     return {
@@ -124,6 +42,27 @@ function getDaysUntilDue(dueDate: string | Date): {
   }
 
   return { days: diffDays, label: `${diffDays} days remaining`, urgent: false };
+}
+
+export function groupNotifications(notifications: Notification[]): NotificationGroup[] {
+  const groups: Record<string, Notification[]> = {};
+
+  notifications.forEach((notification) => {
+    if (!groups[notification.type]) {
+      groups[notification.type] = [];
+    }
+    groups[notification.type].push(notification);
+  });
+
+  return Object.entries(groups).map(([type, notifs]) => {
+    const meta = NOTIFICATION_TYPE_META[type as keyof typeof NOTIFICATION_TYPE_META];
+    return {
+      type,
+      notifications: notifs,
+      label: meta?.label ?? type.charAt(0).toUpperCase() + type.slice(1),
+      color: meta?.color ?? '#6b7280'
+    };
+  });
 }
 
 /**

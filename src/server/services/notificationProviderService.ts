@@ -1,4 +1,3 @@
-import type { ApiResponse } from '$lib/response';
 import type {
   CreateNotificationProvider,
   NotificationChannel,
@@ -17,10 +16,10 @@ import logger from '$server/config/logger';
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { decrypt, encrypt } from '$server/utils/encryption';
+import { decryptWithSecret, encryptWithSecret } from '$server/services/crypto.service';
 import { eq } from 'drizzle-orm';
 import { resolveUpdatedConfig } from './notification-provider-service.helper';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type ProviderRecord = typeof schema.notificationProviderTable.$inferSelect;
 
@@ -35,7 +34,7 @@ function parseChannels(rawChannels: string): NotificationChannel[] {
 
 function parseProvider(provider: ProviderRecord): NotificationProviderWithParsedConfig {
   try {
-    const config = notificationProviderConfigSchema.parse(decrypt(provider.config));
+    const config = notificationProviderConfigSchema.parse(decryptWithSecret(provider.config));
     const channels = parseChannels(provider.channels);
     const type = notificationProviderTypeSchema.parse(provider.type) as NotificationProviderType;
 
@@ -62,23 +61,21 @@ async function getProviderRecord(providerId: string): Promise<ProviderRecord> {
   return requireRecord(provider, 'Provider not found');
 }
 
-export const getProvidersByUserId = async (): Promise<ApiResponse> => {
+export const getAllProviders = async () => {
   const providers = await db.query.notificationProviderTable.findMany({
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
-  return createSuccessResponse(providers.map(parseProvider), 'Providers fetched successfully');
+  return providers.map(parseProvider);
 };
 
-export const getProviderById = async (providerId: string): Promise<ApiResponse> => {
+export const getProviderById = async (providerId: string) => {
   const provider = await getProviderRecord(providerId);
 
-  return createSuccessResponse(parseProvider(provider), 'Provider fetched successfully');
+  return parseProvider(provider);
 };
 
-export const addProvider = async (
-  providerData: CreateNotificationProvider
-): Promise<ApiResponse> => {
+export const addProvider = async (providerData: CreateNotificationProvider) => {
   const validated = createNotificationProviderSchema.parse(providerData);
   const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
 
@@ -87,7 +84,7 @@ export const addProvider = async (
     .values({
       name: validated.name,
       type: validated.type,
-      config: encrypt(validatedConfig),
+      config: encryptWithSecret(validatedConfig),
       channels: JSON.stringify(validated.channels),
       isEnabled: validated.isEnabled
     })
@@ -97,13 +94,13 @@ export const addProvider = async (
     throw new AppError('Failed to create provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return createSuccessResponse(parseProvider(provider), 'Provider created successfully');
+  return parseProvider(provider);
 };
 
 export const updateProvider = async (
   providerId: string,
   providerData: UpdateNotificationProvider
-): Promise<ApiResponse> => {
+) => {
   const validated = updateNotificationProviderSchema.parse(providerData);
   const existingProvider = await getProviderRecord(providerId);
 
@@ -114,9 +111,11 @@ export const updateProvider = async (
   if (validated.channels !== undefined) updateData.channels = JSON.stringify(validated.channels);
 
   if (validated.config !== undefined) {
-    const existingConfig = notificationProviderConfigSchema.parse(decrypt(existingProvider.config));
+    const existingConfig = notificationProviderConfigSchema.parse(
+      decryptWithSecret(existingProvider.config)
+    );
     const mergedConfig = resolveUpdatedConfig(existingConfig, validated.config);
-    updateData.config = encrypt(notificationProviderConfigSchema.parse(mergedConfig));
+    updateData.config = encryptWithSecret(notificationProviderConfigSchema.parse(mergedConfig));
   }
 
   const [updatedProvider] = await db
@@ -129,17 +128,17 @@ export const updateProvider = async (
     throw new AppError('Failed to update provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return createSuccessResponse(parseProvider(updatedProvider), 'Provider updated successfully');
+  return parseProvider(updatedProvider);
 };
 
-export const deleteProvider = async (providerId: string): Promise<ApiResponse> => {
+export const deleteProvider = async (providerId: string) => {
   await getProviderRecord(providerId);
 
   await db
     .delete(schema.notificationProviderTable)
     .where(eq(schema.notificationProviderTable.id, providerId));
 
-  return createSuccessResponse(null, 'Provider deleted successfully');
+  return { id: providerId };
 };
 
 export const getEnabledProvidersForChannels = async (channels: NotificationChannel[]) => {
@@ -154,7 +153,8 @@ export const getEnabledProvidersForChannels = async (channels: NotificationChann
 
 export const getEnabledProvidersByType = async (type: string) => {
   const providers = await db.query.notificationProviderTable.findMany({
-    where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true))
+    where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true)),
+    orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
   return providers.map(parseProvider);

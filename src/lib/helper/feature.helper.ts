@@ -24,22 +24,6 @@ export const Features = {
 } as const;
 
 /**
- * Get all enabled features
- * @returns Array of enabled feature names
- */
-export function getEnabledFeatures(): string[] {
-  const features = [];
-  if (configStore.configs.featureFuelLog) features.push(Features.FUEL_LOG);
-  if (configStore.configs.featureMaintenance) features.push(Features.MAINTENANCE);
-  if (configStore.configs.featurePucc) features.push(Features.PUCC);
-  if (configStore.configs.featureReminders) features.push(Features.REMINDERS);
-  if (configStore.configs.featureInsurance) features.push(Features.INSURANCE);
-  if (configStore.configs.featureOverview) features.push(Features.OVERVIEW);
-  return features;
-}
-
-/**
- * Check if all specified features are enabled
  * @param features - Array of feature names to check
  * @returns boolean - true if all features are enabled
  */

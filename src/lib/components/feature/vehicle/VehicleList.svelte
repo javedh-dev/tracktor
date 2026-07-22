@@ -1,6 +1,6 @@
 <script lang="ts">
   import CardGridSkeleton from '$appui/CardGridSkeleton.svelte';
-  import ResourceState from '$appui/ResourceState.svelte';
+  import StoreResourceState from '$appui/StoreResourceState.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import VehicleCard from './VehicleCard.svelte';
   import { ScrollArea } from '$ui/scroll-area';
@@ -13,14 +13,18 @@
   };
 </script>
 
-{#if vehicleStore.processing}
-  <CardGridSkeleton
-    containerId="vehicle-list-skeleton"
-    containerClass="vehicle-list-loading my-4 flex gap-4 overflow-hidden"
-  />
-{:else if vehicleStore.error}
-  <ResourceState state="error" message={vehicleStore.error} />
-{:else if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
+<StoreResourceState
+  processing={vehicleStore.processing}
+  error={vehicleStore.error}
+  data={vehicleStore.vehicles}
+  emptyMessage={m.vehicle_list_empty()}
+>
+  {#snippet skeleton()}
+    <CardGridSkeleton
+      containerId="vehicle-list-skeleton"
+      containerClass="vehicle-list-loading my-4 flex gap-4 overflow-hidden"
+    />
+  {/snippet}
   <ScrollArea
     id="vehicle-list-container"
     class="vehicle-list w-full whitespace-nowrap"
@@ -39,6 +43,4 @@
       {/each}
     </div>
   </ScrollArea>
-{:else}
-  <ResourceState state="empty" message={m.vehicle_list_empty()} />
-{/if}
+</StoreResourceState>

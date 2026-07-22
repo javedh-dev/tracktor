@@ -13,24 +13,25 @@ export const GET: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID is required');
     }
 
-    const vehicleResult = await vehicleService.getVehicleById(vehicleId);
-    if (!vehicleResult.data) {
-      throw error(404, 'Vehicle not found');
-    }
-    const vehicle = vehicleResult.data;
+    const vehicle = await vehicleService.getVehicleById(vehicleId);
 
-    const logsResult = await maintenanceLogService.getMaintenanceLogs(vehicleId);
-    const maintenanceLogs = logsResult.data || [];
+    const maintenanceLogs = await maintenanceLogService.getMaintenanceLogs(vehicleId);
 
-    const pdfBuffer: any = await generateMaintenanceLogsPdf(maintenanceLogs, {
+    const vehicleLabel =
+      [vehicle.make, vehicle.model].filter(Boolean).join(' ') || 'Unknown Vehicle';
+    const safePlate = vehicle.licensePlate
+      ? vehicle.licensePlate.replace(/[^a-zA-Z0-9]/g, '-')
+      : 'vehicle';
+
+    const pdfBuffer: Buffer = await generateMaintenanceLogsPdf(maintenanceLogs, {
       licensePlate: vehicle.licensePlate,
-      name: vehicle.name
+      label: vehicleLabel
     });
 
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="maintenance-log-${vehicle.licensePlate}.pdf"`
+        'Content-Disposition': `attachment; filename="maintenance-log-${safePlate}.pdf"`
       }
     });
   });

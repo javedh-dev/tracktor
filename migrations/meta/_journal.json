@@ -113,6 +113,13 @@
       "when": 1776743311600,
       "tag": "20260421034831_add_rate_column",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1784694552778,
+      "tag": "20260322000000_add_indexes",
+      "breakpoints": true
     }
   ]
 }

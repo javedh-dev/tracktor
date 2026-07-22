@@ -13,12 +13,7 @@
     placeholder?: string;
   }
 
-  let {
-    value = $bindable(),
-    onValueChange,
-    disabled = false,
-    placeholder = '* * * * *'
-  }: Props = $props();
+  let { value, onValueChange, disabled = false, placeholder = '* * * * *' }: Props = $props();
 
   const presets = $derived([
     { label: m.notif_cron_every_minute(), value: '* * * * *' },
@@ -93,22 +88,14 @@
   let validation = $derived(validateCron(value));
   let hint = $derived(validation.valid ? getNextExecutionHint(value) : validation.message);
 
-  let selectedPreset = $state<string | undefined>(undefined);
-
-  $effect(() => {
-    if (selectedPreset) {
-      value = selectedPreset;
-    }
-  });
-
-  $effect(() => {
-    onValueChange?.(value);
-  });
+  function handlePresetChange(presetValue: string) {
+    onValueChange?.(presetValue);
+  }
 </script>
 
 <div class="grow space-y-2">
   <div class="flex gap-2">
-    <Select.Root bind:value={selectedPreset} type="single" {disabled}>
+    <Select.Root type="single" {disabled} onValueChange={handlePresetChange}>
       <Select.Trigger class="w-35">
         <Clock class="mr-2 h-4 w-4" />
         {m.notif_cron_presets()}
@@ -123,7 +110,8 @@
     </Select.Root>
     <div class="flex-1">
       <Input
-        bind:value
+        {value}
+        oninput={(e) => onValueChange?.(e.currentTarget.value)}
         {placeholder}
         {disabled}
         class="mono font-mono"

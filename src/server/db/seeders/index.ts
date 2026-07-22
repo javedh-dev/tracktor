@@ -96,7 +96,7 @@ export const clearDb = async () => {
 };
 
 const seedDemoData = async (enforce: boolean = false) => {
-  if (!env.DISABLE_AUTH) seedDefaultUser();
+  if (!env.DISABLE_AUTH) await seedDefaultUser();
   if (!enforce) {
     const existingVehicles = await db.$count(vehicleTable);
     if (existingVehicles > 0) {
@@ -132,39 +132,44 @@ const seedDemoData = async (enforce: boolean = false) => {
     ])
     .returning();
 
-  vehicles.forEach(async (vehicle) => {
-    const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
-    const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
-    await db
-      .insert(insuranceTable)
-      .values({
-        vehicleId: vehicle.id,
-        provider: faker.company.name(),
-        policyNumber: faker.string.numeric({ length: { min: 12, max: 18 } }),
-        startDate: faker.date.past({ years: 1 }).toDateString(),
-        endDate: recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
-        recurrenceType: recurrenceType,
-        recurrenceInterval:
-          recurrenceType === 'none' || recurrenceType === 'no_end'
-            ? 1
-            : faker.number.int({ min: 1, max: 3 }),
-        cost: faker.number.int({ min: 1000, max: 5000 })
-      })
-      .run();
-  });
+  await Promise.all(
+    vehicles.map(async (vehicle) => {
+      const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
+      const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
+      await db
+        .insert(insuranceTable)
+        .values({
+          vehicleId: vehicle.id,
+          provider: faker.company.name(),
+          policyNumber: faker.string.numeric({ length: { min: 12, max: 18 } }),
+          startDate: faker.date.past({ years: 1 }).toDateString(),
+          endDate:
+            recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
+          recurrenceType: recurrenceType,
+          recurrenceInterval:
+            recurrenceType === 'none' || recurrenceType === 'no_end'
+              ? 1
+              : faker.number.int({ min: 1, max: 3 }),
+          cost: faker.number.int({ min: 1000, max: 5000 })
+        })
+        .run();
+    })
+  );
 
-  vehicles.forEach(async (vehicle) => {
-    await db
-      .insert(maintenanceLogTable)
-      .values({
-        vehicleId: vehicle.id,
-        date: faker.date.past({ years: 5 }).toDateString(),
-        odometer: faker.number.int({ min: 100, max: 50000 }),
-        serviceCenter: faker.company.name(),
-        cost: faker.number.int({ min: 1000, max: 5000 })
-      })
-      .run();
-  });
+  await Promise.all(
+    vehicles.map(async (vehicle) => {
+      await db
+        .insert(maintenanceLogTable)
+        .values({
+          vehicleId: vehicle.id,
+          date: faker.date.past({ years: 5 }).toDateString(),
+          odometer: faker.number.int({ min: 100, max: 50000 }),
+          serviceCenter: faker.company.name(),
+          cost: faker.number.int({ min: 1000, max: 5000 })
+        })
+        .run();
+    })
+  );
 
   await Promise.all(
     vehicles.map(async (vehicle) => {

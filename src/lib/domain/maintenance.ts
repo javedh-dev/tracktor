@@ -1,5 +1,5 @@
-import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
+import { apiDateString } from './shared';
 
 export interface MaintenanceLog {
   id: string | null;
@@ -15,14 +15,7 @@ export interface MaintenanceLog {
 export const maintenanceSchema = z.object({
   id: z.string().nullable(),
   vehicleId: z.uuid(),
-  date: z.string().refine((val) => {
-    try {
-      parseDate(val);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Invalid date format'),
+  date: apiDateString,
   odometer: z.number().positive(),
   serviceCenter: z
     .string()

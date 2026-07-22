@@ -4,12 +4,8 @@
   import Badge from '$ui/badge/badge.svelte';
   import {
     formatTableBoolean,
-    formatTableCurrency,
-    formatTableDate,
-    formatTableDistance,
     formatTableFuelAmount,
-    formatTableMileage,
-    formatTableText
+    formatTableMileage
   } from '$helper/table-cell.helper';
   import FuelLogContextMenu from './FuelLogContextMenu.svelte';
   import Banknote from '@lucide/svelte/icons/banknote';
@@ -21,19 +17,22 @@
   import PaintBucket from '@lucide/svelte/icons/paint-bucket';
   import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
   import Paperclip from '@lucide/svelte/icons/paperclip';
-  import AttachmentLink from '$lib/components/app/AttachmentLink.svelte';
   import type { ColumnDef } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
-  import ResourceState from '$appui/ResourceState.svelte';
+  import StoreResourceState from '$appui/StoreResourceState.svelte';
   import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
+  import DateCell from '$lib/components/feature/shared/DateCell.svelte';
+  import OdometerCell from '$lib/components/feature/shared/OdometerCell.svelte';
+  import CostCell from '$lib/components/feature/shared/CostCell.svelte';
+  import NotesCell from '$lib/components/feature/shared/NotesCell.svelte';
+  import AttachmentCell from '$lib/components/feature/shared/AttachmentCell.svelte';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import {
     col_date,
-    col_distance_driven,
     col_odometer,
     col_filled,
     col_missed_last,
@@ -48,14 +47,14 @@
     common_no
   } from '$lib/paraglide/messages/_index.js';
 
-  // Get the selected vehicle to determine fuel type and units
   const selectedVehicle = $derived(
     vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
   );
-  // const fuelUnit = $derived(selectedVehicle?.fuelType ? FUEL_UNITS[selectedVehicle.fuelType] : 'L');
   const volumeLabel = $derived(
     selectedVehicle?.fuelType === 'electric' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
   );
+
+  let lastVehicleId: string | undefined;
 
   const columns: ColumnDef<FuelLog>[] = [
     {
@@ -67,7 +66,7 @@
           label: col_date(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(dateCell, { value: row.getValue('date') })
+      cell: ({ row }) => renderComponent(DateCell, { value: row.getValue('date') })
     },
     {
       accessorKey: 'odometer',
@@ -78,7 +77,7 @@
           label: col_odometer(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(odometerCell, { value: row.getValue('odometer') })
+      cell: ({ row }) => renderComponent(OdometerCell, { value: row.getValue('odometer') })
     },
     {
       accessorKey: 'distanceDriven',
@@ -86,11 +85,10 @@
         renderComponent(LabelWithIcon, {
           icon: CircleGauge,
           iconClass: 'h-4 w-4 ',
-          label: col_distance_driven(),
+          label: col_odometer(),
           style: 'justify-center'
         }),
-      cell: ({ row }) =>
-        renderSnippet(distanceDrivenCell, { value: row.getValue('distanceDriven') })
+      cell: ({ row }) => renderComponent(OdometerCell, { value: row.getValue('distanceDriven') })
     },
     {
       accessorKey: 'filled',
@@ -101,7 +99,7 @@
           label: col_filled(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(badge, { value: row.getValue('filled') })
+      cell: ({ row }) => renderSnippet(badge, { value: row.getValue('filled') as boolean })
     },
     {
       accessorKey: 'missedLast',
@@ -112,7 +110,7 @@
           label: col_missed_last(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(badge, { value: row.getValue('missedLast') })
+      cell: ({ row }) => renderSnippet(badge, { value: row.getValue('missedLast') as boolean })
     },
     {
       accessorKey: 'fuelAmount',
@@ -125,7 +123,7 @@
         }),
       cell: ({ row }) =>
         renderSnippet(fuelAmountCell, {
-          amount: row.getValue('fuelAmount'),
+          amount: row.getValue('fuelAmount') as number | null,
           fuelType: selectedVehicle?.fuelType
         })
     },
@@ -138,7 +136,7 @@
           label: col_cost(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(costCell, { value: row.getValue('cost') })
+      cell: ({ row }) => renderComponent(CostCell, { value: row.getValue('cost') })
     },
     {
       accessorKey: 'mileage',
@@ -151,7 +149,7 @@
         }),
       cell: ({ row }) =>
         renderSnippet(mileageCell, {
-          mileage: row.getValue('mileage'),
+          mileage: row.getValue('mileage') as number | null,
           fuelType: selectedVehicle?.fuelType
         })
     },
@@ -164,7 +162,7 @@
           label: col_notes(),
           style: 'justify-start'
         }),
-      cell: ({ row }) => renderSnippet(notesCell, { value: row.getValue('notes') })
+      cell: ({ row }) => renderComponent(NotesCell, { value: row.getValue('notes') })
     },
     {
       accessorKey: 'attachment',
@@ -175,7 +173,8 @@
           label: col_attachment(),
           style: 'justify-center'
         }),
-      cell: ({ row }) => renderSnippet(attachmentCell, { value: row.getValue('attachment') })
+      cell: ({ row }) =>
+        renderComponent(AttachmentCell, { value: row.getValue('attachment') as string | null })
     },
     {
       id: 'actions',
@@ -190,67 +189,57 @@
   ];
 
   $effect(() => {
-    if (vehicleStore.selectedId) fuelLogStore.refreshFuelLogs();
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
+      fuelLogStore.refreshFuelLogs();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
+    }
   });
 </script>
 
-{#if fuelLogStore.processing}
-  <TableSkeleton containerId="fuel-log-list-skeleton" />
-{:else if fuelLogStore.error}
-  <ResourceState state="error" message={fuelLogStore.error} />
-{:else if fuelLogStore.fuelLogs?.length === 0}
-  <ResourceState state="empty" message={fuel_empty_list()} />
-{:else}
+<StoreResourceState
+  processing={fuelLogStore.processing}
+  error={fuelLogStore.error}
+  data={fuelLogStore.fuelLogs}
+  emptyMessage={fuel_empty_list()}
+>
+  {#snippet skeleton()}
+    <TableSkeleton containerId="fuel-log-list-skeleton" />
+  {/snippet}
   <AppTable data={fuelLogStore.fuelLogs || []} {columns} />
-{/if}
+</StoreResourceState>
 
-{#snippet badge(params: any)}
+{#snippet badge({ value }: { value: boolean })}
   <div class="flex flex-row justify-center">
     <Badge variant="outline"
-      ><span>{formatTableBoolean(params.value, common_yes(), common_no())}</span></Badge
+      ><span>{formatTableBoolean(value, common_yes(), common_no())}</span></Badge
     >
   </div>
 {/snippet}
 
-{#snippet dateCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableDate(params.value)}</div>
-{/snippet}
-
-{#snippet odometerCell(params: any)}
-  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
-{/snippet}
-
-{#snippet distanceDrivenCell(params: any)}
-  <div class="flex flex-row justify-center">{formatTableDistance(params.value)}</div>
-{/snippet}
-
-{#snippet fuelAmountCell(params: any)}
+{#snippet fuelAmountCell({
+  amount,
+  fuelType
+}: {
+  amount: number | null;
+  fuelType: string | undefined;
+})}
   <div class="flex flex-row justify-center">
-    {formatTableFuelAmount(params.amount, params.fuelType as string | undefined)}
+    {formatTableFuelAmount(amount, fuelType)}
   </div>
 {/snippet}
 
-{#snippet costCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableCurrency(params.value)}</div>
-{/snippet}
-
-{#snippet mileageCell(params: any)}
+{#snippet mileageCell({
+  mileage,
+  fuelType
+}: {
+  mileage: number | null;
+  fuelType: string | undefined;
+})}
   <div class="flex flex-row justify-center">
-    {formatTableMileage(params.mileage, params.fuelType as string | undefined)}
-  </div>
-{/snippet}
-
-{#snippet notesCell(params: any)}
-  <div class="flex flex-row justify-start">{formatTableText(params.value)}</div>
-{/snippet}
-
-{#snippet attachmentCell(params: any)}
-  <div class="flex flex-row justify-center">
-    {#if params.value}
-      {@const fileName = params.value}
-      <AttachmentLink {fileName} />
-    {:else}
-      <span class="text-muted-foreground">-</span>
-    {/if}
+    {formatTableMileage(mileage, fuelType)}
   </div>
 {/snippet}

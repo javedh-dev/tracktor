@@ -94,7 +94,7 @@ export const handleError: HandleServerError = async ({ error, event }) => {
 
   const body = createErrorResponseBody(error);
 
-  return { message: body.message || 'Internal server error' };
+  return { message: body.error.message || 'Internal server error' };
 };
 
 const originalHandle: Handle = async ({ event, resolve }) => {

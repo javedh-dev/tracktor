@@ -1,13 +1,11 @@
 import { db } from '../db/index';
 import { sql } from 'drizzle-orm';
 import * as schema from '../db/schema/index';
-import type { ApiResponse } from '$lib/response';
-import { createSuccessResponse } from './service-response.helper';
 
 /**
  * Get unique values for service centers from maintenance logs
  */
-export const getUniqueServiceCenters = async (): Promise<ApiResponse> => {
+export const getUniqueServiceCenters = async () => {
   const result = await db
     .selectDistinct({ serviceCenter: schema.maintenanceLogTable.serviceCenter })
     .from(schema.maintenanceLogTable)
@@ -18,13 +16,13 @@ export const getUniqueServiceCenters = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.serviceCenter).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique values for insurance providers
  */
-export const getUniqueInsuranceProviders = async (): Promise<ApiResponse> => {
+export const getUniqueInsuranceProviders = async () => {
   const result = await db
     .selectDistinct({ provider: schema.insuranceTable.provider })
     .from(schema.insuranceTable)
@@ -35,13 +33,13 @@ export const getUniqueInsuranceProviders = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.provider).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique values for pollution certificate testing centers
  */
-export const getUniqueTestingCenters = async (): Promise<ApiResponse> => {
+export const getUniqueTestingCenters = async () => {
   const result = await db
     .selectDistinct({
       testingCenter: schema.pollutionCertificateTable.testingCenter
@@ -54,13 +52,13 @@ export const getUniqueTestingCenters = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.testingCenter).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique vehicle makes
  */
-export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
+export const getUniqueVehicleMakes = async () => {
   const result = await db
     .selectDistinct({ make: schema.vehicleTable.make })
     .from(schema.vehicleTable)
@@ -69,13 +67,13 @@ export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.make).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique vehicle models (optionally filtered by make)
  */
-export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
+export const getUniqueVehicleModels = async () => {
   const result = await db
     .selectDistinct({ model: schema.vehicleTable.model })
     .from(schema.vehicleTable)
@@ -84,5 +82,5 @@ export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.model).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };

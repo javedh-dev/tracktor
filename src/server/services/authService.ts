@@ -4,7 +4,6 @@ import { Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
-import { type ApiResponse } from '$lib/response';
 import {
   generateSessionToken,
   createSession,
@@ -12,10 +11,15 @@ import {
   invalidateSession,
   type User
 } from '../utils/session';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
-export const createUser = async (username: string, password: string): Promise<ApiResponse> => {
-  // Check if user already exists
+const BCRYPT_SALT_ROUNDS = 10;
+
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+}
+
+export const createUser = async (username: string, password: string) => {
   const existingUser = await db.query.usersTable.findFirst({
     where: (users, { eq }) => eq(users.username, username)
   });
@@ -24,7 +28,7 @@ export const createUser = async (username: string, password: string): Promise<Ap
     throw new AppError('Username already exists', Status.BAD_REQUEST);
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await hashPassword(password);
   const userId = crypto.randomUUID();
 
   await db.insert(schema.usersTable).values({
@@ -33,7 +37,7 @@ export const createUser = async (username: string, password: string): Promise<Ap
     passwordHash
   });
 
-  return createSuccessResponse({ userId, username }, 'User created successfully');
+  return { userId, username };
 };
 
 export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
@@ -41,8 +45,9 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
     where: (users, { eq }) => eq(users.username, username)
   });
 
+  const passwordHash = await hashPassword(password);
+
   if (!existingUser) {
-    const passwordHash = await bcrypt.hash(password, 10);
     const userId = crypto.randomUUID();
 
     await db.insert(schema.usersTable).values({
@@ -51,7 +56,6 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
       passwordHash
     });
   } else {
-    const passwordHash = await bcrypt.hash(password, 10);
     await db
       .update(schema.usersTable)
       .set({ passwordHash })
@@ -59,7 +63,7 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
   }
 };
 
-export const loginUser = async (username: string, password: string): Promise<ApiResponse> => {
+export const loginUser = async (username: string, password: string) => {
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.username, username)
@@ -76,21 +80,18 @@ export const loginUser = async (username: string, password: string): Promise<Api
   const sessionToken = generateSessionToken();
   const session = await createSession(sessionToken, user.id);
 
-  return createSuccessResponse(
-    {
-      sessionToken,
-      user: {
-        id: user.id,
-        username: user.username
-      }
-    },
-    'Login successful'
-  );
+  return {
+    sessionToken,
+    user: {
+      id: user.id,
+      username: user.username
+    }
+  };
 };
 
-export const logoutUser = async (sessionId: string): Promise<ApiResponse> => {
+export const logoutUser = async (sessionId: string) => {
   await invalidateSession(sessionId);
-  return createSuccessResponse(undefined, 'Logout successful');
+  return undefined;
 };
 
 export const validateSession = async (sessionToken: string): Promise<{ user: User | null }> => {
@@ -98,18 +99,18 @@ export const validateSession = async (sessionToken: string): Promise<{ user: Use
   return { user: result.user };
 };
 
-export const getUsersCount = async (): Promise<ApiResponse> => {
-  const users = await db.select().from(schema.usersTable);
-  return createSuccessResponse({
-    count: users.length,
-    hasUsers: users.length > 0
-  });
+export const getUsersCount = async () => {
+  const [user] = await db.select({ id: schema.usersTable.id }).from(schema.usersTable).limit(1);
+  return {
+    count: user ? 1 : 0,
+    hasUsers: !!user
+  };
 };
 
 export const updateUserProfile = async (
   userId: string,
   data: { username?: string; currentPassword?: string; newPassword?: string }
-): Promise<ApiResponse> => {
+) => {
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.id, userId)
@@ -143,17 +144,14 @@ export const updateUserProfile = async (
       throw new AppError('Current password is incorrect', Status.UNAUTHORIZED);
     }
 
-    updates.passwordHash = await bcrypt.hash(data.newPassword, 10);
+    updates.passwordHash = await hashPassword(data.newPassword);
   }
 
   if (Object.keys(updates).length === 0) {
-    return createSuccessResponse({ id: user.id, username: user.username }, 'No changes to update');
+    return { id: user.id, username: user.username };
   }
 
   await db.update(schema.usersTable).set(updates).where(eq(schema.usersTable.id, userId));
 
-  return createSuccessResponse(
-    { id: user.id, username: updates.username || user.username },
-    'Profile updated successfully'
-  );
+  return { id: user.id, username: updates.username || user.username };
 };

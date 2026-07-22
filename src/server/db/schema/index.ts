@@ -1,4 +1,4 @@
-import { authTable, usersTable, sessionsTable } from './auth';
+import { usersTable, sessionsTable } from './auth';
 import { configTable } from './config';
 import { fuelLogTable } from './fuel-log';
 import { insuranceTable } from './insurance';
@@ -10,7 +10,6 @@ import { notificationTable } from './notification';
 import { notificationProviderTable } from './notification-provider';
 
 export {
-  authTable,
   usersTable,
   sessionsTable,
   configTable,

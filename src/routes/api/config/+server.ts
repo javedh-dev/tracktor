@@ -1,12 +1,12 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { getAppConfigs, updateAppConfig } from '$server/services/configService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config GET error:', async () => {
     const result = await getAppConfigs();
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -31,6 +31,6 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     const result = await updateAppConfig(body);
-    return json(result);
+    return jsonResponse(result);
   });
 };

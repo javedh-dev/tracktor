@@ -41,9 +41,3 @@ export interface ThemeConfig {
   colors?: ThemeColors;
   darkColors?: ThemeColors;
 }
-
-export interface ThemeContextValue {
-  theme: ThemeName;
-  themes: ThemeConfig[];
-  setTheme: (theme: ThemeName) => void;
-}

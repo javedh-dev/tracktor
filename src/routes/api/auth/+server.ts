@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { env } from '$lib/config/env.server';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
@@ -17,8 +17,8 @@ export const POST: RequestHandler = async (event) => {
     const result = await authService.loginUser(body.username, body.password);
 
     // Set session cookie
-    if (result.data?.sessionToken) {
-      event.cookies.set('session', result.data.sessionToken, {
+    if (result.sessionToken) {
+      event.cookies.set('session', result.sessionToken, {
         path: '/',
         httpOnly: true,
         secure: env.HTTP_MODE === 'https',
@@ -27,7 +27,7 @@ export const POST: RequestHandler = async (event) => {
       });
     }
 
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -51,14 +51,11 @@ export const GET: RequestHandler = async (event) => {
       }
     }
 
-    return json({
+    return jsonResponse({
       ...result,
-      data: {
-        ...result.data,
-        isAuthDisabled,
-        user,
-        isAuthenticated: isAuthDisabled || !!user
-      }
+      isAuthDisabled,
+      user,
+      isAuthenticated: isAuthDisabled || !!user
     });
   });
 };
@@ -82,14 +79,11 @@ export const DELETE: RequestHandler = async (event) => {
     event.cookies.set('session', '', {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: env.HTTP_MODE === 'https',
       sameSite: 'lax',
       maxAge: 0 // Expire immediately
     });
 
-    return json({
-      success: true,
-      message: 'Logout successful'
-    });
+    return jsonResponse(undefined, 'Logout successful');
   });
 };
