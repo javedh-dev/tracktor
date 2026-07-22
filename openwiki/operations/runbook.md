@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Operations Runbook"
+openwiki_generated: true
+---
+
 # Operations Runbook
 
 This page covers deployment, environment configuration, database operations, and runtime behavior.
