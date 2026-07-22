@@ -1,14 +1,13 @@
 import type { RequestHandler } from './$types';
-import { json } from '@sveltejs/kit';
 import * as reminderService from '$server/services/reminderService';
 import { reminderSchema } from '$lib/domain/reminder';
-import { parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Reminder GET error:', async () => {
     const { reminderId } = event.params;
     const result = await reminderService.getReminderById(reminderId);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -18,7 +17,7 @@ export const PUT: RequestHandler = async (event) => {
     const parsed = await parseBody(event, reminderSchema.partial(), { vehicleId: id });
     const { id: _, vehicleId: __, ...body } = parsed;
     const result = await reminderService.updateReminder(id, reminderId, body);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -26,6 +25,6 @@ export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Reminder DELETE error:', async () => {
     const { reminderId } = event.params;
     const result = await reminderService.deleteReminder(reminderId);
-    return json(result);
+    return jsonResponse(result);
   });
 };

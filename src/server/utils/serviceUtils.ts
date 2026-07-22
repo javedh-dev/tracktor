@@ -1,7 +1,6 @@
 import { AppError, Status } from '../exceptions/AppError';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
-import type { ApiResponse } from '$lib/response';
 
 /**
  * Validates that a vehicle exists by ID
@@ -44,16 +43,12 @@ export const performDelete = async (
   table: any,
   id: string,
   entityName: string
-): Promise<ApiResponse> => {
+): Promise<{ id: string }> => {
   const result = await db.delete(table).where(eq(table.id, id)).execute();
 
   if (result.rowsAffected === 0) {
     throw new AppError(`No ${entityName} found for id : ${id}`, Status.NOT_FOUND);
   }
 
-  return {
-    data: { id },
-    success: true,
-    message: `${entityName} deleted successfully.`
-  };
+  return { id };
 };

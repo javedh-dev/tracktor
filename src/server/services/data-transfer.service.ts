@@ -1,6 +1,7 @@
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
 import { decrypt, encrypt } from '$server/services/crypto.service';
+import { AppError, Status } from '$server/exceptions/AppError';
 
 type DataImportPayload = {
   encrypted?: boolean;
@@ -58,60 +59,35 @@ export async function buildExportData(shouldEncrypt: unknown, password?: string)
 export async function resolveImportData(
   importData: DataImportPayload,
   password?: string
-): Promise<
-  { success: true; data: ImportableDataSet } | { success: false; message: string; status: number }
-> {
+): Promise<ImportableDataSet> {
   if (!importData || typeof importData !== 'object') {
-    return {
-      success: false,
-      message: 'Invalid import data format',
-      status: 400
-    };
+    throw new AppError('Invalid import data format', Status.BAD_REQUEST);
   }
 
   let dataToImport = importData.data;
 
   if (importData.encrypted) {
     if (!password) {
-      return {
-        success: false,
-        message: 'Password required for encrypted data',
-        status: 400
-      };
+      throw new AppError('Password required for encrypted data', Status.BAD_REQUEST);
     }
 
     if (typeof dataToImport !== 'string') {
-      return {
-        success: false,
-        message: 'Invalid encrypted data format',
-        status: 400
-      };
+      throw new AppError('Invalid encrypted data format', Status.BAD_REQUEST);
     }
 
     try {
       const decryptedData = await decrypt(dataToImport, password);
       dataToImport = JSON.parse(decryptedData);
     } catch {
-      return {
-        success: false,
-        message: 'Failed to decrypt data. Check your password.',
-        status: 400
-      };
+      throw new AppError('Failed to decrypt data. Check your password.', Status.BAD_REQUEST);
     }
   }
 
   if (!dataToImport || typeof dataToImport !== 'object') {
-    return {
-      success: false,
-      message: 'Invalid data structure',
-      status: 400
-    };
+    throw new AppError('Invalid data structure', Status.BAD_REQUEST);
   }
 
-  return {
-    success: true,
-    data: dataToImport as ImportableDataSet
-  };
+  return dataToImport as ImportableDataSet;
 }
 
 export async function importDataSet(dataToImport: ImportableDataSet): Promise<void> {

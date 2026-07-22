@@ -1,13 +1,12 @@
 import type { RequestHandler } from './$types';
-import { json } from '@sveltejs/kit';
 import * as notificationService from '$server/services/notificationService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Notifications GET error:', async () => {
     const { id } = event.params;
     const result = await notificationService.getNotifications(id);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -15,6 +14,6 @@ export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Notifications PUT error:', async () => {
     const { id } = event.params;
     const result = await notificationService.markAllNotificationsAsRead(id);
-    return json(result);
+    return jsonResponse(result);
   });
 };

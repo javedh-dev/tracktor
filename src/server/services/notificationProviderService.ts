@@ -1,4 +1,3 @@
-import type { ApiResponse } from '$lib/response';
 import type {
   CreateNotificationProvider,
   NotificationChannel,
@@ -20,7 +19,7 @@ import { AppError, Status } from '$server/exceptions/AppError';
 import { decryptWithSecret, encryptWithSecret } from '$server/services/crypto.service';
 import { eq } from 'drizzle-orm';
 import { resolveUpdatedConfig } from './notification-provider-service.helper';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type ProviderRecord = typeof schema.notificationProviderTable.$inferSelect;
 
@@ -62,23 +61,21 @@ async function getProviderRecord(providerId: string): Promise<ProviderRecord> {
   return requireRecord(provider, 'Provider not found');
 }
 
-export const getProvidersByUserId = async (): Promise<ApiResponse> => {
+export const getProvidersByUserId = async () => {
   const providers = await db.query.notificationProviderTable.findMany({
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
 
-  return createSuccessResponse(providers.map(parseProvider), 'Providers fetched successfully');
+  return providers.map(parseProvider);
 };
 
-export const getProviderById = async (providerId: string): Promise<ApiResponse> => {
+export const getProviderById = async (providerId: string) => {
   const provider = await getProviderRecord(providerId);
 
-  return createSuccessResponse(parseProvider(provider), 'Provider fetched successfully');
+  return parseProvider(provider);
 };
 
-export const addProvider = async (
-  providerData: CreateNotificationProvider
-): Promise<ApiResponse> => {
+export const addProvider = async (providerData: CreateNotificationProvider) => {
   const validated = createNotificationProviderSchema.parse(providerData);
   const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
 
@@ -97,13 +94,13 @@ export const addProvider = async (
     throw new AppError('Failed to create provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return createSuccessResponse(parseProvider(provider), 'Provider created successfully');
+  return parseProvider(provider);
 };
 
 export const updateProvider = async (
   providerId: string,
   providerData: UpdateNotificationProvider
-): Promise<ApiResponse> => {
+) => {
   const validated = updateNotificationProviderSchema.parse(providerData);
   const existingProvider = await getProviderRecord(providerId);
 
@@ -131,17 +128,17 @@ export const updateProvider = async (
     throw new AppError('Failed to update provider', Status.INTERNAL_SERVER_ERROR);
   }
 
-  return createSuccessResponse(parseProvider(updatedProvider), 'Provider updated successfully');
+  return parseProvider(updatedProvider);
 };
 
-export const deleteProvider = async (providerId: string): Promise<ApiResponse> => {
+export const deleteProvider = async (providerId: string) => {
   await getProviderRecord(providerId);
 
   await db
     .delete(schema.notificationProviderTable)
     .where(eq(schema.notificationProviderTable.id, providerId));
 
-  return createSuccessResponse(null, 'Provider deleted successfully');
+  return { id: providerId };
 };
 
 export const getEnabledProvidersForChannels = async (channels: NotificationChannel[]) => {

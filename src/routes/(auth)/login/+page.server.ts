@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
   // Check if any users exist in the system
   const usersStatus = await getUsersCount();
-  if (!usersStatus.data.hasUsers) {
+  if (!usersStatus.hasUsers) {
     throw redirect(307, '/register');
   }
 

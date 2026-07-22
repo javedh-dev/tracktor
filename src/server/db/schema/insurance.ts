@@ -3,23 +3,29 @@ import * as t from 'drizzle-orm/sqlite-core';
 import { vehicleTable } from './vehicle';
 import { timestamps } from './audit';
 
-export const insuranceTable = table('insurances', {
-  id: t
-    .text()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  vehicleId: t
-    .text()
-    .notNull()
-    .references(() => vehicleTable.id, { onDelete: 'cascade' }),
-  provider: t.text().notNull(),
-  policyNumber: t.text().notNull(),
-  startDate: t.text().notNull(),
-  endDate: t.text(),
-  recurrenceType: t.text().notNull().default('none'),
-  recurrenceInterval: t.integer().notNull().default(1),
-  cost: t.real().notNull(),
-  notes: t.text(),
-  attachment: t.text(),
-  ...timestamps
-});
+export const insuranceTable = table(
+  'insurances',
+  {
+    id: t
+      .text()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    vehicleId: t
+      .text()
+      .notNull()
+      .references(() => vehicleTable.id, { onDelete: 'cascade' }),
+    provider: t.text().notNull(),
+    policyNumber: t.text().notNull(),
+    startDate: t.text().notNull(),
+    endDate: t.text(),
+    recurrenceType: t.text().notNull().default('none'),
+    recurrenceInterval: t.integer().notNull().default(1),
+    cost: t.real().notNull(),
+    notes: t.text(),
+    attachment: t.text(),
+    ...timestamps
+  },
+  (table) => ({
+    vehicleIdIdx: t.index('idx_insurances_vehicle_id').on(table.vehicleId)
+  })
+);

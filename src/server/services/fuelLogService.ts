@@ -2,22 +2,19 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ApiResponse } from '$lib/response';
 import { fuelSchema } from '$lib/domain/fuel';
+import { computeMileagePerWindow, type FuelLogInput } from '$lib/domain/fuel/mileage';
 import {
   validateVehicleExists,
   validateVehicleExistsByLicensePlate,
   performDelete
 } from '../utils/serviceUtils';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type FuelLogPayload = Omit<z.infer<typeof fuelSchema>, 'id' | 'vehicleId'>;
 type FuelLogUpdatePayload = Partial<FuelLogPayload>;
 
-export const addFuelLog = async (
-  vehicleId: string,
-  fuelLogData: FuelLogPayload
-): Promise<ApiResponse> => {
+export const addFuelLog = async (vehicleId: string, fuelLogData: FuelLogPayload) => {
   await validateVehicleExists(vehicleId);
   const fuelLog = await db
     .insert(schema.fuelLogTable)
@@ -27,10 +24,10 @@ export const addFuelLog = async (
       id: undefined
     })
     .returning();
-  return createSuccessResponse(fuelLog[0], 'Fuel log added successfully.');
+  return fuelLog[0];
 };
 
-export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
+export const getFuelLogs = async (vehicleId: string) => {
   // Fetch mileage unit format config
   const mileageFormatConfig = await db.query.configTable.findFirst({
     where: (config, { eq }) => eq(config.key, 'mileageUnitFormat')
@@ -52,89 +49,41 @@ export const getFuelLogs = async (vehicleId: string): Promise<ApiResponse> => {
     orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
   });
 
+  const rawMileagePerWindow = computeMileagePerWindow(fuelLogs as FuelLogInput[]);
+
   const fuelLogsWithMetrics = fuelLogs.map((log, index, arr) => {
     let distanceDriven: number | null = null;
 
     if (index > 0 && !log.missedLast && log.odometer !== null) {
       const previousLog = arr[index - 1];
-
       if (previousLog?.odometer !== null) {
         const distance = log.odometer - previousLog.odometer;
-
         if (distance > 0) {
           distanceDriven = parseFloat(distance.toFixed(2));
         }
       }
     }
 
-    // Calculate mileage
-    // mileage can only be calculated for a full tank and a previous log is needed
-    // also need valid odometer and fuel amount values
-    if (
-      index === 0 ||
-      !log.filled ||
-      log.missedLast ||
-      log.odometer === null ||
-      log.fuelAmount === null
-    ) {
-      return { ...log, distanceDriven, mileage: null };
-    }
+    const rawMileage = rawMileagePerWindow[index];
+    let mileage: number | null = null;
 
-    // find the previous full tank log that serves as a starting point
-    // a missed log acts as a barrier, preventing searching further back
-    let startIndex = -1;
-    for (let i = index - 1; i >= 0; i--) {
-      if (arr[i]?.filled && arr[i]?.odometer !== null) {
-        startIndex = i;
-        break;
+    if (rawMileage !== null) {
+      if (mileageFormat === 'fuel-per-distance') {
+        mileage = (1 / rawMileage) * 100;
+      } else if (mileageFormat === 'uk-mpg' && distanceUnit === 'mile' && volumeUnit === 'liter') {
+        mileage = rawMileage * 4.546;
+      } else {
+        mileage = rawMileage;
       }
-      if (arr[i]?.missedLast) {
-        break;
-      }
+      mileage = parseFloat(mileage.toFixed(2));
     }
 
-    // if there is no valid starting log, mileage can't be calculated
-    if (startIndex === -1) {
-      return { ...log, distanceDriven, mileage: null };
-    }
-
-    const startLog = arr[startIndex]!;
-    const distance = log.odometer - startLog.odometer!;
-
-    // sum all fuel added after the starting log (accounts for partial fills)
-    // skip logs with null fuel amounts
-    let totalFuel = 0;
-    for (let i = startIndex + 1; i <= index; i++) {
-      const fuelAmount = arr[i]!.fuelAmount;
-      if (fuelAmount !== null) {
-        totalFuel += fuelAmount;
-      }
-    }
-
-    // avoid division by zero and ensure distance is positive
-    if (totalFuel === 0 || distance <= 0) {
-      return { ...log, distanceDriven, mileage: null };
-    }
-
-    // Calculate mileage based on format
-    let mileage: number;
-    if (mileageFormat === 'fuel-per-distance') {
-      // Fuel per 100 distance units (e.g., L/100km, gal/100mi)
-      mileage = (totalFuel / distance) * 100;
-    } else if (mileageFormat === 'uk-mpg' && distanceUnit === 'mile' && volumeUnit === 'liter') {
-      // Miles per imperial gallon (mpg)
-      mileage = (distance / totalFuel) * 4.546;
-    } else {
-      // Distance per fuel unit (e.g., km/L, mpg) - default
-      mileage = distance / totalFuel;
-    }
-
-    return { ...log, distanceDriven, mileage: parseFloat(mileage.toFixed(2)) };
+    return { ...log, distanceDriven, mileage };
   });
-  return createSuccessResponse(fuelLogsWithMetrics);
+  return fuelLogsWithMetrics;
 };
 
-export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
+export const getFuelLogById = async (id: string) => {
   const fuelLog = requireRecord(
     await db.query.fuelLogTable.findFirst({
       where: (log, { eq }) => eq(log.id, id)
@@ -142,14 +91,14 @@ export const getFuelLogById = async (id: string): Promise<ApiResponse> => {
     `No Fuel Logs found for id : ${id}`
   );
 
-  return createSuccessResponse(fuelLog);
+  return fuelLog;
 };
 
 export const updateFuelLog = async (
   vehicleId: string,
   id: string,
   fuelLogData: FuelLogUpdatePayload
-): Promise<ApiResponse> => {
+) => {
   // Validate that the fuel log exists and belongs to the specified vehicle
   requireRecord(
     await db.query.fuelLogTable.findFirst({
@@ -165,17 +114,17 @@ export const updateFuelLog = async (
     })
     .where(eq(schema.fuelLogTable.id, id))
     .returning();
-  return createSuccessResponse(updatedLog[0], 'Fuel log updated successfully.');
+  return updatedLog[0];
 };
 
-export const deleteFuelLog = async (id: string): Promise<ApiResponse> => {
+export const deleteFuelLog = async (id: string) => {
   return await performDelete(schema.fuelLogTable, id, 'Fuel log');
 };
 
 export const addFuelLogByLicensePlate = async (
   licensePlate: string,
   fuelLogData: FuelLogPayload
-): Promise<ApiResponse> => {
+) => {
   await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate)
@@ -183,7 +132,7 @@ export const addFuelLogByLicensePlate = async (
   return await addFuelLog(vehicle!.id, fuelLogData);
 };
 
-export const getFuelLogsByLicensePlate = async (licensePlate: string): Promise<ApiResponse> => {
+export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
   await validateVehicleExistsByLicensePlate(licensePlate);
   const vehicle = await db.query.vehicleTable.findFirst({
     where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate)

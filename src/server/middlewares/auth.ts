@@ -19,7 +19,7 @@ export class AuthMiddleware extends BaseMiddleware {
   private async handleAuthentication(event: RequestEvent): Promise<MiddlewareResult> {
     // Check if any users exist in the system
     const usersStatus = await getUsersCount();
-    if (!usersStatus.data.hasUsers) {
+    if (!usersStatus.hasUsers) {
       return {
         response: this.createAuthErrorResponse(
           'No users found. Please create a user account first.',

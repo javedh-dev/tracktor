@@ -13,14 +13,9 @@ export const GET: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID is required');
     }
 
-    const vehicleResult = await vehicleService.getVehicleById(vehicleId);
-    if (!vehicleResult.data) {
-      throw error(404, 'Vehicle not found');
-    }
-    const vehicle = vehicleResult.data;
+    const vehicle = await vehicleService.getVehicleById(vehicleId);
 
-    const logsResult = await maintenanceLogService.getMaintenanceLogs(vehicleId);
-    const maintenanceLogs = logsResult.data || [];
+    const maintenanceLogs = await maintenanceLogService.getMaintenanceLogs(vehicleId);
 
     const vehicleLabel =
       [vehicle.make, vehicle.model].filter(Boolean).join(' ') || 'Unknown Vehicle';

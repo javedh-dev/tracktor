@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as autocompleteService from '$server/services/autocompleteService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Autocomplete GET error:', async () => {
@@ -38,6 +38,6 @@ export const GET: RequestHandler = async (event) => {
         throw error(400, `Unsupported field: ${field}`);
     }
 
-    return json(result);
+    return jsonResponse(result);
   });
 };

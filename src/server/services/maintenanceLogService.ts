@@ -2,10 +2,9 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ApiResponse } from '$lib/response';
 import { maintenanceSchema } from '$lib/domain/maintenance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type MaintenanceLogPayload = Omit<z.infer<typeof maintenanceSchema>, 'id' | 'vehicleId'>;
 type MaintenanceLogUpdatePayload = Partial<MaintenanceLogPayload>;
@@ -13,7 +12,7 @@ type MaintenanceLogUpdatePayload = Partial<MaintenanceLogPayload>;
 export const addMaintenanceLog = async (
   vehicleId: string,
   maintenanceLogData: MaintenanceLogPayload
-): Promise<ApiResponse> => {
+) => {
   await validateVehicleExists(vehicleId);
 
   const maintenanceLog = await db
@@ -24,18 +23,18 @@ export const addMaintenanceLog = async (
       id: undefined
     })
     .returning();
-  return createSuccessResponse(maintenanceLog[0], 'Maintenance log added successfully.');
+  return maintenanceLog[0];
 };
 
-export const getMaintenanceLogs = async (vehicleId: string): Promise<ApiResponse> => {
-  const maintenanceLogs = await db.query.maintenanceLogTable.findMany({
+export const getMaintenanceLogs = async (vehicleId: string) => {
+  const rows = await db.query.maintenanceLogTable.findMany({
     where: (logs, { eq }) => eq(logs.vehicleId, vehicleId),
     orderBy: (logs, { asc }) => [asc(logs.date), asc(logs.odometer)]
   });
-  return createSuccessResponse(maintenanceLogs);
+  return rows.map((r) => ({ ...r, date: new Date(r.date) }));
 };
 
-export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> => {
+export const getMaintenanceLogById = async (id: string) => {
   const maintenanceLog = requireRecord(
     await db.query.maintenanceLogTable.findFirst({
       where: (logs, { eq }) => eq(logs.id, id)
@@ -43,14 +42,14 @@ export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> =>
     `No Maintenance log found for id : ${id}`
   );
 
-  return createSuccessResponse(maintenanceLog);
+  return maintenanceLog;
 };
 
 export const updateMaintenanceLog = async (
   vehicleId: string,
   id: string,
   maintenanceLogData: MaintenanceLogUpdatePayload
-): Promise<ApiResponse> => {
+) => {
   const existingLog = requireRecord(
     await db.query.maintenanceLogTable.findFirst({
       where: (logs, { eq, and }) => and(eq(logs.vehicleId, vehicleId), eq(logs.id, id))
@@ -70,10 +69,10 @@ export const updateMaintenanceLog = async (
       )
     )
     .returning();
-  return createSuccessResponse(updatedLog[0], 'Maintenance log updated successfully.');
+  return updatedLog[0];
 };
 
-export const deleteMaintenanceLog = async (vehicleId: string, id: string): Promise<ApiResponse> => {
+export const deleteMaintenanceLog = async (vehicleId: string, id: string) => {
   await requireRecord(
     await db.query.maintenanceLogTable.findFirst({
       where: (logs, { eq, and }) => and(eq(logs.vehicleId, vehicleId), eq(logs.id, id))

@@ -2,19 +2,15 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ApiResponse } from '$lib/response';
 import { insuranceSchema } from '$lib/domain/insurance';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type InsurancePayload = Omit<z.infer<typeof insuranceSchema>, 'id' | 'vehicleId'>;
 type InsuranceUpdatePayload = Partial<InsurancePayload>;
 
-export const addInsurance = async (
-  vehicleId: string,
-  insuranceData: InsurancePayload
-): Promise<ApiResponse> => {
+export const addInsurance = async (vehicleId: string, insuranceData: InsurancePayload) => {
   await validateVehicleExists(vehicleId);
   const sanitizedInsuranceData = clearFixedEndDate(insuranceData);
   const insurance = await db
@@ -25,10 +21,10 @@ export const addInsurance = async (
       id: undefined
     })
     .returning();
-  return createSuccessResponse(insurance[0], 'Insurance details added successfully.');
+  return insurance[0];
 };
 
-export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => {
+export const getInsurances = async (vehicleId: string) => {
   const insurance = await db.query.insuranceTable.findMany({
     where: (insurances, { eq }) => eq(insurances.vehicleId, vehicleId)
   });
@@ -36,10 +32,10 @@ export const getInsurances = async (vehicleId: string): Promise<ApiResponse> => 
   const normalized = insurance.map((i) =>
     i.recurrenceType !== 'none' ? { ...i, endDate: null } : i
   );
-  return createSuccessResponse(normalized);
+  return normalized;
 };
 
-export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
+export const getInsuranceById = async (id: string) => {
   const insurance = requireRecord(
     await db.query.insuranceTable.findFirst({
       where: (insurances, { eq }) => eq(insurances.id, id)
@@ -47,14 +43,14 @@ export const getInsuranceById = async (id: string): Promise<ApiResponse> => {
     `No insurance found for id: ${id}`
   );
 
-  return createSuccessResponse(insurance);
+  return insurance;
 };
 
 export const updateInsurance = async (
   vehicleId: string,
   id: string,
   insuranceData: InsuranceUpdatePayload
-): Promise<ApiResponse> => {
+) => {
   requireRecord(
     await db.query.insuranceTable.findFirst({
       where: (insurances, { eq, and }) =>
@@ -67,9 +63,9 @@ export const updateInsurance = async (
     .set(clearFixedEndDate(insuranceData))
     .where(eq(schema.insuranceTable.id, id))
     .returning();
-  return createSuccessResponse(updatedInsurance[0], 'Insurance details updated successfully.');
+  return updatedInsurance[0];
 };
 
-export const deleteInsurance = async (id: string): Promise<ApiResponse> => {
+export const deleteInsurance = async (id: string) => {
   return await performDelete(schema.insuranceTable, id, 'Insurance');
 };

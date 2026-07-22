@@ -26,9 +26,12 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
   }
 
   // Fetch configs and vehicles
-  const [configsResult, vehiclesResult] = await Promise.all([getAppConfigs(), getAllVehicles()]);
+  const [configs, vehicles] = await Promise.all([getAppConfigs(), getAllVehicles()]);
 
-  const rawConfigs = configsResult.success ? configsResult.data : [];
+  const rawConfigs = (configs || []).map((c) => ({
+    ...c,
+    description: c.description ?? undefined
+  }));
   const configsMap: Record<string, boolean | string> = {};
   if (Array.isArray(rawConfigs)) {
     rawConfigs.forEach((item: { key: string; value?: string }) => {
@@ -42,6 +45,6 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
     user,
     rawConfigs,
     configs: configsMap,
-    vehicles: vehiclesResult.success ? vehiclesResult.data : []
+    vehicles: vehicles || []
   };
 };

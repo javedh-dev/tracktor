@@ -1,6 +1,18 @@
 import { error, json, type RequestEvent } from '@sveltejs/kit';
+import type { ApiResponse } from '$lib/response';
 import { z, ZodError } from 'zod';
 import { AppError } from '$server/exceptions/AppError';
+import logger from '$server/config/logger';
+
+export function jsonResponse<T>(
+  data: T,
+  message?: string,
+  init?: Parameters<typeof json>[1]
+): Response {
+  const response: ApiResponse<T> = { success: true, data };
+  if (message) response.message = message;
+  return json(response, init);
+}
 
 export function rethrowRouteError(err: unknown, fallbackMessage = 'Internal server error'): never {
   if (err instanceof ZodError) {
@@ -46,27 +58,7 @@ export async function withRouteErrorHandling<T>(
   try {
     return await handler();
   } catch (err) {
-    console.error(label, err);
+    logger.error(label, err);
     rethrowRouteError(err, fallbackMessage);
-  }
-}
-
-export async function withJsonErrorHandling<T>(
-  label: string,
-  handler: () => Promise<T>,
-  message: string,
-  status = 500
-): Promise<T | Response> {
-  try {
-    return await handler();
-  } catch (err) {
-    console.error(label, err);
-    return json(
-      {
-        success: false,
-        message
-      },
-      { status }
-    );
   }
 }

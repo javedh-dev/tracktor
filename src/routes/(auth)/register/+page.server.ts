@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
   // If users already exist, redirect to login
   const usersStatus = await getUsersCount();
-  if (usersStatus.data.hasUsers) {
+  if (usersStatus.hasUsers) {
     throw redirect(307, '/login');
   }
 

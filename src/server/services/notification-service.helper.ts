@@ -18,6 +18,19 @@ export type GeneratedNotification = {
   notificationKey: string;
 };
 
+export const NOTIFICATION_TYPE_META: Record<
+  NotificationType,
+  { channel: NotificationChannel; label: string; color: string }
+> = {
+  reminder: { channel: 'reminder', label: 'Reminders', color: '#2563eb' },
+  alert: { channel: 'alert', label: 'Alerts', color: '#dc2626' },
+  information: { channel: 'information', label: 'Information', color: '#0284c7' },
+  maintenance: { channel: 'information', label: 'Maintenance', color: '#7c3aed' },
+  insurance: { channel: 'alert', label: 'Insurance', color: '#059669' },
+  pollution: { channel: 'alert', label: 'Pollution Certificate', color: '#0891b2' },
+  registration: { channel: 'alert', label: 'Registration', color: '#ea580c' }
+};
+
 export function toDateOnly(value: Date): Date {
   return new Date(value.getFullYear(), value.getMonth(), value.getDate());
 }
@@ -68,6 +81,15 @@ export function getDaysUntil(targetDate: Date): number {
   const target = toDateOnly(targetDate);
 
   return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function formatDate(dateString: string | Date): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 }
 
 export function formatExpiryMessage(

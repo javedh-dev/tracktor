@@ -1,14 +1,13 @@
 import type { RequestHandler } from './$types';
-import { json } from '@sveltejs/kit';
 import * as pollutionCertificateService from '$server/services/pollutionCertificateService';
 import { pollutionCertificateSchema } from '$lib/domain/pucc';
-import { parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('PUCC GET error:', async () => {
     const { puccId } = event.params;
     const result = await pollutionCertificateService.getPollutionCertificateById(puccId);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -27,7 +26,7 @@ export const PUT: RequestHandler = async (event) => {
       puccId,
       payload
     );
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
@@ -35,6 +34,6 @@ export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('PUCC DELETE error:', async () => {
     const { puccId } = event.params;
     const result = await pollutionCertificateService.deletePollutionCertificate(puccId);
-    return json(result);
+    return jsonResponse(result);
   });
 };

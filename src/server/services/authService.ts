@@ -4,7 +4,6 @@ import { Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
-import { type ApiResponse } from '$lib/response';
 import {
   generateSessionToken,
   createSession,
@@ -12,9 +11,9 @@ import {
   invalidateSession,
   type User
 } from '../utils/session';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
-export const createUser = async (username: string, password: string): Promise<ApiResponse> => {
+export const createUser = async (username: string, password: string) => {
   // Check if user already exists
   const existingUser = await db.query.usersTable.findFirst({
     where: (users, { eq }) => eq(users.username, username)
@@ -33,7 +32,7 @@ export const createUser = async (username: string, password: string): Promise<Ap
     passwordHash
   });
 
-  return createSuccessResponse({ userId, username }, 'User created successfully');
+  return { userId, username };
 };
 
 export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
@@ -59,7 +58,7 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
   }
 };
 
-export const loginUser = async (username: string, password: string): Promise<ApiResponse> => {
+export const loginUser = async (username: string, password: string) => {
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.username, username)
@@ -76,21 +75,18 @@ export const loginUser = async (username: string, password: string): Promise<Api
   const sessionToken = generateSessionToken();
   const session = await createSession(sessionToken, user.id);
 
-  return createSuccessResponse(
-    {
-      sessionToken,
-      user: {
-        id: user.id,
-        username: user.username
-      }
-    },
-    'Login successful'
-  );
+  return {
+    sessionToken,
+    user: {
+      id: user.id,
+      username: user.username
+    }
+  };
 };
 
-export const logoutUser = async (sessionId: string): Promise<ApiResponse> => {
+export const logoutUser = async (sessionId: string) => {
   await invalidateSession(sessionId);
-  return createSuccessResponse(undefined, 'Logout successful');
+  return undefined;
 };
 
 export const validateSession = async (sessionToken: string): Promise<{ user: User | null }> => {
@@ -98,18 +94,18 @@ export const validateSession = async (sessionToken: string): Promise<{ user: Use
   return { user: result.user };
 };
 
-export const getUsersCount = async (): Promise<ApiResponse> => {
+export const getUsersCount = async () => {
   const users = await db.select().from(schema.usersTable);
-  return createSuccessResponse({
+  return {
     count: users.length,
     hasUsers: users.length > 0
-  });
+  };
 };
 
 export const updateUserProfile = async (
   userId: string,
   data: { username?: string; currentPassword?: string; newPassword?: string }
-): Promise<ApiResponse> => {
+) => {
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.id, userId)
@@ -147,13 +143,10 @@ export const updateUserProfile = async (
   }
 
   if (Object.keys(updates).length === 0) {
-    return createSuccessResponse({ id: user.id, username: user.username }, 'No changes to update');
+    return { id: user.id, username: user.username };
   }
 
   await db.update(schema.usersTable).set(updates).where(eq(schema.usersTable.id, userId));
 
-  return createSuccessResponse(
-    { id: user.id, username: updates.username || user.username },
-    'Profile updated successfully'
-  );
+  return { id: user.id, username: updates.username || user.username };
 };

@@ -2,11 +2,10 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ApiResponse } from '$lib/response';
 import { pollutionCertificateSchema } from '$lib/domain/pucc';
 import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
 import { clearFixedEndDate } from './domain-payload.helper';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { requireRecord } from './service-response.helper';
 
 type PollutionCertificatePayload = Omit<
   z.infer<typeof pollutionCertificateSchema>,
@@ -17,10 +16,10 @@ type PollutionCertificateUpdatePayload = Partial<PollutionCertificatePayload>;
 export const addPollutionCertificate = async (
   vehicleId: string,
   pollutionCertificateData: PollutionCertificatePayload
-): Promise<ApiResponse> => {
+) => {
   await validateVehicleExists(vehicleId);
   const sanitizedPayload = clearFixedEndDate(pollutionCertificateData);
-  const pollutionCertificate = await db
+  const [pollutionCertificate] = await db
     .insert(schema.pollutionCertificateTable)
     .values({
       ...sanitizedPayload,
@@ -28,23 +27,20 @@ export const addPollutionCertificate = async (
       id: undefined
     })
     .returning();
-  return createSuccessResponse(
-    pollutionCertificate[0],
-    'Pollution certificate added successfully.'
-  );
+  return pollutionCertificate;
 };
 
-export const getPollutionCertificates = async (vehicleId: string): Promise<ApiResponse> => {
+export const getPollutionCertificates = async (vehicleId: string) => {
   const pollutionCertificates = await db.query.pollutionCertificateTable.findMany({
     where: (certificates, { eq }) => eq(certificates.vehicleId, vehicleId)
   });
   const normalized = pollutionCertificates.map((c) =>
     c.recurrenceType !== 'none' ? { ...c, expiryDate: null } : c
   );
-  return createSuccessResponse(normalized);
+  return normalized;
 };
 
-export const getPollutionCertificateById = async (id: string): Promise<ApiResponse> => {
+export const getPollutionCertificateById = async (id: string) => {
   const pollutionCertificate = requireRecord(
     await db.query.pollutionCertificateTable.findFirst({
       where: (certificates, { eq }) => eq(certificates.id, id)
@@ -52,14 +48,14 @@ export const getPollutionCertificateById = async (id: string): Promise<ApiRespon
     `No PUCC found for id : ${id}`
   );
 
-  return createSuccessResponse(pollutionCertificate);
+  return pollutionCertificate;
 };
 
 export const updatePollutionCertificate = async (
   vehicleId: string,
   id: string,
   pollutionCertificateData: PollutionCertificateUpdatePayload
-): Promise<ApiResponse> => {
+) => {
   requireRecord(
     await db.query.pollutionCertificateTable.findFirst({
       where: (certificates, { eq, and }) =>
@@ -73,12 +69,9 @@ export const updatePollutionCertificate = async (
     .set(clearFixedEndDate(pollutionCertificateData))
     .where(eq(schema.pollutionCertificateTable.id, id))
     .returning();
-  return createSuccessResponse(
-    updatedCertificate[0],
-    'Pollution certificate updated successfully.'
-  );
+  return updatedCertificate[0];
 };
 
-export const deletePollutionCertificate = async (id: string): Promise<ApiResponse> => {
+export const deletePollutionCertificate = async (id: string) => {
   return await performDelete(schema.pollutionCertificateTable, id, 'Pollution certificate');
 };

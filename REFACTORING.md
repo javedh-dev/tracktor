@@ -254,8 +254,12 @@ All verified zero-references:
 - [x] Plan document created
 - [x] Phase 0 — Critical bug fixes (commit 2c1f23f)
 - [x] Phase 1 — Dead code deletion (commit 07dfdf3)
-- [x] Phase 2 — Validation unification (commit <pending>)
-- [ ] Phase 3 — Server services + notification redesign
+- [x] Phase 2 — Validation unification (commit 8b2ea91)
+- [x] Phase 3.1 — One error convention
+- [x] Phase 3.2 — Mileage/odometer engine
+- [x] Phase 3.3 — Notification sync redesign
+- [ ] Phase 3.4 — CRUD skeleton + config service
+- [ ] Phase 3.5 — Auth middleware & misc
 - [ ] Phase 4 — Client factories
 - [ ] Phase 5 — Settings & component decomposition
 - [ ] Phase 6 — DB & infra cleanup
