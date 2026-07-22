@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Architecture Overview"
+openwiki_generated: true
+---
+
 # Architecture Overview
 
 Tracktor is a conventional SvelteKit application with the server-side rendering path used for bootstrapping authenticated state, and API routes used for mutations. Business logic is split between client-side stores/services and server-side services that wrap Drizzle ORM queries.

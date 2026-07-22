@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Testing Guidance"
+openwiki_generated: true
+---
+
 # Testing Guidance
 
 Tracktor uses [Vitest](https://vitest.dev/) with [jsdom](https://github.com/jsdom/jsdom) for unit and component testing. Coverage is provided by `@vitest/coverage-v8`.

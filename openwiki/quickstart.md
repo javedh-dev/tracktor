@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Tracktor — OpenWiki Quickstart"
+openwiki_generated: true
+---
+
 # Tracktor — OpenWiki Quickstart
 
 Tracktor is an open-source vehicle management web application. It lets a single user or household track fuel consumption, maintenance history, insurance and pollution-under-control (PUCC) certificates, reminders, and dashboard analytics for one or more vehicles.

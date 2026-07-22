@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Authentication Workflow"
+openwiki_generated: true
+---
+
 # Authentication Workflow
 
 Tracktor uses username/password authentication with bcrypt-hashed passwords and database-backed sessions. Authentication can be disabled entirely via `TRACKTOR_DISABLE_AUTH` for local/demo use.

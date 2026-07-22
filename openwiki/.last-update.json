@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-07-12T10:54:08.104Z",
-  "command": "init",
-  "gitHead": "0674858e817c0cca3a43c1c970c4b8528a7f8a30",
-  "model": "kimi-k2.7-code"
+  "updatedAt": "2026-07-22T08:44:41.278Z",
+  "command": "update",
+  "gitHead": "965cebd3b3a224b15e1f7d6d724ece1eb49899ee",
+  "model": "deepseek-v4-flash-free"
 }
