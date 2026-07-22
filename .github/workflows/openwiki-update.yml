@@ -19,7 +19,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  update:
+  openwiki-update:
     if: github.ref_name == 'dev'
     runs-on: ubuntu-latest
     steps:
