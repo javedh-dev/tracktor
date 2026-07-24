@@ -37,7 +37,7 @@
   const NAV_ITEMS: NavItem[] = [
     {
       label: 'Dashboard',
-      href: '/dashboard/overview',
+      href: '/dashboard',
       icon: LayoutDashboard
     },
     {
@@ -47,31 +47,31 @@
     },
     {
       label: m.nav_fuel_logs(),
-      href: '/dashboard/fuel',
+      href: '/fuel',
       icon: Fuel,
       featureKey: 'featureFuelLog'
     },
     {
       label: m.nav_maintenance(),
-      href: '/dashboard/maintenance',
+      href: '/maintenance',
       icon: Wrench,
       featureKey: 'featureMaintenance'
     },
     {
       label: m.nav_reminders(),
-      href: '/dashboard/reminders',
+      href: '/reminders',
       icon: Bell,
       featureKey: 'featureReminders'
     },
     {
       label: m.nav_pollution(),
-      href: '/dashboard/pollution',
+      href: '/pollution',
       icon: BadgeInfo,
       featureKey: 'featurePucc'
     },
     {
       label: m.nav_insurance(),
-      href: '/dashboard/insurance',
+      href: '/insurance',
       icon: Shield,
       featureKey: 'featureInsurance'
     }
