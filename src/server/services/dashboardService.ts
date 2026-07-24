@@ -1,6 +1,4 @@
-import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq, sql, and, gte, lte } from 'drizzle-orm';
 
 const EXPIRING_SOON_DAYS = 30;
 
@@ -51,10 +49,24 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     allInsurancesForExpense
   ] = await Promise.all([
     db.query.vehicleTable.findMany({
-      columns: { id: true, make: true, model: true, licensePlate: true, image: true, odometer: true }
+      columns: {
+        id: true,
+        make: true,
+        model: true,
+        licensePlate: true,
+        image: true,
+        odometer: true
+      }
     }),
     db.query.fuelLogTable.findMany({
-      columns: { fuelAmount: true, cost: true, filled: true, odometer: true, date: true, vehicleId: true }
+      columns: {
+        fuelAmount: true,
+        cost: true,
+        filled: true,
+        odometer: true,
+        date: true,
+        vehicleId: true
+      }
     }),
     db.query.maintenanceLogTable.findMany({
       columns: { cost: true, odometer: true, vehicleId: true }
@@ -67,7 +79,12 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     }),
     db.query.reminderTable.findMany({
       columns: {
-        id: true, vehicleId: true, type: true, note: true, dueDate: true, isCompleted: true
+        id: true,
+        vehicleId: true,
+        type: true,
+        note: true,
+        dueDate: true,
+        isCompleted: true
       }
     }),
     db.query.insuranceTable.findMany({
@@ -154,13 +171,19 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
 
     const hasExpiredPucc = puccDate && new Date(puccDate) < today;
     const hasExpiredInsurance = insDate && new Date(insDate) < today;
-    const hasExpiringPucc = puccDate && new Date(puccDate) <= thirtyDaysFromNow && new Date(puccDate) >= today;
-    const hasExpiringInsurance = insDate && new Date(insDate) <= thirtyDaysFromNow && new Date(insDate) >= today;
+    const hasExpiringPucc =
+      puccDate && new Date(puccDate) <= thirtyDaysFromNow && new Date(puccDate) >= today;
+    const hasExpiringInsurance =
+      insDate && new Date(insDate) <= thirtyDaysFromNow && new Date(insDate) >= today;
     const hasOverdueReminder = vehicleReminders.some(
       (r) => !r.isCompleted && r.dueDate && new Date(r.dueDate) < today
     );
     const hasUpcomingReminder = vehicleReminders.some(
-      (r) => !r.isCompleted && r.dueDate && new Date(r.dueDate) <= thirtyDaysFromNow && new Date(r.dueDate) >= today
+      (r) =>
+        !r.isCompleted &&
+        r.dueDate &&
+        new Date(r.dueDate) <= thirtyDaysFromNow &&
+        new Date(r.dueDate) >= today
     );
 
     if (hasExpiredPucc || hasExpiredInsurance || hasOverdueReminder) {

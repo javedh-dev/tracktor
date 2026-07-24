@@ -13,19 +13,24 @@
   import Tractor from '@lucide/svelte/icons/tractor';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
-  import { feature_maintenance_disabled_title, feature_maintenance_disabled_hint } from '$lib/paraglide/messages/_index.js';
+  import {
+    feature_maintenance_disabled_title,
+    feature_maintenance_disabled_hint
+  } from '$lib/paraglide/messages/_index.js';
 
   onMount(() => {
     if (vehicleStore.selectedId) {
-      maintenanceLogStore.refreshMaintenanceLogs();
+      maintenanceStore.refreshMaintenanceLogs();
     }
   });
 
   const vehicleOptions = $derived(
-    vehicleStore.vehicles?.map((v) => ({
-      value: v.id,
-      label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
-    })) ?? []
+    (vehicleStore.vehicles ?? [])
+      .filter((v) => v.id != null)
+      .map((v) => ({
+        value: v.id!,
+        label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
+      }))
   );
 
   let selectedVehicleId = $state(vehicleStore.selectedId ?? '');
@@ -45,9 +50,6 @@
     return Math.max(...logs.map((l) => l.odometer || 0));
   });
   const nextServiceOdometer = $derived(latestOdometer > 0 ? latestOdometer + 5000 : 0);
-  const selectedVehicle = $derived(
-    vehicleStore.vehicles?.find((v) => v.id === selectedVehicleId)
-  );
 </script>
 
 <FeatureGate feature={Features.MAINTENANCE}>
@@ -98,7 +100,9 @@
   {#snippet fallback()}
     <div class="flex h-64 items-center justify-center rounded-lg border border-dashed">
       <div class="text-center">
-        <p class="text-muted-foreground text-lg font-medium">{feature_maintenance_disabled_title()}</p>
+        <p class="text-muted-foreground text-lg font-medium">
+          {feature_maintenance_disabled_title()}
+        </p>
         <p class="text-muted-foreground text-sm">{feature_maintenance_disabled_hint()}</p>
       </div>
     </div>

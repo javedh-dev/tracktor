@@ -21,7 +21,7 @@
     backgroundColor = 'var(--muted)',
     showLabel = true,
     label = undefined,
-    children = undefined,
+    children = undefined
   }: Props = $props();
 
   const center = $derived(size / 2);
@@ -72,11 +72,14 @@
     </div>
   {:else if showLabel}
     <div class="absolute inset-0 flex flex-col items-center justify-center">
-      <span class="text-foreground text-lg font-bold leading-none" style="font-size: {size * 0.22}px;">
+      <span
+        class="text-foreground text-lg leading-none font-bold"
+        style="font-size: {size * 0.22}px;"
+      >
         {Math.round(value)}%
       </span>
       {#if label}
-        <span class="text-muted-foreground mt-0.5 text-xs font-medium leading-none">
+        <span class="text-muted-foreground mt-0.5 text-xs leading-none font-medium">
           {label}
         </span>
       {/if}

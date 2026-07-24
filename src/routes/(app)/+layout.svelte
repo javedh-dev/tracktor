@@ -55,10 +55,7 @@
 <Sidebar.SidebarProvider bind:open={sidebarOpen}>
   <AppSidebar />
   <Sidebar.SidebarInset>
-    <div
-      id="app-topbar"
-      class="bg-background flex items-center gap-2 border-b px-4 py-2"
-    >
+    <div id="app-topbar" class="bg-background flex items-center gap-2 border-b px-4 py-2">
       <Sidebar.SidebarTrigger />
       <div class="flex flex-1 items-center justify-end gap-2">
         <Notifications />

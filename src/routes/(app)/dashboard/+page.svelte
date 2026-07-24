@@ -11,7 +11,6 @@
   import DollarSign from '@lucide/svelte/icons/dollar-sign';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import Bell from '@lucide/svelte/icons/bell';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import ChartBar from '@lucide/svelte/icons/chart-bar';
   import { dashboardStore } from '$stores/dashboard.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
@@ -23,7 +22,6 @@
   import Button from '$ui/button/button.svelte';
   import { goto } from '$app/navigation';
   import * as m from '$lib/paraglide/messages';
-  import { env } from '$lib/config/env';
 
   onMount(() => {
     dashboardStore.fetchSummary();
@@ -43,7 +41,11 @@
     summary
       ? [
           { name: 'Fuel', value: summary.expenseBreakdown.fuel, color: 'var(--chart-1)' },
-          { name: 'Maintenance', value: summary.expenseBreakdown.maintenance, color: 'var(--chart-2)' },
+          {
+            name: 'Maintenance',
+            value: summary.expenseBreakdown.maintenance,
+            color: 'var(--chart-2)'
+          },
           { name: 'Insurance', value: summary.expenseBreakdown.insurance, color: 'var(--chart-3)' }
         ].filter((d) => d.value > 0)
       : []
@@ -53,7 +55,11 @@
     summary
       ? [
           { name: 'Valid', value: summary.puccStatus.valid, color: 'var(--chart-1)' },
-          { name: 'Expiring Soon', value: summary.puccStatus.expiringSoon, color: 'var(--chart-4)' },
+          {
+            name: 'Expiring Soon',
+            value: summary.puccStatus.expiringSoon,
+            color: 'var(--chart-4)'
+          },
           { name: 'Expired', value: summary.puccStatus.expired, color: 'var(--chart-5)' },
           { name: 'N/A', value: summary.puccStatus.notAvailable, color: 'var(--muted)' }
         ].filter((d) => d.value > 0)
@@ -93,7 +99,11 @@
     <StatCard
       icon={Route}
       label="Total Distance"
-      value={loading ? '...' : totalDistance > 0 ? `${(totalDistance / 1000).toFixed(1)}k km` : '--'}
+      value={loading
+        ? '...'
+        : totalDistance > 0
+          ? `${(totalDistance / 1000).toFixed(1)}k km`
+          : '--'}
       color="bg-violet-500/10 text-violet-500"
     />
     <StatCard
@@ -118,12 +128,7 @@
     </div>
 
     <!-- Expenses Donut -->
-    <DonutChart
-      data={expenseDonutData}
-      title="Expenses Overview"
-      loading={loading}
-      height={280}
-    />
+    <DonutChart data={expenseDonutData} title="Expenses Overview" {loading} height={280} />
   </div>
 
   <!-- My Vehicles & Health Section -->
@@ -134,15 +139,18 @@
       {#if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {#each vehicleStore.vehicles as vehicle (vehicle.id)}
-            <VehicleCard {vehicle} onclick={() => vehicleStore.selectedId = vehicle.id} />
+            <VehicleCard
+              {vehicle}
+              onclick={() => (vehicleStore.selectedId = vehicle.id!)}
+              onkeydown={() => {}}
+            />
           {/each}
-          <Button
-            variant="dashed"
-            class="border-muted-foreground/30 text-muted-foreground hover:text-foreground flex h-full min-h-[120px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed"
+          <button
+            class="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex h-full min-h-[120px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-transparent transition-colors"
             onclick={() => sheetStore.openSheet(VehicleForm, m.app_add_vehicle())}
           >
             <LabelWithIcon icon={CirclePlus} label={m.app_add_vehicle()} />
-          </Button>
+          </button>
         </div>
       {:else}
         <div class="text-muted-foreground flex h-40 items-center justify-center">
@@ -167,21 +175,21 @@
             <div class="w-full space-y-2">
               <div class="flex items-center justify-between text-sm">
                 <span class="flex items-center gap-2">
-                  <span class="bg-green-500 inline-block size-2.5 rounded-full"></span>
+                  <span class="inline-block size-2.5 rounded-full bg-green-500"></span>
                   Good
                 </span>
                 <span class="font-medium">{summary.vehicleHealth.good}</span>
               </div>
               <div class="flex items-center justify-between text-sm">
                 <span class="flex items-center gap-2">
-                  <span class="bg-amber-500 inline-block size-2.5 rounded-full"></span>
+                  <span class="inline-block size-2.5 rounded-full bg-amber-500"></span>
                   Attention
                 </span>
                 <span class="font-medium">{summary.vehicleHealth.attention}</span>
               </div>
               <div class="flex items-center justify-between text-sm">
                 <span class="flex items-center gap-2">
-                  <span class="bg-red-500 inline-block size-2.5 rounded-full"></span>
+                  <span class="inline-block size-2.5 rounded-full bg-red-500"></span>
                   Needs Action
                 </span>
                 <span class="font-medium">{summary.vehicleHealth.needsAction}</span>
@@ -196,12 +204,7 @@
       <!-- PUC Status -->
       <div class="bg-card rounded-xl border p-4">
         <h3 class="mb-4 text-lg font-semibold">PUC Status</h3>
-        <DonutChart
-          data={puccDonutData}
-          loading={loading}
-          height={200}
-          innerRadius={50}
-        />
+        <DonutChart data={puccDonutData} {loading} height={200} innerRadius={50} />
       </div>
     </div>
   </div>
@@ -210,9 +213,7 @@
   <div class="bg-card rounded-xl border p-4">
     <div class="mb-4 flex items-center justify-between">
       <h3 class="text-lg font-semibold">Upcoming Reminders</h3>
-      <Button variant="ghost" size="sm" onclick={() => goto('/reminders')}>
-        View All
-      </Button>
+      <Button variant="ghost" size="sm" onclick={() => goto('/reminders')}>View All</Button>
     </div>
     {#if summary && summary.upcomingReminders.length > 0}
       <div class="divide-y">
@@ -229,7 +230,11 @@
               <p class="text-muted-foreground truncate text-xs">{reminder.note || reminder.type}</p>
             </div>
             <StatusPill
-              status={reminder.daysUntilDue <= 7 ? 'expiring_soon' : reminder.daysUntilDue <= 0 ? 'expired' : 'valid'}
+              status={reminder.daysUntilDue <= 7
+                ? 'expiring_soon'
+                : reminder.daysUntilDue <= 0
+                  ? 'expired'
+                  : 'valid'}
               label={reminder.daysUntilDue === 0 ? 'Today' : `in ${reminder.daysUntilDue}d`}
             />
           </div>
@@ -243,10 +248,14 @@
   </div>
 
   <!-- Bottom CTA -->
-  <div class="bg-primary/5 border-primary/20 flex items-center justify-between rounded-xl border p-6">
+  <div
+    class="bg-primary/5 border-primary/20 flex items-center justify-between rounded-xl border p-6"
+  >
     <div>
       <h3 class="text-lg font-semibold">Get detailed insights</h3>
-      <p class="text-muted-foreground text-sm">View comprehensive reports and analytics for your fleet</p>
+      <p class="text-muted-foreground text-sm">
+        View comprehensive reports and analytics for your fleet
+      </p>
     </div>
     <Button variant="default" onclick={() => goto('/reports')} class="shrink-0">
       <LabelWithIcon icon={ChartBar} label="View Reports" />

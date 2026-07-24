@@ -8,7 +8,6 @@
   import Gauge from '@lucide/svelte/icons/gauge';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
-  import { chartStore } from '$stores/chart.svelte';
   import MileageChart from '$feature/overview/MileageChart.svelte';
   import CostChart from '$feature/overview/CostChart.svelte';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
@@ -16,7 +15,10 @@
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
   import Tractor from '@lucide/svelte/icons/tractor';
-  import { feature_fuel_disabled_title, feature_fuel_disabled_hint } from '$lib/paraglide/messages/_index.js';
+  import {
+    feature_fuel_disabled_title,
+    feature_fuel_disabled_hint
+  } from '$lib/paraglide/messages/_index.js';
 
   onMount(() => {
     if (vehicleStore.selectedId) {
@@ -25,10 +27,12 @@
   });
 
   const vehicleOptions = $derived(
-    vehicleStore.vehicles?.map((v) => ({
-      value: v.id,
-      label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
-    })) ?? []
+    (vehicleStore.vehicles ?? [])
+      .filter((v) => v.id != null)
+      .map((v) => ({
+        value: v.id!,
+        label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
+      }))
   );
 
   let selectedVehicleId = $state(vehicleStore.selectedId ?? '');

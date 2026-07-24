@@ -11,6 +11,8 @@
   import Bell from '@lucide/svelte/icons/bell';
   import BadgeInfo from '@lucide/svelte/icons/badge-info';
   import Shield from '@lucide/svelte/icons/shield';
+  import Banknote from '@lucide/svelte/icons/banknote';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Settings from '@lucide/svelte/icons/settings';
   import LogOut from '@lucide/svelte/icons/log-out';
   import UserCog from '@lucide/svelte/icons/user-cog';
@@ -74,20 +76,17 @@
       href: '/insurance',
       icon: Shield,
       featureKey: 'featureInsurance'
+    },
+    {
+      label: 'Expenses',
+      href: '/expenses',
+      icon: Banknote
+    },
+    {
+      label: 'Reports',
+      href: '/reports',
+      icon: BarChart3
     }
-    // TODO: Optional nav items (enable when routes are ready)
-    // {
-    //   label: 'Expenses',
-    //   href: '/dashboard/expenses',
-    //   icon: Banknote,
-    //   featureKey: 'featureExpenses'
-    // },
-    // {
-    //   label: 'Reports',
-    //   href: '/dashboard/reports',
-    //   icon: BarChart3,
-    //   featureKey: 'featureReports'
-    // }
   ];
 
   const visibleNavItems = $derived(
@@ -97,9 +96,7 @@
     })
   );
 
-  const userInitial = $derived(
-    authStore.user?.username?.charAt(0)?.toUpperCase() || 'U'
-  );
+  const userInitial = $derived(authStore.user?.username?.charAt(0)?.toUpperCase() || 'U');
 
   function handleNavClick(href: string) {
     goto(href, { noScroll: true, keepFocus: true });
@@ -178,12 +175,7 @@
             </div>
           </Sidebar.MenuButton>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          side="right"
-          align="end"
-          sideOffset={4}
-          class="w-56 rounded-lg"
-        >
+        <DropdownMenu.Content side="right" align="end" sideOffset={4} class="w-56 rounded-lg">
           <DropdownMenu.Label class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar.Root size="sm" class="size-8 rounded-lg">
@@ -201,11 +193,7 @@
           <DropdownMenu.Separator />
           <DropdownMenu.Item
             onclick={() => {
-              sheetStore.openSheet(
-                ProfileForm,
-                m.profile_sheet_title(),
-                m.profile_sheet_desc()
-              );
+              sheetStore.openSheet(ProfileForm, m.profile_sheet_title(), m.profile_sheet_desc());
             }}
             disabled={authStore.isAuthDisabled || env.DEMO_MODE}
           >

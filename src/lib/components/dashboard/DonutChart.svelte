@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Chart from '$ui/chart/index.js';
-  import { PieChart, type PieChartProps } from 'layerchart';
+  import { PieChart } from 'layerchart';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 
   interface DonutDataPoint {
@@ -48,9 +48,7 @@
   const chartStyle = $derived(`height: ${height}px`);
 </script>
 
-<div
-  class="donut-chart bg-secondary lg:bg-background/50 relative rounded-lg px-4 pt-2 pb-6 lg:p-6"
->
+<div class="donut-chart bg-secondary lg:bg-background/50 relative rounded-lg px-4 pt-2 pb-6 lg:p-6">
   {#if title}
     <div class="mb-4 font-bold">
       <span>{title}</span>
@@ -60,7 +58,10 @@
   {#if loading}
     <div class="flex flex-col items-center gap-6" style={chartStyle}>
       <div class="flex flex-1 items-center justify-center">
-        <Skeleton class="rounded-full" style="width: {Math.min(height * 0.6, 220)}px; height: {Math.min(height * 0.6, 220)}px" />
+        <Skeleton
+          class="rounded-full"
+          style="width: {Math.min(height * 0.6, 220)}px; height: {Math.min(height * 0.6, 220)}px"
+        />
       </div>
       <div class="flex flex-wrap justify-center gap-4">
         {#each [0, 1, 2] as i (i)}
@@ -90,9 +91,8 @@
         {#snippet tooltip()}
           <Chart.Tooltip indicator="dot">
             {#snippet formatter({ value, name })}
-              {@const pct = total > 0 && typeof value === 'number'
-                ? roundToDec((value / total) * 100, 1)
-                : 0}
+              {@const pct =
+                total > 0 && typeof value === 'number' ? roundToDec((value / total) * 100, 1) : 0}
               <span class="text-muted-foreground">{name}</span>
               <span class="font-mono font-medium tabular-nums">
                 {typeof value === 'number' ? value.toLocaleString() : value} ({pct}%)
@@ -104,7 +104,9 @@
     </Chart.Container>
 
     {#if showLegend && itemsWithPercent.length > 0}
-      <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+      <div
+        class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3"
+      >
         {#each itemsWithPercent as item (item.name)}
           <div class="flex items-center gap-2 text-sm">
             <span

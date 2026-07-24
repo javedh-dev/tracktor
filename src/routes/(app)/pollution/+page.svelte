@@ -10,7 +10,10 @@
   import { apiClient } from '$lib/helper/api.helper';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
-  import { feature_pucc_disabled_title, feature_pucc_disabled_hint } from '$lib/paraglide/messages/_index.js';
+  import {
+    feature_pucc_disabled_title,
+    feature_pucc_disabled_hint
+  } from '$lib/paraglide/messages/_index.js';
 
   interface PucRecord {
     vehicleId: string;
@@ -108,8 +111,9 @@
       <div class="flex gap-2">
         {#each tabs as tab}
           <button
-            onclick={() => statusFilter = tab.id}
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {statusFilter === tab.id
+            onclick={() => (statusFilter = tab.id)}
+            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {statusFilter ===
+            tab.id
               ? 'bg-primary text-primary-foreground'
               : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}"
           >
@@ -140,7 +144,8 @@
                 <tr class="hover:bg-secondary/30">
                   <td class="px-4 py-3 font-medium">{record.vehicleName}</td>
                   <td class="text-muted-foreground px-4 py-3">{record.licensePlate ?? '--'}</td>
-                  <td class="text-muted-foreground px-4 py-3">{record.certificateNumber ?? '--'}</td>
+                  <td class="text-muted-foreground px-4 py-3">{record.certificateNumber ?? '--'}</td
+                  >
                   <td class="text-muted-foreground px-4 py-3">
                     {record.expiryDate ? new Date(record.expiryDate).toLocaleDateString() : '--'}
                   </td>

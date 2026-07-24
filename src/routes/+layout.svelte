@@ -6,14 +6,13 @@
   import { Toaster } from '$ui/sonner';
   import { page } from '$app/state';
   import { onMount } from 'svelte';
-  import { env } from '$lib/config/env';
   import { toast } from 'svelte-sonner';
   import { configStore } from '$lib/stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { app_name } from '$lib/paraglide/messages/_index.js';
   import { app_new_update_available } from '$lib/paraglide/messages';
 
-  let { children, data }: LayoutProps = $props();
+  let { children }: LayoutProps = $props();
   let customCss = $state('');
 
   async function detectSWUpdate() {

@@ -1,8 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$server/db/index';
-import * as schema from '$server/db/schema/index';
-import { eq, sql, max } from 'drizzle-orm';
 
 export const GET: RequestHandler = async () => {
   const today = new Date();
@@ -19,10 +17,15 @@ export const GET: RequestHandler = async () => {
   });
 
   // Get latest cert per vehicle
-  const latestCerts = new Map<string, typeof allCerts[0]>();
+  const latestCerts = new Map<string, (typeof allCerts)[0]>();
   for (const cert of allCerts) {
     const existing = latestCerts.get(cert.vehicleId);
-    if (!existing || (cert.expiryDate && existing.expiryDate && new Date(cert.expiryDate) > new Date(existing.expiryDate))) {
+    if (
+      !existing ||
+      (cert.expiryDate &&
+        existing.expiryDate &&
+        new Date(cert.expiryDate) > new Date(existing.expiryDate))
+    ) {
       latestCerts.set(cert.vehicleId, cert);
     }
   }

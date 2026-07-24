@@ -7,10 +7,13 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
   import BadgeInfo from '@lucide/svelte/icons/badge-info';
-  import CalendarDays from '@lucide/svelte/icons/calendar-days';
+
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
-  import { feature_reminders_disabled_title, feature_reminders_disabled_hint } from '$lib/paraglide/messages/_index.js';
+  import {
+    feature_reminders_disabled_title,
+    feature_reminders_disabled_hint
+  } from '$lib/paraglide/messages/_index.js';
 
   interface ReminderRecord {
     id: string;
@@ -45,10 +48,14 @@
 
   const typeIcon = (type: string) => {
     switch (type) {
-      case 'maintenance': return Wrench;
-      case 'insurance': return Shield;
-      case 'pollution': return BadgeInfo;
-      default: return Bell;
+      case 'maintenance':
+        return Wrench;
+      case 'insurance':
+        return Shield;
+      case 'pollution':
+        return BadgeInfo;
+      default:
+        return Bell;
     }
   };
 
@@ -82,8 +89,9 @@
       <div class="flex gap-2">
         {#each tabs as tab}
           <button
-            onclick={() => activeTab = tab.id}
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {activeTab === tab.id
+            onclick={() => (activeTab = tab.id)}
+            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {activeTab ===
+            tab.id
               ? 'bg-primary text-primary-foreground'
               : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}"
           >
@@ -102,14 +110,17 @@
           {#each filteredReminders as reminder (reminder.id)}
             {@const Icon = typeIcon(reminder.type)}
             {@const dueDate = new Date(reminder.dueDate)}
-            {@const daysUntilDue = Math.ceil((dueDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))}
+            {@const daysUntilDue = Math.ceil(
+              (dueDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)
+            )}
             <div class="flex items-center gap-4 px-4 py-3">
               <div class="bg-secondary flex size-10 items-center justify-center rounded-full">
                 <Icon class="text-primary size-4" />
               </div>
               <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium">
-                  {reminder.vehicleMake} {reminder.vehicleModel}
+                  {reminder.vehicleMake}
+                  {reminder.vehicleModel}
                   {#if reminder.vehiclePlate}
                     <span class="text-muted-foreground">({reminder.vehiclePlate})</span>
                   {/if}
@@ -122,7 +133,11 @@
               <div class="text-right text-sm">
                 <p class="font-medium">{dueDate.toLocaleDateString()}</p>
                 <StatusPill
-                  status={daysUntilDue <= 0 ? 'expired' : daysUntilDue <= 7 ? 'expiring_soon' : 'valid'}
+                  status={daysUntilDue <= 0
+                    ? 'expired'
+                    : daysUntilDue <= 7
+                      ? 'expiring_soon'
+                      : 'valid'}
                   label={daysUntilDue <= 0 ? 'Overdue' : `in ${daysUntilDue}d`}
                 />
               </div>
@@ -135,7 +150,9 @@
   {#snippet fallback()}
     <div class="flex h-64 items-center justify-center rounded-lg border border-dashed">
       <div class="text-center">
-        <p class="text-muted-foreground text-lg font-medium">{feature_reminders_disabled_title()}</p>
+        <p class="text-muted-foreground text-lg font-medium">
+          {feature_reminders_disabled_title()}
+        </p>
         <p class="text-muted-foreground text-sm">{feature_reminders_disabled_hint()}</p>
       </div>
     </div>
