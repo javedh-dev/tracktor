@@ -16,7 +16,10 @@ export async function initializeDatabase(): Promise<void> {
     // Run migrations
     logger.info('Running database migrations...');
     await migrate(db, {
-      migrationsFolder: resolve(env.NODE_ENV==='production'?process.cwd():'src/server/db', 'migrations'),
+      migrationsFolder: resolve(
+        env.NODE_ENV === 'production' ? process.cwd() : 'src/server/db',
+        'migrations'
+      ),
       migrationsTable: '_migrations'
     });
     logger.info('Database migrations completed successfully');

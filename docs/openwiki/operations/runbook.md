@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Operations Runbook"
+type: 'Reference'
+title: 'Operations Runbook'
 openwiki_generated: true
 ---
 
