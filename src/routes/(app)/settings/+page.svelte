@@ -2,7 +2,6 @@
   import SettingsSection from '$lib/components/feature/settings/SettingsSection.svelte';
   import { configStore } from '$stores/config.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import LeftArrow from '@lucide/svelte/icons/move-left';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import { toast } from 'svelte-sonner';
   import { superForm, defaults } from 'sveltekit-superforms';
@@ -26,8 +25,6 @@
   import SettingsFeaturesTab from '$feature/settings/SettingsFeaturesTab.svelte';
   import SettingsPersonalizationTab from '$feature/settings/SettingsPersonalizationTab.svelte';
   import SettingsUnitsTab from '$feature/settings/SettingsUnitsTab.svelte';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import { goto } from '$app/navigation';
   import SettingFormSection from '$lib/components/feature/settings/SettingFormSection.svelte';
 
   let processing = $state(false);
@@ -170,16 +167,6 @@
 
 <div id="settings-page" class="flex h-full w-full flex-col">
   <div id="dashboard-header" class="mb-2 flex w-full items-center justify-start gap-2">
-    <Button
-      variant="outline"
-      size="icon"
-      onclick={() => {
-        goto('/dashboard');
-      }}
-      class="cursor-pointer"
-    >
-      <LeftArrow />
-    </Button>
     <h1 id="dashboard-title" class="text-primary text-2xl font-semibold lg:text-3xl">
       {m.settings_title()}
     </h1>
