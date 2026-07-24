@@ -2,15 +2,17 @@
   import PageHeader from '$dashboard/PageHeader.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import VehicleForm from '$feature/vehicle/VehicleForm.svelte';
-  import VehicleList from '$feature/vehicle/VehicleList.svelte';
+  import VehicleCard from '$feature/vehicle/VehicleCard.svelte';
+  import CardGridSkeleton from '$appui/CardGridSkeleton.svelte';
+  import { vehicleStore } from '$stores/vehicle.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import Button from '$ui/button/button.svelte';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
-  import { app_add_vehicle } from '$lib/paraglide/messages/_index.js';
+  import { app_add_vehicle, vehicle_list_empty } from '$lib/paraglide/messages/_index.js';
 </script>
 
 <div class="space-y-6">
-  <PageHeader title="Vehicles">
+  <PageHeader title="Vehicles" description="Manage your fleet">
     <Button
       variant="default"
       onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
@@ -19,5 +21,24 @@
     </Button>
   </PageHeader>
 
-  <VehicleList />
+  {#if vehicleStore.processing}
+    <CardGridSkeleton containerId="vehicles-grid-skeleton" containerClass="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" />
+  {:else if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {#each vehicleStore.vehicles as vehicle (vehicle.id)}
+        <VehicleCard {vehicle} />
+      {/each}
+      <Button
+        variant="dashed"
+        class="text-muted-foreground hover:text-foreground flex min-h-[200px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed"
+        onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
+      >
+        <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
+      </Button>
+    </div>
+  {:else}
+    <div class="bg-muted text-muted-foreground border-border flex h-40 items-center justify-center rounded-2xl border border-dashed">
+      <p class="text-lg font-medium">{vehicle_list_empty()}</p>
+    </div>
+  {/if}
 </div>
