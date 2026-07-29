@@ -25,9 +25,22 @@ const calculateMileageData = (logs: FuelLog[]) => {
     .sort((a, b) => a.x.getTime() - b.x.getTime());
 };
 
+const calculateFuelAmountData = (logs: FuelLog[]) => {
+  return logs
+    .filter((log) => log.fuelAmount)
+    .map((log) => {
+      return {
+        x: new Date(log.date),
+        y: log.fuelAmount
+      };
+    })
+    .sort((a, b) => a.x.getTime() - b.x.getTime());
+};
+
 class ChartStore {
   mileageData? = $derived<DataPoint[]>(calculateMileageData(fuelLogStore.fuelLogs || []));
   costData? = $derived<DataPoint[]>(calculateCostData(fuelLogStore.fuelLogs || []));
+  fuelAmountData? = $derived<DataPoint[]>(calculateFuelAmountData(fuelLogStore.fuelLogs || []));
 }
 
 export const chartStore = new ChartStore();

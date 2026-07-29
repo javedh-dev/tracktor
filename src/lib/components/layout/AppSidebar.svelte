@@ -2,8 +2,8 @@
   import * as Sidebar from '$ui/sidebar/index.js';
   import * as Avatar from '$ui/avatar/index.js';
   import * as DropdownMenu from '$ui/dropdown-menu/index.js';
+  import VehicleSwitcher from '$layout/VehicleSwitcher.svelte';
 
-  import Tractor from '@lucide/svelte/icons/tractor';
   import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
   import Car from '@lucide/svelte/icons/car';
   import Fuel from '@lucide/svelte/icons/fuel';
@@ -18,6 +18,7 @@
   import UserCog from '@lucide/svelte/icons/user-cog';
   import ToolCase from '@lucide/svelte/icons/tool-case';
   import Database from '@lucide/svelte/icons/database';
+  import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 
   import { configStore } from '$stores/config.svelte';
   import { authStore } from '$stores/auth.svelte';
@@ -34,58 +35,68 @@
     href: string;
     icon: typeof LayoutDashboard;
     featureKey?: keyof typeof configStore.configs;
+    group: string;
   };
 
   const NAV_ITEMS: NavItem[] = [
     {
       label: 'Dashboard',
       href: '/dashboard',
-      icon: LayoutDashboard
+      icon: LayoutDashboard,
+      group: 'Overview'
     },
     {
       label: 'Vehicles',
       href: '/vehicles',
-      icon: Car
+      icon: Car,
+      group: 'Overview'
     },
     {
       label: m.nav_fuel_logs(),
       href: '/fuel',
       icon: Fuel,
-      featureKey: 'featureFuelLog'
+      featureKey: 'featureFuelLog',
+      group: 'Logs'
     },
     {
       label: m.nav_maintenance(),
       href: '/maintenance',
       icon: Wrench,
-      featureKey: 'featureMaintenance'
+      featureKey: 'featureMaintenance',
+      group: 'Logs'
     },
     {
       label: m.nav_reminders(),
       href: '/reminders',
       icon: Bell,
-      featureKey: 'featureReminders'
+      featureKey: 'featureReminders',
+      group: 'Logs'
     },
     {
       label: m.nav_pollution(),
       href: '/pollution',
       icon: BadgeInfo,
-      featureKey: 'featurePucc'
+      featureKey: 'featurePucc',
+      group: 'Logs'
     },
     {
       label: m.nav_insurance(),
       href: '/insurance',
       icon: Shield,
-      featureKey: 'featureInsurance'
+      featureKey: 'featureInsurance',
+      group: 'Logs'
     },
     {
       label: 'Expenses',
       href: '/expenses',
-      icon: Banknote
+      icon: Banknote,
+      group: 'Logs'
     },
     {
       label: 'Reports',
       href: '/reports',
-      icon: BarChart3
+      icon: BarChart3,
+      group: 'Insights'
     }
   ];
 
@@ -96,43 +107,62 @@
     })
   );
 
+  const navGroups = $derived.by(() => {
+    const groups: { label: string; items: NavItem[] }[] = [];
+    for (const item of visibleNavItems) {
+      let group = groups.find((g) => g.label === item.group);
+      if (!group) {
+        group = { label: item.group, items: [] };
+        groups.push(group);
+      }
+      group.items.push(item);
+    }
+    return groups;
+  });
+
   const userInitial = $derived(authStore.user?.username?.charAt(0)?.toUpperCase() || 'U');
 
   function handleNavClick(href: string) {
     goto(href, { noScroll: true, keepFocus: true });
   }
+
+  // The underlying Sidebar.MenuButton always renders `data-active="false"` instead of
+  // omitting the attribute, which makes Tailwind's presence-based `data-active:` variant
+  // match on every item. Passing `data-active` explicitly (as an extra, undeclared prop)
+  // overrides that, since it lands in the component's `...restProps` spread last.
+  function navActiveProps(href: string) {
+    const active = page.url.pathname.startsWith(href);
+    return { isActive: active, 'data-active': active || undefined };
+  }
 </script>
 
 <Sidebar.Sidebar variant="sidebar" collapsible="icon">
   <Sidebar.Header>
-    <div class="flex items-center gap-2 px-1 py-1">
-      <Tractor class="text-primary h-6 w-6 shrink-0" />
-      <div class="grid flex-1 text-left text-sm leading-tight">
-        <span class="truncate font-semibold">{m.app_name()}</span>
-        <span class="text-muted-foreground truncate text-xs">Vehicle Management</span>
-      </div>
-    </div>
+    <VehicleSwitcher />
   </Sidebar.Header>
 
   <Sidebar.Content>
-    <Sidebar.Group>
-      <Sidebar.GroupContent>
-        <Sidebar.Menu>
-          {#each visibleNavItems as item (item.href)}
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton
-                isActive={page.url.pathname.startsWith(item.href)}
-                onclick={() => handleNavClick(item.href)}
-                tooltipContent={item.label}
-              >
-                <item.icon class="h-4 w-4" />
-                <span>{item.label}</span>
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-          {/each}
-        </Sidebar.Menu>
-      </Sidebar.GroupContent>
-    </Sidebar.Group>
+    {#each navGroups as group (group.label)}
+      <Sidebar.Group>
+        <Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
+        <Sidebar.GroupContent>
+          <Sidebar.Menu>
+            {#each group.items as item (item.href)}
+              <Sidebar.MenuItem>
+                <Sidebar.MenuButton
+                  {...navActiveProps(item.href)}
+                  onclick={() => handleNavClick(item.href)}
+                  tooltipContent={item.label}
+                >
+                  <item.icon class="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+            {/each}
+          </Sidebar.Menu>
+        </Sidebar.GroupContent>
+      </Sidebar.Group>
+    {/each}
 
     <Sidebar.Separator />
 
@@ -141,7 +171,7 @@
         <Sidebar.Menu>
           <Sidebar.MenuItem>
             <Sidebar.MenuButton
-              isActive={page.url.pathname.startsWith('/settings')}
+              {...navActiveProps('/settings')}
               onclick={() => handleNavClick('/settings')}
               tooltipContent={m.settings_title()}
             >
@@ -161,6 +191,7 @@
           <Sidebar.MenuButton
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            data-active={undefined}
             tooltipContent={authStore.user?.username || m.profile_menu_item()}
           >
             <Avatar.Root size="sm" class="size-6 rounded-lg">
@@ -173,6 +204,7 @@
                 {authStore.user?.username || m.profile_menu_item()}
               </span>
             </div>
+            <ChevronsUpDown class="ml-auto size-4" />
           </Sidebar.MenuButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content side="right" align="end" sideOffset={4} class="w-56 rounded-lg">
@@ -229,4 +261,5 @@
       </DropdownMenu.Root>
     {/if}
   </Sidebar.Footer>
+  <Sidebar.Rail />
 </Sidebar.Sidebar>

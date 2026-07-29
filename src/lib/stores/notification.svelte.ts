@@ -14,10 +14,10 @@ type NotificationType = Notification['type'];
 
 export const NAVIGATION_MAP: Record<NotificationType, string> = {
   information: '/dashboard',
-  insurance: '/dashboard/insurance',
-  pollution: '/dashboard/pollution',
-  reminder: '/dashboard/reminders',
-  maintenance: '/dashboard/maintenance',
+  insurance: '/insurance',
+  pollution: '/pollution',
+  reminder: '/reminders',
+  maintenance: '/maintenance',
   registration: '/dashboard',
   alert: '/dashboard'
 };

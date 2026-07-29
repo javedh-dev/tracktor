@@ -1,24 +1,5 @@
 import { apiClient } from '$lib/helper/api.helper';
-
-interface DashboardSummary {
-  totalVehicles: number;
-  totalFuelUsed: number;
-  totalDistance: number;
-  totalExpenses: number;
-  expenseBreakdown: { fuel: number; maintenance: number; insurance: number };
-  puccStatus: { valid: number; expiringSoon: number; expired: number; notAvailable: number };
-  vehicleHealth: { good: number; attention: number; needsAction: number };
-  upcomingReminders: Array<{
-    id: string;
-    vehicleId: string;
-    vehicleName: string;
-    vehiclePlate: string | null;
-    type: string;
-    note: string | null;
-    dueDate: string;
-    daysUntilDue: number;
-  }>;
-}
+import type { DashboardSummary } from '$lib/domain/dashboard';
 
 class DashboardStore {
   summary = $state<DashboardSummary | null>(null);

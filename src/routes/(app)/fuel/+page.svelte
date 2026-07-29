@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
   import StatCard from '$dashboard/StatCard.svelte';
   import Fuel from '@lucide/svelte/icons/fuel';
@@ -9,38 +8,25 @@
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import MileageChart from '$feature/overview/MileageChart.svelte';
-  import CostChart from '$feature/overview/CostChart.svelte';
+  import FuelAmountChart from '$feature/overview/FuelAmountChart.svelte';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
-  import SearchableSelect from '$appui/SearchableSelect.svelte';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
-  import Tractor from '@lucide/svelte/icons/tractor';
   import {
     feature_fuel_disabled_title,
     feature_fuel_disabled_hint
   } from '$lib/paraglide/messages/_index.js';
 
-  onMount(() => {
-    if (vehicleStore.selectedId) {
-      fuelLogStore.refreshFuelLogs();
-    }
-  });
-
-  const vehicleOptions = $derived(
-    (vehicleStore.vehicles ?? [])
-      .filter((v) => v.id != null)
-      .map((v) => ({
-        value: v.id!,
-        label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
-      }))
-  );
-
-  let selectedVehicleId = $state(vehicleStore.selectedId ?? '');
+  let lastVehicleId: string | undefined;
 
   $effect(() => {
-    if (selectedVehicleId && selectedVehicleId !== vehicleStore.selectedId) {
-      vehicleStore.selectedId = selectedVehicleId;
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
       fuelLogStore.refreshFuelLogs();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
     }
   });
 
@@ -58,47 +44,38 @@
 <FeatureGate feature={Features.FUEL_LOG}>
   {#snippet children()}
     <div class="space-y-6">
-      <PageHeader title="Fuel Tracking" description="Monitor fuel consumption and costs">
-        <div class="w-64">
-          <SearchableSelect
-            options={vehicleOptions}
-            name="vehicle"
-            bind:value={selectedVehicleId}
-            icon={Tractor}
-          />
-        </div>
-      </PageHeader>
+      <PageHeader title="Fuel Tracking" description="Monitor fuel consumption and costs" />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Fuel}
           label="Fuel Used"
           value={totalFuelUsed > 0 ? `${totalFuelUsed.toFixed(1)} L` : '--'}
-          color="bg-green-500/10 text-green-500"
+          color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
         />
         <StatCard
           icon={DollarSign}
           label="Total Spent"
           value={totalCost > 0 ? `$${totalCost.toFixed(2)}` : '--'}
-          color="bg-amber-500/10 text-amber-500"
+          color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
         />
         <StatCard
           icon={Gauge}
           label="Avg Mileage"
           value={avgMileage > 0 ? avgMileage.toFixed(1) : '--'}
-          color="bg-blue-500/10 text-blue-500"
+          color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
         />
         <StatCard
           icon={Route}
           label="Total Entries"
           value={totalEntries}
-          color="bg-violet-500/10 text-violet-500"
+          color="bg-gradient-to-br from-violet-400 to-violet-600 shadow-violet-500/30"
         />
       </div>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <FuelAmountChart />
         <MileageChart />
-        <CostChart />
       </div>
 
       <FuelLogTab />

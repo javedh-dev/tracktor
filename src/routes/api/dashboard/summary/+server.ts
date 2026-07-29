@@ -1,13 +1,10 @@
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDashboardSummary } from '$server/services/dashboardService';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async () => {
-  try {
+  return withRouteErrorHandling('Dashboard summary GET error:', async () => {
     const summary = await getDashboardSummary();
-    return json({ success: true, data: summary });
-  } catch (error) {
-    console.error('Failed to fetch dashboard summary:', error);
-    return json({ success: false, error: 'Failed to fetch dashboard summary' }, { status: 500 });
-  }
+    return jsonResponse(summary);
+  });
 };

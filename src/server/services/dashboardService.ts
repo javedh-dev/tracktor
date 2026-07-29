@@ -1,180 +1,153 @@
 import { db } from '../db/index';
+import {
+  computeAverageMileage,
+  computeTotalDistance,
+  type FuelLogInput
+} from '$lib/domain/fuel/mileage';
+import type {
+  ActivityEntry,
+  DashboardSummary,
+  MonthlyExpensePoint,
+  StatusBucket,
+  UpcomingReminder,
+  VehicleSummary
+} from '$lib/domain/dashboard';
 
 const EXPIRING_SOON_DAYS = 30;
+const FUEL_TREND_MAX_POINTS = 10;
+const ACTIVITY_MAX_ENTRIES = 15;
+const UPCOMING_REMINDERS_MAX = 10;
+const MONTHLY_TREND_MONTHS = 12;
 
-export interface DashboardSummary {
-  totalVehicles: number;
-  totalFuelUsed: number;
-  totalDistance: number;
-  totalExpenses: number;
-  expenseBreakdown: {
-    fuel: number;
-    maintenance: number;
-    insurance: number;
-  };
-  puccStatus: {
-    valid: number;
-    expiringSoon: number;
-    expired: number;
-    notAvailable: number;
-  };
-  vehicleHealth: {
-    good: number;
-    attention: number;
-    needsAction: number;
-  };
-  upcomingReminders: Array<{
-    id: string;
-    vehicleId: string;
-    vehicleName: string;
-    vehiclePlate: string | null;
-    type: string;
-    note: string | null;
-    dueDate: string;
-    daysUntilDue: number;
-  }>;
+async function fetchRawData() {
+  const [vehicles, fuelLogs, maintenanceLogs, insurances, pollutionCerts, reminders] =
+    await Promise.all([
+      db.query.vehicleTable.findMany({
+        columns: {
+          id: true,
+          make: true,
+          model: true,
+          licensePlate: true,
+          image: true,
+          odometer: true,
+          fuelType: true
+        }
+      }),
+      db.query.fuelLogTable.findMany({
+        columns: {
+          vehicleId: true,
+          fuelAmount: true,
+          cost: true,
+          filled: true,
+          missedLast: true,
+          odometer: true,
+          date: true
+        },
+        orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
+      }),
+      db.query.maintenanceLogTable.findMany({
+        columns: { vehicleId: true, cost: true, odometer: true, date: true, serviceCenter: true }
+      }),
+      db.query.insuranceTable.findMany({
+        columns: { vehicleId: true, endDate: true, startDate: true, cost: true }
+      }),
+      db.query.pollutionCertificateTable.findMany({
+        columns: { vehicleId: true, expiryDate: true }
+      }),
+      db.query.reminderTable.findMany({
+        columns: {
+          id: true,
+          vehicleId: true,
+          type: true,
+          note: true,
+          dueDate: true,
+          isCompleted: true
+        }
+      })
+    ]);
+
+  return { vehicles, fuelLogs, maintenanceLogs, insurances, pollutionCerts, reminders };
 }
 
-export async function getDashboardSummary(): Promise<DashboardSummary> {
+type RawData = Awaited<ReturnType<typeof fetchRawData>>;
+
+function statusFromExpiry(
+  expiry: Date | undefined,
+  today: Date,
+  soonCutoff: Date
+): VehicleSummary['puccStatus'] {
+  if (!expiry) return 'not_available';
+  if (expiry < today) return 'expired';
+  if (expiry <= soonCutoff) return 'expiring_soon';
+  return 'valid';
+}
+
+function buildVehicleSummaries(raw: RawData): VehicleSummary[] {
   const today = new Date();
-  const thirtyDaysFromNow = new Date(today.getTime() + EXPIRING_SOON_DAYS * 24 * 60 * 60 * 1000);
+  const soonCutoff = new Date(today.getTime() + EXPIRING_SOON_DAYS * 24 * 60 * 60 * 1000);
 
-  const [
-    vehicles,
-    fuelLogs,
-    maintenanceLogs,
-    insurances,
-    pollutionCerts,
-    reminders,
-    allInsurancesForExpense
-  ] = await Promise.all([
-    db.query.vehicleTable.findMany({
-      columns: {
-        id: true,
-        make: true,
-        model: true,
-        licensePlate: true,
-        image: true,
-        odometer: true
-      }
-    }),
-    db.query.fuelLogTable.findMany({
-      columns: {
-        fuelAmount: true,
-        cost: true,
-        filled: true,
-        odometer: true,
-        date: true,
-        vehicleId: true
-      }
-    }),
-    db.query.maintenanceLogTable.findMany({
-      columns: { cost: true, odometer: true, vehicleId: true }
-    }),
-    db.query.insuranceTable.findMany({
-      columns: { vehicleId: true, endDate: true, cost: true }
-    }),
-    db.query.pollutionCertificateTable.findMany({
-      columns: { vehicleId: true, expiryDate: true }
-    }),
-    db.query.reminderTable.findMany({
-      columns: {
-        id: true,
-        vehicleId: true,
-        type: true,
-        note: true,
-        dueDate: true,
-        isCompleted: true
-      }
-    }),
-    db.query.insuranceTable.findMany({
-      columns: { cost: true }
-    })
-  ]);
-
-  // Totals
-  const totalVehicles = vehicles.length;
-  const totalFuelUsed = fuelLogs.reduce((sum, l) => sum + (l.fuelAmount || 0), 0);
-  const totalFuelCost = fuelLogs.reduce((sum, l) => sum + (l.cost || 0), 0);
-  const totalMaintenanceCost = maintenanceLogs.reduce((sum, l) => sum + (l.cost || 0), 0);
-  const totalInsuranceCost = allInsurancesForExpense.reduce((sum, i) => sum + (i.cost || 0), 0);
-  const totalDistance = fuelLogs
-    .filter((l) => l.odometer && l.filled)
-    .reduce((sum, l, i, arr) => {
-      if (i === 0) return sum;
-      const prev = arr[i - 1];
-      if (prev.odometer && l.odometer && l.odometer > prev.odometer) {
-        return sum + (l.odometer - prev.odometer);
-      }
-      return sum;
-    }, 0);
-  const totalExpenses = totalFuelCost + totalMaintenanceCost + totalInsuranceCost;
-
-  // PUC Status
-  const puccByVehicle = new Map<string, Date>();
-  for (const cert of pollutionCerts) {
-    if (cert.expiryDate) {
-      const existing = puccByVehicle.get(cert.vehicleId);
-      const certDate = new Date(cert.expiryDate);
-      if (!existing || certDate > existing) {
-        puccByVehicle.set(cert.vehicleId, certDate);
-      }
-    }
+  const fuelLogsByVehicle = new Map<string, RawData['fuelLogs']>();
+  const fuelCostByVehicle = new Map<string, number>();
+  for (const log of raw.fuelLogs) {
+    if (!fuelLogsByVehicle.has(log.vehicleId)) fuelLogsByVehicle.set(log.vehicleId, []);
+    fuelLogsByVehicle.get(log.vehicleId)!.push(log);
+    fuelCostByVehicle.set(log.vehicleId, (fuelCostByVehicle.get(log.vehicleId) || 0) + log.cost);
   }
 
-  let puccValid = 0;
-  let puccExpiringSoon = 0;
-  let puccExpired = 0;
-  let puccNotAvailable = 0;
-
-  for (const vehicle of vehicles) {
-    const expiryDate = puccByVehicle.get(vehicle.id);
-    if (!expiryDate) {
-      puccNotAvailable++;
-    } else if (expiryDate < today) {
-      puccExpired++;
-    } else if (expiryDate <= thirtyDaysFromNow) {
-      puccExpiringSoon++;
-    } else {
-      puccValid++;
-    }
+  const maintenanceCostByVehicle = new Map<string, number>();
+  for (const log of raw.maintenanceLogs) {
+    maintenanceCostByVehicle.set(
+      log.vehicleId,
+      (maintenanceCostByVehicle.get(log.vehicleId) || 0) + log.cost
+    );
   }
 
-  // Vehicle Health
-  const insuranceByVehicle = new Map<string, Date>();
-  for (const ins of insurances) {
+  const insuranceCostByVehicle = new Map<string, number>();
+  const insuranceEndByVehicle = new Map<string, Date>();
+  for (const ins of raw.insurances) {
+    insuranceCostByVehicle.set(
+      ins.vehicleId,
+      (insuranceCostByVehicle.get(ins.vehicleId) || 0) + ins.cost
+    );
     if (ins.endDate) {
-      const existing = insuranceByVehicle.get(ins.vehicleId);
-      const insDate = new Date(ins.endDate);
-      if (!existing || insDate > existing) {
-        insuranceByVehicle.set(ins.vehicleId, insDate);
-      }
+      const endDate = new Date(ins.endDate);
+      const existing = insuranceEndByVehicle.get(ins.vehicleId);
+      if (!existing || endDate > existing) insuranceEndByVehicle.set(ins.vehicleId, endDate);
     }
   }
 
-  const remindersByVehicle = new Map<string, typeof reminders>();
-  for (const r of reminders) {
-    if (!remindersByVehicle.has(r.vehicleId)) {
-      remindersByVehicle.set(r.vehicleId, []);
-    }
+  const puccByVehicle = new Map<string, Date>();
+  for (const cert of raw.pollutionCerts) {
+    if (!cert.expiryDate) continue;
+    const expiryDate = new Date(cert.expiryDate);
+    const existing = puccByVehicle.get(cert.vehicleId);
+    if (!existing || expiryDate > existing) puccByVehicle.set(cert.vehicleId, expiryDate);
+  }
+
+  const remindersByVehicle = new Map<string, RawData['reminders']>();
+  for (const r of raw.reminders) {
+    if (!remindersByVehicle.has(r.vehicleId)) remindersByVehicle.set(r.vehicleId, []);
     remindersByVehicle.get(r.vehicleId)!.push(r);
   }
 
-  let healthGood = 0;
-  let healthAttention = 0;
-  let healthNeedsAction = 0;
+  return raw.vehicles.map((vehicle) => {
+    const vehicleFuelLogs: FuelLogInput[] = fuelLogsByVehicle.get(vehicle.id) || [];
+    const totalDistance = computeTotalDistance(vehicleFuelLogs);
+    const avgMileage = computeAverageMileage(vehicleFuelLogs);
 
-  for (const vehicle of vehicles) {
-    const insDate = insuranceByVehicle.get(vehicle.id);
-    const puccDate = puccByVehicle.get(vehicle.id);
+    const totalFuelCost = fuelCostByVehicle.get(vehicle.id) || 0;
+    const totalMaintenanceCost = maintenanceCostByVehicle.get(vehicle.id) || 0;
+    const totalInsuranceCost = insuranceCostByVehicle.get(vehicle.id) || 0;
+    const totalExpenses = totalFuelCost + totalMaintenanceCost + totalInsuranceCost;
+
+    const puccStatus = statusFromExpiry(puccByVehicle.get(vehicle.id), today, soonCutoff);
+    const insuranceStatus = statusFromExpiry(
+      insuranceEndByVehicle.get(vehicle.id),
+      today,
+      soonCutoff
+    );
+
     const vehicleReminders = remindersByVehicle.get(vehicle.id) || [];
-
-    const hasExpiredPucc = puccDate && new Date(puccDate) < today;
-    const hasExpiredInsurance = insDate && new Date(insDate) < today;
-    const hasExpiringPucc =
-      puccDate && new Date(puccDate) <= thirtyDaysFromNow && new Date(puccDate) >= today;
-    const hasExpiringInsurance =
-      insDate && new Date(insDate) <= thirtyDaysFromNow && new Date(insDate) >= today;
     const hasOverdueReminder = vehicleReminders.some(
       (r) => !r.isCompleted && r.dueDate && new Date(r.dueDate) < today
     );
@@ -182,23 +155,150 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       (r) =>
         !r.isCompleted &&
         r.dueDate &&
-        new Date(r.dueDate) <= thirtyDaysFromNow &&
+        new Date(r.dueDate) <= soonCutoff &&
         new Date(r.dueDate) >= today
     );
 
-    if (hasExpiredPucc || hasExpiredInsurance || hasOverdueReminder) {
-      healthNeedsAction++;
-    } else if (hasExpiringPucc || hasExpiringInsurance || hasUpcomingReminder) {
-      healthAttention++;
+    let healthStatus: VehicleSummary['healthStatus'];
+    if (puccStatus === 'expired' || insuranceStatus === 'expired' || hasOverdueReminder) {
+      healthStatus = 'needs_action';
+    } else if (
+      puccStatus === 'expiring_soon' ||
+      insuranceStatus === 'expiring_soon' ||
+      hasUpcomingReminder
+    ) {
+      healthStatus = 'attention';
     } else {
-      healthGood++;
+      healthStatus = 'good';
     }
+
+    return {
+      id: vehicle.id,
+      make: vehicle.make,
+      model: vehicle.model,
+      licensePlate: vehicle.licensePlate,
+      image: vehicle.image,
+      odometer: vehicle.odometer || 0,
+      fuelType: vehicle.fuelType,
+      totalDistance,
+      totalFuelCost,
+      totalMaintenanceCost,
+      totalInsuranceCost,
+      totalExpenses,
+      avgMileage,
+      costPerDistance:
+        totalDistance > 0 ? parseFloat((totalExpenses / totalDistance).toFixed(2)) : null,
+      puccStatus,
+      insuranceStatus,
+      healthStatus
+    };
+  });
+}
+
+function buildFleetSection(
+  vehicles: VehicleSummary[],
+  totalFuelUsed: number
+): DashboardSummary['fleet'] {
+  const totalDistance = vehicles.reduce((sum, v) => sum + v.totalDistance, 0);
+  const totalExpenses = vehicles.reduce((sum, v) => sum + v.totalExpenses, 0);
+  return {
+    totalVehicles: vehicles.length,
+    totalDistance,
+    totalFuelUsed,
+    totalExpenses,
+    costPerDistance:
+      totalDistance > 0 ? parseFloat((totalExpenses / totalDistance).toFixed(2)) : null
+  };
+}
+
+function monthKey(date: Date): string {
+  return date.toISOString().slice(0, 7);
+}
+
+function buildExpensesSection(raw: RawData): DashboardSummary['expenses'] {
+  const fuel = raw.fuelLogs.reduce((sum, l) => sum + l.cost, 0);
+  const maintenance = raw.maintenanceLogs.reduce((sum, l) => sum + l.cost, 0);
+  const insurance = raw.insurances.reduce((sum, i) => sum + i.cost, 0);
+
+  const months: string[] = [];
+  const anchor = new Date();
+  for (let i = MONTHLY_TREND_MONTHS - 1; i >= 0; i--) {
+    months.push(monthKey(new Date(anchor.getFullYear(), anchor.getMonth() - i, 1)));
   }
 
-  // Upcoming Reminders
-  const vehicleMap = new Map(vehicles.map((v) => [v.id, v]));
+  const byMonth = new Map<string, MonthlyExpensePoint>(
+    months.map((month) => [month, { month, fuel: 0, maintenance: 0, insurance: 0, total: 0 }])
+  );
 
-  const upcomingReminders = reminders
+  for (const log of raw.fuelLogs) {
+    if (!log.date) continue;
+    const point = byMonth.get(monthKey(new Date(log.date)));
+    if (point) point.fuel += log.cost;
+  }
+  for (const log of raw.maintenanceLogs) {
+    if (!log.date) continue;
+    const point = byMonth.get(monthKey(new Date(log.date)));
+    if (point) point.maintenance += log.cost;
+  }
+  for (const ins of raw.insurances) {
+    if (!ins.startDate) continue;
+    const point = byMonth.get(monthKey(new Date(ins.startDate)));
+    if (point) point.insurance += ins.cost;
+  }
+
+  const monthlyTrend = months.map((month) => {
+    const point = byMonth.get(month)!;
+    point.total = point.fuel + point.maintenance + point.insurance;
+    return point;
+  });
+
+  return {
+    breakdown: { fuel, maintenance, insurance },
+    monthlyTrend
+  };
+}
+
+function buildFuelSection(raw: RawData): DashboardSummary['fuel'] {
+  const fuelByDate = new Map<string, number>();
+  for (const log of raw.fuelLogs) {
+    if (!log.date || !log.fuelAmount) continue;
+    const dateKey = new Date(log.date).toISOString().slice(0, 10);
+    fuelByDate.set(dateKey, (fuelByDate.get(dateKey) || 0) + log.fuelAmount);
+  }
+  const dailyTrend = Array.from(fuelByDate.entries())
+    .map(([date, fuelAmount]) => ({ date, fuelAmount }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-FUEL_TREND_MAX_POINTS);
+
+  return { dailyTrend };
+}
+
+function bucketFromStatuses(statuses: VehicleSummary['puccStatus'][]): StatusBucket {
+  const bucket: StatusBucket = { valid: 0, expiringSoon: 0, expired: 0, notAvailable: 0 };
+  for (const status of statuses) {
+    if (status === 'valid') bucket.valid++;
+    else if (status === 'expiring_soon') bucket.expiringSoon++;
+    else if (status === 'expired') bucket.expired++;
+    else bucket.notAvailable++;
+  }
+  return bucket;
+}
+
+function buildComplianceSection(
+  raw: RawData,
+  vehicles: VehicleSummary[]
+): DashboardSummary['compliance'] {
+  const today = new Date();
+  const vehicleMap = new Map(raw.vehicles.map((v) => [v.id, v]));
+
+  const vehicleHealth = { good: 0, attention: 0, needsAction: 0 };
+  for (const v of vehicles) {
+    if (v.healthStatus === 'good') vehicleHealth.good++;
+    else if (v.healthStatus === 'attention') vehicleHealth.attention++;
+    else vehicleHealth.needsAction++;
+  }
+
+  const upcomingReminders: UpcomingReminder[] = raw.reminders
     .filter((r) => !r.isCompleted && r.dueDate)
     .map((r) => {
       const dueDate = new Date(r.dueDate!);
@@ -216,29 +316,59 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     })
     .filter((r) => r.daysUntilDue >= 0)
     .sort((a, b) => a.daysUntilDue - b.daysUntilDue)
-    .slice(0, 10);
+    .slice(0, UPCOMING_REMINDERS_MAX);
 
   return {
-    totalVehicles,
-    totalFuelUsed,
-    totalDistance,
-    totalExpenses,
-    expenseBreakdown: {
-      fuel: totalFuelCost,
-      maintenance: totalMaintenanceCost,
-      insurance: totalInsuranceCost
-    },
-    puccStatus: {
-      valid: puccValid,
-      expiringSoon: puccExpiringSoon,
-      expired: puccExpired,
-      notAvailable: puccNotAvailable
-    },
-    vehicleHealth: {
-      good: healthGood,
-      attention: healthAttention,
-      needsAction: healthNeedsAction
-    },
+    pucc: bucketFromStatuses(vehicles.map((v) => v.puccStatus)),
+    insurance: bucketFromStatuses(vehicles.map((v) => v.insuranceStatus)),
+    vehicleHealth,
     upcomingReminders
+  };
+}
+
+function buildActivitySection(raw: RawData): ActivityEntry[] {
+  const vehicleMap = new Map(raw.vehicles.map((v) => [v.id, v]));
+  const vehicleName = (vehicleId: string) => {
+    const vehicle = vehicleMap.get(vehicleId);
+    return vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown';
+  };
+
+  const fuelEntries: ActivityEntry[] = raw.fuelLogs.map((l, i) => ({
+    id: `fuel-${l.vehicleId}-${i}`,
+    type: 'fuel',
+    vehicleId: l.vehicleId,
+    vehicleName: vehicleName(l.vehicleId),
+    date: l.date,
+    description: l.fuelAmount ? `${l.fuelAmount.toFixed(1)}L fill-up` : 'Fuel log',
+    cost: l.cost
+  }));
+
+  const maintenanceEntries: ActivityEntry[] = raw.maintenanceLogs.map((l, i) => ({
+    id: `maintenance-${l.vehicleId}-${i}`,
+    type: 'maintenance',
+    vehicleId: l.vehicleId,
+    vehicleName: vehicleName(l.vehicleId),
+    date: l.date,
+    description: l.serviceCenter,
+    cost: l.cost
+  }));
+
+  return [...fuelEntries, ...maintenanceEntries]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, ACTIVITY_MAX_ENTRIES);
+}
+
+export async function getDashboardSummary(): Promise<DashboardSummary> {
+  const raw = await fetchRawData();
+  const vehicles = buildVehicleSummaries(raw);
+  const totalFuelUsed = raw.fuelLogs.reduce((sum, l) => sum + (l.fuelAmount || 0), 0);
+
+  return {
+    fleet: buildFleetSection(vehicles, totalFuelUsed),
+    expenses: buildExpensesSection(raw),
+    fuel: buildFuelSection(raw),
+    compliance: buildComplianceSection(raw, vehicles),
+    vehicles,
+    activity: buildActivitySection(raw)
   };
 }

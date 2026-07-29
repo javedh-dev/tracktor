@@ -1,100 +1,107 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
   import StatCard from '$dashboard/StatCard.svelte';
-  import Wrench from '@lucide/svelte/icons/wrench';
   import CalendarDays from '@lucide/svelte/icons/calendar-days';
   import Gauge from '@lucide/svelte/icons/gauge';
-  import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+  import HeartPulse from '@lucide/svelte/icons/heart-pulse';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import MaintenenceLogTab from '$feature/maintenance/MaintenenceLogTab.svelte';
-  import SearchableSelect from '$appui/SearchableSelect.svelte';
-  import Tractor from '@lucide/svelte/icons/tractor';
+  import MaintenanceTimeline from '$feature/maintenance/MaintenanceTimeline.svelte';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
+  import * as Tabs from '$ui/tabs';
+  import { formatDate } from '$lib/helper/format.helper';
   import {
     feature_maintenance_disabled_title,
     feature_maintenance_disabled_hint
   } from '$lib/paraglide/messages/_index.js';
 
-  onMount(() => {
-    if (vehicleStore.selectedId) {
-      maintenanceStore.refreshMaintenanceLogs();
-    }
-  });
-
-  const vehicleOptions = $derived(
-    (vehicleStore.vehicles ?? [])
-      .filter((v) => v.id != null)
-      .map((v) => ({
-        value: v.id!,
-        label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
-      }))
-  );
-
-  let selectedVehicleId = $state(vehicleStore.selectedId ?? '');
+  let lastVehicleId: string | undefined;
 
   $effect(() => {
-    if (selectedVehicleId && selectedVehicleId !== vehicleStore.selectedId) {
-      vehicleStore.selectedId = selectedVehicleId;
+    const vehicleId = vehicleStore.selectedId;
+    if (vehicleId && vehicleId !== lastVehicleId) {
+      lastVehicleId = vehicleId;
       maintenanceStore.refreshMaintenanceLogs();
+    }
+    if (!vehicleId) {
+      lastVehicleId = undefined;
     }
   });
 
   const logs = $derived(maintenanceStore.maintenanceLogs ?? []);
-  const totalCost = $derived(logs.reduce((sum, l) => sum + (l.cost || 0), 0));
-  const totalEntries = $derived(logs.length);
   const latestOdometer = $derived.by(() => {
     if (logs.length === 0) return 0;
     return Math.max(...logs.map((l) => l.odometer || 0));
   });
   const nextServiceOdometer = $derived(latestOdometer > 0 ? latestOdometer + 5000 : 0);
+  const lastServiceDate = $derived(logs.length > 0 ? logs[0].date : null);
 </script>
 
 <FeatureGate feature={Features.MAINTENANCE}>
   {#snippet children()}
     <div class="space-y-6">
-      <PageHeader title="Maintenance" description="Track service history and upcoming maintenance">
-        <div class="w-64">
-          <SearchableSelect
-            options={vehicleOptions}
-            name="vehicle"
-            bind:value={selectedVehicleId}
-            icon={Tractor}
-          />
-        </div>
-      </PageHeader>
+      <PageHeader
+        title="Maintenance"
+        description="Track service history and upcoming maintenance"
+      />
 
       <!-- Stat Cards -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
-          icon={Wrench}
-          label="Total Spent"
-          value={totalCost > 0 ? `$${totalCost.toFixed(2)}` : '--'}
-          color="bg-blue-500/10 text-blue-500"
+          icon={HeartPulse}
+          label="Last Service"
+          value={lastServiceDate ? formatDate(lastServiceDate) : '--'}
+          color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
         />
         <StatCard
           icon={CalendarDays}
           label="Next Service"
           value={nextServiceOdometer > 0 ? `${nextServiceOdometer.toLocaleString()} km` : '--'}
-          color="bg-amber-500/10 text-amber-500"
+          color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
         />
         <StatCard
           icon={Gauge}
-          label="Latest Odometer"
+          label="Odometer"
           value={latestOdometer > 0 ? `${latestOdometer.toLocaleString()} km` : '--'}
-          color="bg-green-500/10 text-green-500"
-        />
-        <StatCard
-          icon={ClipboardList}
-          label="Service Records"
-          value={totalEntries}
-          color="bg-violet-500/10 text-violet-500"
+          color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
         />
       </div>
 
-      <MaintenenceLogTab />
+      <Tabs.Root value="overview" class="w-full">
+        <Tabs.List class="grid w-full max-w-xs grid-cols-2">
+          <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+          <Tabs.Trigger value="history">Service History</Tabs.Trigger>
+        </Tabs.List>
+
+        <Tabs.Content value="overview" class="space-y-6">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="bg-card rounded-xl border p-5">
+              <h3 class="mb-1 text-lg font-semibold">Next Service</h3>
+              {#if nextServiceOdometer > 0}
+                <p class="text-2xl font-bold tracking-tight">
+                  {nextServiceOdometer.toLocaleString()} km
+                </p>
+                <p class="text-muted-foreground mt-1 text-sm">
+                  Estimated, based on last service at {latestOdometer.toLocaleString()} km
+                </p>
+              {:else}
+                <p class="text-muted-foreground text-sm">No service history to estimate from</p>
+              {/if}
+            </div>
+
+            <div class="bg-card rounded-xl border p-5">
+              <h3 class="mb-4 text-lg font-semibold">Maintenance Timeline</h3>
+              <MaintenanceTimeline logs={logs.slice(0, 5)} />
+            </div>
+          </div>
+        </Tabs.Content>
+
+        <Tabs.Content value="history">
+          <MaintenenceLogTab />
+        </Tabs.Content>
+      </Tabs.Root>
     </div>
   {/snippet}
   {#snippet fallback()}

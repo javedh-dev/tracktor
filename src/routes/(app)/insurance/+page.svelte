@@ -1,48 +1,18 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
-  import { vehicleStore } from '$stores/vehicle.svelte';
   import InsuranceTab from '$feature/insurance/InsuranceTab.svelte';
-  import SearchableSelect from '$appui/SearchableSelect.svelte';
-  import Tractor from '@lucide/svelte/icons/tractor';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
   import {
     feature_insurance_disabled_title,
     feature_insurance_disabled_hint
   } from '$lib/paraglide/messages/_index.js';
-
-  onMount(() => {
-    if (vehicleStore.selectedId) {
-      vehicleStore.refreshVehicles();
-    }
-  });
-
-  const vehicleOptions = $derived(
-    (vehicleStore.vehicles ?? [])
-      .filter((v) => v.id != null)
-      .map((v) => ({
-        value: v.id!,
-        label: `${v.make} ${v.model}${v.licensePlate ? ` (${v.licensePlate})` : ''}`
-      }))
-  );
-
-  let selectedVehicleId = $state(vehicleStore.selectedId ?? '');
 </script>
 
 <FeatureGate feature={Features.INSURANCE}>
   {#snippet children()}
     <div class="space-y-6">
-      <PageHeader title="Insurance" description="Manage insurance records">
-        <div class="w-64">
-          <SearchableSelect
-            options={vehicleOptions}
-            name="vehicle"
-            bind:value={selectedVehicleId}
-            icon={Tractor}
-          />
-        </div>
-      </PageHeader>
+      <PageHeader title="Insurance" description="Manage insurance records" />
 
       <InsuranceTab />
     </div>

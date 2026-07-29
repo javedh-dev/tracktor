@@ -75,6 +75,11 @@ export function computeAverageMileage(fuelLogs: FuelLogInput[]): number | null {
   return parseFloat(avg.toFixed(2));
 }
 
+export function computeTotalDistance(fuelLogs: FuelLogInput[]): number {
+  const windows = findMileageWindows(fuelLogs);
+  return windows.reduce((sum, w) => sum + w.distance, 0);
+}
+
 export function computeMileagePerWindow(fuelLogs: FuelLogInput[]): (number | null)[] {
   const windows = findMileageWindows(fuelLogs);
 

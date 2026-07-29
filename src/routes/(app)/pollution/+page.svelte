@@ -3,13 +3,22 @@
   import PageHeader from '$dashboard/PageHeader.svelte';
   import StatCard from '$dashboard/StatCard.svelte';
   import StatusPill from '$dashboard/StatusPill.svelte';
+  import CtaBanner from '$dashboard/CtaBanner.svelte';
+  import FilterTabs from '$dashboard/FilterTabs.svelte';
+  import * as Table from '$ui/table/index.js';
+  import Car from '@lucide/svelte/icons/car';
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import Timer from '@lucide/svelte/icons/timer';
-  import Ban from '@lucide/svelte/icons/ban';
   import { apiClient } from '$lib/helper/api.helper';
   import { Features } from '$lib/helper/feature.helper';
   import FeatureGate from '$feature/FeatureGate.svelte';
+  import { sheetStore } from '$stores/sheet.svelte';
+  import PollutionCertificateForm from '$feature/pollution/PollutionCertificateForm.svelte';
+  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import Button from '$ui/button/button.svelte';
+  import CirclePlus from '@lucide/svelte/icons/circle-plus';
+  import * as m from '$lib/paraglide/messages';
   import {
     feature_pucc_disabled_title,
     feature_pucc_disabled_hint
@@ -50,6 +59,7 @@
     const notAvailable = records.filter((r) => r.status === 'not_available').length;
     const total = records.length;
     return {
+      total,
       valid,
       expiringSoon,
       expired,
@@ -77,50 +87,45 @@
 <FeatureGate feature={Features.PUCC}>
   {#snippet children()}
     <div class="space-y-6">
-      <PageHeader title="Pollution (PUC)" description="Fleet-wide PUC certificate status" />
+      <PageHeader title="Pollution (PUC)" description="Fleet-wide PUC certificate status">
+        <Button
+          variant="default"
+          onclick={() => sheetStore.openSheet(PollutionCertificateForm, m.pollution_add_action())}
+        >
+          <LabelWithIcon icon={CirclePlus} label={m.pollution_add_action()} />
+        </Button>
+      </PageHeader>
 
       <!-- Stat Cards -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
+          icon={Car}
+          label="Total"
+          value={loading ? '...' : stats.total}
+          color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
+        />
+        <StatCard
           icon={BadgeCheck}
           label="Valid"
           value={loading ? '...' : `${stats.valid} (${stats.validPct}%)`}
-          color="bg-green-500/10 text-green-500"
+          color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
         />
         <StatCard
           icon={Timer}
           label="Expiring Soon"
           value={loading ? '...' : `${stats.expiringSoon} (${stats.expiringPct}%)`}
-          color="bg-amber-500/10 text-amber-500"
+          color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
         />
         <StatCard
           icon={AlertTriangle}
           label="Expired"
           value={loading ? '...' : `${stats.expired} (${stats.expiredPct}%)`}
-          color="bg-red-500/10 text-red-500"
-        />
-        <StatCard
-          icon={Ban}
-          label="Not Available"
-          value={loading ? '...' : `${stats.notAvailable} (${stats.naPct}%)`}
-          color="bg-gray-500/10 text-gray-500"
+          color="bg-gradient-to-br from-red-400 to-red-600 shadow-red-500/30"
         />
       </div>
 
       <!-- Filter Tabs -->
-      <div class="flex gap-2">
-        {#each tabs as tab}
-          <button
-            onclick={() => (statusFilter = tab.id)}
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {statusFilter ===
-            tab.id
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}"
-          >
-            {tab.label}
-          </button>
-        {/each}
-      </div>
+      <FilterTabs {tabs} bind:value={statusFilter} />
 
       <!-- Records Table -->
       {#if loading}
@@ -129,35 +134,48 @@
         <div class="text-muted-foreground py-8 text-center">No PUC records found</div>
       {:else}
         <div class="bg-card overflow-hidden rounded-xl border">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-secondary/50 border-b text-left">
-                <th class="px-4 py-3 font-medium">Vehicle</th>
-                <th class="px-4 py-3 font-medium">Reg. No.</th>
-                <th class="px-4 py-3 font-medium">PUC No.</th>
-                <th class="px-4 py-3 font-medium">Expiry</th>
-                <th class="px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y">
+          <Table.Root>
+            <Table.Header>
+              <Table.Row class="bg-secondary/50 hover:bg-secondary/50">
+                <Table.Head>Vehicle</Table.Head>
+                <Table.Head>Reg. No.</Table.Head>
+                <Table.Head>PUC No.</Table.Head>
+                <Table.Head>Expiry</Table.Head>
+                <Table.Head>Status</Table.Head>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {#each filteredRecords as record (record.vehicleId)}
-                <tr class="hover:bg-secondary/30">
-                  <td class="px-4 py-3 font-medium">{record.vehicleName}</td>
-                  <td class="text-muted-foreground px-4 py-3">{record.licensePlate ?? '--'}</td>
-                  <td class="text-muted-foreground px-4 py-3">{record.certificateNumber ?? '--'}</td
-                  >
-                  <td class="text-muted-foreground px-4 py-3">
+                <Table.Row>
+                  <Table.Cell class="font-medium">{record.vehicleName}</Table.Cell>
+                  <Table.Cell class="text-muted-foreground">
+                    {record.licensePlate ?? '--'}
+                  </Table.Cell>
+                  <Table.Cell class="text-muted-foreground">
+                    {record.certificateNumber ?? '--'}
+                  </Table.Cell>
+                  <Table.Cell class="text-muted-foreground">
                     {record.expiryDate ? new Date(record.expiryDate).toLocaleDateString() : '--'}
-                  </td>
-                  <td class="px-4 py-3">
+                  </Table.Cell>
+                  <Table.Cell>
                     <StatusPill status={record.status} />
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               {/each}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table.Root>
         </div>
       {/if}
+
+      <!-- Bottom CTA -->
+      <CtaBanner
+        heading="Keep your vehicles compliant"
+        description="Keep your PUC certificates updated to avoid penalties and ensure a cleaner environment."
+        buttonLabel={m.pollution_add_action()}
+        buttonIcon={CirclePlus}
+        onButtonClick={() =>
+          sheetStore.openSheet(PollutionCertificateForm, m.pollution_add_action())}
+      />
     </div>
   {/snippet}
   {#snippet fallback()}
