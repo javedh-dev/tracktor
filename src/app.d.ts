@@ -36,7 +36,13 @@ declare namespace NodeJS {
     APP_VERSION?: string;
     TRACKTOR_DISABLE_AUTH: string;
     TRACKTOR_API_BASE_URL?: string;
+    OIDC_ENABLED: string;
+    OIDC_ISSUER: string;
+    OIDC_CLIENT_ID: string;
+    OIDC_CLIENT_SECRET: string;
+    OIDC_REDIRECT_URI: string;
+    OIDC_SCOPES: string;
   }
 }
 
-export {};
+export { };

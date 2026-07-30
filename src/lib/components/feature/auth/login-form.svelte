@@ -5,12 +5,14 @@
   import { goto } from '$app/navigation';
   import UserIcon from '@lucide/svelte/icons/circle-user-round';
   import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
+  import LogIn from '@lucide/svelte/icons/log-in';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import * as m from '$lib/paraglide/messages';
 
   let username = $state('');
   let password = $state('');
   let processing = $state(false);
+  let oidcProcessing = $state(false);
 
   $effect(() => {
     // Check if users exist when component mounts
@@ -76,3 +78,25 @@
     </FieldGroup>
   </fieldset>
 </form>
+
+{#if authStore.oidcEnabled && !authStore.isAuthDisabled}
+  <div class="relative my-4">
+    <div class="absolute inset-0 flex items-center">
+      <span class="w-full border-t"></span>
+    </div>
+    <div class="relative flex justify-center text-xs uppercase">
+      <span class="bg-card text-muted-foreground px-2">or</span>
+    </div>
+  </div>
+  <button
+    onclick={() => {
+      oidcProcessing = true;
+      authStore.oidcLogin();
+    }}
+    disabled={oidcProcessing}
+    class="hover:bg-accent flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-all duration-300 disabled:opacity-50"
+  >
+    <LogIn class="h-4 w-4" />
+    {oidcProcessing ? 'Redirecting...' : 'Login with SSO'}
+  </button>
+{/if}

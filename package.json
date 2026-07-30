@@ -101,6 +101,7 @@
     "multer": "^2.2.0",
     "node-cron": "^4.6.0",
     "nodemailer": "^9.0.3",
+    "openid-client": "^6.8.4",
     "pdfkit": "^0.19.1",
     "winston": "^3.19.0",
     "zod": "^4.4.3"

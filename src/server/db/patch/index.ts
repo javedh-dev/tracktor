@@ -9,6 +9,7 @@ import { sql } from 'drizzle-orm';
 export async function applyPatches(): Promise<void> {
   try {
     await addFuelLogColumns();
+    await addOidcColumns();
   } catch (error) {
     logger.error('Error while applying database patches : ', error);
     throw error;
@@ -45,5 +46,34 @@ async function addFuelLogColumns(): Promise<void> {
     logger.info("Adding 'missed_last' column to fuel_logs table...");
     await db.run(sql`ALTER TABLE fuel_logs ADD COLUMN missed_last INTEGER DEFAULT 0 NOT NULL`);
     logger.info("Successfully added 'missed_last' column");
+  }
+}
+
+async function addOidcColumns(): Promise<void> {
+  const tableExists = await db.all(
+    sql`SELECT name FROM sqlite_master WHERE type='table' AND name='users'`
+  );
+
+  if (tableExists.length === 0) {
+    return;
+  }
+
+  const tableInfo = await db.all(sql`PRAGMA table_info(users)`);
+
+  const existingColumns = tableInfo.map((col: any) => col.name);
+  const hasOidcId = existingColumns.includes('oidc_id');
+  const hasOidcProvider = existingColumns.includes('oidc_provider');
+
+  if (!hasOidcId) {
+    logger.info("Adding 'oidc_id' column to users table...");
+    await db.run(sql`ALTER TABLE users ADD COLUMN oidc_id TEXT`);
+    await db.run(sql`CREATE UNIQUE INDEX IF NOT EXISTS users_oidc_id_idx ON users(oidc_id)`);
+    logger.info("Successfully added 'oidc_id' column");
+  }
+
+  if (!hasOidcProvider) {
+    logger.info("Adding 'oidc_provider' column to users table...");
+    await db.run(sql`ALTER TABLE users ADD COLUMN oidc_provider TEXT`);
+    logger.info("Successfully added 'oidc_provider' column");
   }
 }
