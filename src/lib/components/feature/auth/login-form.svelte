@@ -85,7 +85,7 @@
       <span class="w-full border-t"></span>
     </div>
     <div class="relative flex justify-center text-xs uppercase">
-      <span class="bg-card text-muted-foreground px-2">or</span>
+      <span class="bg-card text-muted-foreground px-2">{m.auth_login_or()}</span>
     </div>
   </div>
   <button
@@ -97,6 +97,6 @@
     class="hover:bg-accent flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-all duration-300 disabled:opacity-50"
   >
     <LogIn class="h-4 w-4" />
-    {oidcProcessing ? 'Redirecting...' : 'Login with SSO'}
+    {oidcProcessing ? m.auth_sso_login_loading() : m.auth_sso_login_button()}
   </button>
 {/if}
