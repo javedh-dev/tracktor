@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Tracktor — OpenWiki Quickstart"
+type: 'Reference'
+title: 'Tracktor — OpenWiki Quickstart'
 openwiki_generated: true
 ---
 

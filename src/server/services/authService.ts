@@ -136,7 +136,7 @@ export const getFirstAvailableUsername = async (...usernames: string[]) => {
   }
 
   return null;
-}
+};
 
 export const getUsersCount = async () => {
   const [user] = await db.select({ id: schema.usersTable.id }).from(schema.usersTable).limit(1);

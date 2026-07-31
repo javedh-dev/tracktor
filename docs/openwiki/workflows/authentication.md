@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Authentication Workflow"
+type: 'Reference'
+title: 'Authentication Workflow'
 openwiki_generated: true
 ---
 

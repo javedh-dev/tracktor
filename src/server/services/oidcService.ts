@@ -14,17 +14,19 @@ const getConfig = async () => {
 
   const server = new URL(env.OIDC_ISSUER);
 
-  configPromise = client.discovery(server, env.OIDC_CLIENT_ID, {
-    client_secret: env.OIDC_CLIENT_SECRET
-  }).catch((err) => {
-    configPromise = null;
-    throw err;
-  });
+  configPromise = client
+    .discovery(server, env.OIDC_CLIENT_ID, {
+      client_secret: env.OIDC_CLIENT_SECRET
+    })
+    .catch((err) => {
+      configPromise = null;
+      throw err;
+    });
 
   cachedIssuerUrl = env.OIDC_ISSUER;
 
   return configPromise;
-}
+};
 
 export const generateState = () => client.randomState();
 export const generateNonce = () => client.randomNonce();
@@ -35,15 +37,17 @@ export const getAuthorizationUrl = async (state: string, nonce: string, codeVeri
   const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
   const redirectUri = env.OIDC_REDIRECT_URI;
 
-  return client.buildAuthorizationUrl(config, {
-    scope: env.OIDC_SCOPES,
-    redirect_uri: redirectUri,
-    code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
-    state,
-    nonce
-  }).toString();
-}
+  return client
+    .buildAuthorizationUrl(config, {
+      scope: env.OIDC_SCOPES,
+      redirect_uri: redirectUri,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
+      state,
+      nonce
+    })
+    .toString();
+};
 
 export const handleCallback = async (
   callbackUrl: string,
@@ -76,11 +80,15 @@ export const handleCallback = async (
     return { sessionToken, user: { id: existingUser.id, username: existingUser.username } };
   }
 
-  const username = await authService.getFirstAvailableUsername(claims.preferred_username as string, claims.email as string) ?? `oidc_${oidcId.slice(0, 8)}`;
+  const username =
+    (await authService.getFirstAvailableUsername(
+      claims.preferred_username as string,
+      claims.email as string
+    )) ?? `oidc_${oidcId.slice(0, 8)}`;
 
   const newUser = await authService.createUserFromOidc(username, oidcId, oidcProvider);
   const sessionToken = generateSessionToken();
   await createSession(sessionToken, newUser.id);
 
   return { sessionToken, user: { id: newUser.id, username: newUser.username } };
-}
+};

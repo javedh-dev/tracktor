@@ -1,7 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$lib/config/env.server';
-import { generateState, generateNonce, getAuthorizationUrl, generateCodeVerifier } from '$server/services/oidcService';
+import {
+  generateState,
+  generateNonce,
+  getAuthorizationUrl,
+  generateCodeVerifier
+} from '$server/services/oidcService';
 
 export const GET: RequestHandler = async (event) => {
   if (!env.OIDC_ENABLED) {

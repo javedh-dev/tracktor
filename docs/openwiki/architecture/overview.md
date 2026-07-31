@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Architecture Overview"
+type: 'Reference'
+title: 'Architecture Overview'
 openwiki_generated: true
 ---
 
