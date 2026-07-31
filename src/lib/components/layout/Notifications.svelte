@@ -13,7 +13,6 @@
 
   import { browser } from '$app/environment';
   import type { Notification } from '$lib/domain/notification';
-  import { vehicleStore } from '$stores/vehicle.svelte';
   import { notificationStore } from '$stores/notification.svelte';
   import { getLocale } from '$lib/paraglide/runtime.js';
   import { authStore } from '$lib/stores/auth.svelte';
@@ -72,19 +71,19 @@
     await notificationStore.navigate(notification);
   };
 
-  let hydratedVehicleId: string | undefined;
+  // The bell is fleet-wide: fetch once per login rather than per vehicle scope.
+  let hasFetchedNotifications = false;
 
   $effect(() => {
-    if (!browser || !authStore.isLoggedIn) return;
-    const selectedId = vehicleStore.selectedId;
-    if (!selectedId) {
-      hydratedVehicleId = undefined;
+    if (!browser) return;
+    if (!authStore.isLoggedIn) {
+      hasFetchedNotifications = false;
       notificationStore.apiNotifications = [];
       return;
     }
-    if (hydratedVehicleId === selectedId) return;
-    hydratedVehicleId = selectedId;
-    notificationStore.fetch(selectedId);
+    if (hasFetchedNotifications) return;
+    hasFetchedNotifications = true;
+    notificationStore.fetch();
   });
 
   const dateFormatter = $derived(new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }));
@@ -154,14 +153,7 @@
       </div>
     </div>
     <DropdownMenu.Separator />
-    {#if !vehicleStore.selectedId}
-      <div
-        class="notifications-empty text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
-      >
-        <AlertTriangle class="h-4 w-4" />
-        <span>{m.notifications_select_vehicle_hint()}</span>
-      </div>
-    {:else if notificationStore.isLoadingNotifications}
+    {#if notificationStore.isLoadingNotifications}
       <div
         class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
       >

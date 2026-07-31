@@ -16,16 +16,41 @@
   import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import DateCell from '$lib/components/feature/shared/DateCell.svelte';
   import OdometerCell from '$lib/components/feature/shared/OdometerCell.svelte';
   import CostCell from '$lib/components/feature/shared/CostCell.svelte';
   import NotesCell from '$lib/components/feature/shared/NotesCell.svelte';
   import AttachmentCell from '$lib/components/feature/shared/AttachmentCell.svelte';
+  import VehicleCell from '$lib/components/feature/shared/VehicleCell.svelte';
+  import Car from '@lucide/svelte/icons/car';
   import * as m from '$lib/paraglide/messages';
 
-  let lastVehicleId: string | undefined;
+  let lastScopeKey: string | undefined;
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
 
-  const columns: ColumnDef<MaintenanceLog>[] = [
+  const columns = $derived<ColumnDef<MaintenanceLog>[]>([
+    ...(scope.isFleet
+      ? [
+          {
+            id: 'vehicle',
+            header: () =>
+              renderComponent(LabelWithIcon, {
+                icon: Car,
+                iconClass: 'h-4 w-4',
+                label: m.col_vehicle(),
+                style: 'justify-start'
+              }),
+            cell: ({ row }: { row: { original: MaintenanceLog } }) =>
+              renderComponent(VehicleCell, {
+                make: row.original.vehicleMake,
+                model: row.original.vehicleModel,
+                plate: row.original.vehiclePlate
+              })
+          } satisfies ColumnDef<MaintenanceLog>
+        ]
+      : []),
     {
       accessorKey: 'date',
       header: () =>
@@ -100,20 +125,18 @@
         renderComponent(MaintenanceContextMenu, {
           maintenanceLog: row.original,
           onaction: () => {
-            maintenanceStore.refreshMaintenanceLogs();
+            maintenanceStore.reloadMaintenanceLogs();
           }
         })
     }
-  ];
+  ]);
 
   $effect(() => {
-    const vehicleId = vehicleStore.selectedId;
-    if (vehicleId && vehicleId !== lastVehicleId) {
-      lastVehicleId = vehicleId;
-      maintenanceStore.refreshMaintenanceLogs();
-    }
-    if (!vehicleId) {
-      lastVehicleId = undefined;
+    const vehicleId = scope.vehicleId;
+    const scopeKey = vehicleId ?? '__fleet__';
+    if (scopeKey !== lastScopeKey) {
+      lastScopeKey = scopeKey;
+      maintenanceStore.refreshMaintenanceLogs(vehicleId);
     }
   });
 </script>

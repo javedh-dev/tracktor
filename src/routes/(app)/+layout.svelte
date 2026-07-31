@@ -12,8 +12,6 @@
   import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
-  import Tractor from '@lucide/svelte/icons/tractor';
-  import { m } from '$lib/paraglide/messages';
 
   let { data, children }: LayoutProps = $props();
 
@@ -40,10 +38,6 @@
   <Sidebar.SidebarInset>
     <div id="app-topbar" class="bg-background flex items-center gap-2 border-y px-4 py-2">
       <Sidebar.SidebarTrigger />
-      <div class="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-        <Tractor class="text-primary h-6 w-6 shrink-0" />
-        <span class="truncate font-semibold">{m.app_name()}</span>
-      </div>
       <div class="flex flex-1 items-center justify-end gap-2">
         <Notifications />
         <ThemeToggle />

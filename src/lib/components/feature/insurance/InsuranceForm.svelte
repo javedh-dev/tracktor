@@ -22,8 +22,12 @@
   import Building2 from '@lucide/svelte/icons/building-2';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import RecurrenceFields from '$lib/components/feature/shared/RecurrenceFields.svelte';
+  import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
+  import { page } from '$app/state';
+  import { vehicleStore } from '$stores/vehicle.svelte';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
 
   let { data } = $props();
 
@@ -52,7 +56,7 @@
           if (res.status == 'OK') {
             toast.success(m[data ? 'insurance_toast_updated' : 'insurance_toast_saved']());
             sf.attachment = undefined;
-            sheetStore.closeSheet(() => insuranceStore.refreshInsurances());
+            sheetStore.closeSheet(() => insuranceStore.reloadInsurances());
           } else {
             toast.error(m.insurance_toast_error_prefix() + res.error);
           }
@@ -71,6 +75,9 @@
   const { form, enhance } = sf;
   const formData: any = sf.formData;
 
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const suppliedVehicleId = $derived(data?.vehicleId || (scope.isFleet ? '' : scope.vehicleId));
+
   $effect(() => {
     sf.resetAttachment();
     if (data) {
@@ -81,7 +88,7 @@
         attachment: null
       });
     }
-    sf.setVehicleId();
+    if (suppliedVehicleId) sf.setVehicleId(suppliedVehicleId);
   });
 
   $effect(() => {
@@ -95,6 +102,9 @@
 
 <form id="insurance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
   <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
+    {#if !suppliedVehicleId}
+      <VehicleSelectField {form} {formData} vehicles={vehicleStore.vehicles ?? []} />
+    {/if}
     <Form.Field {form} name="attachment" class="w-full">
       <Form.Control>
         <FormLabel description={m.insurance_form_attachment_desc()}

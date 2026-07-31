@@ -28,7 +28,7 @@
   import VehicleCardHeader from './VehicleCardHeader.svelte';
   import VehicleQuickActions from './VehicleQuickActions.svelte';
 
-  const { vehicle, onclick, onkeydown, isSelected = false } = $props();
+  const { vehicle, onclick, onkeydown } = $props();
   let deleteDialog = $state(false);
   let detailsModalOpen = $state(false);
 
@@ -112,7 +112,7 @@
   {onkeydown}
 >
   <Card.Root
-    class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
+    class="hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 border-transparent p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm"
   >
     <Card.Header class="relative h-38 overflow-hidden p-0 ">
       <VehicleCardHeader {vehicle} {imageUrl} />
@@ -120,7 +120,7 @@
     <Card.Content class="px-4">
       <VehicleCardDetails {vehicle} messages={m} />
     </Card.Content>
-    <Card.Footer id="vehicle-card-actions" class="px-3">
+    <Card.Footer id="vehicle-card-actions" class="px-3" onclick={(e) => e.stopPropagation()}>
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
         <VehicleQuickActions actions={quickActions} />
         <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">

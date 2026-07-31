@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { apiDateString, optionalApiDateString } from './shared';
+import { getNextDueDate } from '$lib/helper/recurrence.helper';
 
 export const PUCC_RECURRENCE_TYPES = {
   none: 'none',
@@ -35,6 +36,31 @@ export interface PollutionCertificate {
   testingCenter: string;
   notes: string | null;
   attachment: string | null;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
+}
+
+export type PuccStatus = 'valid' | 'expiring_soon' | 'expired';
+
+/** Next date this certificate is due (issue/expiry + recurrence). Null when it never expires. */
+export function getPuccNextDue(pucc: PollutionCertificate): Date | null {
+  const baseDate = pucc.expiryDate ?? pucc.issueDate;
+  if (!baseDate) return null;
+  if (pucc.recurrenceType === 'no_end') return null;
+  if (pucc.recurrenceType === 'none') return baseDate;
+  return getNextDueDate(new Date(baseDate), pucc.recurrenceType, pucc.recurrenceInterval);
+}
+
+/** Compliance status derived from the next due date, matching the 30-day "expiring soon" window
+ *  previously computed server-side in /api/pucc/status. */
+export function getPuccStatus(pucc: PollutionCertificate, today: Date = new Date()): PuccStatus {
+  const nextDue = getPuccNextDue(pucc);
+  if (!nextDue) return 'valid';
+  const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  if (nextDue < today) return 'expired';
+  if (nextDue <= thirtyDaysFromNow) return 'expiring_soon';
+  return 'valid';
 }
 
 const puccRecurrenceOptions = Object.keys(

@@ -4,11 +4,11 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import AreaChart from './AreaChart.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import { overview_chart_mileage_label } from '$lib/paraglide/messages/_index.js';
 
-  const selectedVehicle = $derived(
-    vehicleStore.vehicles?.find((vehicle: any) => vehicle.id === vehicleStore.selectedId)
-  );
+  const selectedVehicle = $derived(readVehicleScope(page.url, vehicleStore.vehicles).vehicle);
 </script>
 
 <AreaChart

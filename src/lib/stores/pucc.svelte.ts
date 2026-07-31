@@ -1,10 +1,8 @@
 import type { PollutionCertificate } from '$lib/domain';
-import { vehicleStore } from './vehicle.svelte';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<PollutionCertificate>({
-  buildPath: () =>
-    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/pucc` : undefined,
+  buildPath: (vehicleId) => (vehicleId ? `/pucc?vehicleId=${vehicleId}` : '/pucc'),
   errorMessage: 'Failed to fetch PUCCs'
 });
 
@@ -18,5 +16,6 @@ export const puccStore = {
   get error() {
     return entityStore.error;
   },
-  refreshPuccs: entityStore.refresh
+  refreshPuccs: entityStore.refresh,
+  reloadPuccs: entityStore.reload
 };

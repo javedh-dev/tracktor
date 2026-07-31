@@ -29,7 +29,7 @@
     const res = await saveReminder(updated);
     if (res.status === 'OK') {
       toast.success(m.reminder_status_completed());
-      reminderStore.refreshReminders();
+      reminderStore.reloadReminders();
     } else {
       toast.error(res.error || m.reminder_status_error());
     }

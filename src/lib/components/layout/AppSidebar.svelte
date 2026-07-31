@@ -2,7 +2,6 @@
   import * as Sidebar from '$ui/sidebar/index.js';
   import * as Avatar from '$ui/avatar/index.js';
   import * as DropdownMenu from '$ui/dropdown-menu/index.js';
-  import VehicleSwitcher from '$layout/VehicleSwitcher.svelte';
 
   import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
   import Car from '@lucide/svelte/icons/car';
@@ -11,7 +10,6 @@
   import Bell from '@lucide/svelte/icons/bell';
   import BadgeInfo from '@lucide/svelte/icons/badge-info';
   import Shield from '@lucide/svelte/icons/shield';
-  import Banknote from '@lucide/svelte/icons/banknote';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Settings from '@lucide/svelte/icons/settings';
   import LogOut from '@lucide/svelte/icons/log-out';
@@ -19,6 +17,7 @@
   import ToolCase from '@lucide/svelte/icons/tool-case';
   import Database from '@lucide/svelte/icons/database';
   import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
+  import Tractor from '@lucide/svelte/icons/tractor';
 
   import { configStore } from '$stores/config.svelte';
   import { authStore } from '$stores/auth.svelte';
@@ -87,12 +86,6 @@
       group: 'Logs'
     },
     {
-      label: 'Expenses',
-      href: '/expenses',
-      icon: Banknote,
-      group: 'Logs'
-    },
-    {
       label: 'Reports',
       href: '/reports',
       icon: BarChart3,
@@ -138,7 +131,19 @@
 
 <Sidebar.Sidebar variant="sidebar" collapsible="icon">
   <Sidebar.Header>
-    <VehicleSwitcher />
+    <div
+      id="app-identity"
+      class="flex items-center gap-2 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+    >
+      <div
+        class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg"
+      >
+        <Tractor class="size-4" />
+      </div>
+      <span class="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
+        {m.app_name()}
+      </span>
+    </div>
   </Sidebar.Header>
 
   <Sidebar.Content>

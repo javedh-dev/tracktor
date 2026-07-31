@@ -1,6 +1,7 @@
 <script lang="ts">
   import VehicleListItem from '$feature/vehicle/VehicleListItem.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { goto } from '$app/navigation';
 </script>
 
 {#if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
@@ -8,8 +9,9 @@
     {#each vehicleStore.vehicles.slice(0, 5) as vehicle (vehicle.id)}
       <VehicleListItem
         {vehicle}
-        onclick={() => (vehicleStore.selectedId = vehicle.id!)}
-        isSelected={vehicleStore.selectedId === vehicle.id}
+        onclick={() => {
+          if (vehicle.id) goto(`/vehicles/${vehicle.id}`);
+        }}
         actions={false}
       />
     {/each}

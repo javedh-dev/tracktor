@@ -27,6 +27,9 @@
   import { toast } from 'svelte-sonner';
   import * as m from '$lib/paraglide/messages';
   import RecurrenceFields from '$lib/components/feature/shared/RecurrenceFields.svelte';
+  import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
 
   let { data }: { data?: Partial<Reminder> } = $props();
 
@@ -42,7 +45,7 @@
         }).then((res) => {
           if (res.status === 'OK') {
             toast.success(m[data ? 'reminder_toast_updated' : 'reminder_toast_created']());
-            sheetStore.closeSheet(reminderStore.refreshReminders);
+            sheetStore.closeSheet(reminderStore.reloadReminders);
           } else {
             toast.error(res.error || m.reminder_toast_error_fallback());
           }
@@ -55,7 +58,9 @@
   const { form, enhance } = sf;
   const formData: any = sf.formData;
 
-  const resolveVehicleId = () => data?.vehicleId || vehicleStore.selectedId || '';
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const resolveVehicleId = () => data?.vehicleId || (scope.isFleet ? '' : scope.vehicleId) || '';
+  const suppliedVehicleId = $derived(resolveVehicleId());
 
   $effect(() => {
     if (data?.id) {
@@ -87,6 +92,9 @@
 
 <form id="reminder-form" use:enhance onsubmit={(e) => e.preventDefault()}>
   <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
+    {#if !suppliedVehicleId}
+      <VehicleSelectField {form} {formData} vehicles={vehicleStore.vehicles ?? []} />
+    {/if}
     <Form.Field {form} name="dueDate" class="w-full">
       <Form.Control>
         {#snippet children({ props })}

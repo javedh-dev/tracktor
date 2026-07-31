@@ -10,33 +10,36 @@
   import FeatureRecordCardSkeleton from '$appui/FeatureRecordCardSkeleton.svelte';
   import RecordDetailItem from '$appui/RecordDetailItem.svelte';
   import { formatDate } from '$lib/helper/format.helper';
-  import { getNextDueDate } from '$lib/helper/recurrence.helper';
   import PuccContextMenu from './PuccContextMenu.svelte';
   import { puccStore } from '$stores/pucc.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import StoreResourceState from '$appui/StoreResourceState.svelte';
-  import { getPuccRecurrenceTypeLabel } from '$lib/domain/pucc';
+  import { getPuccRecurrenceTypeLabel, getPuccNextDue } from '$lib/domain/pucc';
   import type { PollutionCertificate } from '$lib/domain/pucc';
   import * as m from '$lib/paraglide/messages';
 
-  const getNextPuccDue = (pucc: PollutionCertificate) => {
-    const baseDate = pucc.expiryDate ?? pucc.issueDate;
-    if (!baseDate) return null;
-    if (pucc.recurrenceType === 'no_end') return null;
-    if (pucc.recurrenceType === 'none') return baseDate;
-    return getNextDueDate(new Date(baseDate), pucc.recurrenceType, pucc.recurrenceInterval);
-  };
+  interface Props {
+    /** Optional predicate to narrow what's rendered (e.g. page-level status filter tabs). */
+    filter?: (pucc: PollutionCertificate) => boolean;
+  }
 
-  let lastVehicleId: string | undefined;
+  let { filter }: Props = $props();
+
+  let lastScopeKey: string | undefined;
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+
+  const certs = $derived(
+    filter ? (puccStore.pollutionCerts ?? []).filter(filter) : (puccStore.pollutionCerts ?? [])
+  );
 
   $effect(() => {
-    const vehicleId = vehicleStore.selectedId;
-    if (vehicleId && vehicleId !== lastVehicleId) {
-      lastVehicleId = vehicleId;
-      puccStore.refreshPuccs();
-    }
-    if (!vehicleId) {
-      lastVehicleId = undefined;
+    const vehicleId = scope.vehicleId;
+    const scopeKey = vehicleId ?? '__fleet__';
+    if (scopeKey !== lastScopeKey) {
+      lastScopeKey = scopeKey;
+      puccStore.refreshPuccs(vehicleId);
     }
   });
 </script>
@@ -44,26 +47,29 @@
 <StoreResourceState
   processing={puccStore.processing}
   error={puccStore.error}
-  data={puccStore.pollutionCerts}
+  data={certs}
   emptyMessage={m.pollution_list_empty()}
 >
   {#snippet skeleton()}
     <FeatureRecordCardSkeleton containerId="pollution-list-skeleton" />
   {/snippet}
-  {#each puccStore.pollutionCerts as pucc (pucc.id)}
-    {@const nextDue = getNextPuccDue(pucc)}
+  {#each certs as pucc (pucc.id)}
+    {@const nextDue = getPuccNextDue(pucc)}
     <FeatureRecordCard
       id="pollution-certificate-item-{pucc.id}"
       class="pollution-certificate-item bg-secondary lg:bg-background/50"
       title={pucc.certificateNumber}
       titleIcon={BadgeCheck}
       titleClass="text-fuchsia-500 dark:text-fuchsia-400"
+      subtitle={scope.isFleet && (pucc.vehicleMake || pucc.vehicleModel)
+        ? `${pucc.vehicleMake ?? ''} ${pucc.vehicleModel ?? ''}`.trim()
+        : undefined}
     >
       {#snippet actions()}
         <PuccContextMenu
           {pucc}
           onaction={() => {
-            puccStore.refreshPuccs();
+            puccStore.reloadPuccs();
           }}
         />
       {/snippet}

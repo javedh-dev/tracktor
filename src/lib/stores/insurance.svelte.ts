@@ -1,10 +1,8 @@
 import type { Insurance } from '$lib/domain';
-import { vehicleStore } from './vehicle.svelte';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<Insurance>({
-  buildPath: () =>
-    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/insurance` : undefined,
+  buildPath: (vehicleId) => (vehicleId ? `/insurance?vehicleId=${vehicleId}` : '/insurance'),
   errorMessage: 'Failed to fetch Insurances'
 });
 
@@ -18,5 +16,6 @@ export const insuranceStore = {
   get error() {
     return entityStore.error;
   },
-  refreshInsurances: entityStore.refresh
+  refreshInsurances: entityStore.refresh,
+  reloadInsurances: entityStore.reload
 };

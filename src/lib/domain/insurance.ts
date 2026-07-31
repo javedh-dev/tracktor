@@ -36,6 +36,9 @@ export interface Insurance {
   cost: number;
   notes: string | null;
   attachment: string | null;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
 }
 
 const insuranceRecurrenceOptions = Object.keys(

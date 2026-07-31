@@ -14,6 +14,18 @@ export const getNotifications = async (vehicleId: string): Promise<Response<Noti
   return res;
 };
 
+export const getAllNotifications = async (): Promise<Response<Notification[]>> => {
+  const res: Response<Notification[]> = { status: 'OK' };
+  try {
+    const response = await apiClient.get('/notifications');
+    res.data = response.data.data || response.data;
+  } catch (e: any) {
+    res.status = 'ERROR';
+    res.error = e.response?.data?.message || 'Failed to fetch notifications.';
+  }
+  return res;
+};
+
 export const markNotificationAsRead = async (
   vehicleId: string,
   notificationId: string

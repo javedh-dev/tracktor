@@ -7,9 +7,13 @@ import * as schema from '$server/db/schema/index';
 export const GET: RequestHandler = async ({ url }) => {
   const type = url.searchParams.get('type');
   const status = url.searchParams.get('status');
+  const vehicleId = url.searchParams.get('vehicleId');
 
   const conditions = [];
 
+  if (vehicleId) {
+    conditions.push(eq(schema.reminderTable.vehicleId, vehicleId));
+  }
   if (type && type !== 'all') {
     conditions.push(eq(schema.reminderTable.type, type));
   }
@@ -17,9 +21,10 @@ export const GET: RequestHandler = async ({ url }) => {
     conditions.push(eq(schema.reminderTable.isCompleted, true));
   } else if (status === 'upcoming') {
     conditions.push(eq(schema.reminderTable.isCompleted, false));
-  } else {
-    conditions.push(eq(schema.reminderTable.isCompleted, false));
   }
+  // No status param: return reminders of every completion state — this is
+  // the generic list used by the reminder store (fleet or scoped), not just
+  // the ad-hoc upcoming/completed split on the /reminders page.
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -34,6 +39,7 @@ export const GET: RequestHandler = async ({ url }) => {
       remindSchedule: schema.reminderTable.remindSchedule,
       recurrenceType: schema.reminderTable.recurrenceType,
       recurrenceInterval: schema.reminderTable.recurrenceInterval,
+      recurrenceEndDate: schema.reminderTable.recurrenceEndDate,
       vehicleMake: schema.vehicleTable.make,
       vehicleModel: schema.vehicleTable.model,
       vehiclePlate: schema.vehicleTable.licensePlate

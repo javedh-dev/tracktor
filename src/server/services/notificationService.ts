@@ -3,7 +3,7 @@ import {
   NOTIFICATION_SOURCES,
   NOTIFICATION_TYPES
 } from '$lib/domain/notification';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, getTableColumns, inArray, isNull, sql } from 'drizzle-orm';
 
 import { db } from '$server/db';
 import * as schema from '$server/db/schema';
@@ -196,6 +196,27 @@ export const getNotifications = async (vehicleId: string) => {
   });
 
   return notifications;
+};
+
+/** Fleet-wide notification list, with vehicle fields joined in for display. */
+export const getAllNotifications = async () => {
+  const rows = await db
+    .select({
+      ...getTableColumns(schema.notificationTable),
+      vehicleMake: schema.vehicleTable.make,
+      vehicleModel: schema.vehicleTable.model,
+      vehiclePlate: schema.vehicleTable.licensePlate
+    })
+    .from(schema.notificationTable)
+    .leftJoin(schema.vehicleTable, eq(schema.notificationTable.vehicleId, schema.vehicleTable.id))
+    .where(isNull(schema.notificationTable.clearedAt))
+    .orderBy(
+      asc(schema.notificationTable.isRead),
+      asc(schema.notificationTable.dueDate),
+      desc(schema.notificationTable.created_at)
+    );
+
+  return rows;
 };
 
 export const getPendingNotificationsForChannels = async (channels: NotificationChannel[]) => {

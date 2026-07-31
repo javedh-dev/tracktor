@@ -15,12 +15,15 @@
   import InsuranceContextMenu from './InsuranceContextMenu.svelte';
   import { insuranceStore } from '$stores/insurance.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import StoreResourceState from '$appui/StoreResourceState.svelte';
   import { getInsuranceRecurrenceTypeLabel } from '$lib/domain/insurance';
   import type { Insurance } from '$lib/domain/insurance';
   import * as m from '$lib/paraglide/messages';
 
-  let lastVehicleId: string | undefined;
+  let lastScopeKey: string | undefined;
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
 
   const getNextInsuranceDue = (ins: Insurance) => {
     const baseDate = ins.endDate ?? ins.startDate;
@@ -31,13 +34,11 @@
   };
 
   $effect(() => {
-    const vehicleId = vehicleStore.selectedId;
-    if (vehicleId && vehicleId !== lastVehicleId) {
-      lastVehicleId = vehicleId;
-      insuranceStore.refreshInsurances();
-    }
-    if (!vehicleId) {
-      lastVehicleId = undefined;
+    const vehicleId = scope.vehicleId;
+    const scopeKey = vehicleId ?? '__fleet__';
+    if (scopeKey !== lastScopeKey) {
+      lastScopeKey = scopeKey;
+      insuranceStore.refreshInsurances(vehicleId);
     }
   });
 </script>
@@ -59,12 +60,15 @@
       title={ins.provider}
       titleIcon={Shield}
       titleClass="text-blue-400"
+      subtitle={scope.isFleet && (ins.vehicleMake || ins.vehicleModel)
+        ? `${ins.vehicleMake ?? ''} ${ins.vehicleModel ?? ''}`.trim()
+        : undefined}
     >
       {#snippet actions()}
         <InsuranceContextMenu
           insurance={ins}
           onaction={() => {
-            insuranceStore.refreshInsurances();
+            insuranceStore.reloadInsurances();
           }}
         />
       {/snippet}

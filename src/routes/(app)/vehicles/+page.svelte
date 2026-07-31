@@ -6,6 +6,7 @@
   import CardGridSkeleton from '$appui/CardGridSkeleton.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
+  import { goto } from '$app/navigation';
   import Button from '$ui/button/button.svelte';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import { app_add_vehicle, vehicle_list_empty } from '$lib/paraglide/messages/_index.js';
@@ -29,7 +30,7 @@
         <VehicleCard
           {vehicle}
           onclick={() => {
-            vehicleStore.selectedId = vehicle.id!;
+            if (vehicle.id) goto(`/vehicles/${vehicle.id}`);
           }}
           onkeydown={() => {}}
         />

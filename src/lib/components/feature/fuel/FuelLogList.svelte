@@ -28,9 +28,13 @@
   import CostCell from '$lib/components/feature/shared/CostCell.svelte';
   import NotesCell from '$lib/components/feature/shared/NotesCell.svelte';
   import AttachmentCell from '$lib/components/feature/shared/AttachmentCell.svelte';
+  import VehicleCell from '$lib/components/feature/shared/VehicleCell.svelte';
+  import Car from '@lucide/svelte/icons/car';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import {
     col_date,
     col_odometer,
@@ -40,6 +44,7 @@
     col_mileage,
     col_notes,
     col_attachment,
+    col_vehicle,
     fuel_volume_label_energy,
     fuel_volume_label_fuel,
     fuel_empty_list,
@@ -47,16 +52,35 @@
     common_no
   } from '$lib/paraglide/messages/_index.js';
 
-  const selectedVehicle = $derived(
-    vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
-  );
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const selectedVehicle = $derived(scope.vehicle);
   const volumeLabel = $derived(
     selectedVehicle?.fuelType === 'electric' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
   );
 
-  let lastVehicleId: string | undefined;
+  let lastScopeKey: string | undefined;
 
-  const columns: ColumnDef<FuelLog>[] = [
+  const columns = $derived<ColumnDef<FuelLog>[]>([
+    ...(scope.isFleet
+      ? [
+          {
+            id: 'vehicle',
+            header: () =>
+              renderComponent(LabelWithIcon, {
+                icon: Car,
+                iconClass: 'h-4 w-4',
+                label: col_vehicle(),
+                style: 'justify-start'
+              }),
+            cell: ({ row }: { row: { original: FuelLog } }) =>
+              renderComponent(VehicleCell, {
+                make: row.original.vehicleMake,
+                model: row.original.vehicleModel,
+                plate: row.original.vehiclePlate
+              })
+          } satisfies ColumnDef<FuelLog>
+        ]
+      : []),
     {
       accessorKey: 'date',
       header: () =>
@@ -182,20 +206,18 @@
         renderComponent(FuelLogContextMenu, {
           fuelLog: row.original,
           onaction: () => {
-            fuelLogStore.refreshFuelLogs();
+            fuelLogStore.reloadFuelLogs();
           }
         })
     }
-  ];
+  ]);
 
   $effect(() => {
-    const vehicleId = vehicleStore.selectedId;
-    if (vehicleId && vehicleId !== lastVehicleId) {
-      lastVehicleId = vehicleId;
-      fuelLogStore.refreshFuelLogs();
-    }
-    if (!vehicleId) {
-      lastVehicleId = undefined;
+    const vehicleId = scope.vehicleId;
+    const scopeKey = vehicleId ?? '__fleet__';
+    if (scopeKey !== lastScopeKey) {
+      lastScopeKey = scopeKey;
+      fuelLogStore.refreshFuelLogs(vehicleId);
     }
   });
 </script>
