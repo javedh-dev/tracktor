@@ -4,7 +4,7 @@
     deleteReminder as deleteReminderService,
     saveReminder
   } from '$lib/services/reminder.service';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import ReminderForm from './ReminderForm.svelte';

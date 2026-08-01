@@ -7,19 +7,19 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-export function clampColSpan(span: number): number {
+function clampColSpan(span: number): number {
   return clamp(Math.round(span), 1, GRID_COLUMNS);
 }
 
-export function clampRowSpan(span: number): number {
+function clampRowSpan(span: number): number {
   return clamp(Math.round(span), 1, GRID_MAX_ROW_SPAN);
 }
 
-export function clampColStart(colStart: number, colSpan: number): number {
+function clampColStart(colStart: number, colSpan: number): number {
   return clamp(Math.round(colStart), 1, GRID_COLUMNS - clampColSpan(colSpan) + 1);
 }
 
-export function clampRowStart(rowStart: number): number {
+function clampRowStart(rowStart: number): number {
   return Math.max(1, Math.round(rowStart));
 }
 

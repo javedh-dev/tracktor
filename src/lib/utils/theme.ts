@@ -22,7 +22,7 @@ export function saveTheme(theme: ThemeName): void {
 /**
  * Check if dark mode is currently active
  */
-export function isDarkMode(): boolean {
+function isDarkMode(): boolean {
   if (typeof document === 'undefined') return false;
   return document.documentElement.classList.contains('dark');
 }
@@ -59,31 +59,10 @@ export function applyThemeColors(
 }
 
 /**
- * Reset theme to default (remove all custom theme variables)
- */
-export function resetThemeColors(): void {
-  if (typeof document === 'undefined') return;
-  const root = document.documentElement;
-  const customProps = ['primary', 'primary-foreground', 'ring'];
-
-  customProps.forEach((prop) => {
-    root.style.removeProperty(`--${prop}`);
-  });
-}
-
-/**
  * Add or remove theme class from HTML element
  */
 export function setThemeClass(theme: ThemeName): void {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   root.setAttribute('data-theme', theme);
-}
-
-/**
- * Get the current system theme preference
- */
-export function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }

@@ -86,7 +86,7 @@ function buildMileageSeries(startOdometer: number, count: number): number[] {
   });
 }
 
-export const clearDb = async () => {
+const clearDb = async () => {
   await db.delete(notificationTable);
   await db.delete(pollutionCertificateTable);
   await db.delete(maintenanceLogTable);

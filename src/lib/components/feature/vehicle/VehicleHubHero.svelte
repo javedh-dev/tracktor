@@ -16,7 +16,7 @@
   import { getFuelTypeLabel } from '$lib/domain/vehicle';
   import { formatDistance, formatMileage } from '$lib/helper/format.helper';
   import VehicleForm from './VehicleForm.svelte';
-  import type { Vehicle } from '$lib/domain';
+  import type { Vehicle } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
 
   interface Props {

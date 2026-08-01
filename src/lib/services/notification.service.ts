@@ -1,4 +1,5 @@
-import type { Notification, Response } from '$lib/domain';
+import type { Notification } from '$lib/domain/notification';
+import type { Response } from '$lib/domain/shared';
 import { apiClient } from '$lib/helper/api.helper';
 
 export const getNotifications = async (vehicleId: string): Promise<Response<Notification[]>> => {

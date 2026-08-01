@@ -1,12 +1,12 @@
 // Stub helpers for CSV import flows. Implement the real parsing and persistence logic here.
-export type CsvParseOptions = {
+type CsvParseOptions = {
   delimiter: string;
   hasHeaders: boolean;
 };
 
 export type ParsedCsvRow = Record<string, string>;
 
-export type ParsedCsv = {
+type ParsedCsv = {
   headers: string[];
   rows: ParsedCsvRow[];
 };

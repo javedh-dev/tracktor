@@ -41,7 +41,7 @@ export interface PollutionCertificate {
   vehiclePlate?: string | null;
 }
 
-export type PuccStatus = 'valid' | 'expiring_soon' | 'expired';
+type PuccStatus = 'valid' | 'expiring_soon' | 'expired';
 
 /** Next date this certificate is due (issue/expiry + recurrence). Null when it never expires. */
 export function getPuccNextDue(pucc: PollutionCertificate): Date | null {

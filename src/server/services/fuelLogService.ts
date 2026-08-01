@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { eq, getTableColumns } from 'drizzle-orm';
 import { fuelSchema } from '$lib/domain/fuel';
 import { computeMileagePerWindow, type FuelLogInput } from '$lib/domain/fuel/mileage';
-import { validateVehicleExistsByLicensePlate } from '../utils/serviceUtils';
 import { getConfigsByKeys } from './configService';
 import { createOwnedEntityService } from '../utils/entity-service-factory';
 
@@ -114,23 +113,4 @@ export const getFuelLogs = async (vehicleId?: string) => {
   return Array.from(groupedByVehicle.values()).flatMap((group) =>
     withMileageMetrics(group, mileageFormat, configMap)
   );
-};
-
-export const addFuelLogByLicensePlate = async (
-  licensePlate: string,
-  fuelLogData: FuelLogPayload
-) => {
-  await validateVehicleExistsByLicensePlate(licensePlate);
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate)
-  });
-  return await addFuelLog(vehicle!.id, fuelLogData);
-};
-
-export const getFuelLogsByLicensePlate = async (licensePlate: string) => {
-  await validateVehicleExistsByLicensePlate(licensePlate);
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicle, { eq }) => eq(vehicle.licensePlate, licensePlate)
-  });
-  return await getFuelLogs(vehicle!.id);
 };

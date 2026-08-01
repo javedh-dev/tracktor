@@ -4,17 +4,12 @@ import path from 'path';
 import { logger } from '$server/config';
 import { serverEnv } from '$lib/config/env.server';
 
-export type EnsureAppDirectoriesOptions = {
-  uploadsDir?: string;
-  dataDir?: string;
-};
-
 /**
  * Ensures a directory exists and is actually a directory.
  * If it does not exist, it is created recursively.
  * Throws if the path exists but is not a directory, or if creation fails.
  */
-export async function ensureDirectoryExists(dirPath: string, label?: string): Promise<void> {
+async function ensureDirectoryExists(dirPath: string, label?: string): Promise<void> {
   const resolvedPath = path.resolve(dirPath);
   const name = label || resolvedPath;
 
@@ -44,12 +39,10 @@ export async function ensureDirectoryExists(dirPath: string, label?: string): Pr
  * Logs creation events and throws if any directory cannot be created,
  * allowing the caller to stop the application.
  */
-export async function ensureAppDirectories(
-  options: EnsureAppDirectoriesOptions = {}
-): Promise<void> {
-  const uploadsDir = options.uploadsDir ?? serverEnv.UPLOADS_DIR ?? './uploads';
+export async function ensureAppDirectories(): Promise<void> {
+  const uploadsDir = serverEnv.UPLOADS_DIR ?? './uploads';
   const logDir = serverEnv.LOG_DIR ?? './logs';
-  const dataDir = options.dataDir ?? path.dirname(serverEnv.DB_PATH ?? './tracktor.db');
+  const dataDir = path.dirname(serverEnv.DB_PATH ?? './tracktor.db');
 
   try {
     await Promise.all([

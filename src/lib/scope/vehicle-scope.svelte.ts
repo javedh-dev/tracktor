@@ -1,9 +1,9 @@
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
-import type { Vehicle } from '$lib/domain';
+import type { Vehicle } from '$lib/domain/vehicle';
 
 /** Query param used to express the current vehicle scope in the URL. */
-export const SCOPE_PARAM = 'vehicle';
+const SCOPE_PARAM = 'vehicle';
 
 export interface VehicleScope {
   vehicleId?: string;

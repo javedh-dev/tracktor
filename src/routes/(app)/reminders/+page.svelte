@@ -8,7 +8,7 @@
   import ReminderList from '$feature/reminder/ReminderList.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import Button from '$ui/button/button.svelte';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import * as m from '$lib/paraglide/messages';
   import {
     feature_reminders_disabled_title,

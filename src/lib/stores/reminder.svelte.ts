@@ -1,4 +1,4 @@
-import type { Reminder } from '$lib/domain';
+import type { Reminder } from '$lib/domain/reminder';
 import { createEntityStore } from './entity-store.svelte';
 
 function parseReminder(raw: unknown): Reminder {

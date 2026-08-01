@@ -4,7 +4,7 @@ import { data as currencies } from 'currency-codes';
 import { getCurrencySymbol } from '$lib/helper/format.helper';
 import { z } from 'zod/v4';
 
-export const settingsConfigSchema = z.object({
+const settingsConfigSchema = z.object({
   dateFormat: z.string(),
   locale: z.string().min(2),
   timezone: z.string().min(3),

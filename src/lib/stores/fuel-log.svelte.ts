@@ -1,4 +1,4 @@
-import type { FuelLog } from '$lib/domain';
+import type { FuelLog } from '$lib/domain/fuel';
 import { compareDesc } from 'date-fns';
 import { createEntityStore } from './entity-store.svelte';
 

@@ -121,7 +121,7 @@ export interface WidgetLayoutItem {
   rowSpan: WidgetRowSpan;
 }
 
-export const widgetLayoutItemSchema = z.object({
+const widgetLayoutItemSchema = z.object({
   id: z.string(),
   type: z.enum(widgetTypeOptions),
   colStart: z.number().int().min(1).max(GRID_COLUMNS),

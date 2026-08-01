@@ -5,7 +5,7 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import { formatDistance, formatMileage } from '$lib/helper/format.helper';
-  import type { Vehicle } from '$lib/domain';
+  import type { Vehicle } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
 
   interface Props {

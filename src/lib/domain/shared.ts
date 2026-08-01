@@ -11,3 +11,15 @@ export const apiDateString = z
 
 /** Nullable/optional variant for fields that can be empty or omitted. */
 export const optionalApiDateString = apiDateString.nullable().optional();
+
+export type DataPoint = {
+  x: Date | string;
+  y: number | null;
+};
+
+/** Result envelope returned by the client-side `$lib/services/*` layer. */
+export type Response<DataType> = {
+  status: 'OK' | 'ERROR';
+  data?: DataType;
+  error?: string;
+};

@@ -1,15 +1,13 @@
 import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { clientEnv as publicClientEnv } from './env';
 
 /**
- * Client-side environment configuration
- * Only includes public environment variables that are safe to expose to the browser
+ * Client-side environment configuration, plus the server-only way of disabling auth
+ * (the private env var also works, so it can be set in container deployments).
  */
 export const clientEnv = {
-  DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
-  // Allow disabling auth via either the public or private env var so it works in container deployments
-  DISABLE_AUTH:
-    publicEnv.TRACKTOR_DISABLE_AUTH === 'true' || privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
+  ...publicClientEnv,
+  DISABLE_AUTH: publicClientEnv.DISABLE_AUTH || privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
 } as const;
 
 function getCorsOrigins(origins?: string): string[] {

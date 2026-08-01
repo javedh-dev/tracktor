@@ -1,4 +1,4 @@
-import type { PollutionCertificate } from '$lib/domain';
+import type { PollutionCertificate } from '$lib/domain/pucc';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<PollutionCertificate>({

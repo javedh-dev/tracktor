@@ -22,7 +22,7 @@ export type NotificationProviderType = z.infer<typeof notificationProviderTypeSc
 export type NotificationChannel = keyof typeof NOTIFICATION_CHANNELS;
 
 // Email Provider Configuration
-export const emailProviderConfigSchema = z.object({
+const emailProviderConfigSchema = z.object({
   host: z.string().min(1, 'SMTP host is required'),
   port: z.number().int().min(1).max(65535),
   secure: z.boolean(),
@@ -38,7 +38,7 @@ export const emailProviderConfigSchema = z.object({
 export type EmailProviderConfig = z.infer<typeof emailProviderConfigSchema>;
 
 // Webhook Provider Configuration
-export const webhookProviderConfigSchema = z.object({
+const webhookProviderConfigSchema = z.object({
   url: z.string().url('Valid webhook URL is required'),
   method: z.enum(['POST', 'PUT', 'PATCH']).default('POST'),
   headers: z.record(z.string(), z.string()).optional(),
@@ -57,7 +57,7 @@ export const webhookProviderConfigSchema = z.object({
 export type WebhookProviderConfig = z.infer<typeof webhookProviderConfigSchema>;
 
 // Gotify Provider Configuration
-export const gotifyProviderConfigSchema = z.object({
+const gotifyProviderConfigSchema = z.object({
   serverUrl: z.string().url('Valid Gotify server URL is required'),
   appToken: z.string().min(1, 'App token is required'),
   priority: z.number().int().min(0).max(10).default(5)
@@ -83,7 +83,7 @@ export const notificationProviderConfigSchema = z.discriminatedUnion('type', [
 
 export type NotificationProviderConfig = z.infer<typeof notificationProviderConfigSchema>;
 
-export const notificationProviderSchema = z.object({
+const notificationProviderSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, 'Provider name is required').max(100),
   type: notificationProviderTypeSchema,
@@ -94,7 +94,7 @@ export const notificationProviderSchema = z.object({
   updated_at: z.string()
 });
 
-export type NotificationProvider = z.infer<typeof notificationProviderSchema>;
+type NotificationProvider = z.infer<typeof notificationProviderSchema>;
 
 export const createNotificationProviderSchema = z.object({
   name: z.string().min(1, 'Provider name is required').max(100),

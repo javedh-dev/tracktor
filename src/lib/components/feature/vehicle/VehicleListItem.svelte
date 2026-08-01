@@ -12,7 +12,7 @@
   import { sheetStore } from '$stores/sheet.svelte';
   import VehicleForm from './VehicleForm.svelte';
   import * as m from '$lib/paraglide/messages';
-  import type { Vehicle } from '$lib/domain';
+  import type { Vehicle } from '$lib/domain/vehicle';
 
   const {
     vehicle,

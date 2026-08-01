@@ -1,4 +1,4 @@
-import type { Vehicle } from '$lib/domain';
+import type { Vehicle } from '$lib/domain/vehicle';
 import { apiClient } from '$lib/helper/api.helper';
 import type { ApiResponse } from '$lib/response';
 

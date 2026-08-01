@@ -1,4 +1,4 @@
-import type { MaintenanceLog } from '$lib/domain';
+import type { MaintenanceLog } from '$lib/domain/maintenance';
 import { compareDesc } from 'date-fns';
 import { createEntityStore } from './entity-store.svelte';
 

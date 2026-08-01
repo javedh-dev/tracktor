@@ -19,7 +19,7 @@
   import AlarmClock from '@lucide/svelte/icons/alarm-clock';
   import Repeat from '@lucide/svelte/icons/repeat';
   import { browser } from '$app/environment';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import FileText from '@lucide/svelte/icons/file-text';
   import ReminderContextMenu from './ReminderContextMenu.svelte';
   import * as m from '$lib/paraglide/messages';

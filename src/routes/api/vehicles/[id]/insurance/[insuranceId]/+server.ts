@@ -28,8 +28,8 @@ export const PUT: RequestHandler = async (event) => {
 
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Insurance DELETE error:', async () => {
-    const { insuranceId } = event.params;
-    const result = await insuranceService.deleteInsurance(insuranceId);
+    const { id, insuranceId } = event.params;
+    const result = await insuranceService.deleteInsurance(id, insuranceId);
     return jsonResponse(result);
   });
 };

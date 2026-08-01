@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MaintenanceLog } from '$lib/domain';
+  import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { formatCurrency, formatDate, formatDistance } from '$lib/helper/format.helper';
 
   let { logs }: { logs: MaintenanceLog[] } = $props();

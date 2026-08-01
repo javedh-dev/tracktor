@@ -11,7 +11,7 @@ import * as m from '$lib/paraglide/messages/_index.js';
 
 type NotificationType = Notification['type'];
 
-export const NAVIGATION_MAP: Record<NotificationType, string> = {
+const NAVIGATION_MAP: Record<NotificationType, string> = {
   information: '/dashboard',
   insurance: '/insurance',
   pollution: '/pollution',

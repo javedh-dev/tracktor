@@ -16,7 +16,7 @@ export function computeLatestOdometer(
   return values.length > 0 ? Math.max(...values) : 0;
 }
 
-export type MileageResult = {
+type MileageResult = {
   distance: number;
   totalFuel: number;
 };

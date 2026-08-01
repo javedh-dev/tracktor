@@ -207,5 +207,3 @@ export const themes: Record<string, ThemeConfig> = {
     }
   }
 };
-
-export const themesList = Object.values(themes);

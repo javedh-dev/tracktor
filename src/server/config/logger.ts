@@ -1,49 +1,41 @@
+import { appendFile } from 'fs/promises';
+import path from 'path';
 import { env } from '$lib/config/env.server';
-import winston from 'winston';
 
-const logFormatter = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    let logMessage = `${timestamp} [${level}]: ${message}`;
+const LEVELS = ['error', 'warn', 'info', 'debug'] as const;
+type Level = (typeof LEVELS)[number];
 
-    // Add stack trace on new lines if present
-    if (stack) {
-      logMessage += '\n' + stack;
-    }
+const threshold = LEVELS.indexOf((env.LOG_LEVEL as Level) || 'info');
+const logFile = path.join(env.LOG_DIR || './logs', 'tracktor.log');
 
-    // Add any remaining metadata
-    const metaKeys = Object.keys(meta);
-    if (metaKeys.length > 0) {
-      logMessage += '\n' + JSON.stringify(meta, null, 2);
-    }
+function format(level: Level, message: unknown, meta: unknown[]): string {
+  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  const details = meta
+    .map((item) =>
+      item instanceof Error ? (item.stack ?? item.message) : JSON.stringify(item, null, 2)
+    )
+    .filter(Boolean);
 
-    return logMessage;
-  })
-);
-
-const transports: winston.transport[] = [
-  new winston.transports.File({
-    dirname: env.LOG_DIR || './logs',
-    filename: `tracktor.log`
-  })
-];
-
-if (env.NODE_ENV !== 'test') {
-  transports.push(
-    new winston.transports.Console({
-      format: winston.format.combine(winston.format.colorize(), logFormatter)
-    })
-  );
+  return [`${timestamp} [${level}]: ${message}`, ...details].join('\n');
 }
 
-const logger = winston.createLogger({
-  level: env.LOG_LEVEL || 'info',
-  exitOnError: false,
-  format: logFormatter,
-  transports
-});
+function log(level: Level, message: unknown, ...meta: unknown[]): void {
+  if (LEVELS.indexOf(level) > threshold) return;
 
-// logger.info(`Winston logger configured with ${transports.length} transports`);
+  const line = format(level, message, meta);
+
+  if (env.NODE_ENV !== 'test') {
+    console[level === 'debug' ? 'log' : level](line);
+  }
+  // Fire and forget: a failed log write must never take a request down with it.
+  void appendFile(logFile, `${line}\n`).catch(() => {});
+}
+
+const logger = {
+  error: (message: unknown, ...meta: unknown[]) => log('error', message, ...meta),
+  warn: (message: unknown, ...meta: unknown[]) => log('warn', message, ...meta),
+  info: (message: unknown, ...meta: unknown[]) => log('info', message, ...meta),
+  debug: (message: unknown, ...meta: unknown[]) => log('debug', message, ...meta)
+};
 
 export default logger;

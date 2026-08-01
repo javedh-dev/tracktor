@@ -1,4 +1,5 @@
-import type { DataPoint, FuelLog } from '$lib/domain';
+import type { FuelLog } from '$lib/domain/fuel';
+import type { DataPoint } from '$lib/domain/shared';
 import { fuelLogStore } from './fuel-log.svelte';
 
 const calculateCostData = (logs: FuelLog[]) => {

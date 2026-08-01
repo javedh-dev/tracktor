@@ -3,14 +3,6 @@ import * as pollutionCertificateService from '$server/services/pollutionCertific
 import { pollutionCertificateSchema } from '$lib/domain/pucc';
 import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
 
-export const GET: RequestHandler = async (event) => {
-  return withRouteErrorHandling('PUCC GET error:', async () => {
-    const { id } = event.params;
-    const result = await pollutionCertificateService.getPollutionCertificates(id);
-    return jsonResponse(result);
-  });
-};
-
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('PUCC POST error:', async () => {
     const { id } = event.params;

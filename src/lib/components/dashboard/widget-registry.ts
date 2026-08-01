@@ -16,7 +16,7 @@ import Fuel from '@lucide/svelte/icons/fuel';
 import DollarSign from '@lucide/svelte/icons/dollar-sign';
 import CircleGauge from '@lucide/svelte/icons/circle-gauge';
 
-export interface WidgetDefinition {
+interface WidgetDefinition {
   type: WidgetType;
   title: string;
   description: string;

@@ -211,19 +211,6 @@ export const deleteVehicle = async (id: string) => {
 };
 
 // Get vehicles with minimal data for dropdown/selection purposes
-export const getVehiclesMinimal = async () => {
-  const vehicles = await db.query.vehicleTable.findMany({
-    columns: {
-      id: true,
-      make: true,
-      model: true,
-      year: true,
-      licensePlate: true
-    }
-  });
-  return vehicles;
-};
-
 export const getVehicleSummary = async (id: string) => {
   const [vehicle, fuelLogsCount, maintenanceLogsCount] = await Promise.all([
     getVehicleById(id),

@@ -1,4 +1,4 @@
-import type { Reminder } from '$lib/domain';
+import type { Reminder } from '$lib/domain/reminder';
 import { createEntityService } from './entity-service';
 
 const { save, delete: remove } = createEntityService<Reminder>({

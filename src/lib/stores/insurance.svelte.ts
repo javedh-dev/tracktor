@@ -1,4 +1,4 @@
-import type { Insurance } from '$lib/domain';
+import type { Insurance } from '$lib/domain/insurance';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<Insurance>({

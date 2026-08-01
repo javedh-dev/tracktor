@@ -8,7 +8,7 @@ import { maintenanceSchema } from '$lib/domain/maintenance';
 type MaintenanceLogPayload = Omit<z.infer<typeof maintenanceSchema>, 'id' | 'vehicleId'>;
 type MaintenanceLogUpdatePayload = Partial<MaintenanceLogPayload>;
 
-const { add, getById, update, removeScoped } = createOwnedEntityService<
+const { add, getById, update, remove } = createOwnedEntityService<
   MaintenanceLogPayload,
   MaintenanceLogUpdatePayload
 >({
@@ -19,7 +19,7 @@ const { add, getById, update, removeScoped } = createOwnedEntityService<
 export const addMaintenanceLog = add;
 export const getMaintenanceLogById = getById;
 export const updateMaintenanceLog = update;
-export const deleteMaintenanceLog = removeScoped;
+export const deleteMaintenanceLog = remove;
 
 export const getMaintenanceLogs = async (vehicleId?: string) => {
   if (vehicleId) {

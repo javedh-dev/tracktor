@@ -1,7 +1,7 @@
 <script lang="ts">
   import CrudActionsMenu from '$appui/CrudActionsMenu.svelte';
   import { deleteInsurance } from '$lib/services/insurance.service';
-  import type { Insurance } from '$lib/domain';
+  import type { Insurance } from '$lib/domain/insurance';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import InsuranceForm from './InsuranceForm.svelte';

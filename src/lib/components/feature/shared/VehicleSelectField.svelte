@@ -4,7 +4,7 @@
   import SearchableSelect from '$appui/SearchableSelect.svelte';
   import Car from '@lucide/svelte/icons/car';
   import type { SuperForm } from 'sveltekit-superforms';
-  import type { Vehicle } from '$lib/domain';
+  import type { Vehicle } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
 
   interface Props {

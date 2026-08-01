@@ -9,10 +9,10 @@ import {
 import { clamp, ROW_UNIT_PX } from './widget-size';
 import { moveElement, resizeElement, type GridRect } from './grid-layout';
 
-export type GridMode = 'move' | 'resize';
+type GridMode = 'move' | 'resize';
 
 /** Pixel geometry of the widget being dragged, relative to the grid's padding box. */
-export interface FloatRect {
+interface FloatRect {
   left: number;
   top: number;
   width: number;
@@ -20,7 +20,7 @@ export interface FloatRect {
 }
 
 /** Rendered track geometry: `pitch` is one track plus one gap, i.e. the distance between track starts. */
-export interface GridMetrics {
+interface GridMetrics {
   colPitch: number;
   colGap: number;
   rowPitch: number;

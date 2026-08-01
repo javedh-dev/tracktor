@@ -32,8 +32,8 @@ export const PUT: RequestHandler = async (event) => {
 
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('PUCC DELETE error:', async () => {
-    const { puccId } = event.params;
-    const result = await pollutionCertificateService.deletePollutionCertificate(puccId);
+    const { id, puccId } = event.params;
+    const result = await pollutionCertificateService.deletePollutionCertificate(id, puccId);
     return jsonResponse(result);
   });
 };

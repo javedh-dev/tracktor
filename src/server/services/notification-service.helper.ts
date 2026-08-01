@@ -31,11 +31,11 @@ export const NOTIFICATION_TYPE_META: Record<
   registration: { channel: 'alert', label: 'Registration', color: '#ea580c' }
 };
 
-export function toDateOnly(value: Date): Date {
+function toDateOnly(value: Date): Date {
   return new Date(value.getFullYear(), value.getMonth(), value.getDate());
 }
 
-export function calculateReminderNotificationDate(dueDate: Date, remindSchedule: string): Date {
+function calculateReminderNotificationDate(dueDate: Date, remindSchedule: string): Date {
   const notificationDate = new Date(dueDate);
 
   switch (remindSchedule) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import CrudActionsMenu from '$appui/CrudActionsMenu.svelte';
   import { deletePollutionCertificate } from '$lib/services/pucc.service';
-  import type { PollutionCertificate } from '$lib/domain';
+  import type { PollutionCertificate } from '$lib/domain/pucc';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import PollutionCertificateForm from './PollutionCertificateForm.svelte';

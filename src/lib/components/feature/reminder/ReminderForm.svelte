@@ -15,7 +15,7 @@
   import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import SubmitButton from '$appui/SubmitButton.svelte';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import Layers from '@lucide/svelte/icons/layers';
