@@ -1,6 +1,7 @@
-import type { ThemeName, ThemeConfig } from '$lib/types/theme';
+import type { ThemeName, ThemeConfig, DarkVariant } from '$lib/types/theme';
 
 const THEME_STORAGE_KEY = 'tracktor-theme';
+const DARK_VARIANT_STORAGE_KEY = 'tracktor-dark-variant';
 
 /**
  * Get the theme from localStorage
@@ -65,4 +66,28 @@ export function setThemeClass(theme: ThemeName): void {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   root.setAttribute('data-theme', theme);
+}
+
+/**
+ * Get the dark mode variant from localStorage
+ */
+export function getStoredDarkVariant(): DarkVariant | null {
+  if (typeof window === 'undefined') return null;
+  return (localStorage.getItem(DARK_VARIANT_STORAGE_KEY) as DarkVariant) || null;
+}
+
+/**
+ * Save the dark mode variant to localStorage
+ */
+export function saveDarkVariant(variant: DarkVariant): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(DARK_VARIANT_STORAGE_KEY, variant);
+}
+
+/**
+ * Apply the dark mode variant attribute, read by the `.dark[data-dark-variant=...]` CSS overrides
+ */
+export function setDarkVariantAttr(variant: DarkVariant): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute('data-dark-variant', variant);
 }

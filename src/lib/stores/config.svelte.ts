@@ -23,7 +23,8 @@ const DEFAULT_CONFIGS: Configs = {
   featureOverview: true,
   notificationProcessingEnabled: true,
   notificationProcessingSchedule: '0 9 * * *',
-  theme: 'light'
+  theme: 'light',
+  darkVariant: 'default'
 };
 
 /**

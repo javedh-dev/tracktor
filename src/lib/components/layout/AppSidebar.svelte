@@ -18,6 +18,9 @@
   import Database from '@lucide/svelte/icons/database';
   import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
   import Tractor from '@lucide/svelte/icons/tractor';
+  import SunIcon from '@lucide/svelte/icons/sun';
+  import MoonIcon from '@lucide/svelte/icons/moon';
+  import { toggleMode } from 'mode-watcher';
 
   import { configStore } from '$stores/config.svelte';
   import { authStore } from '$stores/auth.svelte';
@@ -131,23 +134,27 @@
 
 <Sidebar.Sidebar variant="sidebar" collapsible="icon">
   <Sidebar.Header>
-    <div
+    <a
+      href="/"
       id="app-identity"
-      class="flex items-center gap-2 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+      class="hover:bg-sidebar-accent flex items-center gap-2 rounded-lg px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
     >
       <div
-        class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg"
+        class="bg-primary text-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg"
       >
         <Tractor class="size-4" />
       </div>
       <span class="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
         {m.app_name()}
       </span>
-    </div>
+    </a>
   </Sidebar.Header>
 
   <Sidebar.Content>
-    {#each navGroups as group (group.label)}
+    {#each navGroups as group, i (group.label)}
+      {#if i > 0}
+        <Sidebar.Separator />
+      {/if}
       <Sidebar.Group>
         <Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
         <Sidebar.GroupContent>
@@ -168,28 +175,37 @@
         </Sidebar.GroupContent>
       </Sidebar.Group>
     {/each}
-
-    <Sidebar.Separator />
-
-    <Sidebar.Group>
-      <Sidebar.GroupContent>
-        <Sidebar.Menu>
-          <Sidebar.MenuItem>
-            <Sidebar.MenuButton
-              {...navActiveProps('/settings')}
-              onclick={() => handleNavClick('/settings')}
-              tooltipContent={m.settings_title()}
-            >
-              <Settings class="h-4 w-4" />
-              <span>{m.settings_title()}</span>
-            </Sidebar.MenuButton>
-          </Sidebar.MenuItem>
-        </Sidebar.Menu>
-      </Sidebar.GroupContent>
-    </Sidebar.Group>
   </Sidebar.Content>
 
   <Sidebar.Footer>
+    <Sidebar.Menu>
+      <Sidebar.MenuItem>
+        <Sidebar.MenuButton
+          {...navActiveProps('/settings')}
+          onclick={() => handleNavClick('/settings')}
+          tooltipContent={m.settings_title()}
+        >
+          <Settings class="h-4 w-4" />
+          <span>{m.settings_title()}</span>
+        </Sidebar.MenuButton>
+      </Sidebar.MenuItem>
+      <Sidebar.MenuItem>
+        <Sidebar.MenuButton
+          onclick={toggleMode}
+          data-active={undefined}
+          tooltipContent={m.theme_toggle_label()}
+        >
+          <SunIcon
+            class="h-4 w-4 scale-100 rotate-0 transition-all! dark:scale-0 dark:-rotate-90"
+          />
+          <MoonIcon
+            class="absolute h-4 w-4 scale-0 rotate-90 transition-all! dark:scale-100 dark:rotate-0"
+          />
+          <span>{m.theme_toggle_label()}</span>
+        </Sidebar.MenuButton>
+      </Sidebar.MenuItem>
+    </Sidebar.Menu>
+
     {#if authStore.isLoggedIn}
       <DropdownMenu.Root>
         <DropdownMenu.Trigger class="w-full" data-slot="sidebar-user-trigger">

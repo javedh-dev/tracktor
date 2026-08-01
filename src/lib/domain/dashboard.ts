@@ -98,7 +98,8 @@ export const WIDGET_TYPES = {
   'vehicle-health-distribution': 'vehicle-health-distribution',
   'upcoming-reminders-list': 'upcoming-reminders-list',
   'vehicle-quick-list': 'vehicle-quick-list',
-  'recent-activity-feed': 'recent-activity-feed'
+  'recent-activity-feed': 'recent-activity-feed',
+  'activity-calendar': 'activity-calendar'
 } as const;
 
 export type WidgetType = keyof typeof WIDGET_TYPES;
@@ -165,7 +166,9 @@ const WIDGET_MIN_SIZES: Partial<Record<WidgetType, WidgetMinSize>> = {
   'efficiency-leaderboard': { minColSpan: 3, minRowSpan: 4 },
   'upcoming-reminders-list': { minColSpan: 3, minRowSpan: 4 },
   'vehicle-quick-list': { minColSpan: 3, minRowSpan: 4 },
-  'recent-activity-feed': { minColSpan: 3, minRowSpan: 4 }
+  'recent-activity-feed': { minColSpan: 3, minRowSpan: 4 },
+  // Month grid (7 cols) plus a per-date event list below it.
+  'activity-calendar': { minColSpan: 4, minRowSpan: 8 }
 };
 
 export function widgetMinSize(type: WidgetType): WidgetMinSize {

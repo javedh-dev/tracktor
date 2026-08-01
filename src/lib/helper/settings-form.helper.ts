@@ -17,6 +17,7 @@ const settingsConfigSchema = z.object({
     .enum(['distance-per-fuel', 'fuel-per-distance', 'uk-mpg'])
     .default('distance-per-fuel'),
   theme: z.string().default('light'),
+  darkVariant: z.string().default('default'),
   customCss: z.string().optional(),
   featureFuelLog: z.boolean().default(true),
   featureMaintenance: z.boolean().default(true),
@@ -86,6 +87,11 @@ export function createSettingsOptions(
       label: theme.label,
       colorPreview: theme.colors?.primary || '#000'
     })),
+    darkVariantOptions: [
+      { value: 'default', label: m.dark_variant_default() },
+      { value: 'dim', label: m.dark_variant_dim() },
+      { value: 'oled', label: m.dark_variant_oled() }
+    ],
     currencyOptions: currencies.map((currency) => ({
       value: currency.code,
       label: `${getCurrencySymbol(currency.code)} - ${currency.currency} `

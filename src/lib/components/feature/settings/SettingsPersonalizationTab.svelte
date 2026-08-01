@@ -10,6 +10,7 @@
   import Earth from '@lucide/svelte/icons/earth';
   import Languages from '@lucide/svelte/icons/languages';
   import Palette from '@lucide/svelte/icons/palette';
+  import MoonStar from '@lucide/svelte/icons/moon-star';
   import SettingsSelectField from './SettingsSelectField.svelte';
 
   interface Props {
@@ -17,6 +18,7 @@
     formData: any;
     processing: boolean;
     themeOptions: Array<SettingsOption>;
+    darkVariantOptions: Array<SettingsOption>;
     localeOptions: Array<SettingsOption>;
     currencyOptions: Array<SettingsOption>;
     getTimezoneOptions: () => Array<SettingsOption>;
@@ -29,6 +31,7 @@
     formData,
     processing,
     themeOptions,
+    darkVariantOptions,
     localeOptions,
     currencyOptions,
     getTimezoneOptions,
@@ -47,6 +50,17 @@
     options={themeOptions}
     placeholder={m.settings_select_theme()}
     bind:value={$formData.theme}
+    disabled={processing}
+  />
+  <SettingsSelectField
+    {form}
+    name="darkVariant"
+    label={m.settings_label_dark_mode()}
+    description={m.settings_desc_dark_mode()}
+    icon={MoonStar}
+    options={darkVariantOptions}
+    placeholder={m.settings_select_dark_mode()}
+    bind:value={$formData.darkVariant}
     disabled={processing}
   />
   <SettingsSelectField

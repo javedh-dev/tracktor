@@ -96,6 +96,36 @@ html[dir='ltr'] {
   --cp-button-hover-color: var(--color-ring);
 }
 
+/* Softer, lower-contrast dark surfaces for evening/low-light reading. */
+.dark[data-dark-variant='dim'] {
+  --background: oklch(0.225 0 0);
+  --card: oklch(0.265 0 0);
+  --popover: oklch(0.265 0 0);
+  --secondary: oklch(0.32 0 0);
+  --secondary-foreground: oklch(0.94 0 0);
+  --muted: oklch(0.32 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.34 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --sidebar: oklch(0.245 0 0);
+  --sidebar-accent: oklch(0.32 0 0);
+}
+
+/* True-black surfaces for OLED screens. */
+.dark[data-dark-variant='oled'] {
+  --background: oklch(0 0 0);
+  --card: oklch(0.09 0 0);
+  --popover: oklch(0.09 0 0);
+  --secondary: oklch(0.13 0 0);
+  --muted: oklch(0.13 0 0);
+  --accent: oklch(0.15 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+  --sidebar: oklch(0 0 0);
+  --sidebar-accent: oklch(0.12 0 0);
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

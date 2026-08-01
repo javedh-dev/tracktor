@@ -45,6 +45,9 @@
         if (f.data.theme) {
           themeStore.setTheme(f.data.theme as any);
         }
+        if (f.data.darkVariant) {
+          themeStore.setDarkVariant(f.data.darkVariant as any);
+        }
 
         const updatedConfig = formDataToConfigs(f.data as SettingsConfig, configStore.rawConfig);
 
@@ -101,6 +104,7 @@
 
   const {
     themeOptions,
+    darkVariantOptions,
     currencyOptions,
     uodOptions,
     uovOptions,
@@ -146,6 +150,7 @@
       ) as SettingsConfig;
       // Add current theme to form data (theme is client-side only)
       configData.theme = themeStore.theme;
+      configData.darkVariant = themeStore.darkVariant;
       notificationProcessingEnabled = configData.notificationProcessingEnabled !== false;
       formData.set(configData);
     }
@@ -223,6 +228,7 @@
                   {formData}
                   {processing}
                   {themeOptions}
+                  {darkVariantOptions}
                   {localeOptions}
                   {currencyOptions}
                   {getTimezoneOptions}

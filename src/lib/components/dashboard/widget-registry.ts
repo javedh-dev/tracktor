@@ -10,6 +10,7 @@ import VehicleHealthWidget from './widgets/VehicleHealthWidget.svelte';
 import UpcomingRemindersWidget from './widgets/UpcomingRemindersWidget.svelte';
 import VehicleQuickListWidget from './widgets/VehicleQuickListWidget.svelte';
 import RecentActivityWidget from './widgets/RecentActivityWidget.svelte';
+import CalendarWidget from './widgets/CalendarWidget.svelte';
 import Car from '@lucide/svelte/icons/car';
 import Route from '@lucide/svelte/icons/route';
 import Fuel from '@lucide/svelte/icons/fuel';
@@ -176,5 +177,13 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: RecentActivityWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
+  },
+  'activity-calendar': {
+    type: 'activity-calendar',
+    title: 'Activity Calendar',
+    description: 'Upcoming reminders and past fuel/maintenance activity by date',
+    component: CalendarWidget,
+    defaultColSpan: 4,
+    defaultRowSpan: 10
   }
 };

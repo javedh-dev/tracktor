@@ -31,7 +31,7 @@ export function rawConfigToFormData(
 /**
  * Convert form data back into a Config[] array suitable for the save API.
  * Merges with existing rawConfig to preserve descriptions and any extra keys.
- * The `theme` key is excluded since it is stored client-side only.
+ * The `theme` and `darkVariant` keys are excluded since they are stored client-side only.
  */
 export function formDataToConfigs(
   formData: Record<string, unknown>,
@@ -42,7 +42,7 @@ export function formDataToConfigs(
     configMap.set(item.key, item);
   }
   for (const [key, value] of Object.entries(formData)) {
-    if (key === 'theme') continue;
+    if (key === 'theme' || key === 'darkVariant') continue;
     const stringValue = typeof value === 'boolean' ? String(value) : ((value || '') as string);
     const existing = configMap.get(key);
     if (existing) {
