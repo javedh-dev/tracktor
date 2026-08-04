@@ -258,7 +258,7 @@
       cell: ({ row }) =>
         renderSnippet(fuelAmountCell, {
           amount: row.getValue('fuelAmount') as number | null,
-          fuelType: selectedVehicle?.fuelType
+          fuelType: vehicleStore.vehicles?.find((v) => v.id === row.original.vehicleId)?.fuelType
         })
     },
     {
@@ -284,7 +284,7 @@
       cell: ({ row }) =>
         renderSnippet(mileageCell, {
           mileage: row.getValue('mileage') as number | null,
-          fuelType: selectedVehicle?.fuelType
+          fuelType: vehicleStore.vehicles?.find((v) => v.id === row.original.vehicleId)?.fuelType
         })
     },
     {
