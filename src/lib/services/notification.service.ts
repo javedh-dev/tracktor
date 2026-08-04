@@ -5,7 +5,7 @@ import { apiClient } from '$lib/helper/api.helper';
 export const getNotifications = async (vehicleId: string): Promise<Response<Notification[]>> => {
   const res: Response<Notification[]> = { status: 'OK' };
   try {
-    const response = await apiClient.get(`/vehicles/${vehicleId}/notifications`);
+    const response = await apiClient.get(`/garage/${vehicleId}/notifications`);
     // API returns { data: notifications[], success: true }
     res.data = response.data.data || response.data;
   } catch (e: any) {
@@ -34,7 +34,7 @@ export const markNotificationAsRead = async (
   const res: Response<Notification> = { status: 'OK' };
   try {
     const response = await apiClient.patch(
-      `/vehicles/${vehicleId}/notifications/${notificationId}`
+      `/garage/${vehicleId}/notifications/${notificationId}`
     );
     res.data = response.data.data || response.data;
   } catch (e: any) {
@@ -49,7 +49,7 @@ export const markAllNotificationsAsRead = async (
 ): Promise<Response<Notification[]>> => {
   const res: Response<Notification[]> = { status: 'OK' };
   try {
-    const response = await apiClient.put(`/vehicles/${vehicleId}/notifications`);
+    const response = await apiClient.put(`/garage/${vehicleId}/notifications`);
     res.data = response.data.data || response.data;
   } catch (e: any) {
     res.status = 'ERROR';
@@ -65,7 +65,7 @@ export const clearNotification = async (
   const res: Response<Notification> = { status: 'OK' };
   try {
     const response = await apiClient.delete(
-      `/vehicles/${vehicleId}/notifications/${notificationId}`
+      `/garage/${vehicleId}/notifications/${notificationId}`
     );
     res.data = response.data.data || response.data;
   } catch (e: any) {

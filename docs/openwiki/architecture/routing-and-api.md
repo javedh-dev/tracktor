@@ -42,49 +42,49 @@ All API routes return the shared `ApiResponse` shape (`success`, `data`, `messag
 - `GET /api/vehicles` — list all vehicles.
 - `POST /api/vehicles` — create vehicle.
 - `PUT /api/vehicles` — update vehicle.
-- `GET /api/vehicles/[id]` — get one vehicle.
-- `DELETE /api/vehicles/[id]` — delete vehicle.
+- `GET /api/garage/[id]` — get one vehicle.
+- `DELETE /api/garage/[id]` — delete vehicle.
 
 ### Fuel logs
 
-- `GET /api/vehicles/[id]/fuel-logs` — list fuel logs for a vehicle with computed `distanceDriven` and mileage.
-- `POST /api/vehicles/[id]/fuel-logs` — create fuel log.
-- `PUT /api/vehicles/[id]/fuel-logs/[logId]` — update fuel log.
-- `DELETE /api/vehicles/[id]/fuel-logs/[logId]` — delete fuel log.
+- `GET /api/garage/[id]/fuel-logs` — list fuel logs for a vehicle with computed `distanceDriven` and mileage.
+- `POST /api/garage/[id]/fuel-logs` — create fuel log.
+- `PUT /api/garage/[id]/fuel-logs/[logId]` — update fuel log.
+- `DELETE /api/garage/[id]/fuel-logs/[logId]` — delete fuel log.
 
 ### Maintenance logs
 
-- `GET /api/vehicles/[id]/maintenance-logs` — list maintenance logs.
-- `POST /api/vehicles/[id]/maintenance-logs` — create maintenance log.
-- `PUT /api/vehicles/[id]/maintenance-logs/[logId]` — update maintenance log.
-- `DELETE /api/vehicles/[id]/maintenance-logs/[logId]` — delete maintenance log.
-- `GET /api/vehicles/[id]/maintenance-logs/export-pdf` — PDF export (added in `d34021f`).
+- `GET /api/garage/[id]/maintenance-logs` — list maintenance logs.
+- `POST /api/garage/[id]/maintenance-logs` — create maintenance log.
+- `PUT /api/garage/[id]/maintenance-logs/[logId]` — update maintenance log.
+- `DELETE /api/garage/[id]/maintenance-logs/[logId]` — delete maintenance log.
+- `GET /api/garage/[id]/maintenance-logs/export-pdf` — PDF export (added in `d34021f`).
 
 ### Insurance
 
-- `GET /api/vehicles/[id]/insurance`
-- `POST /api/vehicles/[id]/insurance`
-- `PUT /api/vehicles/[id]/insurance/[insuranceId]`
-- `DELETE /api/vehicles/[id]/insurance/[insuranceId]`
+- `GET /api/garage/[id]/insurance`
+- `POST /api/garage/[id]/insurance`
+- `PUT /api/garage/[id]/insurance/[insuranceId]`
+- `DELETE /api/garage/[id]/insurance/[insuranceId]`
 
 ### PUCC (pollution certificates)
 
-- `GET /api/vehicles/[id]/pucc`
-- `POST /api/vehicles/[id]/pucc`
-- `PUT /api/vehicles/[id]/pucc/[puccId]`
-- `DELETE /api/vehicles/[id]/pucc/[puccId]`
+- `GET /api/garage/[id]/pucc`
+- `POST /api/garage/[id]/pucc`
+- `PUT /api/garage/[id]/pucc/[puccId]`
+- `DELETE /api/garage/[id]/pucc/[puccId]`
 
 ### Reminders
 
-- `GET /api/vehicles/[id]/reminders`
-- `POST /api/vehicles/[id]/reminders`
-- `PUT /api/vehicles/[id]/reminders/[reminderId]`
-- `DELETE /api/vehicles/[id]/reminders/[reminderId]`
+- `GET /api/garage/[id]/reminders`
+- `POST /api/garage/[id]/reminders`
+- `PUT /api/garage/[id]/reminders/[reminderId]`
+- `DELETE /api/garage/[id]/reminders/[reminderId]`
 
 ### Notifications
 
-- `GET /api/vehicles/[id]/notifications`
-- `PUT /api/vehicles/[id]/notifications/[notificationId]`
+- `GET /api/garage/[id]/notifications`
+- `PUT /api/garage/[id]/notifications/[notificationId]`
 - `GET /api/notifications/test-enabled-providers` — trigger a test dispatch.
 - `POST /api/test-email-digest` — send a test email digest.
 

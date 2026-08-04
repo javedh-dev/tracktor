@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { withBase } from '$lib/utils';
   import * as DropdownMenu from '$ui/dropdown-menu/index.js';
   import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
   import Pencil from '@lucide/svelte/icons/pencil';
@@ -11,6 +10,7 @@
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import VehicleForm from './VehicleForm.svelte';
+  import VehicleImage from './VehicleImage.svelte';
   import * as m from '$lib/paraglide/messages';
   import type { Vehicle } from '$lib/domain/vehicle';
 
@@ -28,10 +28,6 @@
 
   let deleteDialog = $state(false);
 
-  const imageUrl = $derived(
-    vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
-  );
-
   const performDelete = async (vehicleId: string) => {
     deleteVehicle(vehicleId).then((res) => {
       if (res.status == 'OK') {
@@ -48,7 +44,10 @@
   class={`hover:border-primary flex items-center gap-3 rounded-xl border-2 p-3 transition-colors ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
 >
   <button type="button" {onclick} class="flex min-w-0 flex-1 items-center gap-3 text-left">
-    <img src={imageUrl} alt="" class="bg-secondary size-11 shrink-0 rounded-lg object-cover" />
+    <VehicleImage
+      image={vehicle.image}
+      class="bg-secondary size-11 shrink-0 rounded-lg object-cover"
+    />
     <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-semibold">{vehicle.make} {vehicle.model}</p>
       <p class="text-muted-foreground truncate text-xs">

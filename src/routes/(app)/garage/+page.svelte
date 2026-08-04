@@ -7,17 +7,12 @@
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import { goto } from '$app/navigation';
-  import Button from '$ui/button/button.svelte';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import { app_add_vehicle, vehicle_list_empty } from '$lib/paraglide/messages/_index.js';
 </script>
 
 <div class="space-y-6">
-  <PageHeader title="Vehicles" description="Manage your fleet">
-    <Button variant="default" onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}>
-      <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
-    </Button>
-  </PageHeader>
+  <PageHeader title="Vehicles" description="Manage your fleet" />
 
   {#if vehicleStore.processing}
     <CardGridSkeleton
@@ -30,7 +25,7 @@
         <VehicleCard
           {vehicle}
           onclick={() => {
-            if (vehicle.id) goto(`/vehicles/${vehicle.id}`);
+            if (vehicle.id) goto(`/garage/${vehicle.id}`);
           }}
           onkeydown={() => {}}
         />
@@ -43,10 +38,12 @@
       </button>
     </div>
   {:else}
-    <div
-      class="bg-muted text-muted-foreground border-border flex h-40 items-center justify-center rounded-2xl border border-dashed"
+    <button
+      class="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex h-40 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed bg-transparent transition-colors"
+      onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
     >
       <p class="text-lg font-medium">{vehicle_list_empty()}</p>
-    </div>
+      <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
+    </button>
   {/if}
 </div>

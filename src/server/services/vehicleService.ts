@@ -1,7 +1,7 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq, sql } from 'drizzle-orm';
-import type { Vehicle } from '$lib/domain/vehicle';
+import type { Vehicle, VehicleActivityEntry } from '$lib/domain/vehicle';
 import { performDelete } from '../utils/serviceUtils';
 import { requireRecord } from './service-response.helper';
 import {
@@ -61,6 +61,7 @@ export const getAllVehicles = async () => {
         vin: true,
         image: true,
         fuelType: true,
+        vehicleType: true,
         customFields: true
       }
     }),
@@ -210,23 +211,89 @@ export const deleteVehicle = async (id: string) => {
   return await performDelete(schema.vehicleTable, id, 'Vehicle');
 };
 
+type ValidityStatus = 'valid' | 'expired' | 'not_available';
+
+function latestValidity(
+  dates: Array<string | null>,
+  today: Date
+): { validTill: string | null; status: ValidityStatus } {
+  const parsed = dates.filter((d): d is string => !!d);
+  if (parsed.length === 0) return { validTill: null, status: 'not_available' };
+
+  const latest = parsed.reduce((a, b) => (new Date(a) > new Date(b) ? a : b));
+  return { validTill: latest, status: new Date(latest) >= today ? 'valid' : 'expired' };
+}
+
 // Get vehicles with minimal data for dropdown/selection purposes
 export const getVehicleSummary = async (id: string) => {
-  const [vehicle, fuelLogsCount, maintenanceLogsCount] = await Promise.all([
-    getVehicleById(id),
-    db.query.fuelLogTable.findMany({
-      where: (log, { eq }) => eq(log.vehicleId, id),
-      columns: { id: true }
-    }),
-    db.query.maintenanceLogTable.findMany({
-      where: (log, { eq }) => eq(log.vehicleId, id),
-      columns: { id: true }
-    })
-  ]);
+  const [vehicle, fuelLogs, maintenanceLogs, insurances, pollutionCerts, reminders] =
+    await Promise.all([
+      getVehicleById(id),
+      db.query.fuelLogTable.findMany({
+        where: (log, { eq }) => eq(log.vehicleId, id),
+        orderBy: (log, { desc }) => [desc(log.date)]
+      }),
+      db.query.maintenanceLogTable.findMany({
+        where: (log, { eq }) => eq(log.vehicleId, id),
+        orderBy: (log, { desc }) => [desc(log.date)]
+      }),
+      db.query.insuranceTable.findMany({
+        where: (ins, { eq }) => eq(ins.vehicleId, id),
+        orderBy: (ins, { desc }) => [desc(ins.startDate)]
+      }),
+      db.query.pollutionCertificateTable.findMany({
+        where: (pucc, { eq }) => eq(pucc.vehicleId, id)
+      }),
+      db.query.reminderTable.findMany({
+        where: (reminder, { eq, and }) =>
+          and(eq(reminder.vehicleId, id), eq(reminder.isCompleted, false))
+      })
+    ]);
+
+  const today = new Date();
+  const insuranceValidity = latestValidity(
+    insurances.map((i) => i.endDate),
+    today
+  );
+  const puccValidity = latestValidity(
+    pollutionCerts.map((p) => p.expiryDate),
+    today
+  );
+
+  const recentActivity: VehicleActivityEntry[] = [
+    ...fuelLogs.slice(0, 1).map((log) => ({
+      id: `fuel-${log.id}`,
+      kind: 'fuel' as const,
+      date: log.date,
+      cost: log.cost,
+      fuelAmount: log.fuelAmount
+    })),
+    ...maintenanceLogs.slice(0, 1).map((log) => ({
+      id: `maintenance-${log.id}`,
+      kind: 'maintenance' as const,
+      date: log.date,
+      cost: log.cost,
+      serviceCenter: log.serviceCenter
+    })),
+    ...insurances.slice(0, 1).map((ins) => ({
+      id: `insurance-${ins.id}`,
+      kind: 'insurance' as const,
+      date: ins.startDate,
+      policyNumber: ins.policyNumber
+    }))
+  ]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3);
 
   return {
     ...vehicle,
-    totalFuelLogs: fuelLogsCount.length,
-    totalMaintenanceLogs: maintenanceLogsCount.length
+    totalFuelLogs: fuelLogs.length,
+    totalMaintenanceLogs: maintenanceLogs.length,
+    insuranceValidTill: insuranceValidity.validTill,
+    insuranceValidityStatus: insuranceValidity.status,
+    puccValidTill: puccValidity.validTill,
+    puccValidityStatus: puccValidity.status,
+    upcomingRemindersCount: reminders.length,
+    recentActivity
   };
 };

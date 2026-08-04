@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { withBase } from '$lib/utils';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import Fuel from '@lucide/svelte/icons/fuel';
@@ -7,12 +6,10 @@
   import Shield from '@lucide/svelte/icons/shield';
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import BellRing from '@lucide/svelte/icons/bell-ring';
-  import Info from '@lucide/svelte/icons/info';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import IconButton from '$appui/IconButton.svelte';
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import * as Card from '$ui/card';
-  import VehicleDetailsModal from '$lib/components/feature/vehicle/VehicleDetailsModal.svelte';
   import { deleteVehicle } from '$lib/services/vehicle.service';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
@@ -30,7 +27,6 @@
 
   const { vehicle, onclick, onkeydown } = $props();
   let deleteDialog = $state(false);
-  let detailsModalOpen = $state(false);
 
   const performDelete = async (vehicleId: string) => {
     deleteVehicle(vehicleId).then((res) => {
@@ -42,11 +38,6 @@
       }
     });
   };
-
-  // Dynamic image URL - fallback to default if vehicle doesn't have image
-  const imageUrl = $derived(
-    vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
-  );
 
   const quickActions = [
     {
@@ -114,8 +105,8 @@
   <Card.Root
     class="hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 border-transparent p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm"
   >
-    <Card.Header class="relative h-38 overflow-hidden p-0 ">
-      <VehicleCardHeader {vehicle} {imageUrl} />
+    <Card.Header class="relative block h-38 overflow-hidden p-0">
+      <VehicleCardHeader {vehicle} />
     </Card.Header>
     <Card.Content class="px-4">
       <VehicleCardDetails {vehicle} messages={m} />
@@ -124,14 +115,6 @@
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
         <VehicleQuickActions actions={quickActions} />
         <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
-          <IconButton
-            id="vehicle-card-info-btn"
-            buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-            iconStyles="text-gray-600 dark:text-gray-100 hover:text-blue-500"
-            icon={Info}
-            onclick={() => (detailsModalOpen = true)}
-            ariaLabel={m.vehicle_action_more_info()}
-          />
           <IconButton
             id="vehicle-card-edit-btn"
             buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -156,4 +139,3 @@
   </Card.Root>
 </div>
 <DeleteConfirmation onConfirm={() => performDelete(vehicle.id)} bind:open={deleteDialog} />
-<VehicleDetailsModal bind:open={detailsModalOpen} {vehicle} />

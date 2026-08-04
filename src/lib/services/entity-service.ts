@@ -20,7 +20,7 @@ export function createEntityService<T extends { id?: string | null; vehicleId: s
 
   function buildUrl(entity: T): string {
     const suffix = entity.id || '';
-    return `/vehicles/${entity.vehicleId}/${basePath}/${suffix}`;
+    return `/garage/${entity.vehicleId}/${basePath}/${suffix}`;
   }
 
   function getMethod(entity: T): 'post' | 'put' {

@@ -10,7 +10,7 @@
       <VehicleListItem
         {vehicle}
         onclick={() => {
-          if (vehicle.id) goto(`/vehicles/${vehicle.id}`);
+          if (vehicle.id) goto(`/garage/${vehicle.id}`);
         }}
         actions={false}
       />

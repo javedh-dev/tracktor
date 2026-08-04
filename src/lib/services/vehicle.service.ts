@@ -39,7 +39,7 @@ const saveVehicle = async (
 ): Promise<Response<Vehicle>> => {
   const res: Response<Vehicle> = { status: 'OK' };
   try {
-    const response = await apiClient[method.toLowerCase() as 'put' | 'post']('/vehicles/', vehicle);
+    const response = await apiClient[method.toLowerCase() as 'put' | 'post']('/garage/', vehicle);
     res.data = response.data;
   } catch (e: any) {
     res.status = 'ERROR';
@@ -51,7 +51,7 @@ const saveVehicle = async (
 export const deleteVehicle = async (vehicleId: string): Promise<Response<string>> => {
   const res: Response<string> = { status: 'OK' };
   try {
-    await apiClient.delete(`/vehicles/${vehicleId}`);
+    await apiClient.delete(`/garage/${vehicleId}`);
     res.data = vehicleId;
   } catch (e: any) {
     res.status = 'ERROR';

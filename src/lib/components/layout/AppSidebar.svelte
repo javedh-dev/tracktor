@@ -4,7 +4,6 @@
   import * as DropdownMenu from '$ui/dropdown-menu/index.js';
 
   import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
-  import Car from '@lucide/svelte/icons/car';
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Bell from '@lucide/svelte/icons/bell';
@@ -31,6 +30,7 @@
   import { env } from '$lib/config/env';
   import ProfileForm from '$feature/auth/profile-form.svelte';
   import DataExportImport from '$feature/data-export-import/DataExportImport.svelte';
+  import Warehouse from '@lucide/svelte/icons/warehouse';
 
   type NavItem = {
     label: string;
@@ -48,9 +48,9 @@
       group: 'Overview'
     },
     {
-      label: 'Vehicles',
-      href: '/vehicles',
-      icon: Car,
+      label: 'Garage',
+      href: '/garage',
+      icon: Warehouse,
       group: 'Overview'
     },
     {
