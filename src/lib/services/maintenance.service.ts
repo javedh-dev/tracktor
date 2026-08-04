@@ -10,7 +10,7 @@ export const saveMaintenanceLogWithAttachment = saveWithAttachment;
 export const deleteMaintenanceLog = remove;
 
 export const exportMaintenanceLogsPdf = async (vehicleId: string): Promise<void> => {
-  const response = await apiClient.get(`/garage/${vehicleId}/maintenance-logs/export-pdf`, {
+  const response = await apiClient.get(`/vehicles/${vehicleId}/maintenance-logs/export-pdf`, {
     responseType: 'blob'
   });
 

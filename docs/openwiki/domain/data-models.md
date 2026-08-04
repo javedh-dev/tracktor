@@ -53,7 +53,7 @@ Recent additions:
 - Schema: `src/server/db/schema/maintenance-logs.ts`
 - Server service: `src/server/services/maintenanceLogService.ts`
 - Client service: `src/lib/services/maintenance.service.ts`
-- PDF export: `src/server/services/maintenanceLogPdfService.ts` + `src/routes/api/garage/[id]/maintenance-logs/export-pdf/+server.ts`
+- PDF export: `src/server/services/maintenanceLogPdfService.ts` + `src/routes/api/vehicles/[id]/maintenance-logs/export-pdf/+server.ts`
 
 Fields: `id`, `vehicleId`, `date`, `odometer`, `serviceCenter`, `cost`, `notes`, `attachment`.
 

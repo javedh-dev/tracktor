@@ -2,8 +2,9 @@
   import * as Chart from '$ui/chart/index.js';
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
-  import { AreaChart, type AreaChartProps } from 'layerchart';
+  import { Area, AreaChart, type AreaChartProps } from 'layerchart';
   import type { MonthlyExpensePoint } from '$lib/domain/dashboard';
+  import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
@@ -39,11 +40,10 @@
       motion: 'tween'
     },
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }),
-      tickLabelProps: {
-        rotate: 325,
-        textAnchor: 'end'
-      }
+      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
+    },
+    yAxis: {
+      format: (v: number) => `$${v.toFixed(0)}`
     },
     grid: {
       style: 'stroke-dasharray: 2',
@@ -62,7 +62,7 @@
   id="stacked-chart-{title}"
   class={bare
     ? 'area-chart relative flex h-full flex-col'
-    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-lg px-4 pt-2 pb-6 lg:p-6'}
+    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
   {#if !bare}
     <div class="mb-4 font-bold">
@@ -83,15 +83,18 @@
       <Skeleton class="h-4 w-full" />
     </div>
   {:else if hasData}
-    <Chart.Container config={chartConfig} class={bare ? 'aspect-auto min-h-0 w-full flex-1' : ''}>
+    <Chart.Container
+      config={chartConfig}
+      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-[2.5/1]'}
+    >
       <AreaChart
         data={chartData}
         x="x"
         xScale={scaleUtc()}
-        points={{ r: 0 }}
+        padding={{ left: 48 }}
         series={SERIES.map((s) => ({ key: s.key, label: s.label, color: s.color }))}
         seriesLayout="stack"
-        axis={'x'}
+        axis
         props={chartProps}
       >
         {#snippet tooltip()}
@@ -103,10 +106,16 @@
             {#snippet formatter({ value, name })}
               <span class="text-muted-foreground">{name}</span>
               <span class="font-mono font-medium tabular-nums">
-                {typeof value === 'number' ? value.toFixed(2) : value}
+                {typeof value === 'number' ? `$${value.toFixed(2)}` : value}
               </span>
             {/snippet}
           </Chart.Tooltip>
+        {/snippet}
+        {#snippet marks({ context }: { context: any })}
+          {#each context.series.visibleSeries as s (s.key)}
+            <Area seriesKey={s.key} {...chartProps.area} />
+            <ChartPoints seriesKey={s.key} color={s.color} />
+          {/each}
         {/snippet}
       </AreaChart>
     </Chart.Container>

@@ -1,14 +1,23 @@
 <script lang="ts">
   import { formatTableText } from '$helper/table-cell.helper';
+  import { getColumnDisplayName } from '$helper/table.helper';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
   import Notebook from '@lucide/svelte/icons/notebook';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Paperclip from '@lucide/svelte/icons/paperclip';
+  import CirclePlus from '@lucide/svelte/icons/circle-plus';
+  import FileDown from '@lucide/svelte/icons/file-down';
+  import Columns3 from '@lucide/svelte/icons/columns-3';
+  import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+  import SearchIcon from '@lucide/svelte/icons/search';
   import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
-  import type { ColumnDef } from '@tanstack/table-core';
+  import Button from '$ui/button/button.svelte';
+  import Input from '$appui/input.svelte';
+  import * as DropdownMenu from '$ui/dropdown-menu';
+  import type { ColumnDef, Table } from '@tanstack/table-core';
   import { renderComponent, renderSnippet } from '$ui/data-table';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import StoreResourceState from '$appui/StoreResourceState.svelte';
@@ -26,6 +35,13 @@
   import VehicleCell from '$lib/components/feature/shared/VehicleCell.svelte';
   import Car from '@lucide/svelte/icons/car';
   import * as m from '$lib/paraglide/messages';
+
+  interface Props {
+    addAction?: (() => void) | null;
+    exportAction?: (() => void) | null;
+  }
+
+  let { addAction = null, exportAction = null }: Props = $props();
 
   let lastScopeKey: string | undefined;
   const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
@@ -141,19 +157,87 @@
   });
 </script>
 
-<StoreResourceState
-  processing={maintenanceStore.processing}
-  error={maintenanceStore.error}
-  data={maintenanceStore.maintenanceLogs}
-  emptyMessage={m.maintenance_list_empty()}
->
-  {#snippet skeleton()}
-    <TableSkeleton containerId="maintenance-log-list-skeleton" />
-  {/snippet}
-  <div id="maintenance-log-table" class="maintenance-log-table">
-    <AppTable data={maintenanceStore.maintenanceLogs || []} {columns} />
-  </div>
-</StoreResourceState>
+<div id="maintenance-log-card" class="bg-card rounded-2xl border p-4 lg:p-6">
+  <StoreResourceState
+    processing={maintenanceStore.processing}
+    error={maintenanceStore.error}
+    data={maintenanceStore.maintenanceLogs}
+    emptyMessage={m.maintenance_list_empty()}
+    actions={actionButtons}
+  >
+    {#snippet skeleton()}
+      <TableSkeleton containerId="maintenance-log-list-skeleton" />
+    {/snippet}
+    <AppTable data={maintenanceStore.maintenanceLogs || []} {columns}>
+      {#snippet toolbar(table: Table<MaintenanceLog>)}
+        <div class="mb-4 flex flex-row flex-wrap items-center justify-between gap-2">
+          <Input
+            placeholder={m.common_search()}
+            value={(table.getColumn('serviceCenter')?.getFilterValue() as string) ?? ''}
+            oninput={(e) => table.getColumn('serviceCenter')?.setFilterValue(e.currentTarget.value)}
+            onchange={(e) => {
+              table.getColumn('serviceCenter')?.setFilterValue(e.currentTarget.value);
+            }}
+            icon={SearchIcon}
+            class="bg-background/60 h-full max-w-sm"
+          />
+          <div class="flex flex-row items-center gap-2">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                {#snippet child({ props })}
+                  <Button variant="outline" size="sm" {...props}>
+                    <Columns3 />
+                    <span class="inline">{m.common_columns()}</span>
+                    <ChevronDownIcon />
+                  </Button>
+                {/snippet}
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end">
+                {#each table
+                  .getAllColumns()
+                  .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
+                  <DropdownMenu.CheckboxItem
+                    class="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {getColumnDisplayName(column)}
+                  </DropdownMenu.CheckboxItem>
+                {/each}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+            {@render actionButtons()}
+          </div>
+        </div>
+      {/snippet}
+    </AppTable>
+  </StoreResourceState>
+</div>
+
+{#snippet actionButtons()}
+  {#if exportAction}
+    <Button
+      id="maintenance-log-export-btn"
+      variant="outline"
+      size="icon-sm"
+      class="cursor-pointer"
+      onclick={exportAction}
+    >
+      <FileDown class="h-4 w-4" />
+    </Button>
+  {/if}
+  {#if addAction}
+    <Button
+      id="maintenance-log-add-btn"
+      variant="outline"
+      size="sm"
+      class="cursor-pointer"
+      onclick={addAction}
+    >
+      <LabelWithIcon icon={CirclePlus} label={m.common_add_new()} />
+    </Button>
+  {/if}
+{/snippet}
 
 {#snippet serviceCenterCell({ value }: { value: string | null })}
   <div class="flex flex-row justify-start">{formatTableText(value)}</div>

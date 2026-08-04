@@ -4,6 +4,7 @@
   import { curveCatmullRom } from 'd3-shape';
   import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
   import type { DataPoint } from '$lib/domain/shared';
+  import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
@@ -40,11 +41,10 @@
       motion: 'tween'
     },
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      tickLabelProps: {
-        rotate: 325,
-        textAnchor: 'end'
-      }
+      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short' })
+    },
+    yAxis: {
+      format: (v: number) => valueFormatter?.(v) ?? v.toString()
     },
     grid: {
       style: 'stroke-dasharray: 2',
@@ -84,7 +84,7 @@
   id="chart-area-{title}"
   class={bare
     ? 'area-chart relative flex h-full flex-col'
-    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-lg px-4 pt-2 pb-6 lg:p-6'}
+    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
   <div class="mb-4 flex shrink-0 flex-row items-center justify-start gap-2 font-bold">
     {#if !bare}
@@ -111,14 +111,15 @@
       <Skeleton class="h-4 w-full" />
     </div>
   {:else if chartData.length != 0}
-    <Chart.Container config={chartConfig} class={bare ? 'aspect-auto min-h-0 w-full flex-1' : ''}>
+    <Chart.Container
+      config={chartConfig}
+      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-[2.5/1]'}
+    >
       <AreaChart
         data={chartDataWithAverage}
         x="x"
         xScale={scaleUtc()}
-        points={{
-          r: 0
-        }}
+        padding={{ left: 48 }}
         series={[
           {
             key: 'y',
@@ -131,7 +132,7 @@
             color: 'var(--muted-foreground)'
           }
         ]}
-        axis={'x'}
+        axis
         props={chartProps}
       >
         {#snippet tooltip()}
@@ -165,6 +166,7 @@
                   />
                 {/snippet}
               </LinearGradient>
+              <ChartPoints seriesKey={s.key} color={s.color} />
             {:else}
               <Area
                 seriesKey={s.key}

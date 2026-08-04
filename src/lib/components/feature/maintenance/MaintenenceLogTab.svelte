@@ -1,7 +1,7 @@
 <script lang="ts">
-  import FeatureTabShell from '$appui/FeatureTabShell.svelte';
   import MaintenanceForm from './MaintenanceForm.svelte';
   import MaintenanceLogList from './MaintenanceLogList.svelte';
+  import { sheetStore } from '$stores/sheet.svelte';
   import { vehicleStore } from '$lib/stores/vehicle.svelte';
   import { page } from '$app/state';
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
@@ -17,10 +17,7 @@
   };
 </script>
 
-<FeatureTabShell
-  title={m.maintenance_tab_title()}
-  listComponent={MaintenanceLogList}
-  addSheetTitle={m.maintenance_add_action()}
-  addSheetComponent={MaintenanceForm}
-  exportAction={handleExportPdf}
+<MaintenanceLogList
+  addAction={() => sheetStore.openSheet(MaintenanceForm, m.maintenance_add_action(), '')}
+  exportAction={scope.vehicleId ? handleExportPdf : null}
 />

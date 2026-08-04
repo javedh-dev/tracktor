@@ -127,6 +127,13 @@
       "when": 1785559377786,
       "tag": "20260801044257_add_vehicle_type_to_vehicles",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1785825446204,
+      "tag": "20260804073000_fix_notification_key_unique_index",
+      "breakpoints": true
     }
   ]
 }

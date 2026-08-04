@@ -5,6 +5,8 @@ import ExpenseBreakdownWidget from './widgets/ExpenseBreakdownWidget.svelte';
 import MonthlyExpenseTrendWidget from './widgets/MonthlyExpenseTrendWidget.svelte';
 import VehicleLeaderboardWidget from './widgets/VehicleLeaderboardWidget.svelte';
 import FleetFuelTrendWidget from './widgets/FleetFuelTrendWidget.svelte';
+import FuelConsumptionTrendWidget from './widgets/FuelConsumptionTrendWidget.svelte';
+import MileageOverviewWidget from './widgets/MileageOverviewWidget.svelte';
 import StatusDonutWidget from './widgets/StatusDonutWidget.svelte';
 import VehicleHealthWidget from './widgets/VehicleHealthWidget.svelte';
 import UpcomingRemindersWidget from './widgets/UpcomingRemindersWidget.svelte';
@@ -116,6 +118,22 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     title: 'Fleet Fuel Trend',
     description: 'Daily fuel usage across the fleet',
     component: FleetFuelTrendWidget,
+    defaultColSpan: 9,
+    defaultRowSpan: 8
+  },
+  'fuel-consumption-trend': {
+    type: 'fuel-consumption-trend',
+    title: 'Fuel Consumption Trend',
+    description: 'Fuel usage over time, one line per vehicle',
+    component: FuelConsumptionTrendWidget,
+    defaultColSpan: 9,
+    defaultRowSpan: 8
+  },
+  'mileage-overview-trend': {
+    type: 'mileage-overview-trend',
+    title: 'Mileage Overview',
+    description: 'Mileage over time, one line per vehicle',
+    component: MileageOverviewWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },

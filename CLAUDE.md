@@ -63,7 +63,7 @@ Note: test coverage is currently minimal (essentially a placeholder in `src/__te
 
 - `src/routes/(app)/*` — authenticated app pages (dashboard, fuel, maintenance, insurance, pollution, reminders, vehicles, expenses, reports, settings), sharing the app shell (`AppSidebar`, `+layout.svelte`).
 - `src/routes/(auth)/*` — login/register, outside the app shell.
-- `src/routes/api/*` — REST endpoints as `+server.ts` files; vehicle-scoped resources nest under `api/garage/[id]/...`.
+- `src/routes/api/*` — REST endpoints as `+server.ts` files; vehicle-scoped resources nest under `api/vehicles/[id]/...`.
 
 The app recently moved from a `/dashboard/*` nested-route structure to top-level feature routes (`/fuel`, `/insurance`, `/maintenance`, `/pollution`, `/reminders`) with a single sidebar app shell — the old `dashboard/(feature)` routes are being removed in favor of this flatter structure with fleet-wide/vehicle-selector support baked into each page.
 

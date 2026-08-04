@@ -5,9 +5,9 @@
   import Route from '@lucide/svelte/icons/route';
   import Gauge from '@lucide/svelte/icons/gauge';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
-  import MileageChart from '$feature/overview/MileageChart.svelte';
-  import FuelAmountChart from '$feature/overview/FuelAmountChart.svelte';
-  import FleetChartPlaceholder from '$feature/overview/FleetChartPlaceholder.svelte';
+  import { chartStore } from '$stores/chart.svelte';
+  import { formatMileage } from '$lib/helper/format.helper';
+  import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
   import { Features } from '$lib/helper/feature.helper';
   import FeaturePageShell from '$feature/shared/FeaturePageShell.svelte';
@@ -40,7 +40,7 @@
   disabledTitle={feature_fuel_disabled_title()}
   disabledHint={feature_fuel_disabled_hint()}
 >
-  {#snippet children(scope)}
+  {#snippet children(_scope)}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         icon={Fuel}
@@ -69,13 +69,22 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      {#if scope.isFleet}
-        <FleetChartPlaceholder title="Fuel Consumption Trend" />
-        <FleetChartPlaceholder title="Mileage Overview" />
-      {:else}
-        <FuelAmountChart />
-        <MileageChart />
-      {/if}
+      <VehicleTrendChart
+        series={chartStore.fuelAmountByVehicle}
+        title="Fuel Consumption Trend"
+        loading={fuelLogStore.processing}
+        valueFormatter={(value) => `${value.toFixed(1)} L`}
+        xFormatter={(v: Date) =>
+          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+      />
+      <VehicleTrendChart
+        series={chartStore.mileageByVehicle}
+        title="Mileage Overview"
+        loading={fuelLogStore.processing}
+        valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
+        xFormatter={(v: Date) =>
+          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+      />
     </div>
 
     <FuelLogTab />

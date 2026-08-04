@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class="area-chart lg:bg-background/50 bg-secondary relative flex h-64 flex-col rounded-lg px-4 pt-2 pb-6 lg:p-6"
+  class="area-chart lg:bg-background/50 bg-secondary relative flex h-64 flex-col rounded-xl border px-4 pt-2 pb-6 lg:p-6"
 >
   {#if title}
     <div class="mb-4 flex shrink-0 flex-row items-center gap-2 font-bold">

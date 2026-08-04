@@ -10,7 +10,8 @@
     | 'needs_action'
     | 'attention'
     | 'good'
-    | 'not_available';
+    | 'not_available'
+    | 'upcoming';
 
   interface Props {
     status: Status;
@@ -27,7 +28,8 @@
     needs_action: 'Needs Action',
     attention: 'Attention',
     good: 'Good',
-    not_available: 'N/A'
+    not_available: 'N/A',
+    upcoming: 'Upcoming'
   };
 
   const displayLabel = $derived(label ?? defaultLabels[status]);
@@ -35,7 +37,7 @@
   const variant = $derived(
     status === 'expired' || status === 'needs_action'
       ? 'destructive'
-      : status === 'expiring_soon' || status === 'attention'
+      : status === 'expiring_soon' || status === 'attention' || status === 'upcoming'
         ? 'secondary'
         : status === 'not_available'
           ? 'outline'
@@ -49,7 +51,9 @@
         ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border-amber-200 dark:border-amber-800'
         : status === 'not_available'
           ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300 border-gray-200 dark:border-gray-800'
-          : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border-red-200 dark:border-red-800'
+          : status === 'upcoming'
+            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+            : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border-red-200 dark:border-red-800'
   );
 </script>
 

@@ -92,6 +92,8 @@ export const WIDGET_TYPES = {
   'monthly-expense-trend': 'monthly-expense-trend',
   'cost-by-vehicle-leaderboard': 'cost-by-vehicle-leaderboard',
   'fleet-fuel-trend': 'fleet-fuel-trend',
+  'fuel-consumption-trend': 'fuel-consumption-trend',
+  'mileage-overview-trend': 'mileage-overview-trend',
   'efficiency-leaderboard': 'efficiency-leaderboard',
   'pucc-status-donut': 'pucc-status-donut',
   'insurance-status-donut': 'insurance-status-donut',
@@ -161,6 +163,8 @@ const WIDGET_MIN_SIZES: Partial<Record<WidgetType, WidgetMinSize>> = {
   // Plot area plus a rotated x-axis.
   'monthly-expense-trend': { minColSpan: 4, minRowSpan: 6 },
   'fleet-fuel-trend': { minColSpan: 4, minRowSpan: 6 },
+  'fuel-consumption-trend': { minColSpan: 4, minRowSpan: 6 },
+  'mileage-overview-trend': { minColSpan: 4, minRowSpan: 6 },
   // Scrolling lists stay usable at a couple of visible rows.
   'cost-by-vehicle-leaderboard': { minColSpan: 3, minRowSpan: 4 },
   'efficiency-leaderboard': { minColSpan: 3, minRowSpan: 4 },

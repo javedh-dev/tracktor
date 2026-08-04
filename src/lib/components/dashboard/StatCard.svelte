@@ -58,12 +58,12 @@
   </div>
 {:else}
   <div
-    class="bg-card text-card-foreground group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md"
+    class="bg-card text-card-foreground group relative flex items-center gap-3 overflow-hidden rounded-xl border p-4 shadow-sm transition-shadow hover:shadow-md"
   >
     {#if Icon}
       <div
         class={cn(
-          'flex size-11 shrink-0 items-center justify-center rounded-xl shadow-lg ring-1 ring-white/10',
+          'flex aspect-square h-11 shrink-0 items-center justify-center rounded-xl shadow-lg ring-1 ring-white/10',
           color
         )}
       >
@@ -71,9 +71,14 @@
       </div>
     {/if}
 
-    <div class="flex min-w-0 flex-col gap-1">
-      <span class="text-muted-foreground text-sm font-medium">{label}</span>
-      <span class="text-foreground text-2xl font-bold tracking-tight tabular-nums">{value}</span>
+    <div class="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+      <span
+        class="text-muted-foreground truncate text-[11px] font-semibold tracking-[0.08em] uppercase"
+        >{label}</span
+      >
+      <span class="text-foreground truncate text-xl font-bold tracking-tight tabular-nums"
+        >{value}</span
+      >
       {@render trendBadge()}
     </div>
   </div>
