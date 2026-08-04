@@ -150,13 +150,14 @@
       <Sidebar.Group>
         <Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
         <Sidebar.GroupContent>
-          <Sidebar.Menu>
+          <Sidebar.Menu class="gap-1">
             {#each group.items as item (item.href)}
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton
                   {...navActiveProps(item.href)}
                   onclick={() => handleNavClick(item.href)}
                   tooltipContent={item.label}
+                  class="h-10"
                 >
                   <item.icon class="h-4 w-4" />
                   <span>{item.label}</span>

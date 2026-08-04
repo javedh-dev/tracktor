@@ -131,7 +131,7 @@
   {:else if hasData}
     <Chart.Container
       config={chartConfig}
-      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-[2.5/1]'}
+      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-2.5/1'}
     >
       <AreaChart
         x="x"

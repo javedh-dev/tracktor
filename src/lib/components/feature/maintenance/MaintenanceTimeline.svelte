@@ -43,7 +43,7 @@
 
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
   <div
-    class="flex flex-col rounded-xl border bg-gradient-to-br from-blue-50/60 to-transparent p-5 lg:col-span-1 dark:from-blue-950/20"
+    class="flex flex-col rounded-xl border bg-linear-to-br from-blue-50/60 to-transparent p-5 lg:col-span-1 dark:from-blue-950/20"
   >
     <div class="mb-4 flex items-center gap-2">
       <span
@@ -98,20 +98,20 @@
         {m.maintenance_history_empty()}
       </div>
     {:else}
-      <ol class="space-y-6">
+      <ol class="space-y-0">
         {#each timelineEntries as entry, i (entry.key)}
           <li class="relative flex gap-4 pl-1">
-            <div class="flex flex-col items-center">
+            <div class="mt-0.5 flex flex-col items-center gap-0">
               <span
-                class="size-2.5 shrink-0 rounded-full {entry.kind === 'upcoming'
+                class="size-4 shrink-0 rounded-full {entry.kind === 'upcoming'
                   ? 'bg-blue-500'
                   : 'bg-emerald-500'}"
               ></span>
               {#if i < timelineEntries.length - 1}
-                <span class="bg-border mt-1 w-px flex-1"></span>
+                <span class="bg-border w-0.5 flex-1"></span>
               {/if}
             </div>
-            <div class="min-w-0 flex-1 pb-1">
+            <div class="min-w-0 flex-1 pb-4">
               <div class="flex items-center justify-between gap-2">
                 <p class="text-sm font-semibold tabular-nums">{formatDate(entry.date)}</p>
                 {#if entry.kind === 'upcoming'}

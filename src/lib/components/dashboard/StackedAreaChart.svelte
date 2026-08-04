@@ -64,11 +64,20 @@
     ? 'area-chart relative flex h-full flex-col'
     : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  {#if !bare}
-    <div class="mb-4 font-bold">
-      <span>{title}</span>
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+    {#if !bare}
+      <span class="font-bold">{title}</span>
+    {/if}
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {#each SERIES as s (s.key)}
+        <span class="text-muted-foreground inline-flex items-center gap-1.5 text-xs font-medium">
+          <span class="inline-block size-1.5 rounded-full" style="background-color: {s.color}"
+          ></span>
+          {s.label}
+        </span>
+      {/each}
     </div>
-  {/if}
+  </div>
   {#if loading}
     <div
       class={bare

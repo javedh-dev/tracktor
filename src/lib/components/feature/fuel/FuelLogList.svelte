@@ -1,5 +1,6 @@
 <script lang="ts">
   import { type FuelLog } from '$lib/domain/fuel';
+  import { endOfDay } from 'date-fns';
 
   import Badge from '$ui/badge/badge.svelte';
   import Button from '$ui/button/button.svelte';
@@ -7,8 +8,12 @@
   import * as DropdownMenu from '$ui/dropdown-menu';
   import {
     formatTableBoolean,
+    formatTableCurrency,
+    formatTableDate,
+    formatTableDistance,
     formatTableFuelAmount,
-    formatTableMileage
+    formatTableMileage,
+    formatTableText
   } from '$helper/table-cell.helper';
   import { getColumnDisplayName } from '$helper/table.helper';
   import FuelLogContextMenu from './FuelLogContextMenu.svelte';
@@ -20,9 +25,12 @@
   import Notebook from '@lucide/svelte/icons/notebook';
   import PaintBucket from '@lucide/svelte/icons/paint-bucket';
   import SquircleDashed from '@lucide/svelte/icons/squircle-dashed';
+  import Route from '@lucide/svelte/icons/route';
+  import Tag from '@lucide/svelte/icons/tag';
   import Paperclip from '@lucide/svelte/icons/paperclip';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import ImportIcon from '@lucide/svelte/icons/import';
+  import FileDown from '@lucide/svelte/icons/file-down';
   import Columns3 from '@lucide/svelte/icons/columns-3';
   import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
   import SearchIcon from '@lucide/svelte/icons/search';
@@ -32,18 +40,23 @@
   import StoreResourceState from '$appui/StoreResourceState.svelte';
   import TableSkeleton from '$appui/TableSkeleton.svelte';
   import AppTable from '$layout/AppTable.svelte';
+  import TableDetailPanel from '$layout/TableDetailPanel.svelte';
+  import DetailFieldList from '$layout/DetailFieldList.svelte';
   import DateCell from '$lib/components/feature/shared/DateCell.svelte';
   import OdometerCell from '$lib/components/feature/shared/OdometerCell.svelte';
   import CostCell from '$lib/components/feature/shared/CostCell.svelte';
   import NotesCell from '$lib/components/feature/shared/NotesCell.svelte';
   import AttachmentCell from '$lib/components/feature/shared/AttachmentCell.svelte';
   import VehicleCell from '$lib/components/feature/shared/VehicleCell.svelte';
+  import AttachmentPreview from '$lib/components/app/AttachmentPreview.svelte';
   import Car from '@lucide/svelte/icons/car';
 
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { page } from '$app/state';
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import { parseDate } from '$helper/format.helper';
+  import { downloadCsv } from '$helper/csv-export.helper';
   import * as m from '$lib/paraglide/messages';
   import {
     col_date,
@@ -65,14 +78,94 @@
   interface Props {
     addAction?: (() => void) | null;
     importAction?: (() => void) | null;
+    /** Optional predicate to narrow what's rendered (e.g. page-level filters). */
+    filter?: (log: FuelLog) => boolean;
   }
 
-  let { addAction = null, importAction = null }: Props = $props();
+  let { addAction = null, importAction = null, filter }: Props = $props();
+
+  let dateFrom = $state('');
+  let dateTo = $state('');
+
+  function inDateRange(date: Date): boolean {
+    if (dateFrom && date < parseDate(dateFrom)) return false;
+    if (dateTo && date > endOfDay(parseDate(dateTo))) return false;
+    return true;
+  }
+
+  const logs = $derived(
+    (fuelLogStore.fuelLogs ?? [])
+      .filter((l) => !filter || filter(l))
+      .filter((l) => inDateRange(new Date(l.date)))
+  );
+
+  let selectedId = $state<string | null | undefined>(null);
+  const selectedLog = $derived(selectedId ? (logs.find((l) => l.id === selectedId) ?? null) : null);
 
   const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
   const selectedVehicle = $derived(scope.vehicle);
   const volumeLabel = $derived(
     selectedVehicle?.fuelType === 'electric' ? fuel_volume_label_energy() : fuel_volume_label_fuel()
+  );
+
+  const detailFields = $derived(
+    selectedLog
+      ? [
+          ...(scope.isFleet
+            ? [
+                {
+                  label: m.col_vehicle(),
+                  value: [
+                    `${selectedLog.vehicleMake ?? ''} ${selectedLog.vehicleModel ?? ''}`.trim(),
+                    selectedLog.vehiclePlate
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+                  icon: Car,
+                  full: true
+                }
+              ]
+            : []),
+          { label: m.col_date(), value: formatTableDate(selectedLog.date), icon: Calendar1 },
+          {
+            label: m.col_odometer(),
+            value: formatTableDistance(selectedLog.odometer),
+            icon: CircleGauge
+          },
+          {
+            label: m.col_distance_driven(),
+            value: formatTableDistance(selectedLog.distanceDriven),
+            icon: Route
+          },
+          {
+            label: m.col_filled(),
+            value: formatTableBoolean(selectedLog.filled, common_yes(), common_no()),
+            icon: Fuel
+          },
+          {
+            label: m.col_missed_last(),
+            value: formatTableBoolean(selectedLog.missedLast, common_yes(), common_no()),
+            icon: SquircleDashed
+          },
+          {
+            label: volumeLabel,
+            value: formatTableFuelAmount(selectedLog.fuelAmount, selectedVehicle?.fuelType),
+            icon: PaintBucket
+          },
+          { label: m.form_rate(), value: formatTableCurrency(selectedLog.rate), icon: Tag },
+          { label: m.col_cost(), value: formatTableCurrency(selectedLog.cost), icon: Banknote },
+          {
+            label: m.col_mileage(),
+            value: formatTableMileage(selectedLog.mileage, selectedVehicle?.fuelType),
+            icon: Rabbit
+          },
+          {
+            label: m.col_notes(),
+            value: formatTableText(selectedLog.notes),
+            icon: Notebook
+          }
+        ]
+      : []
   );
 
   let lastScopeKey: string | undefined;
@@ -237,63 +330,135 @@
       fuelLogStore.refreshFuelLogs(vehicleId);
     }
   });
+
+  function vehicleLabel(vehicleId: string): string {
+    const v = vehicleStore.vehicles?.find((x) => x.id === vehicleId);
+    return v ? [`${v.make} ${v.model}`.trim(), v.licensePlate].filter(Boolean).join(' · ') : '';
+  }
+
+  function exportCsv(table: Table<FuelLog>) {
+    const header = [
+      ...(scope.isFleet ? [col_vehicle()] : []),
+      col_date(),
+      col_odometer(),
+      col_filled(),
+      col_missed_last(),
+      volumeLabel,
+      m.form_rate(),
+      col_cost(),
+      col_mileage(),
+      col_notes()
+    ];
+    const rows = table
+      .getFilteredRowModel()
+      .rows.map((r) => r.original)
+      .map((l) => {
+        const fuelType = vehicleStore.vehicles?.find((v) => v.id === l.vehicleId)?.fuelType;
+        return [
+          ...(scope.isFleet ? [vehicleLabel(l.vehicleId)] : []),
+          formatTableDate(l.date),
+          formatTableDistance(l.odometer),
+          formatTableBoolean(l.filled, common_yes(), common_no()),
+          formatTableBoolean(l.missedLast, common_yes(), common_no()),
+          formatTableFuelAmount(l.fuelAmount, fuelType),
+          formatTableCurrency(l.rate),
+          formatTableCurrency(l.cost),
+          formatTableMileage(l.mileage, fuelType),
+          formatTableText(l.notes)
+        ];
+      });
+    downloadCsv(`tracktor-fuel-logs-${new Date().toISOString().split('T')[0]}.csv`, header, rows);
+  }
 </script>
 
-<div id="fuel-log-card" class="bg-card rounded-2xl border p-4 lg:p-6">
-  <StoreResourceState
-    processing={fuelLogStore.processing}
-    error={fuelLogStore.error}
-    data={fuelLogStore.fuelLogs}
-    emptyMessage={fuel_empty_list()}
-    actions={actionButtons}
+<div class="grid grid-cols-1 items-start gap-4 {selectedLog ? 'lg:grid-cols-3' : ''}">
+  <div
+    id="fuel-log-card"
+    class="bg-card min-w-0 rounded-2xl border p-4 {selectedLog ? 'lg:col-span-2' : ''}"
   >
-    {#snippet skeleton()}
-      <TableSkeleton containerId="fuel-log-list-skeleton" />
-    {/snippet}
-    <AppTable data={fuelLogStore.fuelLogs || []} {columns}>
-      {#snippet toolbar(table: Table<FuelLog>)}
-        <div class="mb-4 flex flex-row flex-wrap items-center justify-between gap-2">
-          <Input
-            placeholder={m.common_search()}
-            value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
-            oninput={(e) => table.getColumn('notes')?.setFilterValue(e.currentTarget.value)}
-            onchange={(e) => {
-              table.getColumn('notes')?.setFilterValue(e.currentTarget.value);
-            }}
-            icon={SearchIcon}
-            class="bg-background/60 h-full max-w-sm"
-          />
-          <div class="flex flex-row items-center gap-2">
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger>
-                {#snippet child({ props })}
-                  <Button variant="outline" size="sm" {...props}>
-                    <Columns3 />
-                    <span class="inline">{m.common_columns()}</span>
-                    <ChevronDownIcon />
-                  </Button>
-                {/snippet}
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Content align="end">
-                {#each table
-                  .getAllColumns()
-                  .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
-                  <DropdownMenu.CheckboxItem
-                    class="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {getColumnDisplayName(column)}
-                  </DropdownMenu.CheckboxItem>
-                {/each}
-              </DropdownMenu.Content>
-            </DropdownMenu.Root>
-            {@render actionButtons()}
-          </div>
-        </div>
+    <StoreResourceState
+      processing={fuelLogStore.processing}
+      error={fuelLogStore.error}
+      data={fuelLogStore.fuelLogs}
+      emptyMessage={fuel_empty_list()}
+      actions={actionButtons}
+    >
+      {#snippet skeleton()}
+        <TableSkeleton containerId="fuel-log-list-skeleton" />
       {/snippet}
-    </AppTable>
-  </StoreResourceState>
+      <AppTable data={logs} {columns} getRowId={(l) => l.id} bind:selectedId>
+        {#snippet toolbar(table: Table<FuelLog>)}
+          <div class="mb-4 flex flex-row flex-wrap items-center justify-between gap-2">
+            <Input
+              placeholder={m.common_search()}
+              value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
+              oninput={(e) => table.getColumn('notes')?.setFilterValue(e.currentTarget.value)}
+              onchange={(e) => {
+                table.getColumn('notes')?.setFilterValue(e.currentTarget.value);
+              }}
+              icon={SearchIcon}
+              class="bg-background/60 h-full max-w-sm"
+            />
+            <div class="flex flex-row flex-wrap items-center gap-2">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-muted-foreground">{m.common_date_from()}</span>
+                <Input type="calendar" bind:value={dateFrom} icon={Calendar1} class="h-7 w-auto" />
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-muted-foreground">{m.common_date_to()}</span>
+                <Input type="calendar" bind:value={dateTo} icon={Calendar1} class="h-7 w-auto" />
+              </div>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  {#snippet child({ props })}
+                    <Button variant="outline" size="sm" {...props}>
+                      <Columns3 />
+                      <span class="inline">{m.common_columns()}</span>
+                      <ChevronDownIcon />
+                    </Button>
+                  {/snippet}
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content align="end">
+                  {#each table
+                    .getAllColumns()
+                    .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
+                    <DropdownMenu.CheckboxItem
+                      class="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    >
+                      {getColumnDisplayName(column)}
+                    </DropdownMenu.CheckboxItem>
+                  {/each}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <Button
+                variant="outline"
+                size="sm"
+                class="cursor-pointer"
+                onclick={() => exportCsv(table)}
+              >
+                <LabelWithIcon icon={FileDown} label={m.common_export_csv()} />
+              </Button>
+              {@render actionButtons()}
+            </div>
+          </div>
+        {/snippet}
+      </AppTable>
+    </StoreResourceState>
+  </div>
+
+  {#if selectedLog}
+    <TableDetailPanel onClose={() => (selectedId = null)}>
+      <DetailFieldList fields={detailFields} />
+      {#if selectedLog.attachment}
+        <div class="mt-4">
+          <p class="text-muted-foreground mb-2 text-xs">{m.col_attachment()}</p>
+          <AttachmentPreview fileName={selectedLog.attachment} />
+        </div>
+      {/if}
+    </TableDetailPanel>
+  {/if}
 </div>
 
 {#snippet actionButtons()}

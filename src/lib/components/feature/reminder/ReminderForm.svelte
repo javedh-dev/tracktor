@@ -30,6 +30,7 @@
   import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
   import { page } from '$app/state';
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 
   let { data }: { data?: Partial<Reminder> } = $props();
 
@@ -201,7 +202,7 @@
       <Form.Control>
         {#snippet children({ props })}
           <label class="flex items-center gap-2 text-sm font-medium">
-            <input type="checkbox" {...props} bind:checked={$formData.isCompleted} />
+            <Checkbox {...props} bind:checked={$formData.isCompleted} />
             <span>{m.reminder_form_is_completed_label()}</span>
           </label>
         {/snippet}

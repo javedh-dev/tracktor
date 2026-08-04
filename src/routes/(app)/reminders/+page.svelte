@@ -4,6 +4,7 @@
   import { toast } from 'svelte-sonner';
   import StatCard from '$dashboard/StatCard.svelte';
   import StatusPill from '$dashboard/StatusPill.svelte';
+  import * as Select from '$ui/select/index.js';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -13,6 +14,7 @@
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import X from '@lucide/svelte/icons/x';
+  import ListFilter from '@lucide/svelte/icons/list-filter';
   import Wrench from '@lucide/svelte/icons/wrench';
   import ShieldCheck from '@lucide/svelte/icons/shield-check';
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
@@ -32,7 +34,13 @@
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import { deleteReminder as deleteReminderService } from '$lib/services/reminder.service';
   import { formatDate } from '$lib/helper/format.helper';
-  import { getReminderTypeLabel, type Reminder } from '$lib/domain/reminder';
+  import {
+    REMINDER_TYPES,
+    getReminderTypeLabel,
+    getReminderScheduleLabel,
+    getRecurrenceTypeLabel,
+    type Reminder
+  } from '$lib/domain/reminder';
   import * as m from '$lib/paraglide/messages';
   import {
     feature_reminders_disabled_title,
@@ -81,21 +89,61 @@
     selectedDate ? formatDate(selectedDate.toDate(getLocalTimeZone())) : undefined
   );
 
-  // Default view: upcoming (soonest first, already sorted that way by the store) followed by
-  // completed history (most recently completed first) — so the contained list covers both.
-  const mergedReminders = $derived([
-    ...allReminders.filter((r) => !r.isCompleted),
-    ...allReminders
+  let typeFilter = $state<string>('all');
+  const typeOptions = $derived([
+    { id: 'all', label: m.reminder_filter_all_types() },
+    ...Object.keys(REMINDER_TYPES).map((type) => ({
+      id: type,
+      label: getReminderTypeLabel(type, m)
+    }))
+  ]);
+  const typeOptionLabel = $derived(
+    typeOptions.find((o) => o.id === typeFilter)?.label ?? m.reminder_filter_all_types()
+  );
+
+  const baseReminders = $derived(
+    (selectedDateKey
+      ? allReminders.filter((r) => dateKey(r.dueDate) === selectedDateKey)
+      : allReminders
+    ).filter((r) => typeFilter === 'all' || r.type === typeFilter)
+  );
+
+  // Upcoming keeps the store's soonest-first order; done reminders show most recently marked first.
+  const upcomingReminders = $derived(baseReminders.filter((r) => !r.isCompleted));
+  const doneReminders = $derived(
+    baseReminders
       .filter((r) => r.isCompleted)
       .slice()
       .sort((a, b) => b.dueDate.getTime() - a.dueDate.getTime())
-  ]);
-
-  const displayedReminders = $derived(
-    selectedDateKey
-      ? allReminders.filter((r) => dateKey(r.dueDate) === selectedDateKey)
-      : mergedReminders
   );
+
+  const recurrenceLabel = (r: Reminder) => {
+    const unit =
+      r.recurrenceType === 'yearly'
+        ? m.recurrence_interval_years()
+        : r.recurrenceType === 'monthly'
+          ? m.recurrence_interval_months()
+          : r.recurrenceType === 'weekly'
+            ? m.recurrence_interval_weeks()
+            : m.recurrence_interval_days();
+    const interval =
+      r.recurrenceInterval > 1 ? ` (${m.recurrence_every()} ${r.recurrenceInterval} ${unit})` : '';
+    const until = r.recurrenceEndDate
+      ? ` - ${m.recurrence_until()} ${formatDate(r.recurrenceEndDate)}`
+      : '';
+    return `${getRecurrenceTypeLabel(r.recurrenceType, m)}${interval}${until}`;
+  };
+
+  // Second card line: vehicle, schedule, repetition (if any) and note, condensed into one row.
+  const metaFor = (r: Reminder) =>
+    [
+      subtitleFor(r),
+      getReminderScheduleLabel(r.remindSchedule, m),
+      r.recurrenceType !== 'none' ? recurrenceLabel(r) : null,
+      r.note
+    ]
+      .filter(Boolean)
+      .join(' · ');
 
   const TYPE_STYLES: Record<Reminder['type'], { icon: typeof Wrench; bg: string; text: string }> = {
     maintenance: { icon: Wrench, bg: 'bg-blue-500/10', text: 'text-blue-500' },
@@ -112,7 +160,7 @@
 
   function statusFor(r: Reminder) {
     if (r.isCompleted) {
-      return { status: 'valid' as const, badge: m.reminder_status_completed() };
+      return { status: 'not_available' as const, badge: m.reminder_status_completed() };
     }
     const days = daysUntil(r.dueDate);
     if (days < 0) {
@@ -214,84 +262,78 @@
       />
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div class="bg-card flex min-h-0 flex-col rounded-xl border p-4 lg:col-span-1">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div class="bg-card flex min-h-0 flex-col rounded-xl border p-4 lg:col-span-2">
         <div class="mb-3 flex items-center justify-between gap-2">
           <h3 class="text-lg font-semibold">
             {selectedDateLabel
               ? m.reminder_list_title_for_date({ date: selectedDateLabel })
               : m.reminder_list_title()}
           </h3>
-          {#if selectedDateKey}
-            <button
-              type="button"
-              class="text-primary flex items-center gap-1 text-sm font-medium"
-              onclick={() => (selectedDate = undefined)}
-            >
-              <X class="size-3.5" />
-              {m.reminder_clear_filter()}
-            </button>
-          {/if}
+          <div class="flex items-center gap-2">
+            <Select.Root type="single" bind:value={typeFilter}>
+              <Select.Trigger class="w-40" size="sm">
+                <span class="flex items-center gap-1.5">
+                  <ListFilter class="text-muted-foreground size-3.5" />
+                  {typeOptionLabel}
+                </span>
+              </Select.Trigger>
+              <Select.Content>
+                {#each typeOptions as option (option.id)}
+                  <Select.Item value={option.id}>{option.label}</Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+            {#if selectedDateKey}
+              <button
+                type="button"
+                class="text-primary flex items-center gap-1 text-sm font-medium"
+                onclick={() => (selectedDate = undefined)}
+              >
+                <X class="size-3.5" />
+                {m.reminder_clear_filter()}
+              </button>
+            {/if}
+          </div>
         </div>
 
-        {#if reminderStore.processing && displayedReminders.length === 0}
+        {#if reminderStore.processing && upcomingReminders.length === 0 && doneReminders.length === 0}
           <p class="text-muted-foreground py-6 text-center text-sm">{m.common_loading()}</p>
-        {:else if displayedReminders.length === 0}
+        {:else if upcomingReminders.length === 0 && doneReminders.length === 0}
           <p class="text-muted-foreground py-6 text-center text-sm">
             {selectedDateKey ? m.reminder_calendar_empty_day() : m.reminder_list_empty()}
           </p>
         {:else}
-          <ul class="h-auto max-h-128 space-y-2 overflow-y-auto pr-1">
-            {#each displayedReminders as reminder (reminderKey(reminder))}
-              {@const typeStyle = TYPE_STYLES[reminder.type]}
-              {@const info = statusFor(reminder)}
-              <li class="rounded-xl border p-3">
-                <div class="flex items-start gap-3">
-                  <span
-                    class="flex size-10 shrink-0 items-center justify-center rounded-lg {typeStyle.bg} {typeStyle.text}"
-                  >
-                    <typeStyle.icon class="size-4" />
-                  </span>
-                  <div class="min-w-0 flex-1">
-                    <div class="flex flex-row gap-2">
-                      <p class="truncate text-sm font-medium">
-                        {getReminderTypeLabel(reminder.type, m)}
-                      </p>
-                      <div class="flex shrink-0 flex-col items-end gap-1">
-                        <StatusPill status={info.status} label={info.badge} />
-                      </div>
-                    </div>
-
-                    {#if subtitleFor(reminder)}
-                      <p class="text-muted-foreground truncate text-sm">{subtitleFor(reminder)}</p>
-                    {/if}
-                  </div>
-                  <div class="flex flex-row items-center gap-4">
-                    <p class="text-primary mt-0.5 flex flex-col truncate text-sm">
-                      {formatDate(reminder.dueDate)}
-                      {#if info.sub}
-                        <span class="text-muted-foreground">({info.sub})</span>
-                      {/if}
-                    </p>
-
-                    <div class="flex items-center justify-end gap-1">
-                      <Button variant="outline" size="icon" onclick={() => openEdit(reminder)}>
-                        <Pencil class="size-3.5" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        class="text-destructive hover:text-destructive"
-                        onclick={() => requestDelete(reminder)}
-                      >
-                        <Trash2 class="size-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            {/each}
-          </ul>
+          <div class="h-auto max-h-128 space-y-4 overflow-y-auto pr-1">
+            {#if upcomingReminders.length > 0}
+              <div>
+                <h4
+                  class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
+                >
+                  {m.reminder_section_upcoming()} ({upcomingReminders.length})
+                </h4>
+                <ul class="space-y-2">
+                  {#each upcomingReminders as reminder (reminderKey(reminder))}
+                    {@render reminderRow(reminder, false)}
+                  {/each}
+                </ul>
+              </div>
+            {/if}
+            {#if doneReminders.length > 0}
+              <div>
+                <h4
+                  class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
+                >
+                  {m.reminder_section_marked_done()} ({doneReminders.length})
+                </h4>
+                <ul class="space-y-2">
+                  {#each doneReminders as reminder (reminderKey(reminder))}
+                    {@render reminderRow(reminder, true)}
+                  {/each}
+                </ul>
+              </div>
+            {/if}
+          </div>
         {/if}
       </div>
 
@@ -334,5 +376,50 @@
     </div>
   {/if}
 </FeaturePageShell>
+
+{#snippet reminderRow(reminder: Reminder, done: boolean)}
+  {@const typeStyle = TYPE_STYLES[reminder.type]}
+  {@const info = statusFor(reminder)}
+  <li class="rounded-xl border p-3 {done ? 'opacity-60' : ''}">
+    <div class="flex items-start gap-3">
+      <span
+        class="flex size-10 shrink-0 items-center justify-center rounded-lg {typeStyle.bg} {typeStyle.text}"
+      >
+        <typeStyle.icon class="size-4" />
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-row items-center gap-2">
+          <p class="truncate text-sm font-medium">{getReminderTypeLabel(reminder.type, m)}</p>
+          <StatusPill status={info.status} label={info.badge} />
+        </div>
+        <p class="text-muted-foreground truncate text-sm">{metaFor(reminder)}</p>
+      </div>
+      <div class="flex flex-row items-center gap-4">
+        <p class="text-primary mt-0.5 flex flex-col truncate text-sm">
+          {formatDate(reminder.dueDate)}
+          {#if info.sub}
+            <span class="text-muted-foreground">({info.sub})</span>
+          {/if}
+        </p>
+
+        <div class="flex items-center justify-end gap-1">
+          {#if !done}
+            <Button variant="outline" size="icon" onclick={() => openEdit(reminder)}>
+              <Pencil class="size-3.5" />
+            </Button>
+          {/if}
+          <Button
+            variant="outline"
+            size="icon"
+            class="text-destructive hover:text-destructive"
+            onclick={() => requestDelete(reminder)}
+          >
+            <Trash2 class="size-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  </li>
+{/snippet}
 
 <DeleteConfirmation onConfirm={confirmDelete} bind:open={showDeleteDialog} />

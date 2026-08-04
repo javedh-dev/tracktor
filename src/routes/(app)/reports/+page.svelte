@@ -4,39 +4,25 @@
   import StackedAreaChart from '$dashboard/StackedAreaChart.svelte';
   import FleetChartPlaceholder from '$feature/overview/FleetChartPlaceholder.svelte';
   import FeaturePageShell from '$feature/shared/FeaturePageShell.svelte';
-  import DataExportImport from '$feature/data-export-import/DataExportImport.svelte';
-  import { Button } from '$ui/button';
-  import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import DetailedReportTable from '$feature/reports/DetailedReportTable.svelte';
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import FileDown from '@lucide/svelte/icons/file-down';
   import { dashboardStore } from '$stores/dashboard.svelte';
-  import { sheetStore } from '$stores/sheet.svelte';
   import { formatCurrency } from '$lib/helper/format.helper';
-  import { exportMaintenanceLogsPdf } from '$lib/services/maintenance.service';
   import type { VehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import { onMount } from 'svelte';
   import {
     reports_page_title,
     reports_page_description,
     reports_section_costs,
-    reports_section_exports,
+    reports_section_details,
     reports_stat_fuel_costs,
     reports_stat_maintenance_costs,
     reports_stat_compliance_costs,
     reports_chart_breakdown_title,
     reports_chart_trend_title,
-    reports_chart_trend_unavailable,
-    reports_export_maintenance_title,
-    reports_export_maintenance_description,
-    reports_export_maintenance_hint,
-    reports_export_data_title,
-    reports_export_data_description,
-    reports_export_action,
-    data_export_import_sheet_title,
-    data_export_import_sheet_desc
+    reports_chart_trend_unavailable
   } from '$lib/paraglide/messages/_index.js';
 
   onMount(() => {
@@ -72,19 +58,6 @@
       { name: 'Compliance', value: costs.compliance, color: 'var(--chart-3)' }
     ].filter((d) => d.value > 0);
   }
-
-  function handleExportMaintenancePdf(scope: VehicleScope) {
-    if (!scope.vehicleId) return;
-    void exportMaintenanceLogsPdf(scope.vehicleId);
-  }
-
-  function openDataExport() {
-    sheetStore.openSheet(
-      DataExportImport,
-      data_export_import_sheet_title(),
-      data_export_import_sheet_desc()
-    );
-  }
 </script>
 
 <FeaturePageShell title={reports_page_title()} description={reports_page_description()}>
@@ -114,66 +87,38 @@
         />
       </div>
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <DonutChart
-          data={costDonutData(costs)}
-          title={reports_chart_breakdown_title()}
-          {loading}
-          height={300}
-        />
-        {#if scope.isFleet}
-          <StackedAreaChart
-            data={summary?.expenses.monthlyTrend ?? []}
-            title={reports_chart_trend_title()}
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div class="bg-card col-span-5 h-72 rounded-2xl border p-4">
+          <DonutChart
+            bare
+            legendPosition="side"
+            data={costDonutData(costs)}
+            title={reports_chart_breakdown_title()}
             {loading}
           />
-        {:else}
-          <FleetChartPlaceholder
-            title={reports_chart_trend_title()}
-            message={reports_chart_trend_unavailable()}
-          />
-        {/if}
+        </div>
+        <div class="bg-card col-span-7 h-72 rounded-2xl border p-4 pb-8">
+          {#if scope.isFleet}
+            <StackedAreaChart
+              bare
+              data={summary?.expenses.monthlyTrend ?? []}
+              title={reports_chart_trend_title()}
+              {loading}
+            />
+          {:else}
+            <FleetChartPlaceholder
+              bare
+              title={reports_chart_trend_title()}
+              message={reports_chart_trend_unavailable()}
+            />
+          {/if}
+        </div>
       </div>
     </section>
 
     <section class="space-y-4">
-      <h2 class="text-lg font-semibold">{reports_section_exports()}</h2>
-
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div class="bg-card flex flex-col items-center gap-4 rounded-xl border p-8 text-center">
-          <FileText class="text-primary size-12" />
-          <div>
-            <h3 class="font-semibold">{reports_export_maintenance_title()}</h3>
-            <p class="text-muted-foreground mt-1 text-sm">
-              {reports_export_maintenance_description()}
-            </p>
-            {#if scope.isFleet}
-              <p class="text-muted-foreground mt-1 text-xs italic">
-                {reports_export_maintenance_hint()}
-              </p>
-            {/if}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={scope.isFleet}
-            onclick={() => handleExportMaintenancePdf(scope)}
-          >
-            <LabelWithIcon icon={FileDown} label={reports_export_action()} />
-          </Button>
-        </div>
-
-        <div class="bg-card flex flex-col items-center gap-4 rounded-xl border p-8 text-center">
-          <FileText class="text-primary size-12" />
-          <div>
-            <h3 class="font-semibold">{reports_export_data_title()}</h3>
-            <p class="text-muted-foreground mt-1 text-sm">{reports_export_data_description()}</p>
-          </div>
-          <Button variant="outline" size="sm" onclick={openDataExport}>
-            <LabelWithIcon icon={FileDown} label={reports_export_action()} />
-          </Button>
-        </div>
-      </div>
+      <h2 class="text-lg font-semibold">{reports_section_details()}</h2>
+      <DetailedReportTable />
     </section>
   {/snippet}
 </FeaturePageShell>

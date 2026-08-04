@@ -14,6 +14,7 @@
     title = '',
     loading = false,
     showLegend = true,
+    legendPosition = 'bottom',
     height = 300,
     innerRadius = 60,
     bare = false,
@@ -24,6 +25,8 @@
     title?: string;
     loading?: boolean;
     showLegend?: boolean;
+    /** 'side' places the legend next to the pie instead of stacked below it. */
+    legendPosition?: 'bottom' | 'side';
     height?: number;
     innerRadius?: number;
     /** Render content only — surrounding card chrome is provided by the parent. */
@@ -67,9 +70,19 @@
 
   // Bare legends may need to give ground to the chart in a short card, and scroll rather than clip.
   const legendClass = $derived(
-    bare
-      ? 'mt-3 flex min-h-0 shrink flex-col gap-1 overflow-y-auto'
-      : 'mt-4 flex shrink-0 flex-col gap-1'
+    legendPosition === 'side'
+      ? 'flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-y-auto'
+      : bare
+        ? 'mt-3 flex min-h-0 shrink flex-col gap-1 overflow-y-auto'
+        : 'mt-4 flex shrink-0 flex-col gap-1'
+  );
+
+  // 'side' arranges the chart area + legend in a row; 'bottom' keeps them as a transparent
+  // flex-col pass-through so the chart area's flex-1 still reaches up to the bare root.
+  const contentWrapClass = $derived(
+    legendPosition === 'side'
+      ? 'flex min-h-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center'
+      : 'flex min-h-0 flex-1 flex-col'
   );
 </script>
 
@@ -171,55 +184,64 @@
       </div>
     {/if}
   {:else}
-    <div class="relative {chartAreaClass}" style={chartStyle}>
-      <Chart.Container config={chartConfig} class="aspect-auto h-full w-full">
-        <PieChart
-          {data}
-          key="name"
-          label="name"
-          value="value"
-          c={(d: DonutDataPoint) => d.color}
-          {innerRadius}
-          padAngle={0.02}
-          cornerRadius={4}
-        >
-          {#snippet tooltip()}
-            <Chart.Tooltip indicator="dot">
-              {#snippet formatter({ value, name })}
-                {@const pct =
-                  total > 0 && typeof value === 'number' ? roundToDec((value / total) * 100, 1) : 0}
-                <span class="text-muted-foreground">{name}</span>
-                <span class="font-mono font-medium tabular-nums">
-                  {typeof value === 'number' ? value.toLocaleString() : value} ({pct}%)
-                </span>
-              {/snippet}
-            </Chart.Tooltip>
-          {/snippet}
-        </PieChart>
-      </Chart.Container>
-      {@render centerContent()}
-    </div>
-
-    {#if showLegend && itemsWithPercent.length > 0}
-      <div class={legendClass}>
-        {#each itemsWithPercent as item (item.name)}
-          <div
-            class="hover:bg-muted/60 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors"
+    <div class={contentWrapClass}>
+      <div
+        class="relative {legendPosition === 'side'
+          ? 'mx-auto aspect-square h-40 shrink-0 sm:mx-0 sm:h-full sm:max-h-56'
+          : chartAreaClass}"
+        style={chartStyle}
+      >
+        <Chart.Container config={chartConfig} class="aspect-auto h-full w-full">
+          <PieChart
+            {data}
+            key="name"
+            label="name"
+            value="value"
+            c={(d: DonutDataPoint) => d.color}
+            {innerRadius}
+            padAngle={0.02}
+            cornerRadius={4}
           >
-            <span
-              class="inline-block size-2.5 shrink-0 rounded-full"
-              style="background-color: {item.color}"
-            ></span>
-            <span class="text-foreground truncate font-medium">{item.name}</span>
-            <span class="text-muted-foreground shrink-0 font-mono text-xs tabular-nums"
-              >{item.percentage}%</span
-            >
-            <span class="ml-auto shrink-0 font-mono text-xs font-semibold tabular-nums">
-              {item.value.toLocaleString()}
-            </span>
-          </div>
-        {/each}
+            {#snippet tooltip()}
+              <Chart.Tooltip indicator="dot">
+                {#snippet formatter({ value, name })}
+                  {@const pct =
+                    total > 0 && typeof value === 'number'
+                      ? roundToDec((value / total) * 100, 1)
+                      : 0}
+                  <span class="text-muted-foreground">{name}</span>
+                  <span class="font-mono font-medium tabular-nums">
+                    {typeof value === 'number' ? value.toLocaleString() : value} ({pct}%)
+                  </span>
+                {/snippet}
+              </Chart.Tooltip>
+            {/snippet}
+          </PieChart>
+        </Chart.Container>
+        {@render centerContent()}
       </div>
-    {/if}
+
+      {#if showLegend && itemsWithPercent.length > 0}
+        <div class={legendClass}>
+          {#each itemsWithPercent as item (item.name)}
+            <div
+              class="hover:bg-muted/60 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors"
+            >
+              <span
+                class="inline-block size-2.5 shrink-0 rounded-full"
+                style="background-color: {item.color}"
+              ></span>
+              <span class="text-foreground truncate font-medium">{item.name}</span>
+              <span class="text-muted-foreground shrink-0 font-mono text-xs tabular-nums"
+                >{item.percentage}%</span
+              >
+              <span class="ml-auto shrink-0 font-mono text-xs font-semibold tabular-nums">
+                {item.value.toLocaleString()}
+              </span>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
   {/if}
 </div>

@@ -154,7 +154,7 @@
     <div class="flex flex-wrap items-center gap-2">
       <ListFilter class="text-muted-foreground size-4" />
       <Select.Root type="single" bind:value={typeFilter}>
-        <Select.Trigger class="w-44">{typeOptionLabel}</Select.Trigger>
+        <Select.Trigger class="w-auto" size="sm">{typeOptionLabel}</Select.Trigger>
         <Select.Content>
           {#each typeOptions as option (option.id)}
             <Select.Item value={option.id}>{option.label}</Select.Item>
@@ -162,7 +162,7 @@
         </Select.Content>
       </Select.Root>
       <Select.Root type="single" bind:value={statusFilter}>
-        <Select.Trigger class="w-44">{statusOptionLabel}</Select.Trigger>
+        <Select.Trigger class="w-auto" size="sm">{statusOptionLabel}</Select.Trigger>
         <Select.Content>
           {#each statusOptions as option (option.id)}
             <Select.Item value={option.id}>{option.label}</Select.Item>
