@@ -17,10 +17,9 @@ The following features can be toggled:
 
 1. **Fuel Log** - Track and manage fuel consumption and refueling history
 2. **Maintenance** - Record and schedule vehicle maintenance activities
-3. **PUCC** - Manage Pollution Under Control Certificate records
+3. **Compliance** - Manage insurance and Pollution Under Control Certificate (PUCC) records
 4. **Reminders** - Set and receive reminders for important vehicle events
-5. **Insurance** - Manage vehicle insurance details and renewals
-6. **Overview** - Display overview dashboard with key vehicle metrics
+5. **Overview** - Display overview dashboard with key vehicle metrics
 
 ## Configuration
 
@@ -32,9 +31,8 @@ Feature toggles are stored in the `configs` table with the following keys:
 
 - `featureFuelLog`
 - `featureMaintenance`
-- `featurePucc`
+- `featureCompliance`
 - `featureReminders`
-- `featureInsurance`
 - `featureOverview`
 
 Values are stored as strings: `'true'` or `'false'`
@@ -61,7 +59,7 @@ The easiest way to conditionally show/hide components based on feature flags:
 </FeatureGate>
 
 <!-- Require at least one feature to be enabled -->
-<FeatureGate requireAny={['insurance', 'pucc']}>
+<FeatureGate requireAny={['compliance', 'reminders']}>
   <DocumentsSection />
 </FeatureGate>
 
@@ -104,7 +102,7 @@ if (areAllFeaturesEnabled([Features.FUEL_LOG, Features.MAINTENANCE])) {
 }
 
 // Check if any feature is enabled
-if (isAnyFeatureEnabled([Features.INSURANCE, Features.PUCC])) {
+if (isAnyFeatureEnabled([Features.COMPLIANCE, Features.REMINDERS])) {
   // Show documents section
 }
 ```
@@ -128,7 +126,7 @@ You can use feature flags to conditionally show/hide navigation items:
 </script>
 
 {#if configStore.configs.featureFuelLog}
-  <NavItem href="/fuel-log">Fuel Log</NavItem>
+  <NavItem href="/fuel">Fuel Log</NavItem>
 {/if}
 
 {#if configStore.configs.featureMaintenance}

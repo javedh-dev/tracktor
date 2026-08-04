@@ -171,7 +171,7 @@ For Proxmox LXC container setup, use [Community-Scripts](https://community-scrip
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v22 or higher)
 - pnpm package manager
 
 ### Steps

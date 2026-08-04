@@ -17,10 +17,9 @@
 
 </div>
 
-<p align="center" style="font-size: 1.2rem;">
-  <b>Tracktor</b> is an open-source web application for <b>comprehensive vehicle management</b>.<br>
-  Easily track <span style="color:#4ade80;">⛽ fuel</span> consumption, <span style="color:#fbbf24;">🛠️ maintenance</span>, <span style="color:#60a5fa;">🛡️ insurance</span>, and <span style="color:#a78bfa;">📄 regulatory documents</span> for all your vehicles in one place.
-</p>
+If you own more than one vehicle, you know the drill: fuel receipts in a drawer, insurance PDFs buried in email, a maintenance date you meant to write down somewhere. Tracktor is a self-hosted app that keeps all of that in one place — fuel logs, service history, insurance and pollution certs, reminders before they lapse, and a dashboard that actually shows you what's going on across your fleet.
+
+Run it on a Raspberry Pi, a home server, or a $5 VPS. Your data stays yours.
 
 <p align="center">
   <picture>
@@ -30,61 +29,65 @@
   </picture>
 </p>
 
-## ✨ Features
+## What it does
 
-- 🚗 **Vehicle Management:** Add, edit, and manage multiple vehicles with support for different fuel types.
-- ⛽ **Fuel Tracking:** Log fuel refills and monitor fuel efficiency over time.
-- 🛠️ **Maintenance Log:** Record and view maintenance history for each vehicle.
-- 📄 **Document Tracking:** Track insurance and pollution certificates with renewal dates.
-- 🔔 **Reminders:** Set and manage reminders for maintenance, renewals, and other vehicle events.
-- 📊 **Dashboard:** Visualize key metrics, analytics, and upcoming renewals.
-- 🔒 **User Authentication:** Secure username/password authentication with session management.
-- 🎨 **Feature Toggles:** Enable or disable specific features based on your needs.
+- **Garage** — Add and manage multiple vehicles, each with its own fuel type and history.
+- **Fuel tracking** — Log every fill-up and watch your mileage/efficiency trends over time.
+- **Maintenance log** — Keep a full service history per vehicle, and know what's coming up next.
+- **Compliance** — Track insurance and pollution (PUCC) certificates, with renewal dates that don't sneak up on you.
+- **Reminders** — Get nudged before something expires or a service is due.
+- **Expenses & reports** — See what your vehicles actually cost you.
+- **Dashboard** — A fleet-wide overview with widgets you can rearrange to your liking.
+- **Auth & feature toggles** — Username/password login with sessions, and the ability to turn off features you don't need.
+- **10 languages** — English, Hindi, Spanish, French, German, Italian, Arabic, Romanian, Hungarian, and Finnish.
 
-## 🛠️ Tech Stack
+## Tech stack
 
-- 🎨 **Frontend:** SvelteKit, Tailwind CSS, Svelte 5
-- 🖥️ **Backend:** SvelteKit Server Routes
-- 🗄️ **Database:** SQLite with Drizzle ORM
-- 🐳 **Deployment:** Docker & Docker Compose
+SvelteKit (Svelte 5) + Tailwind CSS on the frontend, SvelteKit server routes on the backend, SQLite via Drizzle ORM for storage, shipped as a Docker image.
 
-## 🚀 Getting Started
+## Getting started
 
-Refer to the [installation guide](./docs/installation.md) for setup instructions.
+The fastest way to try Tracktor is Docker Compose:
 
-## 📚 Documentation
+```yaml
+services:
+  app:
+    image: ghcr.io/javedh-dev/tracktor:latest
+    container_name: tracktor-app
+    restart: always
+    ports:
+      - '3333:3000'
+    volumes:
+      - tracktor-data:/data
+volumes:
+  tracktor-data:
+```
 
-- [Installation Guide](./docs/installation.md) - Setup instructions for Docker, local development, and Proxmox LXC
-- [Authentication](./docs/authentication.md) - User authentication and session management
-- [Environment Variables](./docs/environment.md) - Configuration options
-- [Feature Toggles](./docs/feature-toggles.md) - Customizing enabled features
-- [Contributing](./docs/contributing.md) - Guidelines for contributing
+```bash
+docker-compose up -d
+```
 
-## 🤝 Contributing
+Then open `http://<your_ip_address>:3333`.
 
-Contributions are welcome! Please read the [contributing guidelines](./docs/contributing.md) before submitting a pull request.
+For local development, Proxmox LXC setup, reverse proxies, and every configuration option, see the [installation guide](./docs/installation.md).
 
-Consider supporting this project by giving it a star ⭐ or [sponsoring](https://github.com/sponsors/javedh-dev).
+## Documentation
 
-## 📄 License
+- [Installation Guide](./docs/installation.md) — Docker, local dev, Proxmox LXC
+- [Environment Variables](./docs/environment.md) — every config option, explained
+- [Authentication](./docs/authentication.md) — how login and sessions work
+- [Feature Toggles](./docs/feature-toggles.md) — turning features on/off
+- [Contributing](./docs/contributing.md) — how to get involved
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Contributing
 
-## 📊 Repository activity
+PRs and issues are welcome — read the [contributing guide](./docs/contributing.md) first. If Tracktor is useful to you, a star ⭐ or a [sponsorship](https://github.com/sponsors/javedh-dev) helps keep it going.
 
-![Activities](https://repobeats.axiom.co/api/embed/d41931a72a5373ee0d2073e72279862171468023.svg 'Repobeats analytics image')
+## License
 
-## ⭐ Star History
+MIT — see [LICENSE](LICENSE).
 
-<a href="https://www.star-history.com/#javedh-dev/tracktor&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=javedh-dev/tracktor&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=javedh-dev/tracktor&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=javedh-dev/tracktor&type=Date" />
- </picture>
-</a>
-
-## 🤝 Contributors
+## Contributors
 
 <a href="https://github.com/javedh-dev/tracktor/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=javedh-dev/tracktor"/>
