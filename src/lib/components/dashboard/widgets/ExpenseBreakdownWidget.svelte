@@ -15,8 +15,8 @@
             color: 'var(--chart-2)'
           },
           {
-            name: 'Insurance',
-            value: summary.expenses.breakdown.insurance,
+            name: 'Compliance',
+            value: summary.expenses.breakdown.compliance,
             color: 'var(--chart-3)'
           }
         ].filter((d) => d.value > 0)

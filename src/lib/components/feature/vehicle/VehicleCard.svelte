@@ -4,7 +4,6 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
-  import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import IconButton from '$appui/IconButton.svelte';
@@ -16,8 +15,7 @@
   import * as m from '$lib/paraglide/messages';
   import FuelLogForm from '../fuel/FuelLogForm.svelte';
   import MaintenanceForm from '../maintenance/MaintenanceForm.svelte';
-  import InsuranceForm from '../insurance/InsuranceForm.svelte';
-  import PollutionCertificateForm from '../pollution/PollutionCertificateForm.svelte';
+  import ComplianceForm from '../compliance/ComplianceForm.svelte';
   import VehicleForm from './VehicleForm.svelte';
   import ReminderForm from '../reminder/ReminderForm.svelte';
   import { Features } from '$lib/helper/feature.helper';
@@ -62,24 +60,13 @@
       ariaLabel: m.vehicle_action_add_maintenance_log()
     },
     {
-      id: 'vehicle-card-insurance-btn',
-      feature: Features.INSURANCE,
+      id: 'vehicle-card-compliance-btn',
+      feature: Features.COMPLIANCE,
       buttonStyles: 'hover:bg-sky-100 dark:hover:bg-sky-700',
       iconStyles: 'text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200',
       icon: Shield,
-      onclick: () => sheetStore.openSheet(InsuranceForm, m.vehicle_action_add_insurance(), ''),
-      ariaLabel: m.vehicle_action_add_insurance()
-    },
-    {
-      id: 'vehicle-card-pollution-btn',
-      feature: Features.PUCC,
-      buttonStyles: 'hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700',
-      iconStyles:
-        'text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200',
-      icon: BadgeCheck,
-      onclick: () =>
-        sheetStore.openSheet(PollutionCertificateForm, m.vehicle_action_add_pollution(), ''),
-      ariaLabel: m.vehicle_action_add_pollution()
+      onclick: () => sheetStore.openSheet(ComplianceForm, m.vehicle_action_add_compliance(), ''),
+      ariaLabel: m.vehicle_action_add_compliance()
     },
     {
       id: 'vehicle-card-reminder-btn',

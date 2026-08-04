@@ -34,7 +34,7 @@ export const markNotificationAsRead = async (
   const res: Response<Notification> = { status: 'OK' };
   try {
     const response = await apiClient.patch(
-      `/garage/${vehicleId}/notifications/${notificationId}`
+      `/vehicles/${vehicleId}/notifications/${notificationId}`
     );
     res.data = response.data.data || response.data;
   } catch (e: any) {

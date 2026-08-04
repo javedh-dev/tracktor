@@ -25,7 +25,7 @@
     reports_section_exports,
     reports_stat_fuel_costs,
     reports_stat_maintenance_costs,
-    reports_stat_insurance_costs,
+    reports_stat_compliance_costs,
     reports_chart_breakdown_title,
     reports_chart_trend_title,
     reports_chart_trend_unavailable,
@@ -52,7 +52,7 @@
       return {
         fuel: summary.expenses.breakdown.fuel,
         maintenance: summary.expenses.breakdown.maintenance,
-        insurance: summary.expenses.breakdown.insurance
+        compliance: summary.expenses.breakdown.compliance
       };
     }
     const vehicle = summary.vehicles.find((v) => v.id === scope.vehicleId);
@@ -60,16 +60,16 @@
     return {
       fuel: vehicle.totalFuelCost,
       maintenance: vehicle.totalMaintenanceCost,
-      insurance: vehicle.totalInsuranceCost
+      compliance: vehicle.totalComplianceCost
     };
   }
 
-  function costDonutData(costs: { fuel: number; maintenance: number; insurance: number } | null) {
+  function costDonutData(costs: { fuel: number; maintenance: number; compliance: number } | null) {
     if (!costs) return [];
     return [
       { name: 'Fuel', value: costs.fuel, color: 'var(--chart-1)' },
       { name: 'Maintenance', value: costs.maintenance, color: 'var(--chart-2)' },
-      { name: 'Insurance', value: costs.insurance, color: 'var(--chart-3)' }
+      { name: 'Compliance', value: costs.compliance, color: 'var(--chart-3)' }
     ].filter((d) => d.value > 0);
   }
 
@@ -108,8 +108,8 @@
         />
         <StatCard
           icon={Shield}
-          label={reports_stat_insurance_costs()}
-          value={loading ? '...' : costs ? formatCurrency(costs.insurance) : '--'}
+          label={reports_stat_compliance_costs()}
+          value={loading ? '...' : costs ? formatCurrency(costs.compliance) : '--'}
           color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
         />
       </div>

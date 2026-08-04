@@ -20,8 +20,6 @@ export interface Vehicle {
   vin: string | null;
   color: string | null;
   odometer: number | null;
-  insuranceStatus?: string;
-  puccStatus?: string;
   image?: string | null;
   fuelType: 'petrol' | 'diesel' | 'electric' | 'lpg' | 'cng';
   vehicleType:
@@ -40,12 +38,12 @@ export interface Vehicle {
 
 export interface VehicleActivityEntry {
   id: string;
-  kind: 'fuel' | 'maintenance' | 'insurance';
+  kind: 'fuel' | 'maintenance' | 'compliance';
   date: string;
   cost?: number | null;
   fuelAmount?: number | null;
   serviceCenter?: string | null;
-  policyNumber?: string | null;
+  documentNumber?: string | null;
 }
 
 /** Shape returned by the vehicle hub page's server load (getVehicleSummary) — vehicle plus derived stats. */
@@ -56,8 +54,8 @@ export interface VehicleHubSummary extends Vehicle {
   totalMaintenanceLogs?: number;
   insuranceValidTill?: string | null;
   insuranceValidityStatus?: 'valid' | 'expired' | 'not_available';
-  puccValidTill?: string | null;
-  puccValidityStatus?: 'valid' | 'expired' | 'not_available';
+  otherComplianceValidTill?: string | null;
+  otherComplianceValidityStatus?: 'valid' | 'expired' | 'not_available';
   upcomingRemindersCount?: number;
   recentActivity?: VehicleActivityEntry[];
 }

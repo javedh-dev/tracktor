@@ -3,7 +3,6 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
-  import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -52,26 +51,15 @@
         })
     },
     {
-      id: 'insurance',
-      feature: Features.INSURANCE,
+      id: 'compliance',
+      feature: Features.COMPLIANCE,
       icon: Shield,
-      label: m.nav_insurance(),
+      label: m.nav_compliance(),
       subtitle: vehicle.insuranceValidTill
         ? m.vehicle_hub_valid_till({ date: formatDate(vehicle.insuranceValidTill) })
         : m.vehicle_details_not_available(),
-      href: `/insurance?vehicle=${vehicleId}`,
+      href: `/compliance?vehicle=${vehicleId}`,
       dotClass: 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
-    },
-    {
-      id: 'pollution',
-      feature: Features.PUCC,
-      icon: BadgeCheck,
-      label: m.nav_pollution(),
-      subtitle: vehicle.puccValidTill
-        ? m.vehicle_hub_valid_till({ date: formatDate(vehicle.puccValidTill) })
-        : m.vehicle_details_not_available(),
-      href: `/pollution?vehicle=${vehicleId}`,
-      dotClass: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400'
     },
     {
       id: 'reminders',

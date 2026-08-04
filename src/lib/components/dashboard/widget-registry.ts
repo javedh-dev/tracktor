@@ -91,7 +91,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   'expense-breakdown-donut': {
     type: 'expense-breakdown-donut',
     title: 'Expenses by Category',
-    description: 'Fuel vs. maintenance vs. insurance spend',
+    description: 'Fuel vs. maintenance vs. compliance spend',
     component: ExpenseBreakdownWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
@@ -148,10 +148,10 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'pucc-status-donut': {
     type: 'pucc-status-donut',
-    title: 'PUC Status',
-    description: 'Pollution certificate status across the fleet',
+    title: 'Other Compliance Status',
+    description: 'Emissions, roadworthiness & registration status across the fleet',
     component: StatusDonutWidget,
-    extraProps: { metric: 'pucc' },
+    extraProps: { metric: 'other' },
     defaultColSpan: 6,
     defaultRowSpan: 6
   },

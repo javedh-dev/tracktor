@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import { getLocalTimeZone, type DateValue } from '@internationalized/date';
   import { toast } from 'svelte-sonner';
-  import FilterTabs from '$dashboard/FilterTabs.svelte';
   import StatCard from '$dashboard/StatCard.svelte';
   import StatusPill from '$dashboard/StatusPill.svelte';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
@@ -11,7 +10,6 @@
   import Clock from '@lucide/svelte/icons/clock';
   import CalendarClock from '@lucide/svelte/icons/calendar-clock';
   import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
-  import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import X from '@lucide/svelte/icons/x';
@@ -24,7 +22,6 @@
   import FeaturePageShell from '$feature/shared/FeaturePageShell.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import ReminderForm from '$feature/reminder/ReminderForm.svelte';
-  import ReminderList from '$feature/reminder/ReminderList.svelte';
   import ReminderCalendar from '$feature/reminder/ReminderCalendar.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
@@ -41,37 +38,6 @@
     feature_reminders_disabled_title,
     feature_reminders_disabled_hint
   } from '$lib/paraglide/messages/_index.js';
-
-  let typeFilter = $state<string>('upcoming');
-  let showFullList = $state(false);
-
-  const tabs = [
-    { id: 'upcoming', label: m.reminder_filter_all() },
-    { id: 'service', label: m.reminder_filter_service() },
-    { id: 'puc', label: m.reminder_filter_puc() },
-    { id: 'insurance', label: m.reminder_filter_insurance() },
-    { id: 'others', label: m.reminder_filter_others() }
-  ];
-
-  function matchesTypeFilter(reminder: Reminder): boolean {
-    switch (typeFilter) {
-      case 'service':
-        return reminder.type === 'maintenance';
-      case 'puc':
-        return reminder.type === 'pollution';
-      case 'insurance':
-        return reminder.type === 'insurance';
-      case 'others':
-        return !['maintenance', 'pollution', 'insurance'].includes(reminder.type);
-      default:
-        return true;
-    }
-  }
-
-  const upcomingFilter = (reminder: Reminder) =>
-    !reminder.isCompleted && matchesTypeFilter(reminder);
-  const completedFilter = (reminder: Reminder) =>
-    reminder.isCompleted && matchesTypeFilter(reminder);
 
   const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
 
@@ -337,7 +303,7 @@
 
         <div class="bg-card rounded-xl border p-4">
           <h3 class="mb-3 text-lg font-semibold">{m.reminder_quick_actions_title()}</h3>
-          <div class="grid grid-cols-4 gap-2">
+          <div class="grid grid-cols-3 gap-2">
             <button
               type="button"
               class="hover:bg-muted/40 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center"
@@ -357,48 +323,15 @@
             <button
               type="button"
               class="hover:bg-muted/40 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center"
-              onclick={() => goto('/insurance')}
+              onclick={() => goto('/compliance')}
             >
               <ShieldCheck class="size-5 text-amber-500" />
-              <span class="text-xs font-medium">{m.nav_insurance()}</span>
-            </button>
-            <button
-              type="button"
-              class="hover:bg-muted/40 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center"
-              onclick={() => goto('/pollution')}
-            >
-              <BadgeCheck class="size-5 text-red-500" />
-              <span class="text-xs font-medium">{m.nav_pollution()}</span>
+              <span class="text-xs font-medium">{m.nav_compliance()}</span>
             </button>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="border-t pt-2">
-      <button
-        type="button"
-        class="text-primary flex items-center gap-1 text-sm font-medium"
-        onclick={() => (showFullList = !showFullList)}
-      >
-        {showFullList ? m.common_view_less() : m.reminder_manage_all_action()}
-        <ChevronRight class="size-3.5" />
-      </button>
-    </div>
-
-    {#if showFullList}
-      <FilterTabs {tabs} bind:value={typeFilter} />
-
-      <div class="space-y-3">
-        <h3 class="text-lg font-semibold">{m.reminder_section_upcoming()}</h3>
-        <ReminderList filter={upcomingFilter} />
-      </div>
-
-      <div class="space-y-3">
-        <h3 class="text-lg font-semibold">{m.reminder_section_completed()}</h3>
-        <ReminderList filter={completedFilter} />
-      </div>
-    {/if}
   {/if}
 </FeaturePageShell>
 

@@ -17,9 +17,8 @@ export function isFeatureEnabled(feature: string): boolean {
 export const Features = {
   FUEL_LOG: 'fuelLog',
   MAINTENANCE: 'maintenance',
-  PUCC: 'pucc',
+  COMPLIANCE: 'compliance',
   REMINDERS: 'reminders',
-  INSURANCE: 'insurance',
   OVERVIEW: 'overview'
 } as const;
 

@@ -1,8 +1,7 @@
 import {
   fuelLogTable,
-  insuranceTable,
+  complianceDocumentTable,
   maintenanceLogTable,
-  pollutionCertificateTable,
   vehicleTable,
   notificationTable,
   configTable
@@ -88,10 +87,9 @@ function buildMileageSeries(startOdometer: number, count: number): number[] {
 
 const clearDb = async () => {
   await db.delete(notificationTable);
-  await db.delete(pollutionCertificateTable);
+  await db.delete(complianceDocumentTable);
   await db.delete(maintenanceLogTable);
   await db.delete(fuelLogTable);
-  await db.delete(insuranceTable);
   await db.delete(vehicleTable);
 };
 
@@ -137,11 +135,12 @@ const seedDemoData = async (enforce: boolean = false) => {
       const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
       const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
       await db
-        .insert(insuranceTable)
+        .insert(complianceDocumentTable)
         .values({
           vehicleId: vehicle.id,
-          provider: faker.company.name(),
-          policyNumber: faker.string.numeric({ length: { min: 12, max: 18 } }),
+          type: 'insurance',
+          issuer: faker.company.name(),
+          documentNumber: faker.string.numeric({ length: { min: 12, max: 18 } }),
           startDate: faker.date.past({ years: 1 }).toDateString(),
           endDate:
             recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
@@ -176,22 +175,23 @@ const seedDemoData = async (enforce: boolean = false) => {
       const recurrenceTypes = ['none', 'yearly', 'monthly', 'no_end'];
       const recurrenceType = faker.helpers.arrayElement(recurrenceTypes);
       await db
-        .insert(pollutionCertificateTable)
+        .insert(complianceDocumentTable)
         .values({
           vehicleId: vehicle.id,
-          certificateNumber: faker.string.alphanumeric({
+          type: 'emissions',
+          documentNumber: faker.string.alphanumeric({
             casing: 'upper',
             length: 10
           }),
-          issueDate: faker.date.past({ years: 1 }).toDateString(),
-          expiryDate:
+          startDate: faker.date.past({ years: 1 }).toDateString(),
+          endDate:
             recurrenceType !== 'none' ? null : faker.date.future({ years: 1 }).toDateString(),
           recurrenceType: recurrenceType,
           recurrenceInterval:
             recurrenceType === 'none' || recurrenceType === 'no_end'
               ? 1
               : faker.number.int({ min: 1, max: 2 }),
-          testingCenter: faker.company.name()
+          issuer: faker.company.name()
         })
         .run();
     })
@@ -256,7 +256,7 @@ const seedDemoData = async (enforce: boolean = false) => {
   await Promise.all(
     vehicles.map(async (vehicle) => {
       const notifications = [];
-      const notificationTypes = ['reminder', 'alert', 'maintenance', 'insurance', 'pollution'];
+      const notificationTypes = ['reminder', 'alert', 'maintenance', 'compliance'];
       const channels = ['reminder', 'alert', 'information'];
       const sources = ['system', 'user'];
 
@@ -276,11 +276,13 @@ const seedDemoData = async (enforce: boolean = false) => {
           case 'maintenance':
             message = `Scheduled maintenance: ${faker.helpers.arrayElement(['Annual service', 'Engine checkup', 'Transmission service', 'Coolant flush'])}`;
             break;
-          case 'insurance':
-            message = `Insurance renewal due for policy ${faker.string.alphanumeric({ length: 8, casing: 'upper' })}`;
-            break;
-          case 'pollution':
-            message = `Pollution certificate expiring soon - visit testing center`;
+          case 'compliance':
+            message = faker.helpers.arrayElement([
+              `Insurance renewal due for policy ${faker.string.alphanumeric({ length: 8, casing: 'upper' })}`,
+              'Emissions certificate expiring soon - visit testing center',
+              'Roadworthiness inspection due soon',
+              'Registration renewal due soon'
+            ]);
             break;
           case 'alert':
             message = faker.helpers.arrayElement([

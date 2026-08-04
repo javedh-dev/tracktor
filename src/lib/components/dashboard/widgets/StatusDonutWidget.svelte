@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  export type StatusDonutMetric = 'pucc' | 'insurance';
+  export type StatusDonutMetric = 'other' | 'insurance';
 </script>
 
 <script lang="ts">
@@ -17,7 +17,7 @@
   } = $props();
 
   const data = $derived.by(() => {
-    const bucket = metric === 'pucc' ? summary?.compliance.pucc : summary?.compliance.insurance;
+    const bucket = metric === 'other' ? summary?.compliance.other : summary?.compliance.insurance;
     if (!bucket) return [];
     return [
       { name: 'Valid', value: bucket.valid, color: 'var(--chart-1)' },

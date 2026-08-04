@@ -21,9 +21,8 @@ const settingsConfigSchema = z.object({
   customCss: z.string().optional(),
   featureFuelLog: z.boolean().default(true),
   featureMaintenance: z.boolean().default(true),
-  featurePucc: z.boolean().default(true),
+  featureCompliance: z.boolean().default(true),
   featureReminders: z.boolean().default(true),
-  featureInsurance: z.boolean().default(true),
   featureOverview: z.boolean().default(true),
   notificationProcessingEnabled: z.boolean().default(true),
   notificationProcessingSchedule: z.string().default('0 9 * * *')

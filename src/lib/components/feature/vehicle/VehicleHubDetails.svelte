@@ -61,9 +61,13 @@
     },
     {
       icon: BadgeCheck,
-      label: m.vehicle_hub_pollution_valid_till(),
-      value: vehicle.puccValidTill ? formatDate(vehicle.puccValidTill) : notSpecified,
-      badge: vehicle.puccValidityStatus ? { status: vehicle.puccValidityStatus } : undefined
+      label: m.vehicle_hub_other_compliance_valid_till(),
+      value: vehicle.otherComplianceValidTill
+        ? formatDate(vehicle.otherComplianceValidTill)
+        : notSpecified,
+      badge: vehicle.otherComplianceValidityStatus
+        ? { status: vehicle.otherComplianceValidityStatus }
+        : undefined
     },
     {
       icon: getVehicleTypeIcon(vehicle.vehicleType ?? 'car'),

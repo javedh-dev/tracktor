@@ -30,10 +30,10 @@
       dot: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
       route: '/maintenance'
     },
-    insurance: {
+    compliance: {
       icon: Shield,
       dot: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
-      route: '/insurance'
+      route: '/compliance'
     }
   };
 
@@ -43,8 +43,8 @@
         return m.vehicle_hub_activity_fuel_added();
       case 'maintenance':
         return m.vehicle_hub_activity_maintenance();
-      case 'insurance':
-        return m.vehicle_hub_activity_insurance_renewed();
+      case 'compliance':
+        return m.vehicle_hub_activity_compliance_updated();
     }
   }
 
@@ -59,9 +59,9 @@
           .join(' • ');
       case 'maintenance':
         return entry.serviceCenter || '';
-      case 'insurance':
-        return entry.policyNumber
-          ? `${m.vehicle_hub_activity_policy_prefix()}${entry.policyNumber}`
+      case 'compliance':
+        return entry.documentNumber
+          ? `${m.vehicle_hub_activity_document_prefix()}${entry.documentNumber}`
           : '';
     }
   }

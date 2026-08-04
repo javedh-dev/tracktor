@@ -19,11 +19,11 @@ export interface VehicleSummary {
   totalDistance: number;
   totalFuelCost: number;
   totalMaintenanceCost: number;
-  totalInsuranceCost: number;
+  totalComplianceCost: number;
   totalExpenses: number;
   avgMileage: number | null;
   costPerDistance: number | null;
-  puccStatus: 'valid' | 'expiring_soon' | 'expired' | 'not_available';
+  otherComplianceStatus: 'valid' | 'expiring_soon' | 'expired' | 'not_available';
   insuranceStatus: 'valid' | 'expiring_soon' | 'expired' | 'not_available';
   healthStatus: 'good' | 'attention' | 'needs_action';
 }
@@ -53,7 +53,7 @@ export interface MonthlyExpensePoint {
   month: string; // YYYY-MM
   fuel: number;
   maintenance: number;
-  insurance: number;
+  compliance: number;
   total: number;
 }
 
@@ -66,14 +66,14 @@ export interface DashboardSummary {
     costPerDistance: number | null;
   };
   expenses: {
-    breakdown: { fuel: number; maintenance: number; insurance: number };
+    breakdown: { fuel: number; maintenance: number; compliance: number };
     monthlyTrend: MonthlyExpensePoint[];
   };
   fuel: {
     dailyTrend: Array<{ date: string; fuelAmount: number }>;
   };
   compliance: {
-    pucc: StatusBucket;
+    other: StatusBucket;
     insurance: StatusBucket;
     vehicleHealth: { good: number; attention: number; needsAction: number };
     upcomingReminders: UpcomingReminder[];

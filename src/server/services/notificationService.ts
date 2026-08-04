@@ -46,15 +46,15 @@ async function buildReminderNotifications(vehicleId: string): Promise<GeneratedN
     });
 }
 
-async function buildInsuranceNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
-  const policies = await db.query.insuranceTable.findMany({
-    where: (insurance, { eq }) => eq(insurance.vehicleId, vehicleId)
+async function buildComplianceNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
+  const documents = await db.query.complianceDocumentTable.findMany({
+    where: (doc, { eq }) => eq(doc.vehicleId, vehicleId)
   });
 
-  return policies
-    .filter((policy) => policy.endDate)
-    .flatMap((policy) => {
-      const expiryDate = new Date(policy.endDate!);
+  return documents
+    .filter((doc) => doc.endDate)
+    .flatMap((doc) => {
+      const expiryDate = new Date(doc.endDate!);
       const daysUntilExpiry = getDaysUntil(expiryDate);
 
       if (daysUntilExpiry > 30) {
@@ -63,63 +63,35 @@ async function buildInsuranceNotifications(vehicleId: string): Promise<Generated
 
       return {
         vehicleId,
-        type: 'insurance' as const,
-        channel: NOTIFICATION_TYPE_META.insurance.channel,
-        message: formatExpiryMessage('Insurance policy', policy.policyNumber, daysUntilExpiry),
-        source: 'system' as const,
-        dueDate: expiryDate.toISOString(),
-        notificationKey: `insurance:${policy.id}:${policy.endDate}`
-      };
-    });
-}
-
-async function buildPuccNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
-  const certificates = await db.query.pollutionCertificateTable.findMany({
-    where: (certificate, { eq }) => eq(certificate.vehicleId, vehicleId)
-  });
-
-  return certificates
-    .filter((certificate) => certificate.expiryDate)
-    .flatMap((certificate) => {
-      const expiryDate = new Date(certificate.expiryDate!);
-      const daysUntilExpiry = getDaysUntil(expiryDate);
-
-      if (daysUntilExpiry > 30) {
-        return [];
-      }
-
-      return {
-        vehicleId,
-        type: 'pollution' as const,
-        channel: NOTIFICATION_TYPE_META.pollution.channel,
+        type: 'compliance' as const,
+        channel: NOTIFICATION_TYPE_META.compliance.channel,
         message: formatExpiryMessage(
-          'PUCC certificate',
-          certificate.certificateNumber,
+          `${doc.type.charAt(0).toUpperCase()}${doc.type.slice(1)} document`,
+          doc.documentNumber,
           daysUntilExpiry
         ),
         source: 'system' as const,
         dueDate: expiryDate.toISOString(),
-        notificationKey: `pollution:${certificate.id}:${certificate.expiryDate}`
+        notificationKey: `compliance:${doc.id}:${doc.endDate}`
       };
     });
 }
 
 async function buildAvailableNotifications(vehicleId: string): Promise<GeneratedNotification[]> {
-  let puccEnabled = true;
+  let complianceEnabled = true;
   try {
-    const puccConfig = await getAppConfigByKey('featurePucc');
-    if (puccConfig?.value) puccEnabled = puccConfig.value !== 'false';
+    const complianceConfig = await getAppConfigByKey('featureCompliance');
+    if (complianceConfig?.value) complianceEnabled = complianceConfig.value !== 'false';
   } catch {
     // key not in DB yet — default to enabled
   }
 
-  const [reminders, insurances, puccCertificates] = await Promise.all([
+  const [reminders, complianceDocuments] = await Promise.all([
     buildReminderNotifications(vehicleId),
-    buildInsuranceNotifications(vehicleId),
-    puccEnabled ? buildPuccNotifications(vehicleId) : Promise.resolve([])
+    complianceEnabled ? buildComplianceNotifications(vehicleId) : Promise.resolve([])
   ]);
 
-  return sortNotificationsByDueDate([...reminders, ...insurances, ...puccCertificates]);
+  return sortNotificationsByDueDate([...reminders, ...complianceDocuments]);
 }
 
 async function removeStaleNotifications(vehicleId: string, activeKeys: Set<string>): Promise<void> {

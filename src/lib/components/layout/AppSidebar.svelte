@@ -7,7 +7,6 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Bell from '@lucide/svelte/icons/bell';
-  import BadgeInfo from '@lucide/svelte/icons/badge-info';
   import Shield from '@lucide/svelte/icons/shield';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Settings from '@lucide/svelte/icons/settings';
@@ -75,17 +74,10 @@
       group: 'Logs'
     },
     {
-      label: m.nav_pollution(),
-      href: '/pollution',
-      icon: BadgeInfo,
-      featureKey: 'featurePucc',
-      group: 'Logs'
-    },
-    {
-      label: m.nav_insurance(),
-      href: '/insurance',
+      label: m.nav_compliance(),
+      href: '/compliance',
       icon: Shield,
-      featureKey: 'featureInsurance',
+      featureKey: 'featureCompliance',
       group: 'Logs'
     },
     {

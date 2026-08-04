@@ -10,8 +10,7 @@ import {
   type FuelLogInput
 } from '$lib/domain/fuel/mileage';
 
-type VehiclePayload = Omit<Vehicle, 'insuranceStatus' | 'puccStatus'>;
-type VehicleMutationPayload = Omit<VehiclePayload, 'id'>;
+type VehicleMutationPayload = Omit<Vehicle, 'id'>;
 
 function serializeVehiclePayload(vehicleData: VehicleMutationPayload) {
   const { id: _, ...data } = vehicleData as VehicleMutationPayload & { id?: unknown };
@@ -28,11 +27,6 @@ function parseVehicleRecord<T extends { customFields: string | null }>(vehicle: 
   };
 }
 
-const getStatusFromDates = (dates: Date[], today: Date) => {
-  if (dates.length === 0) return 'Not Available';
-  return dates.some((date) => date > today) ? 'Active' : 'Expired';
-};
-
 export const addVehicle = async (vehicleData: VehicleMutationPayload) => {
   const processedData = serializeVehiclePayload(vehicleData);
   const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
@@ -41,63 +35,51 @@ export const addVehicle = async (vehicleData: VehicleMutationPayload) => {
 };
 
 export const getAllVehicles = async () => {
-  const [
-    vehicles,
-    insurances,
-    pollutionCerts,
-    maxFuelOdometerRows,
-    maxMaintenanceOdometerRows,
-    allFuelLogs
-  ] = await Promise.all([
-    db.query.vehicleTable.findMany({
-      columns: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        licensePlate: true,
-        color: true,
-        odometer: true,
-        vin: true,
-        image: true,
-        fuelType: true,
-        vehicleType: true,
-        customFields: true
-      }
-    }),
-    db.query.insuranceTable.findMany({
-      columns: { vehicleId: true, endDate: true }
-    }),
-    db.query.pollutionCertificateTable.findMany({
-      columns: { vehicleId: true, expiryDate: true }
-    }),
-    db
-      .select({
-        vehicleId: schema.fuelLogTable.vehicleId,
-        maxOdometer: sql<number>`MAX(${schema.fuelLogTable.odometer})`.as('max_odometer')
+  const [vehicles, maxFuelOdometerRows, maxMaintenanceOdometerRows, allFuelLogs] =
+    await Promise.all([
+      db.query.vehicleTable.findMany({
+        columns: {
+          id: true,
+          make: true,
+          model: true,
+          year: true,
+          licensePlate: true,
+          color: true,
+          odometer: true,
+          vin: true,
+          image: true,
+          fuelType: true,
+          vehicleType: true,
+          customFields: true
+        }
+      }),
+      db
+        .select({
+          vehicleId: schema.fuelLogTable.vehicleId,
+          maxOdometer: sql<number>`MAX(${schema.fuelLogTable.odometer})`.as('max_odometer')
+        })
+        .from(schema.fuelLogTable)
+        .where(sql`${schema.fuelLogTable.odometer} IS NOT NULL`)
+        .groupBy(schema.fuelLogTable.vehicleId),
+      db
+        .select({
+          vehicleId: schema.maintenanceLogTable.vehicleId,
+          maxOdometer: sql<number>`MAX(${schema.maintenanceLogTable.odometer})`.as('max_odometer')
+        })
+        .from(schema.maintenanceLogTable)
+        .where(sql`${schema.maintenanceLogTable.odometer} IS NOT NULL`)
+        .groupBy(schema.maintenanceLogTable.vehicleId),
+      db.query.fuelLogTable.findMany({
+        columns: {
+          vehicleId: true,
+          filled: true,
+          missedLast: true,
+          odometer: true,
+          fuelAmount: true
+        },
+        orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
       })
-      .from(schema.fuelLogTable)
-      .where(sql`${schema.fuelLogTable.odometer} IS NOT NULL`)
-      .groupBy(schema.fuelLogTable.vehicleId),
-    db
-      .select({
-        vehicleId: schema.maintenanceLogTable.vehicleId,
-        maxOdometer: sql<number>`MAX(${schema.maintenanceLogTable.odometer})`.as('max_odometer')
-      })
-      .from(schema.maintenanceLogTable)
-      .where(sql`${schema.maintenanceLogTable.odometer} IS NOT NULL`)
-      .groupBy(schema.maintenanceLogTable.vehicleId),
-    db.query.fuelLogTable.findMany({
-      columns: {
-        vehicleId: true,
-        filled: true,
-        missedLast: true,
-        odometer: true,
-        fuelAmount: true
-      },
-      orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
-    })
-  ]);
+    ]);
 
   const maxFuelOdometer = new Map(maxFuelOdometerRows.map((r) => [r.vehicleId, r.maxOdometer]));
   const maxMaintenanceOdometer = new Map(
@@ -112,8 +94,6 @@ export const getAllVehicles = async () => {
     fuelLogsByVehicle.get(log.vehicleId)!.push(log);
   }
 
-  const today = new Date();
-
   const enrichedVehicles = vehicles.map((vehicle) => {
     const vehicleFuelLogs = fuelLogsByVehicle.get(vehicle.id) || [];
 
@@ -125,22 +105,12 @@ export const getAllVehicles = async () => {
 
     const overallMileage = computeAverageMileage(vehicleFuelLogs);
 
-    const vehicleInsuranceDates = insurances
-      .filter((ins) => ins.vehicleId === vehicle.id && ins.endDate)
-      .map((ins) => new Date(ins.endDate!));
-
-    const vehiclePuccDates = pollutionCerts
-      .filter((pucc) => pucc.vehicleId === vehicle.id && pucc.expiryDate)
-      .map((pucc) => new Date(pucc.expiryDate!));
-
     const parsedVehicle = parseVehicleRecord(vehicle);
 
     return {
       ...parsedVehicle,
       odometer: latestOdometer || vehicle.odometer || 0,
-      overallMileage,
-      insuranceStatus: getStatusFromDates(vehicleInsuranceDates, today),
-      puccStatus: getStatusFromDates(vehiclePuccDates, today)
+      overallMileage
     };
   });
 
@@ -226,37 +196,35 @@ function latestValidity(
 
 // Get vehicles with minimal data for dropdown/selection purposes
 export const getVehicleSummary = async (id: string) => {
-  const [vehicle, fuelLogs, maintenanceLogs, insurances, pollutionCerts, reminders] =
-    await Promise.all([
-      getVehicleById(id),
-      db.query.fuelLogTable.findMany({
-        where: (log, { eq }) => eq(log.vehicleId, id),
-        orderBy: (log, { desc }) => [desc(log.date)]
-      }),
-      db.query.maintenanceLogTable.findMany({
-        where: (log, { eq }) => eq(log.vehicleId, id),
-        orderBy: (log, { desc }) => [desc(log.date)]
-      }),
-      db.query.insuranceTable.findMany({
-        where: (ins, { eq }) => eq(ins.vehicleId, id),
-        orderBy: (ins, { desc }) => [desc(ins.startDate)]
-      }),
-      db.query.pollutionCertificateTable.findMany({
-        where: (pucc, { eq }) => eq(pucc.vehicleId, id)
-      }),
-      db.query.reminderTable.findMany({
-        where: (reminder, { eq, and }) =>
-          and(eq(reminder.vehicleId, id), eq(reminder.isCompleted, false))
-      })
-    ]);
+  const [vehicle, fuelLogs, maintenanceLogs, complianceDocuments, reminders] = await Promise.all([
+    getVehicleById(id),
+    db.query.fuelLogTable.findMany({
+      where: (log, { eq }) => eq(log.vehicleId, id),
+      orderBy: (log, { desc }) => [desc(log.date)]
+    }),
+    db.query.maintenanceLogTable.findMany({
+      where: (log, { eq }) => eq(log.vehicleId, id),
+      orderBy: (log, { desc }) => [desc(log.date)]
+    }),
+    db.query.complianceDocumentTable.findMany({
+      where: (doc, { eq }) => eq(doc.vehicleId, id),
+      orderBy: (doc, { desc }) => [desc(doc.startDate)]
+    }),
+    db.query.reminderTable.findMany({
+      where: (reminder, { eq, and }) =>
+        and(eq(reminder.vehicleId, id), eq(reminder.isCompleted, false))
+    })
+  ]);
 
   const today = new Date();
+  const insurances = complianceDocuments.filter((doc) => doc.type === 'insurance');
+  const otherCompliance = complianceDocuments.filter((doc) => doc.type !== 'insurance');
   const insuranceValidity = latestValidity(
     insurances.map((i) => i.endDate),
     today
   );
-  const puccValidity = latestValidity(
-    pollutionCerts.map((p) => p.expiryDate),
+  const otherComplianceValidity = latestValidity(
+    otherCompliance.map((d) => d.endDate),
     today
   );
 
@@ -275,11 +243,11 @@ export const getVehicleSummary = async (id: string) => {
       cost: log.cost,
       serviceCenter: log.serviceCenter
     })),
-    ...insurances.slice(0, 1).map((ins) => ({
-      id: `insurance-${ins.id}`,
-      kind: 'insurance' as const,
-      date: ins.startDate,
-      policyNumber: ins.policyNumber
+    ...complianceDocuments.slice(0, 1).map((doc) => ({
+      id: `compliance-${doc.id}`,
+      kind: 'compliance' as const,
+      date: doc.startDate,
+      documentNumber: doc.documentNumber
     }))
   ]
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -291,8 +259,8 @@ export const getVehicleSummary = async (id: string) => {
     totalMaintenanceLogs: maintenanceLogs.length,
     insuranceValidTill: insuranceValidity.validTill,
     insuranceValidityStatus: insuranceValidity.status,
-    puccValidTill: puccValidity.validTill,
-    puccValidityStatus: puccValidity.status,
+    otherComplianceValidTill: otherComplianceValidity.validTill,
+    otherComplianceValidityStatus: otherComplianceValidity.status,
     upcomingRemindersCount: reminders.length,
     recentActivity
   };

@@ -13,11 +13,10 @@ type NotificationType = Notification['type'];
 
 const NAVIGATION_MAP: Record<NotificationType, string> = {
   information: '/dashboard',
-  insurance: '/insurance',
-  pollution: '/pollution',
+  compliance: '/compliance',
   reminder: '/reminders',
   maintenance: '/maintenance',
-  registration: '/dashboard',
+  registration: '/compliance',
   alert: '/dashboard'
 };
 

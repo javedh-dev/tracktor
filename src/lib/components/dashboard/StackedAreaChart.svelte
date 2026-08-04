@@ -25,7 +25,7 @@
   const SERIES = [
     { key: 'fuel', label: 'Fuel', color: 'var(--chart-1)' },
     { key: 'maintenance', label: 'Maintenance', color: 'var(--chart-2)' },
-    { key: 'insurance', label: 'Insurance', color: 'var(--chart-3)' }
+    { key: 'compliance', label: 'Compliance', color: 'var(--chart-3)' }
   ] as const;
 
   const chartData = $derived(data.map((point) => ({ ...point, x: new Date(`${point.month}-01`) })));

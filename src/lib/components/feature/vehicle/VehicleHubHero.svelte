@@ -25,10 +25,16 @@
   // Overall status pill: attention if either compliance record has lapsed, active once both are
   // valid, hidden entirely when there's not enough data yet to say either way.
   const overallStatus = $derived.by(() => {
-    if (vehicle.insuranceValidityStatus === 'expired' || vehicle.puccValidityStatus === 'expired') {
+    if (
+      vehicle.insuranceValidityStatus === 'expired' ||
+      vehicle.otherComplianceValidityStatus === 'expired'
+    ) {
       return { label: 'Needs Attention', dot: 'bg-amber-500' };
     }
-    if (vehicle.insuranceValidityStatus === 'valid' && vehicle.puccValidityStatus === 'valid') {
+    if (
+      vehicle.insuranceValidityStatus === 'valid' &&
+      vehicle.otherComplianceValidityStatus === 'valid'
+    ) {
       return { label: 'Active', dot: 'bg-emerald-500' };
     }
     return null;
