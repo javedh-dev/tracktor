@@ -3,22 +3,17 @@
   import FormLabel from '$appui/FormLabel.svelte';
   import Input from '$appui/input.svelte';
   import SearchableSelect from '$appui/SearchableSelect.svelte';
-  import { Textarea } from '$lib/components/ui/textarea';
+  import SettingsSelectField from './SettingsSelectField.svelte';
   import type { SettingsOption } from '$lib/types/settings';
   import Calendar from '@lucide/svelte/icons/calendar';
   import Currency from '@lucide/svelte/icons/currency';
   import Earth from '@lucide/svelte/icons/earth';
   import Languages from '@lucide/svelte/icons/languages';
-  import Palette from '@lucide/svelte/icons/palette';
-  import MoonStar from '@lucide/svelte/icons/moon-star';
-  import SettingsSelectField from './SettingsSelectField.svelte';
 
   interface Props {
     form: any;
     formData: any;
     processing: boolean;
-    themeOptions: Array<SettingsOption>;
-    darkVariantOptions: Array<SettingsOption>;
     localeOptions: Array<SettingsOption>;
     currencyOptions: Array<SettingsOption>;
     getTimezoneOptions: () => Array<SettingsOption>;
@@ -30,8 +25,6 @@
     form,
     formData,
     processing,
-    themeOptions,
-    darkVariantOptions,
     localeOptions,
     currencyOptions,
     getTimezoneOptions,
@@ -40,29 +33,7 @@
   }: Props = $props();
 </script>
 
-<fieldset class="grid gap-4 lg:grid-cols-3" disabled={processing}>
-  <SettingsSelectField
-    {form}
-    name="theme"
-    label={m.settings_label_theme()}
-    description={m.settings_desc_theme()}
-    icon={Palette}
-    options={themeOptions}
-    placeholder={m.settings_select_theme()}
-    bind:value={$formData.theme}
-    disabled={processing}
-  />
-  <SettingsSelectField
-    {form}
-    name="darkVariant"
-    label={m.settings_label_dark_mode()}
-    description={m.settings_desc_dark_mode()}
-    icon={MoonStar}
-    options={darkVariantOptions}
-    placeholder={m.settings_select_dark_mode()}
-    bind:value={$formData.darkVariant}
-    disabled={processing}
-  />
+<fieldset class="grid gap-4 sm:grid-cols-2" disabled={processing}>
   <SettingsSelectField
     {form}
     name="locale"
@@ -123,22 +94,6 @@
           {m.common_example_prefix()}
           {isValidFormat($formData.dateFormat).ex || m.common_invalid_format()}
         </Form.Description>
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
-  <Form.Field {form} name="customCss" class="w-full lg:col-span-3">
-    <Form.Control>
-      {#snippet children({ props })}
-        <FormLabel description={m.settings_desc_custom_css()}
-          >{m.settings_label_custom_css()}</FormLabel
-        >
-        <Textarea
-          {...props}
-          placeholder={m.settings_custom_css_placeholder()}
-          class="mono h-40 resize-none"
-          bind:value={$formData.customCss}
-        />
       {/snippet}
     </Form.Control>
     <Form.FieldErrors />

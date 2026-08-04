@@ -32,7 +32,7 @@
 </script>
 
 <Sidebar.SidebarProvider bind:open={sidebarOpen}>
-  <AppSidebar />
+  <AppSidebar appVersion={data.appVersion} />
   <Sidebar.SidebarInset>
     <div id="app-topbar" class="bg-background flex flex-wrap items-center gap-2 border-y px-4 py-2">
       <Sidebar.SidebarTrigger />

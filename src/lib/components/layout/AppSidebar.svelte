@@ -31,6 +31,12 @@
   import DataExportImport from '$feature/data-export-import/DataExportImport.svelte';
   import Warehouse from '@lucide/svelte/icons/warehouse';
 
+  interface Props {
+    appVersion?: string;
+  }
+
+  let { appVersion }: Props = $props();
+
   type NavItem = {
     label: string;
     href: string;
@@ -134,10 +140,13 @@
       <div
         class="bg-primary text-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg"
       >
-        <Tractor class="size-4" />
+        <Tractor class="size-5" />
       </div>
-      <span class="truncate text-sm font-semibold group-data-[collapsible=icon]:hidden">
-        {m.app_name()}
+      <span class="flex min-w-0 items-baseline gap-1.5 group-data-[collapsible=icon]:hidden">
+        <span class="truncate text-xl font-semibold">{m.app_name()}</span>
+        {#if appVersion}
+          <span class="text-muted-foreground shrink-0 text-xs font-normal">v{appVersion}</span>
+        {/if}
       </span>
     </a>
   </Sidebar.Header>

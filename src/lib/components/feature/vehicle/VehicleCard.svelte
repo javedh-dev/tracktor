@@ -90,7 +90,7 @@
   {onkeydown}
 >
   <Card.Root
-    class="hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 border-transparent p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm"
+    class="hover:border-primary h-full w-full cursor-pointer gap-2 rounded-2xl border-2 border-transparent p-0 pb-4 transition-all duration-300 ease-in-out"
   >
     <Card.Header class="relative block h-38 overflow-hidden p-0">
       <VehicleCardHeader {vehicle} />
