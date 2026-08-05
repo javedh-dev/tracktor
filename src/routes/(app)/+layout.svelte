@@ -9,7 +9,7 @@
   import { authStore } from '$stores/auth.svelte';
   import { env } from '$lib/config/env';
   import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-  import { demo_banner, default_login } from '$lib/paraglide/messages/_index.js';
+  import { demo_banner } from '$lib/paraglide/messages/_index.js';
 
   let { data, children }: LayoutProps = $props();
 

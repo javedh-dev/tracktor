@@ -211,26 +211,21 @@
     {#if authStore.isLoggedIn}
       <DropdownMenu.Root>
         <DropdownMenu.Trigger class="w-full" data-slot="sidebar-user-trigger">
-          <Sidebar.MenuButton
-            size="lg"
-            class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            data-active={undefined}
-            tooltipContent={authStore.user?.username || m.profile_menu_item()}
-          >
-            <Avatar.Root size="sm" class="size-6 rounded-lg">
+          <Sidebar.MenuButton size="lg" class="rounded-2xl">
+            <Avatar.Root size="default" class="size-6 rounded-lg">
               <Avatar.AvatarFallback class="rounded-lg">
                 {userInitial}
               </Avatar.AvatarFallback>
             </Avatar.Root>
-            <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-semibold">
+            <div class="grid flex-1 text-left leading-tight">
+              <span class="truncate font-semibold capitalize">
                 {authStore.user?.username || m.profile_menu_item()}
               </span>
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
           </Sidebar.MenuButton>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content side="right" align="end" sideOffset={4} class="w-56 rounded-lg">
+        <DropdownMenu.Content side="top" align="end" sideOffset={4} class="w-56 rounded-lg">
           <DropdownMenu.Label class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar.Root size="sm" class="size-8 rounded-lg">
@@ -239,7 +234,7 @@
                 </Avatar.AvatarFallback>
               </Avatar.Root>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-semibold">
+                <span class="truncate font-semibold capitalize">
                   {authStore.user?.username || m.profile_menu_item()}
                 </span>
               </div>
