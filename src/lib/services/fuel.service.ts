@@ -1,4 +1,4 @@
-import type { FuelLog } from '$lib/domain';
+import type { FuelLog } from '$lib/domain/fuel';
 import { createEntityService } from './entity-service';
 
 const {

@@ -2,7 +2,6 @@
   import type { Component } from 'svelte';
   import TabContainer from '$appui/TabContainer.svelte';
   import { sheetStore } from '$lib/stores/sheet.svelte';
-  import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
   type SheetDataResolver = () => unknown;
   type AnyComponent = Component<any>;
@@ -57,8 +56,7 @@
         )
     : null}
   {exportAction}
-  exportActionDisabled={exportActionDisabled || !vehicleStore.selectedId}
-  addActionDisabled={!vehicleStore.selectedId}
+  {exportActionDisabled}
 >
   <ListComponent />
 </TabContainer>

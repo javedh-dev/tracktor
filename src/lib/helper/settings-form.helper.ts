@@ -4,7 +4,7 @@ import { data as currencies } from 'currency-codes';
 import { getCurrencySymbol } from '$lib/helper/format.helper';
 import { z } from 'zod/v4';
 
-export const settingsConfigSchema = z.object({
+const settingsConfigSchema = z.object({
   dateFormat: z.string(),
   locale: z.string().min(2),
   timezone: z.string().min(3),
@@ -17,12 +17,12 @@ export const settingsConfigSchema = z.object({
     .enum(['distance-per-fuel', 'fuel-per-distance', 'uk-mpg'])
     .default('distance-per-fuel'),
   theme: z.string().default('light'),
+  darkVariant: z.string().default('default'),
   customCss: z.string().optional(),
   featureFuelLog: z.boolean().default(true),
   featureMaintenance: z.boolean().default(true),
-  featurePucc: z.boolean().default(true),
+  featureCompliance: z.boolean().default(true),
   featureReminders: z.boolean().default(true),
-  featureInsurance: z.boolean().default(true),
   featureOverview: z.boolean().default(true),
   notificationProcessingEnabled: z.boolean().default(true),
   notificationProcessingSchedule: z.string().default('0 9 * * *')
@@ -86,6 +86,11 @@ export function createSettingsOptions(
       label: theme.label,
       colorPreview: theme.colors?.primary || '#000'
     })),
+    darkVariantOptions: [
+      { value: 'default', label: m.dark_variant_default() },
+      { value: 'dim', label: m.dark_variant_dim() },
+      { value: 'oled', label: m.dark_variant_oled() }
+    ],
     currencyOptions: currencies.map((currency) => ({
       value: currency.code,
       label: `${getCurrencySymbol(currency.code)} - ${currency.currency} `

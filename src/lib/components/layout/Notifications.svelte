@@ -6,14 +6,12 @@
   import CalendarDays from '@lucide/svelte/icons/calendar-days';
   import Shield from '@lucide/svelte/icons/shield';
   import Wrench from '@lucide/svelte/icons/wrench';
-  import Leaf from '@lucide/svelte/icons/leaf';
   import FileText from '@lucide/svelte/icons/file-text';
   import Info from '@lucide/svelte/icons/info';
   import X from '@lucide/svelte/icons/x';
 
   import { browser } from '$app/environment';
   import type { Notification } from '$lib/domain/notification';
-  import { vehicleStore } from '$stores/vehicle.svelte';
   import { notificationStore } from '$stores/notification.svelte';
   import { getLocale } from '$lib/paraglide/runtime.js';
   import { authStore } from '$lib/stores/auth.svelte';
@@ -37,15 +35,10 @@
       badge: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300',
       icon: Wrench
     },
-    insurance: {
+    compliance: {
       ring: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/50 dark:bg-emerald-500/10',
       badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
       icon: Shield
-    },
-    pollution: {
-      ring: 'border-green-500/40 bg-green-500/10 text-green-600 dark:border-green-500/50 dark:bg-green-500/10',
-      badge: 'bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-300',
-      icon: Leaf
     },
     registration: {
       ring: 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:border-amber-500/50 dark:bg-amber-500/10',
@@ -72,19 +65,19 @@
     await notificationStore.navigate(notification);
   };
 
-  let hydratedVehicleId: string | undefined;
+  // The bell is fleet-wide: fetch once per login rather than per vehicle scope.
+  let hasFetchedNotifications = false;
 
   $effect(() => {
-    if (!browser || !authStore.isLoggedIn) return;
-    const selectedId = vehicleStore.selectedId;
-    if (!selectedId) {
-      hydratedVehicleId = undefined;
+    if (!browser) return;
+    if (!authStore.isLoggedIn) {
+      hasFetchedNotifications = false;
       notificationStore.apiNotifications = [];
       return;
     }
-    if (hydratedVehicleId === selectedId) return;
-    hydratedVehicleId = selectedId;
-    notificationStore.fetch(selectedId);
+    if (hasFetchedNotifications) return;
+    hasFetchedNotifications = true;
+    notificationStore.fetch();
   });
 
   const dateFormatter = $derived(new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }));
@@ -154,14 +147,7 @@
       </div>
     </div>
     <DropdownMenu.Separator />
-    {#if !vehicleStore.selectedId}
-      <div
-        class="notifications-empty text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
-      >
-        <AlertTriangle class="h-4 w-4" />
-        <span>{m.notifications_select_vehicle_hint()}</span>
-      </div>
-    {:else if notificationStore.isLoadingNotifications}
+    {#if notificationStore.isLoadingNotifications}
       <div
         class="notifications-loading text-muted-foreground flex items-center gap-2 px-3 py-4 text-sm"
       >

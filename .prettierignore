@@ -9,5 +9,9 @@ bun.lockb
 /static/
 
 # Ignore specific files for linting
-project.inlang/.meta.json
-project.inlang/README.md
+i18n/project.inlang/.meta.json
+i18n/project.inlang/README.md
+
+# Vendored agent skills and local tool config — not ours to reformat
+.agents/
+.claude/

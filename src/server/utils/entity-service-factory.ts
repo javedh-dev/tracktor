@@ -53,18 +53,13 @@ export function createOwnedEntityService<TAdd, TUpdate = Partial<TAdd>>(
       return updated[0];
     },
 
-    remove: async (id: string) => {
-      return performDelete(table, id, entityName);
-    },
-
-    removeScoped: async (vehicleId: string, id: string) => {
+    remove: async (vehicleId: string, id: string) => {
       const rows = await db
         .select()
         .from(table)
         .where(and(eq(table.vehicleId, vehicleId), eq(table.id, id)))
         .limit(1);
-      const existing = rows[0];
-      if (!existing) {
+      if (!rows[0]) {
         throw new AppError(`No ${entityName} found for id: ${id}`, Status.NOT_FOUND);
       }
       return performDelete(table, id, entityName);

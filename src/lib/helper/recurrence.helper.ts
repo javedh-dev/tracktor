@@ -9,7 +9,7 @@
  * @param interval - The interval (e.g., every 1 year, every 2 months)
  * @returns The next occurrence date
  */
-export function calculateNextOccurrence(
+function calculateNextOccurrence(
   currentDate: Date,
   recurrenceType: string,
   interval: number = 1
@@ -42,7 +42,7 @@ export function calculateNextOccurrence(
  * @param recurrenceType - Type of recurrence
  * @returns true if the date should recur
  */
-export function shouldRecur(recurrenceType: string): boolean {
+function shouldRecur(recurrenceType: string): boolean {
   return ['yearly', 'monthly', 'weekly', 'daily'].includes(recurrenceType);
 }
 

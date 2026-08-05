@@ -108,17 +108,54 @@ jobs:
       - name: Update package version
         run: npm pkg set version="${{ steps.release-version.outputs.value }}"
 
-      - name: Commit version bump
+      - name: Update OpenWiki docs
         run: |
-          if git diff --quiet package.json; then
+          npm install --global openwiki
+          openwiki code --update --print
+        env:
+          OPENWIKI_PROVIDER: openai-compatible
+          OPENAI_COMPATIBLE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENAI_COMPATIBLE_BASE_URL: https://opencode.ai/zen/v1
+          OPENWIKI_MODEL_ID: deepseek-v4-flash-free
+          OPENWIKI_TELEMETRY_DISABLED: true
+
+      - name: Format updated docs
+        run: |
+          npm install --global prettier
+          paths=""
+          for p in docs/openwiki CLAUDE.md AGENTS.md; do
+            [ -e "$p" ] && paths="$paths $p"
+          done
+          if [ -n "$paths" ]; then
+            prettier --write $paths
+          fi
+
+      - name: Commit version bump and doc updates
+        id: release-commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          paths="package.json"
+          for p in docs/openwiki CLAUDE.md AGENTS.md; do
+            [ -e "$p" ] && paths="$paths $p"
+          done
+          git add $paths
+
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add package.json
-          git commit -m "chore: bump version to ${{ steps.release-version.outputs.value }}"
+          git commit -m "chore: release ${{ steps.release-version.outputs.value }} (version bump + doc update)"
           git push origin "HEAD:${{ steps.release-branch.outputs.value }}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Move release tag to the updated commit
+        if: steps.release-commit.outputs.changed == 'true'
+        run: |
+          git tag -f "$GITHUB_REF_NAME" HEAD
+          git push origin "refs/tags/$GITHUB_REF_NAME" --force
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

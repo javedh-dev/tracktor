@@ -1,26 +1,21 @@
 <script lang="ts">
-  import { withBase } from '$lib/utils';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Shield from '@lucide/svelte/icons/shield';
-  import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import BellRing from '@lucide/svelte/icons/bell-ring';
-  import Info from '@lucide/svelte/icons/info';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import IconButton from '$appui/IconButton.svelte';
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import * as Card from '$ui/card';
-  import VehicleDetailsModal from '$lib/components/feature/vehicle/VehicleDetailsModal.svelte';
   import { deleteVehicle } from '$lib/services/vehicle.service';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import * as m from '$lib/paraglide/messages';
   import FuelLogForm from '../fuel/FuelLogForm.svelte';
   import MaintenanceForm from '../maintenance/MaintenanceForm.svelte';
-  import InsuranceForm from '../insurance/InsuranceForm.svelte';
-  import PollutionCertificateForm from '../pollution/PollutionCertificateForm.svelte';
+  import ComplianceForm from '../compliance/ComplianceForm.svelte';
   import VehicleForm from './VehicleForm.svelte';
   import ReminderForm from '../reminder/ReminderForm.svelte';
   import { Features } from '$lib/helper/feature.helper';
@@ -28,9 +23,8 @@
   import VehicleCardHeader from './VehicleCardHeader.svelte';
   import VehicleQuickActions from './VehicleQuickActions.svelte';
 
-  const { vehicle, onclick, onkeydown, isSelected = false } = $props();
+  const { vehicle, onclick, onkeydown } = $props();
   let deleteDialog = $state(false);
-  let detailsModalOpen = $state(false);
 
   const performDelete = async (vehicleId: string) => {
     deleteVehicle(vehicleId).then((res) => {
@@ -42,11 +36,6 @@
       }
     });
   };
-
-  // Dynamic image URL - fallback to default if vehicle doesn't have image
-  const imageUrl = $derived(
-    vehicle.image ? withBase(`/api/files/${vehicle.image}`) : '/default-vehicle.png'
-  );
 
   const quickActions = [
     {
@@ -71,24 +60,13 @@
       ariaLabel: m.vehicle_action_add_maintenance_log()
     },
     {
-      id: 'vehicle-card-insurance-btn',
-      feature: Features.INSURANCE,
+      id: 'vehicle-card-compliance-btn',
+      feature: Features.COMPLIANCE,
       buttonStyles: 'hover:bg-sky-100 dark:hover:bg-sky-700',
       iconStyles: 'text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200',
       icon: Shield,
-      onclick: () => sheetStore.openSheet(InsuranceForm, m.vehicle_action_add_insurance(), ''),
-      ariaLabel: m.vehicle_action_add_insurance()
-    },
-    {
-      id: 'vehicle-card-pollution-btn',
-      feature: Features.PUCC,
-      buttonStyles: 'hover:bg-fuchsia-100 dark:hover:bg-fuchsia-700',
-      iconStyles:
-        'text-fuchsia-500 hover:text-fuchsia-600 dark:text-fuchsia-400 dark:hover:text-fuchsia-200',
-      icon: BadgeCheck,
-      onclick: () =>
-        sheetStore.openSheet(PollutionCertificateForm, m.vehicle_action_add_pollution(), ''),
-      ariaLabel: m.vehicle_action_add_pollution()
+      onclick: () => sheetStore.openSheet(ComplianceForm, m.vehicle_action_add_compliance(), ''),
+      ariaLabel: m.vehicle_action_add_compliance()
     },
     {
       id: 'vehicle-card-reminder-btn',
@@ -112,26 +90,18 @@
   {onkeydown}
 >
   <Card.Root
-    class={`hover:border-primary h-full w-xs cursor-pointer gap-2 rounded-2xl border-2 p-0 pb-4 transition-all duration-300 ease-in-out lg:w-sm ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
+    class="hover:border-primary h-full w-full cursor-pointer gap-2 rounded-2xl border-2 border-transparent p-0 pb-4 transition-all duration-300 ease-in-out"
   >
-    <Card.Header class="relative h-38 overflow-hidden p-0 ">
-      <VehicleCardHeader {vehicle} {imageUrl} />
+    <Card.Header class="relative block h-38 overflow-hidden p-0">
+      <VehicleCardHeader {vehicle} />
     </Card.Header>
     <Card.Content class="px-4">
       <VehicleCardDetails {vehicle} messages={m} />
     </Card.Content>
-    <Card.Footer id="vehicle-card-actions" class="px-3">
+    <Card.Footer id="vehicle-card-actions" class="px-3" onclick={(e) => e.stopPropagation()}>
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
         <VehicleQuickActions actions={quickActions} />
         <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
-          <IconButton
-            id="vehicle-card-info-btn"
-            buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-            iconStyles="text-gray-600 dark:text-gray-100 hover:text-blue-500"
-            icon={Info}
-            onclick={() => (detailsModalOpen = true)}
-            ariaLabel={m.vehicle_action_more_info()}
-          />
           <IconButton
             id="vehicle-card-edit-btn"
             buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -156,4 +126,3 @@
   </Card.Root>
 </div>
 <DeleteConfirmation onConfirm={() => performDelete(vehicle.id)} bind:open={deleteDialog} />
-<VehicleDetailsModal bind:open={detailsModalOpen} {vehicle} />

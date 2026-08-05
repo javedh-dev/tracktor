@@ -1,4 +1,4 @@
-import { error, json, type RequestEvent } from '@sveltejs/kit';
+import { error, isHttpError, isRedirect, json, type RequestEvent } from '@sveltejs/kit';
 import type { ApiResponse } from '$lib/response';
 import { z, ZodError } from 'zod';
 import { AppError } from '$server/exceptions/AppError';
@@ -14,7 +14,7 @@ export function jsonResponse<T>(
   return json(response, init);
 }
 
-export function rethrowRouteError(err: unknown, fallbackMessage = 'Internal server error'): never {
+function rethrowRouteError(err: unknown, fallbackMessage = 'Internal server error'): never {
   if (err instanceof ZodError) {
     throw error(400, `Validation error: ${err.issues.map((issue) => issue.message).join(', ')}`);
   }
@@ -23,7 +23,8 @@ export function rethrowRouteError(err: unknown, fallbackMessage = 'Internal serv
     throw error(err.status, err.message);
   }
 
-  if (err instanceof Error && 'status' in err) {
+  // `error()` and `redirect()` throw plain objects, not Errors — instanceof never matches them.
+  if (isHttpError(err) || isRedirect(err)) {
     throw err;
   }
 

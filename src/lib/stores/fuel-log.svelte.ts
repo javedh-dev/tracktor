@@ -1,11 +1,9 @@
-import type { FuelLog } from '$lib/domain';
+import type { FuelLog } from '$lib/domain/fuel';
 import { compareDesc } from 'date-fns';
-import { vehicleStore } from './vehicle.svelte';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<FuelLog>({
-  buildPath: () =>
-    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/fuel-logs` : undefined,
+  buildPath: (vehicleId) => (vehicleId ? `/fuel-logs?vehicleId=${vehicleId}` : '/fuel-logs'),
   sort: (a, b) => {
     const dateDiff = compareDesc(a.date, b.date);
     if (dateDiff !== 0) return dateDiff;
@@ -24,5 +22,6 @@ export const fuelLogStore = {
   get error() {
     return entityStore.error;
   },
-  refreshFuelLogs: entityStore.refresh
+  refreshFuelLogs: entityStore.refresh,
+  reloadFuelLogs: entityStore.reload
 };

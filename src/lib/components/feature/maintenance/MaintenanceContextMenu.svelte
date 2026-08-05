@@ -1,6 +1,6 @@
 <script lang="ts">
   import CrudActionsMenu from '$appui/CrudActionsMenu.svelte';
-  import type { MaintenanceLog } from '$lib/domain';
+  import type { MaintenanceLog } from '$lib/domain/maintenance';
   import { toast } from 'svelte-sonner';
   import { deleteMaintenanceLog } from '$lib/services/maintenance.service';
   import { sheetStore } from '$stores/sheet.svelte';

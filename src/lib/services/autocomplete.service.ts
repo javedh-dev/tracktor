@@ -33,17 +33,11 @@ export async function getServiceCenterSuggestions(): Promise<string[]> {
 }
 
 /**
- * Get unique insurance provider names
+ * Get unique issuer names for compliance documents (insurance providers, testing centers,
+ * inspection centers, registration authorities, ...), optionally narrowed to one type.
  */
-export async function getInsuranceProviderSuggestions(): Promise<string[]> {
-  return fetchAutocompleteSuggestions('insuranceProvider');
-}
-
-/**
- * Get unique testing center names from pollution certificates
- */
-export async function getTestingCenterSuggestions(): Promise<string[]> {
-  return fetchAutocompleteSuggestions('testingCenter');
+export async function getComplianceIssuerSuggestions(type?: string): Promise<string[]> {
+  return fetchAutocompleteSuggestions('complianceIssuer', type ? { type } : undefined);
 }
 
 /**

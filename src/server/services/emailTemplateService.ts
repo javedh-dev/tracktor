@@ -2,7 +2,7 @@ import type { Notification } from '$lib/domain/notification';
 import { env } from '$lib/config/env.server';
 import { formatDate, getDaysUntil, NOTIFICATION_TYPE_META } from './notification-service.helper';
 
-export interface NotificationGroup {
+interface NotificationGroup {
   type: string;
   notifications: Notification[];
   label: string;

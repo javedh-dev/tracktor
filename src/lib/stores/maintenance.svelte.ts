@@ -1,11 +1,10 @@
-import type { MaintenanceLog } from '$lib/domain';
+import type { MaintenanceLog } from '$lib/domain/maintenance';
 import { compareDesc } from 'date-fns';
-import { vehicleStore } from './vehicle.svelte';
 import { createEntityStore } from './entity-store.svelte';
 
 const entityStore = createEntityStore<MaintenanceLog>({
-  buildPath: () =>
-    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/maintenance-logs` : undefined,
+  buildPath: (vehicleId) =>
+    vehicleId ? `/maintenance-logs?vehicleId=${vehicleId}` : '/maintenance-logs',
   sort: (a, b) => {
     const dateDiff = compareDesc(a.date, b.date);
     if (dateDiff !== 0) return dateDiff;
@@ -24,5 +23,6 @@ export const maintenanceStore = {
   get error() {
     return entityStore.error;
   },
-  refreshMaintenanceLogs: entityStore.refresh
+  refreshMaintenanceLogs: entityStore.refresh,
+  reloadMaintenanceLogs: entityStore.reload
 };

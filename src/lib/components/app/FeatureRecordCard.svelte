@@ -8,6 +8,8 @@
     titleIcon: Component<{ class?: string }>;
     titleClass?: string;
     class?: string;
+    /** Shown as a small pill next to the title — used for the vehicle badge in fleet scope. */
+    subtitle?: string;
     headerExtras?: Snippet;
     actions?: Snippet;
     children?: Snippet;
@@ -19,6 +21,7 @@
     titleIcon: TitleIcon,
     titleClass = '',
     class: className = '',
+    subtitle,
     headerExtras,
     actions,
     children
@@ -32,6 +35,13 @@
         <TitleIcon class="h-6 w-6" />
         <span class="line-clamp-1 text-lg font-bold lg:text-xl">{title}</span>
       </div>
+      {#if subtitle}
+        <span
+          class="bg-secondary text-muted-foreground rounded-full px-2.5 py-0.5 text-xs font-medium"
+        >
+          {subtitle}
+        </span>
+      {/if}
       {@render headerExtras?.()}
     </div>
     {@render actions?.()}

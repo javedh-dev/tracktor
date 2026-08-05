@@ -1,5 +1,7 @@
 import { formatInTimeZone } from 'date-fns-tz';
-import { CANONICAL_TIMEZONES } from '$lib/constants/timezones';
+
+// Intl omits UTC itself from the zone list, but it's the app's default timezone.
+const TIMEZONES = ['UTC', ...Intl.supportedValuesOf('timeZone')];
 
 export const getTimezoneOptions = (): {
   value: string;
@@ -8,24 +10,14 @@ export const getTimezoneOptions = (): {
 }[] => {
   const referenceDate = new Date('2024-01-01T12:00:00Z');
 
-  return CANONICAL_TIMEZONES.map((zone) => {
-    try {
-      const offset = formatInTimeZone(referenceDate, zone, 'xxx');
-      return {
-        value: zone,
-        label: `[${offset}] ${zone}`,
-        offset: Number(offset.replace(':', ''))
-      };
-    } catch (e) {
-      return {
-        value: zone,
-        label: zone,
-        offset: 0
-      };
-    }
+  return TIMEZONES.map((zone) => {
+    const offset = formatInTimeZone(referenceDate, zone, 'xxx');
+    return {
+      value: zone,
+      label: `[${offset}] ${zone}`,
+      offset: Number(offset.replace(':', ''))
+    };
   }).sort((a, b) => a.offset - b.offset);
 };
 
-export const isValidTimezone = (tz: string) => {
-  return CANONICAL_TIMEZONES.includes(tz as any);
-};
+export const isValidTimezone = (tz: string) => TIMEZONES.includes(tz);

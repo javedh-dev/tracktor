@@ -11,8 +11,7 @@ export const NOTIFICATION_TYPES = {
   alert: 'alert',
   information: 'information',
   maintenance: 'maintenance',
-  insurance: 'insurance',
-  pollution: 'pollution',
+  compliance: 'compliance',
   registration: 'registration'
 } as const;
 

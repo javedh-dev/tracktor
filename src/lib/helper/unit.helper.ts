@@ -59,7 +59,7 @@ export const formatCurrency = (amount: number, config: FormatConfig): string => 
   }).format(amount);
 };
 
-export const getFuelVolumeUnit = (fuelType: string, config: FormatConfig): string => {
+const getFuelVolumeUnit = (fuelType: string, config: FormatConfig): string => {
   switch (fuelType) {
     case 'lpg':
       return config.unitOfLpg || config.unitOfVolume;

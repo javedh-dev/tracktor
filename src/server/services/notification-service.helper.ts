@@ -26,16 +26,15 @@ export const NOTIFICATION_TYPE_META: Record<
   alert: { channel: 'alert', label: 'Alerts', color: '#dc2626' },
   information: { channel: 'information', label: 'Information', color: '#0284c7' },
   maintenance: { channel: 'information', label: 'Maintenance', color: '#7c3aed' },
-  insurance: { channel: 'alert', label: 'Insurance', color: '#059669' },
-  pollution: { channel: 'alert', label: 'Pollution Certificate', color: '#0891b2' },
+  compliance: { channel: 'alert', label: 'Compliance', color: '#059669' },
   registration: { channel: 'alert', label: 'Registration', color: '#ea580c' }
 };
 
-export function toDateOnly(value: Date): Date {
+function toDateOnly(value: Date): Date {
   return new Date(value.getFullYear(), value.getMonth(), value.getDate());
 }
 
-export function calculateReminderNotificationDate(dueDate: Date, remindSchedule: string): Date {
+function calculateReminderNotificationDate(dueDate: Date, remindSchedule: string): Date {
   const notificationDate = new Date(dueDate);
 
   switch (remindSchedule) {

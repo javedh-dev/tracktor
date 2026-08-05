@@ -120,6 +120,41 @@
       "when": 1784694552778,
       "tag": "20260322000000_add_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1785559377786,
+      "tag": "20260801044257_add_vehicle_type_to_vehicles",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1785825446204,
+      "tag": "20260804073000_fix_notification_key_unique_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1785825447204,
+      "tag": "20260804090000_add_compliance_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1785825448204,
+      "tag": "20260804090100_migrate_compliance_data",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1785825449204,
+      "tag": "20260804090200_drop_insurance_pucc_tables",
+      "breakpoints": true
     }
   ]
 }

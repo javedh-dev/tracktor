@@ -12,8 +12,7 @@ type ImportableDataSet = {
   vehicles?: (typeof schema.vehicleTable.$inferInsert)[];
   fuelLogs?: (typeof schema.fuelLogTable.$inferInsert)[];
   maintenanceLogs?: (typeof schema.maintenanceLogTable.$inferInsert)[];
-  insurances?: (typeof schema.insuranceTable.$inferInsert)[];
-  puccs?: (typeof schema.pollutionCertificateTable.$inferInsert)[];
+  complianceDocuments?: (typeof schema.complianceDocumentTable.$inferInsert)[];
   reminders?: (typeof schema.reminderTable.$inferInsert)[];
   notifications?: (typeof schema.notificationTable.$inferInsert)[];
   notificationProviders?: (typeof schema.notificationProviderTable.$inferInsert)[];
@@ -29,8 +28,7 @@ export async function buildExportData(shouldEncrypt: unknown, password?: string)
       vehicles: await db.select().from(schema.vehicleTable),
       fuelLogs: await db.select().from(schema.fuelLogTable),
       maintenanceLogs: await db.select().from(schema.maintenanceLogTable),
-      insurances: await db.select().from(schema.insuranceTable),
-      puccs: await db.select().from(schema.pollutionCertificateTable),
+      complianceDocuments: await db.select().from(schema.complianceDocumentTable),
       reminders: await db.select().from(schema.reminderTable),
       notifications: await db.select().from(schema.notificationTable),
       notificationProviders: await db.select().from(schema.notificationProviderTable),
@@ -95,8 +93,7 @@ export async function importDataSet(dataToImport: ImportableDataSet): Promise<vo
     // Delete in FK-safe order (children first)
     await tx.delete(schema.notificationTable);
     await tx.delete(schema.reminderTable);
-    await tx.delete(schema.pollutionCertificateTable);
-    await tx.delete(schema.insuranceTable);
+    await tx.delete(schema.complianceDocumentTable);
     await tx.delete(schema.maintenanceLogTable);
     await tx.delete(schema.fuelLogTable);
     await tx.delete(schema.vehicleTable);
@@ -114,12 +111,8 @@ export async function importDataSet(dataToImport: ImportableDataSet): Promise<vo
       await tx.insert(schema.maintenanceLogTable).values(dataToImport.maintenanceLogs);
     }
 
-    if (dataToImport.insurances?.length) {
-      await tx.insert(schema.insuranceTable).values(dataToImport.insurances);
-    }
-
-    if (dataToImport.puccs?.length) {
-      await tx.insert(schema.pollutionCertificateTable).values(dataToImport.puccs);
+    if (dataToImport.complianceDocuments?.length) {
+      await tx.insert(schema.complianceDocumentTable).values(dataToImport.complianceDocuments);
     }
 
     if (dataToImport.reminders?.length) {

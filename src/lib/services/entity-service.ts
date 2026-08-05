@@ -1,8 +1,8 @@
-import type { Response } from '$lib/domain';
+import type { Response } from '$lib/domain/shared';
 import { apiClient } from '$lib/helper/api.helper';
 import { uploadFile } from './file.service';
 
-export function extractApiError(e: unknown, fallback: string): string {
+function extractApiError(e: unknown, fallback: string): string {
   const err = e as { response?: { data?: { message?: string } } };
   return err.response?.data?.message || fallback;
 }

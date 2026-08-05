@@ -159,16 +159,3 @@ export const getEnabledProvidersByType = async (type: string) => {
 
   return providers.map(parseProvider);
 };
-
-export const getEnabledProvidersByIds = async (providerIds: string[]) => {
-  if (providerIds.length === 0) {
-    return [];
-  }
-
-  const providers = await db.query.notificationProviderTable.findMany({
-    where: (provider, { and, eq, inArray }) =>
-      and(eq(provider.isEnabled, true), inArray(provider.id, providerIds))
-  });
-
-  return providers.map(parseProvider);
-};

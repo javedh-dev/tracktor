@@ -3,14 +3,6 @@ import * as reminderService from '$server/services/reminderService';
 import { reminderSchema } from '$lib/domain/reminder';
 import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
 
-export const GET: RequestHandler = async (event) => {
-  return withRouteErrorHandling('Reminders GET error:', async () => {
-    const { id } = event.params;
-    const result = await reminderService.getReminders(id);
-    return jsonResponse(result);
-  });
-};
-
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Reminders POST error:', async () => {
     const { id } = event.params;

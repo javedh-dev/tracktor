@@ -4,7 +4,7 @@
     deleteReminder as deleteReminderService,
     saveReminder
   } from '$lib/services/reminder.service';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import ReminderForm from './ReminderForm.svelte';
@@ -29,7 +29,7 @@
     const res = await saveReminder(updated);
     if (res.status === 'OK') {
       toast.success(m.reminder_status_completed());
-      reminderStore.refreshReminders();
+      reminderStore.reloadReminders();
     } else {
       toast.error(res.error || m.reminder_status_error());
     }

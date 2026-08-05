@@ -26,6 +26,9 @@
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
   import {
     form_date,
     form_date_desc,
@@ -76,7 +79,7 @@
           if (res.status == 'OK') {
             toast.success(data ? fuel_toast_updated() : fuel_toast_saved());
             sf.attachment = undefined;
-            sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
+            sheetStore.closeSheet(() => fuelLogStore.reloadFuelLogs());
           } else {
             toast.error(`${fuel_toast_error_prefix()}${res.error}`);
           }
@@ -89,8 +92,11 @@
   const { form, enhance } = sf;
   const formData: any = sf.formData;
 
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const suppliedVehicleId = $derived(data?.vehicleId || (scope.isFleet ? '' : scope.vehicleId));
+
   const selectedVehicle = $derived(
-    vehicleStore.vehicles?.find((v) => v.id === vehicleStore.selectedId)
+    vehicleStore.vehicles?.find((v) => v.id === $formData.vehicleId)
   );
   const volumeLabel = $derived(
     selectedVehicle?.fuelType === 'electric' ? form_volume_energy() : form_volume_fuel()
@@ -174,7 +180,7 @@
     } else {
       formData.set({
         id: null,
-        vehicleId: vehicleStore.selectedId || '',
+        vehicleId: suppliedVehicleId || '',
         date: formatDate(new Date()),
         odometer: null,
         filled: true,
@@ -186,12 +192,15 @@
         attachment: null
       });
     }
-    sf.setVehicleId();
+    if (suppliedVehicleId) sf.setVehicleId(suppliedVehicleId);
   });
 </script>
 
 <form id="fuel-log-form" use:enhance onsubmit={(e) => e.preventDefault()}>
   <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
+    {#if !suppliedVehicleId}
+      <VehicleSelectField {form} {formData} vehicles={vehicleStore.vehicles ?? []} />
+    {/if}
     <Form.Field {form} name="date" class="w-full">
       <Form.Control>
         {#snippet children({ props })}

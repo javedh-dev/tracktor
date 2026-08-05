@@ -10,6 +10,9 @@ export interface MaintenanceLog {
   cost: number;
   notes: string | null;
   attachment: string | null;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
 }
 
 export const maintenanceSchema = z.object({

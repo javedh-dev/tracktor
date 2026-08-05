@@ -1,5 +1,4 @@
-import type { Reminder } from '$lib/domain';
-import { vehicleStore } from './vehicle.svelte';
+import type { Reminder } from '$lib/domain/reminder';
 import { createEntityStore } from './entity-store.svelte';
 
 function parseReminder(raw: unknown): Reminder {
@@ -8,8 +7,7 @@ function parseReminder(raw: unknown): Reminder {
 }
 
 const entityStore = createEntityStore<Reminder>({
-  buildPath: () =>
-    vehicleStore.selectedId ? `/vehicles/${vehicleStore.selectedId}/reminders` : undefined,
+  buildPath: (vehicleId) => (vehicleId ? `/reminders?vehicleId=${vehicleId}` : '/reminders'),
   map: parseReminder,
   sort: (a, b) => a.dueDate.getTime() - b.dueDate.getTime(),
   errorMessage: 'Failed to fetch reminders'
@@ -26,5 +24,6 @@ export const reminderStore = {
     return entityStore.error;
   },
   refreshReminders: entityStore.refresh,
+  reloadReminders: entityStore.reload,
   clear: entityStore.clear
 };

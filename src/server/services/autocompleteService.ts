@@ -20,37 +20,21 @@ export const getUniqueServiceCenters = async () => {
 };
 
 /**
- * Get unique values for insurance providers
+ * Get unique values for compliance document issuers (insurance providers, testing centers,
+ * inspection centers, registration authorities, ...), optionally narrowed to one type.
  */
-export const getUniqueInsuranceProviders = async () => {
+export const getUniqueComplianceIssuers = async (type?: string) => {
   const result = await db
-    .selectDistinct({ provider: schema.insuranceTable.provider })
-    .from(schema.insuranceTable)
+    .selectDistinct({ issuer: schema.complianceDocumentTable.issuer })
+    .from(schema.complianceDocumentTable)
     .where(
-      sql`${schema.insuranceTable.provider} IS NOT NULL AND ${schema.insuranceTable.provider} != ''`
+      type
+        ? sql`${schema.complianceDocumentTable.issuer} != '' AND ${schema.complianceDocumentTable.type} = ${type}`
+        : sql`${schema.complianceDocumentTable.issuer} != ''`
     )
-    .orderBy(schema.insuranceTable.provider);
+    .orderBy(schema.complianceDocumentTable.issuer);
 
-  const values = result.map((r) => r.provider).filter(Boolean);
-
-  return values;
-};
-
-/**
- * Get unique values for pollution certificate testing centers
- */
-export const getUniqueTestingCenters = async () => {
-  const result = await db
-    .selectDistinct({
-      testingCenter: schema.pollutionCertificateTable.testingCenter
-    })
-    .from(schema.pollutionCertificateTable)
-    .where(
-      sql`${schema.pollutionCertificateTable.testingCenter} IS NOT NULL AND ${schema.pollutionCertificateTable.testingCenter} != ''`
-    )
-    .orderBy(schema.pollutionCertificateTable.testingCenter);
-
-  const values = result.map((r) => r.testingCenter).filter(Boolean);
+  const values = result.map((r) => r.issuer).filter(Boolean);
 
   return values;
 };
