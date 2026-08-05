@@ -39,13 +39,10 @@
       {#if demoMode}
         <div
           id="demo-mode-banner"
-          class="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400"
+          class="flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300"
         >
-          <TriangleAlert class="h-3.5 w-3.5 shrink-0" />
+          <TriangleAlert class="size-3.5 shrink-0" />
           <span>{demo_banner()}</span>
-          {#if !env.DISABLE_AUTH}
-            <strong>{default_login()}</strong>
-          {/if}
         </div>
       {/if}
       <div class="flex flex-1 items-center justify-end gap-2">

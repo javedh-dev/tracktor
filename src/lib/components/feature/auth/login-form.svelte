@@ -6,6 +6,7 @@
   import UserIcon from '@lucide/svelte/icons/circle-user-round';
   import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
   import SubmitButton from '$appui/SubmitButton.svelte';
+
   import * as m from '$lib/paraglide/messages';
 
   let username = $state('');
@@ -32,6 +33,11 @@
     }
   };
 </script>
+
+<div class="mb-6 flex flex-col gap-1">
+  <h1 class="text-2xl font-semibold">{m.auth_login_title()}</h1>
+  <p class="text-muted-foreground text-sm">{m.auth_login_subtitle()}</p>
+</div>
 
 <form id="auth-login-form" onsubmit={handleLogin}>
   <fieldset disabled={processing} class="w-full">

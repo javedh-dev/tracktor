@@ -23,6 +23,8 @@
   "auth_login_loading": "Signing in...",
   "auth_signup_loading": "Creating account...",
   "auth_password_mismatch": "Passwords do not match!!!",
+  "auth_login_title": "Welcome back",
+  "auth_login_subtitle": "Sign in to keep your vehicles, fuel, and paperwork on track.",
   "settings_tab_personalization": "Personalization",
   "settings_tab_interface": "Interface",
   "settings_tab_localization": "Localization",
