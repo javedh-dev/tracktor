@@ -1,4 +1,5 @@
-import type { Response, Vehicle } from '$lib/domain';
+import type { Response } from '$lib/domain/shared';
+import type { Vehicle } from '$lib/domain/vehicle';
 import { apiClient } from '$lib/helper/api.helper';
 import { uploadFile } from './file.service';
 

@@ -15,6 +15,9 @@ export interface FuelLog {
   notes: string | null;
   attachment: string | null;
   mileage?: number;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
 }
 
 export const fuelSchema = z.object({

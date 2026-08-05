@@ -18,6 +18,10 @@
   import { sheetStore } from '$stores/sheet.svelte';
   import { FileDropZone, AutocompleteInput } from '$lib/components/app';
   import { getServiceCenterSuggestions } from '$lib/services/autocomplete.service';
+  import { page } from '$app/state';
+  import { vehicleStore } from '$stores/vehicle.svelte';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
   import * as m from '$lib/paraglide/messages';
 
   let { data } = $props();
@@ -42,7 +46,7 @@
           if (res.status == 'OK') {
             toast.success(data ? m.maintenance_toast_updated() : m.maintenance_toast_saved());
             sf.attachment = undefined;
-            sheetStore.closeSheet(maintenanceStore.refreshMaintenanceLogs);
+            sheetStore.closeSheet(maintenanceStore.reloadMaintenanceLogs);
           } else {
             toast.error(`${m.maintenance_toast_error_prefix()}${res.error}`);
           }
@@ -57,12 +61,15 @@
   const { form, enhance } = sf;
   const formData: any = sf.formData;
 
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const suppliedVehicleId = $derived(data?.vehicleId || (scope.isFleet ? '' : scope.vehicleId));
+
   $effect(() => {
     sf.resetAttachment();
     if (data) {
       formData.set({ ...data, date: formatDate(data.date), attachment: null });
     }
-    sf.setVehicleId();
+    if (suppliedVehicleId) sf.setVehicleId(suppliedVehicleId);
   });
 
   $effect(() => {
@@ -76,6 +83,9 @@
 
 <form id="maintenance-form" use:enhance onsubmit={(e) => e.preventDefault()}>
   <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
+    {#if !suppliedVehicleId}
+      <VehicleSelectField {form} {formData} vehicles={vehicleStore.vehicles ?? []} />
+    {/if}
     <Form.Field {form} name="attachment" class="w-full">
       <Form.Control>
         <FormLabel description={m.maintenance_form_attachment_desc()}>

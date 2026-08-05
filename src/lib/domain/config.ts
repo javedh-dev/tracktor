@@ -10,9 +10,8 @@ export interface Config {
 export const BOOLEAN_CONFIG_KEYS = new Set([
   'featureFuelLog',
   'featureMaintenance',
-  'featurePucc',
+  'featureCompliance',
   'featureReminders',
-  'featureInsurance',
   'featureOverview',
   'notificationProcessingEnabled'
 ]);

@@ -31,17 +31,14 @@ export const POST: RequestHandler = async (event) => {
       throw new AppError('Failed to save file', Status.INTERNAL_SERVER_ERROR);
     }
 
-    const result = {
-      success: true,
-      message: 'File uploaded successfully',
-      data: {
+    return jsonResponse(
+      {
         filename: filename,
         originalName: file.name,
         size: file.size,
         mimetype: file.type
-      }
-    };
-
-    return jsonResponse(result);
+      },
+      'File uploaded successfully'
+    );
   });
 };

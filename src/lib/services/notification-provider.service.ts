@@ -17,16 +17,6 @@ export const getProviders = async (): Promise<NotificationProviderWithParsedConf
   }
 };
 
-export const getProvider = async (id: string): Promise<NotificationProviderWithParsedConfig> => {
-  try {
-    const response = await apiClient.get(`/notification-providers/${id}`);
-    return response.data.data;
-  } catch (error) {
-    console.error('Failed to fetch notification provider:', error);
-    throw error;
-  }
-};
-
 export const createProvider = async (
   provider: CreateNotificationProvider
 ): Promise<NotificationProviderWithParsedConfig> => {

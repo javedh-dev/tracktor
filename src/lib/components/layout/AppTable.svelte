@@ -9,8 +9,10 @@
     type PaginationState,
     type RowSelectionState,
     type SortingState,
+    type Table as TanstackTable,
     type VisibilityState
   } from '@tanstack/table-core';
+  import type { Snippet } from 'svelte';
   import { applyUpdater, getColumnDisplayName, getVisiblePageItems } from '$helper/table.helper';
   import { createSvelteTable, FlexRender } from '$ui/data-table/index.js';
   import * as Table from '$ui/table/index.js';
@@ -33,9 +35,21 @@
   type DataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    /** Replaces the default search+columns row with a caller-supplied toolbar. */
+    toolbar?: Snippet<[TanstackTable<TData>]>;
+    /** Enables click-to-select rows by returning a stable id per row (e.g. `(r) => r.id`). */
+    getRowId?: (row: TData) => string | null | undefined;
+    /** Id of the currently selected row; bind to render a details panel outside this component. */
+    selectedId?: string | null | undefined;
   };
-  let pageSize = $state('5');
-  let { columns, data }: DataTableProps<TData, TValue> = $props();
+  let pageSize = $state('10');
+  let {
+    columns,
+    data,
+    toolbar,
+    getRowId,
+    selectedId = $bindable<string | null | undefined>(null)
+  }: DataTableProps<TData, TValue> = $props();
   let pagination = $derived<PaginationState>({
     pageIndex: 0,
     pageSize: Number(pageSize)
@@ -85,47 +99,51 @@
 </script>
 
 <div id="app-table-container">
-  {#if !data || data.length === 0}
+  {#if !data}
     <div class="flex h-24 flex-col items-center justify-center">
       <LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={m.common_no_data_available()} />
     </div>
   {:else}
-    <div class="mb-4 flex flex-row items-center justify-between gap-2">
-      <Input
-        placeholder={m.common_search()}
-        value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
-        oninput={(e) => table.getColumn('notes')?.setFilterValue(e.currentTarget.value)}
-        onchange={(e) => {
-          table.getColumn('notes')?.setFilterValue(e.currentTarget.value);
-        }}
-        icon={Search}
-        class="bg-background/60 h-full max-w-sm"
-      />
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger>
-          {#snippet child({ props })}
-            <Button variant="outline" size="sm" {...props}>
-              <Columns3 />
-              <span class="inline">{m.common_columns()}</span>
-              <ChevronDownIcon />
-            </Button>
-          {/snippet}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content align="center">
-          {#each table
-            .getAllColumns()
-            .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
-            <DropdownMenu.CheckboxItem
-              class="capitalize"
-              checked={column.getIsVisible()}
-              onCheckedChange={(value) => column.toggleVisibility(!!value)}
-            >
-              {getColumnDisplayName(column)}
-            </DropdownMenu.CheckboxItem>
-          {/each}
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
-    </div>
+    {#if toolbar}
+      {@render toolbar(table)}
+    {:else}
+      <div class="mb-4 flex flex-row items-center justify-between gap-2">
+        <Input
+          placeholder={m.common_search()}
+          value={(table.getColumn('notes')?.getFilterValue() as string) ?? ''}
+          oninput={(e) => table.getColumn('notes')?.setFilterValue(e.currentTarget.value)}
+          onchange={(e) => {
+            table.getColumn('notes')?.setFilterValue(e.currentTarget.value);
+          }}
+          icon={Search}
+          class="bg-background/60 h-full max-w-sm"
+        />
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger>
+            {#snippet child({ props })}
+              <Button variant="outline" size="sm" {...props}>
+                <Columns3 />
+                <span class="inline">{m.common_columns()}</span>
+                <ChevronDownIcon />
+              </Button>
+            {/snippet}
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content align="center">
+            {#each table
+              .getAllColumns()
+              .filter((col: any) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column (column.id)}
+              <DropdownMenu.CheckboxItem
+                class="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {getColumnDisplayName(column)}
+              </DropdownMenu.CheckboxItem>
+            {/each}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
+    {/if}
     <div class="rounded-t-md border text-sm">
       <Table.Root>
         <Table.Header>
@@ -146,7 +164,17 @@
         </Table.Header>
         <Table.Body class="bg-background/50">
           {#each table.getRowModel().rows as row (row.id)}
-            <Table.Row data-state={row.getIsSelected() && 'selected'}>
+            <Table.Row
+              data-state={row.getIsSelected() && 'selected'}
+              class={getRowId
+                ? `cursor-pointer ${getRowId(row.original) === selectedId ? 'bg-muted/60' : ''}`
+                : ''}
+              onclick={() => {
+                if (!getRowId) return;
+                const id = getRowId(row.original);
+                selectedId = selectedId === id ? null : id;
+              }}
+            >
               {#each row.getVisibleCells() as cell (cell.id)}
                 <Table.Cell>
                   <FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
@@ -160,7 +188,7 @@
                   icon={CircleSlash2}
                   iconClass="h-4 w-4"
                   style="justify-center"
-                  label={m.common_no_data_available()}
+                  label={m.common_no_records_found()}
                 />
               </Table.Cell>
             </Table.Row>

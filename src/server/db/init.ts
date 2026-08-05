@@ -3,7 +3,6 @@ import { db } from './index';
 import { seedData } from './seeders';
 import { logger } from '$server/config';
 import { resolve } from 'path';
-import { applyPatches } from './patch';
 import { env } from '$lib/config/env.server';
 
 /**
@@ -16,7 +15,10 @@ export async function initializeDatabase(): Promise<void> {
     // Run migrations
     logger.info('Running database migrations...');
     await migrate(db, {
-      migrationsFolder: resolve(env.NODE_ENV==='production'?process.cwd():'src/server/db', 'migrations'),
+      migrationsFolder: resolve(
+        env.NODE_ENV === 'production' ? process.cwd() : 'src/server/db',
+        'migrations'
+      ),
       migrationsTable: '_migrations'
     });
     logger.info('Database migrations completed successfully');
@@ -25,11 +27,6 @@ export async function initializeDatabase(): Promise<void> {
     logger.info('Running data seeding if applicable...');
     await seedData();
     logger.info('Data seeding completed successfully');
-
-    // Apply Patches if needed.
-    logger.info('Running database patches if applicable..');
-    await applyPatches();
-    logger.info('Database patches applied successfully');
     logger.info('Database initialization completed successfully');
   } catch (error) {
     logger.error('Failed to initialize database:', error);

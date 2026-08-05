@@ -3,7 +3,8 @@
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
   import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
-  import type { DataPoint } from '$lib/domain';
+  import type { DataPoint } from '$lib/domain/shared';
+  import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
@@ -18,7 +19,8 @@
     title,
     xFormatter,
     valueFormatter,
-    loading = false
+    loading = false,
+    bare = false
   }: {
     chartData: DataPoint[];
     color?: string;
@@ -27,6 +29,8 @@
     xFormatter: (_: Date) => string;
     valueFormatter?: (_: number) => string;
     loading?: boolean;
+    /** Render content only — surrounding card chrome is provided by the parent. */
+    bare?: boolean;
   } = $props();
 
   const chartProps = {
@@ -37,11 +41,10 @@
       motion: 'tween'
     },
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      tickLabelProps: {
-        rotate: 325,
-        textAnchor: 'end'
-      }
+      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short' })
+    },
+    yAxis: {
+      format: (v: number) => valueFormatter?.(v) ?? v.toString()
     },
     grid: {
       style: 'stroke-dasharray: 2',
@@ -79,18 +82,27 @@
 
 <div
   id="chart-area-{title}"
-  class="area-chart lg:bg-background/50 bg-secondary relative rounded-lg px-4 pt-2 pb-6 lg:p-6"
+  class={bare
+    ? 'area-chart relative flex h-full flex-col'
+    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  <div class="mb-4 flex flex-row items-center justify-start gap-2 font-bold">
-    <span>{title}</span>
+  <div class="mb-4 flex shrink-0 flex-row items-center justify-start gap-2 font-bold">
+    {#if !bare}
+      <span>{title}</span>
+    {/if}
     <span
-      class="bg-background/90 text-muted-foreground rounded-full border px-2 py-0.5 text-[11px] font-medium shadow-sm"
+      class="bg-background/90 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium shadow-sm"
     >
+      <span class="inline-block size-1.5 rounded-full" style="background-color: {color}"></span>
       Avg: {formattedAverage}
     </span>
   </div>
   {#if loading}
-    <div class="flex h-50 flex-col justify-end space-y-2">
+    <div
+      class={bare
+        ? 'flex min-h-0 flex-1 flex-col justify-end space-y-2'
+        : 'flex h-50 flex-col justify-end space-y-2'}
+    >
       <div class="flex h-full items-end justify-between gap-2">
         {#each [40, 65, 45, 80, 55, 70, 50, 85, 60, 75] as height, i (i)}
           <Skeleton class="w-full rounded-t" style="height: {height}%" />
@@ -99,14 +111,15 @@
       <Skeleton class="h-4 w-full" />
     </div>
   {:else if chartData.length != 0}
-    <Chart.Container config={chartConfig}>
+    <Chart.Container
+      config={chartConfig}
+      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-[2.5/1]'}
+    >
       <AreaChart
         data={chartDataWithAverage}
         x="x"
         xScale={scaleUtc()}
-        points={{
-          r: 0
-        }}
+        padding={{ left: 48 }}
         series={[
           {
             key: 'y',
@@ -119,7 +132,7 @@
             color: 'var(--muted-foreground)'
           }
         ]}
-        axis={'x'}
+        axis
         props={chartProps}
       >
         {#snippet tooltip()}
@@ -136,20 +149,24 @@
           {#each context.series.visibleSeries as s (s.key)}
             {#if s.key === 'y'}
               <LinearGradient
-                stops={[s.color ?? '', 'color-mix(in lch, ' + s.color + ' 10%, transparent)']}
+                stops={[
+                  'color-mix(in lch, ' + s.color + ' 55%, transparent)',
+                  'color-mix(in lch, ' + s.color + ' 4%, transparent)'
+                ]}
                 vertical
               >
                 {#snippet children({ gradient })}
                   <Area
                     seriesKey={s.key}
                     curve={curveCatmullRom}
-                    fillOpacity={0.4}
-                    line={{ class: 'stroke-2' }}
+                    fillOpacity={0.8}
+                    line={{ class: 'stroke-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]' }}
                     motion="tween"
                     fill={gradient}
                   />
                 {/snippet}
               </LinearGradient>
+              <ChartPoints seriesKey={s.key} color={s.color} />
             {:else}
               <Area
                 seriesKey={s.key}

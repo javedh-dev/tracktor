@@ -53,7 +53,7 @@
   ]);
 </script>
 
-<div id={menuId} class="flex flex-row justify-end">
+<div id={menuId} class="flex flex-row justify-end" onclickcapture={(e) => e.stopPropagation()}>
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
       id={triggerId}

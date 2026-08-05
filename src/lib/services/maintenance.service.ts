@@ -1,16 +1,11 @@
-import type { MaintenanceLog } from '$lib/domain';
+import type { MaintenanceLog } from '$lib/domain/maintenance';
 import { createEntityService } from './entity-service';
 import { apiClient } from '$lib/helper/api.helper';
 
-const {
-  save,
-  saveWithAttachment,
-  delete: remove
-} = createEntityService<MaintenanceLog>({
+const { saveWithAttachment, delete: remove } = createEntityService<MaintenanceLog>({
   basePath: 'maintenance-logs'
 });
 
-export const saveMaintenanceLog = save;
 export const saveMaintenanceLogWithAttachment = saveWithAttachment;
 export const deleteMaintenanceLog = remove;
 

@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Domain and Data Models"
+type: 'Reference'
+title: 'Domain and Data Models'
 openwiki_generated: true
 ---
 

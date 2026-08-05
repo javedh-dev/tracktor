@@ -15,7 +15,7 @@
   import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import SubmitButton from '$appui/SubmitButton.svelte';
-  import type { Reminder } from '$lib/domain';
+  import type { Reminder } from '$lib/domain/reminder';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import BellRing from '@lucide/svelte/icons/bell-ring';
   import Layers from '@lucide/svelte/icons/layers';
@@ -27,6 +27,10 @@
   import { toast } from 'svelte-sonner';
   import * as m from '$lib/paraglide/messages';
   import RecurrenceFields from '$lib/components/feature/shared/RecurrenceFields.svelte';
+  import VehicleSelectField from '$feature/shared/VehicleSelectField.svelte';
+  import { page } from '$app/state';
+  import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 
   let { data }: { data?: Partial<Reminder> } = $props();
 
@@ -42,7 +46,7 @@
         }).then((res) => {
           if (res.status === 'OK') {
             toast.success(m[data ? 'reminder_toast_updated' : 'reminder_toast_created']());
-            sheetStore.closeSheet(reminderStore.refreshReminders);
+            sheetStore.closeSheet(reminderStore.reloadReminders);
           } else {
             toast.error(res.error || m.reminder_toast_error_fallback());
           }
@@ -55,7 +59,9 @@
   const { form, enhance } = sf;
   const formData: any = sf.formData;
 
-  const resolveVehicleId = () => data?.vehicleId || vehicleStore.selectedId || '';
+  const scope = $derived(readVehicleScope(page.url, vehicleStore.vehicles));
+  const resolveVehicleId = () => data?.vehicleId || (scope.isFleet ? '' : scope.vehicleId) || '';
+  const suppliedVehicleId = $derived(resolveVehicleId());
 
   $effect(() => {
     if (data?.id) {
@@ -87,6 +93,9 @@
 
 <form id="reminder-form" use:enhance onsubmit={(e) => e.preventDefault()}>
   <fieldset class="flex flex-col gap-4" disabled={sf.processing}>
+    {#if !suppliedVehicleId}
+      <VehicleSelectField {form} {formData} vehicles={vehicleStore.vehicles ?? []} />
+    {/if}
     <Form.Field {form} name="dueDate" class="w-full">
       <Form.Control>
         {#snippet children({ props })}
@@ -193,7 +202,7 @@
       <Form.Control>
         {#snippet children({ props })}
           <label class="flex items-center gap-2 text-sm font-medium">
-            <input type="checkbox" {...props} bind:checked={$formData.isCompleted} />
+            <Checkbox {...props} bind:checked={$formData.isCompleted} />
             <span>{m.reminder_form_is_completed_label()}</span>
           </label>
         {/snippet}

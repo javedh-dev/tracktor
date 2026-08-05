@@ -18,12 +18,10 @@ export const GET: RequestHandler = async (event) => {
         result = await autocompleteService.getUniqueServiceCenters();
         break;
 
-      case 'insuranceProvider':
-        result = await autocompleteService.getUniqueInsuranceProviders();
-        break;
-
-      case 'testingCenter':
-        result = await autocompleteService.getUniqueTestingCenters();
+      case 'complianceIssuer':
+        result = await autocompleteService.getUniqueComplianceIssuers(
+          event.url.searchParams.get('type') ?? undefined
+        );
         break;
 
       case 'vehicleMake':

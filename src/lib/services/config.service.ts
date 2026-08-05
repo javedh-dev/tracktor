@@ -1,4 +1,5 @@
-import type { Config, Response } from '$lib/domain';
+import type { Config } from '$lib/domain/config';
+import type { Response } from '$lib/domain/shared';
 import { apiClient } from '$lib/helper/api.helper';
 
 export const saveConfig = async (configs: Config[]): Promise<Response<any>> => {

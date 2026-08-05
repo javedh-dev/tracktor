@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Feature Toggles Workflow"
+type: 'Reference'
+title: 'Feature Toggles Workflow'
 openwiki_generated: true
 ---
 

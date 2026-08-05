@@ -2,15 +2,17 @@ import { parseCsvPreview, importFuelLogsFromCsv } from '$lib/helper/csv.helper';
 import { fuelLogStore } from '$stores/fuel-log.svelte';
 import { sheetStore } from '$stores/sheet.svelte';
 import { vehicleStore } from '$stores/vehicle.svelte';
+import { page } from '$app/state';
+import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
 import { toast } from 'svelte-sonner';
 import { parseWithFormat } from '$lib/helper/format.helper';
 import { configStore } from '$lib/stores/config.svelte';
 import * as m from '$lib/paraglide/messages';
 
-export type FuelLogColumnKey =
+type FuelLogColumnKey =
   'date' | 'odometer' | 'fuelAmount' | 'cost' | 'filled' | 'missedLast' | 'notes';
 
-export interface ColumnDefinition {
+interface ColumnDefinition {
   key: FuelLogColumnKey;
   label: string;
   required: boolean;
@@ -22,7 +24,7 @@ export interface ParsedCsvRow {
 }
 
 export const stepOrder = [1, 2, 3] as const;
-export type ImportStep = (typeof stepOrder)[number];
+type ImportStep = (typeof stepOrder)[number];
 
 export const columns: ColumnDefinition[] = [
   { key: 'date', label: m.col_date(), required: true, hint: m.fuel_import_col_date_hint() },
@@ -54,7 +56,7 @@ export const columns: ColumnDefinition[] = [
   { key: 'notes', label: m.col_notes(), required: false, hint: m.fuel_import_col_notes_hint() }
 ];
 
-export const defaultMapping = (): Record<FuelLogColumnKey, string> => ({
+const defaultMapping = (): Record<FuelLogColumnKey, string> => ({
   date: '',
   odometer: '',
   fuelAmount: '',
@@ -74,7 +76,7 @@ const autoMapHints: Record<FuelLogColumnKey, string[]> = {
   notes: ['note', 'remarks', 'comment', 'description']
 };
 
-export const buildAutoMapping = (headers: string[]): Record<FuelLogColumnKey, string> => {
+const buildAutoMapping = (headers: string[]): Record<FuelLogColumnKey, string> => {
   const next = defaultMapping();
   for (const header of headers) {
     const normalized = header.toLowerCase();
@@ -100,8 +102,10 @@ export class FuelLogImportState {
   parseError = $state<string>();
   processing = $state<'idle' | 'parsing' | 'importing'>('idle');
 
+  scopedVehicleId = $derived(readVehicleScope(page.url, vehicleStore.vehicles).vehicleId);
+
   selectedVehicle = $derived(
-    vehicleStore.vehicles?.find((vehicle) => vehicle.id === vehicleStore.selectedId)
+    vehicleStore.vehicles?.find((vehicle) => vehicle.id === this.scopedVehicleId)
   );
 
   selectedVehicleLabel = $derived(
@@ -211,7 +215,7 @@ export class FuelLogImportState {
   };
 
   handleImport = async () => {
-    if (!this.canImport || !vehicleStore.selectedId) return;
+    if (!this.canImport || !this.scopedVehicleId) return;
     this.processing = 'importing';
     try {
       const rowsForImport = this.csvRows.map((row) => {
@@ -227,13 +231,13 @@ export class FuelLogImportState {
 
       const result = await importFuelLogsFromCsv(
         rowsForImport,
-        vehicleStore.selectedId,
+        this.scopedVehicleId,
         this.dateFormat
       );
 
       if (result.failed === 0) {
         toast.success(m.fuel_import_success({ count: result.imported }));
-        sheetStore.closeSheet(() => fuelLogStore.refreshFuelLogs());
+        sheetStore.closeSheet(() => fuelLogStore.reloadFuelLogs());
       } else {
         const message = m.fuel_import_failed_count({
           imported: result.imported,

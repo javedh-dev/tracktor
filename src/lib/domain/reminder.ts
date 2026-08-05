@@ -93,6 +93,9 @@ export interface Reminder {
   recurrenceEndDate: Date | null;
   note: string | null;
   isCompleted: boolean;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
 }
 
 const reminderTypeOptions = Object.keys(REMINDER_TYPES) as (keyof typeof REMINDER_TYPES)[];

@@ -11,7 +11,14 @@
   import Input from '$appui/input.svelte';
   import { saveVehicleWithImage } from '$lib/services/vehicle.service';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { vehicleSchema, FUEL_TYPES, getFuelTypeLabel } from '$lib/domain/vehicle';
+  import {
+    vehicleSchema,
+    FUEL_TYPES,
+    VEHICLE_TYPES,
+    getFuelTypeLabel,
+    getVehicleTypeLabel,
+    getVehicleTypeIcon
+  } from '$lib/domain/vehicle';
   import Building2 from '@lucide/svelte/icons/building-2';
   import Calendar from '@lucide/svelte/icons/calendar';
   import CarFront from '@lucide/svelte/icons/car-front';
@@ -183,6 +190,38 @@
       </Form.Field>
     </div>
     <div class="flex w-full flex-row gap-4">
+      <Form.Field {form} name="vehicleType" class="w-full">
+        <Form.Control>
+          {#snippet children({ props })}
+            {@const VehicleTypeIcon = getVehicleTypeIcon($formData.vehicleType)}
+            <FormLabel description={m.vehicle_form_vehicle_type_desc()} required>
+              {m.vehicle_form_vehicle_type_label()}
+            </FormLabel>
+            <Select.Root bind:value={$formData.vehicleType} type="single">
+              <Select.Trigger {...props} class="w-full">
+                <div class="flex items-center justify-start">
+                  <VehicleTypeIcon class="mr-2 h-4 w-4" />
+                  <span>
+                    {$formData.vehicleType
+                      ? getVehicleTypeLabel($formData.vehicleType, m)
+                      : m.vehicle_form_vehicle_type_placeholder()}
+                  </span>
+                </div>
+              </Select.Trigger>
+              <Select.Content>
+                {#each Object.keys(VEHICLE_TYPES) as value}
+                  {@const ItemIcon = getVehicleTypeIcon(value)}
+                  <Select.Item {value}>
+                    <ItemIcon class="mr-2 h-4 w-4" />
+                    {getVehicleTypeLabel(value, m)}
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          {/snippet}
+        </Form.Control>
+        <Form.FieldErrors />
+      </Form.Field>
       <Form.Field {form} name="fuelType" class="w-full">
         <Form.Control>
           {#snippet children({ props })}
@@ -210,6 +249,8 @@
         </Form.Control>
         <Form.FieldErrors />
       </Form.Field>
+    </div>
+    <div class="flex w-full flex-row gap-4">
       <Form.Field {form} name="odometer" class="w-full">
         <Form.Control>
           {#snippet children({ props })}
@@ -222,20 +263,19 @@
         <!-- <Form.Description>Model of the vehicle</Form.Description> -->
         <Form.FieldErrors />
       </Form.Field>
+      <Form.Field {form} name="licensePlate" class="w-full">
+        <Form.Control>
+          {#snippet children({ props })}
+            <FormLabel description={m.vehicle_form_license_desc()}>
+              {m.vehicle_form_license_label()}
+            </FormLabel>
+            <Input {...props} bind:value={$formData.licensePlate} icon={IdCard} />
+          {/snippet}
+        </Form.Control>
+        <!-- <Form.Description>Model of the vehicle</Form.Description> -->
+        <Form.FieldErrors />
+      </Form.Field>
     </div>
-
-    <Form.Field {form} name="licensePlate" class="w-full">
-      <Form.Control>
-        {#snippet children({ props })}
-          <FormLabel description={m.vehicle_form_license_desc()}>
-            {m.vehicle_form_license_label()}
-          </FormLabel>
-          <Input {...props} bind:value={$formData.licensePlate} icon={IdCard} />
-        {/snippet}
-      </Form.Control>
-      <!-- <Form.Description>Model of the vehicle</Form.Description> -->
-      <Form.FieldErrors />
-    </Form.Field>
     <Form.Field {form} name="vin" class="w-full">
       <Form.Control>
         {#snippet children({ props })}

@@ -8,8 +8,8 @@ Configure Tracktor by setting environment variables in a `.env` file in the root
 
 Application environment.
 
-- **Values**: `dev`, `production`, `test`
-- **Default**: `dev`
+- **Values**: `development`, `production`, `test`
+- **Default**: `development`
 
 ### HOST
 
@@ -70,6 +70,21 @@ Disable authentication (not recommended for production).
 - **Values**: `true`, `false`
 - **Default**: `false`
 
+### APP_SECRET
+
+Secret key used to encrypt stored credentials (e.g. notification provider passwords). Required once you configure any notification provider — the app refuses to store or read credentials without it.
+
+- **Values**: Any random string
+- **Default**: none (must be set to use notification providers)
+- **Generate**: `openssl rand -hex 32`
+
+### HTTP_MODE
+
+Controls whether auth cookies are marked `secure`. Set to `https` when Tracktor is served over HTTPS (e.g. behind a TLS-terminating reverse proxy) so the session cookie gets the `secure` flag.
+
+- **Values**: `http`, `https`
+- **Default**: `http`
+
 ## Demo Mode
 
 ### TRACKTOR_DEMO_MODE
@@ -113,8 +128,8 @@ Directory for log files.
 
 Limits the upload size of image/documents.
 
-- **values**: Any number (size in bytes)
-- **Defaut**: 512Kb
+- **Values**: Any number (size in bytes)
+- **Default**: 512Kb
 - **Docker**: Infinity (removes restriction)
 
 ## Notes

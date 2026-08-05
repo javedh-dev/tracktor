@@ -33,7 +33,7 @@ async function isNotificationProcessingEnabled(): Promise<boolean> {
   return true;
 }
 
-export async function processScheduledNotifications(): Promise<void> {
+async function processScheduledNotifications(): Promise<void> {
   const result = await dispatchScheduledNotifications();
 
   if (result.success) {
@@ -81,14 +81,4 @@ export async function initializeNotificationScheduler(): Promise<void> {
 
 export async function reloadNotificationScheduler(): Promise<void> {
   await initializeNotificationScheduler();
-}
-
-export function stopNotificationScheduler(): void {
-  if (!scheduledTask) {
-    return;
-  }
-
-  scheduledTask.stop();
-  scheduledTask = null;
-  logger.info('Notification scheduler stopped');
 }

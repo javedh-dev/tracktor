@@ -5,8 +5,7 @@ declare module '@sveltejs/kit' {
     vehicleId?: string;
     licensePlate?: string;
     logId?: string;
-    insuranceId?: string;
-    puccId?: string;
+    complianceId?: string;
   }
 }
 

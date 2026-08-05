@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Accordion from '$lib/components/ui/accordion';
   import type { Snippet } from 'svelte';
 
   const {
@@ -9,21 +8,16 @@
   }: {
     title?: string;
     subtitle?: string;
-    separator?: boolean;
     children: Snippet;
   } = $props();
 </script>
 
-<Accordion.Item value={title} class="m-0 p-0">
-  <Accordion.Trigger
-    class="hover:text-primary mb-2 items-center rounded-sm py-2 hover:cursor-pointer hover:no-underline"
-  >
+<div class="space-y-4 border-t pt-4 first:border-t-0 first:pt-0">
+  {#if title}
     <div>
-      {#if title}<h3 class="mb-1">{title}</h3>{/if}
+      <h3 class="text-sm font-semibold">{title}</h3>
       {#if subtitle}<p class="text-muted-foreground text-xs">{subtitle}</p>{/if}
     </div>
-  </Accordion.Trigger>
-  <Accordion.Content class="flex flex-col gap-4 p-2 text-balance">
-    {@render children()}
-  </Accordion.Content>
-</Accordion.Item>
+  {/if}
+  {@render children()}
+</div>

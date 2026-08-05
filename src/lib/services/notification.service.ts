@@ -1,4 +1,5 @@
-import type { Notification, Response } from '$lib/domain';
+import type { Notification } from '$lib/domain/notification';
+import type { Response } from '$lib/domain/shared';
 import { apiClient } from '$lib/helper/api.helper';
 
 export const getNotifications = async (vehicleId: string): Promise<Response<Notification[]>> => {
@@ -6,6 +7,18 @@ export const getNotifications = async (vehicleId: string): Promise<Response<Noti
   try {
     const response = await apiClient.get(`/vehicles/${vehicleId}/notifications`);
     // API returns { data: notifications[], success: true }
+    res.data = response.data.data || response.data;
+  } catch (e: any) {
+    res.status = 'ERROR';
+    res.error = e.response?.data?.message || 'Failed to fetch notifications.';
+  }
+  return res;
+};
+
+export const getAllNotifications = async (): Promise<Response<Notification[]>> => {
+  const res: Response<Notification[]> = { status: 'OK' };
+  try {
+    const response = await apiClient.get('/notifications');
     res.data = response.data.data || response.data;
   } catch (e: any) {
     res.status = 'ERROR';

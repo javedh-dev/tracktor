@@ -23,8 +23,8 @@ export const PUT: RequestHandler = async (event) => {
 
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Fuel log DELETE error:', async () => {
-    const { logId } = event.params;
-    const result = await fuelLogService.deleteFuelLog(logId);
+    const { id, logId } = event.params;
+    const result = await fuelLogService.deleteFuelLog(id, logId);
     return jsonResponse(result);
   });
 };

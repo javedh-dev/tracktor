@@ -1,30 +1,18 @@
 import { logger } from '$server/config';
-import type { RequestEvent } from '@sveltejs/kit';
-import { BaseMiddleware, type MiddlewareResult } from './base';
+import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { env } from '$lib/config/env.server';
 
-export class LoggingMiddleware extends BaseMiddleware {
-  protected async process(event: RequestEvent): Promise<MiddlewareResult> {
-    if (env.LOG_REQUESTS) {
-      let message = `${this.getNormalizedIPv4Address(this.getClientAddress(event))} - ${event.request.method} - ${event.url.pathname}`;
-      logger.info(message);
-    }
+function getClientAddress(event: RequestEvent): string {
+  const forwardedFor = event.request.headers.get('x-forwarded-for');
+  const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : event.getClientAddress();
 
-    return { continue: true };
-  }
-
-  private getClientAddress(event: RequestEvent): string {
-    const forwardedFor = event.request.headers.get('x-forwarded-for');
-    if (forwardedFor) {
-      return forwardedFor.split(',')[0].trim();
-    }
-    return event.getClientAddress();
-  }
-
-  private getNormalizedIPv4Address(ip: string): string {
-    if (ip.startsWith('::ffff:')) {
-      return ip.replace('::ffff:', '');
-    }
-    return ip;
-  }
+  return ip.startsWith('::ffff:') ? ip.slice('::ffff:'.length) : ip;
 }
+
+export const handleLogging: Handle = ({ event, resolve }) => {
+  if (env.LOG_REQUESTS) {
+    logger.info(`${getClientAddress(event)} - ${event.request.method} - ${event.url.pathname}`);
+  }
+
+  return resolve(event);
+};

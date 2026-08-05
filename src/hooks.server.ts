@@ -1,29 +1,16 @@
 import { sequence } from '@sveltejs/kit/hooks';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
-import { createErrorResponseBody, logError } from './server/utils/errorHandler';
 
-import {
-  CorsMiddleware,
-  RateLimitMiddleware,
-  AuthMiddleware,
-  LoggingMiddleware
-} from '$server/middlewares';
-
-import { MiddlewareChain } from '$server/middlewares/base';
+import { handleCors } from '$server/middlewares/cors';
+import { handleAuth } from '$server/middlewares/auth';
+import { handleLogging } from '$server/middlewares/logging';
 import { initializeDatabase } from '$server/db/init';
 import { appAsciiArt, appVersion, logger } from '$server/config';
 import { env } from '$lib/config/env.server';
+import { getTextDirection } from '$lib/utils';
 import { ensureAppDirectories } from '$server/utils/fs';
 import { initializeNotificationScheduler } from '$server/services/notificationSchedulerService';
-
-const middlewareChain = new MiddlewareChain();
-middlewareChain.init([
-  new CorsMiddleware(),
-  new AuthMiddleware(),
-  new RateLimitMiddleware(),
-  new LoggingMiddleware()
-]);
 
 const envSnapshot = () => ({
   APP_VERSION: appVersion,
@@ -90,27 +77,15 @@ const initPromise = (async () => {
 })();
 
 export const handleError: HandleServerError = async ({ error, event }) => {
-  logError(error, event);
+  logger.error(`Error in ${event.request.method} - ${event.url.pathname}`, error);
 
-  const body = createErrorResponseBody(error);
-
-  return { message: body.error.message || 'Internal server error' };
+  return { message: error instanceof Error ? error.message : 'Internal server error' };
 };
 
-const originalHandle: Handle = async ({ event, resolve }) => {
+const handleInit: Handle = async ({ event, resolve }) => {
   await initPromise;
 
-  const middlewareResult = await middlewareChain.handle(event);
-
-  if (middlewareResult.response) {
-    return middlewareResult.response;
-  }
-
-  const response = await resolve(event);
-
-  CorsMiddleware.addCorsHeaders(response, event.request);
-
-  return response;
+  return resolve(event);
 };
 
 const handleParaglide: Handle = ({ event, resolve }) =>
@@ -118,15 +93,11 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     event.request = request;
 
     return resolve(event, {
-      transformPageChunk: ({ html }) => {
-        // Set language and direction attributes based on locale
-        const rtlLanguages = ['ar', 'he', 'fa', 'ur', 'yi'];
-        const direction = rtlLanguages.includes(locale) ? 'rtl' : 'ltr';
-        return html
+      transformPageChunk: ({ html }) =>
+        html
           .replace('%paraglide.lang%', locale)
-          .replace('dir="%paraglide.lang%"', `dir="${direction}"`);
-      }
+          .replace('dir="%paraglide.lang%"', `dir="${getTextDirection(locale)}"`)
     });
   });
 
-export const handle = sequence(originalHandle, handleParaglide);
+export const handle = sequence(handleInit, handleCors, handleAuth, handleLogging, handleParaglide);

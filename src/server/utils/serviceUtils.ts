@@ -18,21 +18,6 @@ export const validateVehicleExists = async (vehicleId: string): Promise<void> =>
 };
 
 /**
- * Validates that a vehicle exists by license plate
- * @param licensePlate - The license plate to validate
- * @throws AppError if vehicle is not found
- */
-export const validateVehicleExistsByLicensePlate = async (licensePlate: string): Promise<void> => {
-  const vehicle = await db.query.vehicleTable.findFirst({
-    where: (vehicles, { eq }) => eq(vehicles.licensePlate, licensePlate)
-  });
-
-  if (!vehicle) {
-    throw new AppError(`No vehicle found for license plate : ${licensePlate}`, Status.NOT_FOUND);
-  }
-};
-
-/**
  * Generic delete operation with standard error handling
  * @param table - The database table to delete from
  * @param id - The ID of the record to delete

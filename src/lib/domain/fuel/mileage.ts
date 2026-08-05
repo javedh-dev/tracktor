@@ -16,7 +16,7 @@ export function computeLatestOdometer(
   return values.length > 0 ? Math.max(...values) : 0;
 }
 
-export type MileageResult = {
+type MileageResult = {
   distance: number;
   totalFuel: number;
 };
@@ -73,6 +73,11 @@ export function computeAverageMileage(fuelLogs: FuelLogInput[]): number | null {
   const ratios = windows.map((w) => w.distance / w.totalFuel);
   const avg = ratios.reduce((sum, r) => sum + r, 0) / ratios.length;
   return parseFloat(avg.toFixed(2));
+}
+
+export function computeTotalDistance(fuelLogs: FuelLogInput[]): number {
+  const windows = findMileageWindows(fuelLogs);
+  return windows.reduce((sum, w) => sum + w.distance, 0);
 }
 
 export function computeMileagePerWindow(fuelLogs: FuelLogInput[]): (number | null)[] {

@@ -1,6 +1,6 @@
 ---
-type: "Reference"
-title: "Testing Guidance"
+type: 'Reference'
+title: 'Testing Guidance'
 openwiki_generated: true
 ---
 

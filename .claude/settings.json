@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm check *)",
+      "Bash(pnpm lint *)",
+      "Bash(node_modules/.bin/prettier --check *)",
+      "Bash(npm run check *)",
+      "Bash(npm run lint *)",
+      "Bash(pnpm exec prettier --check *)",
+      "Bash(pnpm vitest --run *)"
+    ]
+  }
+}

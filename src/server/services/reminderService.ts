@@ -3,7 +3,7 @@ import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import type { Reminder } from '$lib/domain/reminder';
 import { performDelete, validateVehicleExists } from '../utils/serviceUtils';
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { syncVehicleNotifications } from './notificationService';
 import { requireRecord } from './service-response.helper';
 
@@ -102,13 +102,28 @@ export const addReminder = async (vehicleId: string, reminderData: ReminderPaylo
   return inserted;
 };
 
-export const getReminders = async (vehicleId: string) => {
-  const reminders = await db.query.reminderTable.findMany({
-    where: (reminder, { eq }) => eq(reminder.vehicleId, vehicleId),
-    orderBy: (reminder, { asc }) => [asc(reminder.dueDate)]
-  });
+export const getReminders = async (vehicleId?: string) => {
+  if (vehicleId) {
+    const reminders = await db.query.reminderTable.findMany({
+      where: (reminder, { eq }) => eq(reminder.vehicleId, vehicleId),
+      orderBy: (reminder, { asc }) => [asc(reminder.dueDate)]
+    });
 
-  return reminders;
+    return reminders;
+  }
+
+  const rows = await db
+    .select({
+      ...getTableColumns(schema.reminderTable),
+      vehicleMake: schema.vehicleTable.make,
+      vehicleModel: schema.vehicleTable.model,
+      vehiclePlate: schema.vehicleTable.licensePlate
+    })
+    .from(schema.reminderTable)
+    .leftJoin(schema.vehicleTable, eq(schema.reminderTable.vehicleId, schema.vehicleTable.id))
+    .orderBy(schema.reminderTable.dueDate);
+
+  return rows;
 };
 
 export const getReminderById = async (id: string) => {

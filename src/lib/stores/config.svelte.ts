@@ -17,13 +17,13 @@ const DEFAULT_CONFIGS: Configs = {
   timezone: 'UTC',
   featureFuelLog: true,
   featureMaintenance: true,
-  featurePucc: true,
+  featureCompliance: true,
   featureReminders: true,
-  featureInsurance: true,
   featureOverview: true,
   notificationProcessingEnabled: true,
   notificationProcessingSchedule: '0 9 * * *',
-  theme: 'light'
+  theme: 'light',
+  darkVariant: 'default'
 };
 
 /**

@@ -1,6 +1,5 @@
 import { superForm, defaults } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { vehicleStore } from '$stores/vehicle.svelte';
 import type { z } from 'zod';
 
 export function createSheetForm(config: {
@@ -22,10 +21,10 @@ export function createSheetForm(config: {
 
   const { form: formData, enhance } = form;
 
-  function setVehicleId() {
+  function setVehicleId(vehicleId: string) {
     formData.update((fd: any) => ({
       ...fd,
-      vehicleId: vehicleStore.selectedId || ''
+      vehicleId
     }));
   }
 
@@ -35,12 +34,24 @@ export function createSheetForm(config: {
   }
 
   return {
-    get processing() { return processing; },
-    set processing(v) { processing = v; },
-    get attachment() { return attachment; },
-    set attachment(v) { attachment = v; },
-    get removeExistingAttachment() { return removeExistingAttachment; },
-    set removeExistingAttachment(v) { removeExistingAttachment = v; },
+    get processing() {
+      return processing;
+    },
+    set processing(v) {
+      processing = v;
+    },
+    get attachment() {
+      return attachment;
+    },
+    set attachment(v) {
+      attachment = v;
+    },
+    get removeExistingAttachment() {
+      return removeExistingAttachment;
+    },
+    set removeExistingAttachment(v) {
+      removeExistingAttachment = v;
+    },
     form,
     formData,
     enhance,

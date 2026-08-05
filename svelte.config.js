@@ -31,6 +31,7 @@ const config = {
       $stores: './src/lib/stores',
       $services: './src/lib/services',
       $helper: './src/lib/helper',
+      $dashboard: './src/lib/components/dashboard',
       $server: './src/server'
     }
   }

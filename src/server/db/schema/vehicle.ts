@@ -21,6 +21,23 @@ export const vehicleTable = table('vehicles', {
     })
     .notNull()
     .default('petrol'),
+  vehicleType: t
+    .text({
+      enum: [
+        'car',
+        'motorcycle',
+        'scooter',
+        'truck',
+        'van',
+        'bus',
+        'farm_vehicle',
+        'yacht',
+        'rv',
+        'other'
+      ]
+    })
+    .notNull()
+    .default('car'),
   customFields: t.text(),
   ...timestamps
 });
