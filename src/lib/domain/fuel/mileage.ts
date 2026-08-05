@@ -21,8 +21,8 @@ type MileageResult = {
   totalFuel: number;
 };
 
-function findMileageWindows(fuelLogs: FuelLogInput[]): MileageResult[] {
-  const results: MileageResult[] = [];
+function findMileageWindows(fuelLogs: FuelLogInput[]): Map<number, MileageResult> {
+  const results = new Map<number, MileageResult>();
 
   for (let index = 0; index < fuelLogs.length; index++) {
     const log = fuelLogs[index]!;
@@ -60,14 +60,14 @@ function findMileageWindows(fuelLogs: FuelLogInput[]): MileageResult[] {
     }
     if (totalFuel === 0) continue;
 
-    results.push({ distance, totalFuel });
+    results.set(index, { distance, totalFuel });
   }
 
   return results;
 }
 
 export function computeAverageMileage(fuelLogs: FuelLogInput[]): number | null {
-  const windows = findMileageWindows(fuelLogs);
+  const windows = [...findMileageWindows(fuelLogs).values()];
   if (windows.length === 0) return null;
 
   const ratios = windows.map((w) => w.distance / w.totalFuel);
@@ -76,30 +76,14 @@ export function computeAverageMileage(fuelLogs: FuelLogInput[]): number | null {
 }
 
 export function computeTotalDistance(fuelLogs: FuelLogInput[]): number {
-  const windows = findMileageWindows(fuelLogs);
+  const windows = [...findMileageWindows(fuelLogs).values()];
   return windows.reduce((sum, w) => sum + w.distance, 0);
 }
 
 export function computeMileagePerWindow(fuelLogs: FuelLogInput[]): (number | null)[] {
   const windows = findMileageWindows(fuelLogs);
-
-  if (windows.length === 0) {
-    return fuelLogs.map(() => null);
-  }
-
-  let windowIdx = 0;
-  return fuelLogs.map((log, index) => {
-    if (
-      index === 0 ||
-      !log.filled ||
-      log.missedLast ||
-      log.odometer === null ||
-      log.fuelAmount === null
-    ) {
-      return null;
-    }
-    const w = windows[windowIdx]!;
-    windowIdx++;
-    return parseFloat((w.distance / w.totalFuel).toFixed(2));
+  return fuelLogs.map((_, index) => {
+    const w = windows.get(index);
+    return w ? parseFloat((w.distance / w.totalFuel).toFixed(2)) : null;
   });
 }

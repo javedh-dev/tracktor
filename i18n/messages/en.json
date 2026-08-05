@@ -26,6 +26,8 @@
   "auth_login_or": "or",
   "auth_sso_login_button": "Login with SSO",
   "auth_sso_login_loading": "Redirecting...",
+  "auth_login_title": "Welcome back",
+  "auth_login_subtitle": "Sign in to keep your vehicles, fuel, and paperwork on track.",
   "settings_tab_personalization": "Personalization",
   "settings_tab_interface": "Interface",
   "settings_tab_localization": "Localization",
