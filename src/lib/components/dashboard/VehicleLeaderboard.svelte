@@ -1,6 +1,7 @@
 <script lang="ts">
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { cn } from '$lib/utils';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Entry {
     id: string;
@@ -21,11 +22,11 @@
 
   const rankClass = (rank: number) =>
     rank === 0
-      ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950 shadow-sm shadow-amber-500/40'
+      ? ACCENT.ochre.medal
       : rank === 1
-        ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-900 shadow-sm shadow-slate-400/30'
+        ? ACCENT.fog.medal
         : rank === 2
-          ? 'bg-gradient-to-br from-orange-300 to-orange-500 text-orange-950 shadow-sm shadow-orange-500/30'
+          ? ACCENT.clay.medal
           : 'bg-secondary text-muted-foreground';
 </script>
 

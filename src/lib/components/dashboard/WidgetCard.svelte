@@ -4,13 +4,14 @@
   import type { WidgetLayoutItem } from '$lib/domain/dashboard';
   import { widgetGridVars } from './widget-size';
   import { getGridInteraction } from './grid-interaction.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
   import X from '@lucide/svelte/icons/x';
 
   let {
     layout,
     title,
     icon: Icon,
-    iconColor = 'bg-gradient-to-br from-slate-400 to-slate-600 shadow-slate-500/30',
+    iconColor = ACCENT.fog.gradient,
     draggable = true,
     onRemove,
     children

@@ -2,6 +2,7 @@
   import StatusPill from '$dashboard/StatusPill.svelte';
   import Bell from '@lucide/svelte/icons/bell';
   import type { DashboardSummary } from '$lib/domain/dashboard';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   let { summary, loading }: { summary: DashboardSummary | null; loading: boolean } = $props();
 </script>
@@ -13,7 +14,7 @@
         class="hover:bg-muted/40 -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors"
       >
         <span
-          class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500"
+          class="flex size-8 shrink-0 items-center justify-center rounded-lg {ACCENT.plum.chip}"
         >
           <Bell class="size-4" />
         </span>

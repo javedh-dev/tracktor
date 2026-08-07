@@ -8,6 +8,7 @@
   import { formatTableDate, formatTableCurrency, formatTableText } from '$helper/table-cell.helper';
   import { parseDate } from '$helper/format.helper';
   import { downloadCsv } from '$helper/csv-export.helper';
+  import { ACCENT } from '$helper/accent-color.helper';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import Timer from '@lucide/svelte/icons/timer';
@@ -53,17 +54,17 @@
   import * as m from '$lib/paraglide/messages';
 
   const TYPE_STYLES: Record<string, { bg: string; text: string }> = {
-    insurance: { bg: 'bg-blue-500/10', text: 'text-blue-500' },
-    emissions: { bg: 'bg-fuchsia-500/10', text: 'text-fuchsia-500' },
-    roadworthiness: { bg: 'bg-violet-500/10', text: 'text-violet-500' },
-    registration: { bg: 'bg-amber-500/10', text: 'text-amber-500' },
-    other: { bg: 'bg-slate-500/10', text: 'text-slate-500' }
+    insurance: { bg: ACCENT.denim.soft, text: ACCENT.denim.text },
+    emissions: { bg: ACCENT.plum.soft, text: ACCENT.plum.text },
+    roadworthiness: { bg: ACCENT.teal.soft, text: ACCENT.teal.text },
+    registration: { bg: ACCENT.ochre.soft, text: ACCENT.ochre.text },
+    other: { bg: ACCENT.fog.soft, text: ACCENT.fog.text }
   };
 
   const DAYS_LEFT_COLOR: Record<string, string> = {
-    valid: 'text-emerald-600 dark:text-emerald-400',
-    expiring_soon: 'text-amber-600 dark:text-amber-400',
-    expired: 'text-red-600 dark:text-red-400'
+    valid: 'text-success',
+    expiring_soon: 'text-warning',
+    expired: 'text-destructive'
   };
 
   interface Props {

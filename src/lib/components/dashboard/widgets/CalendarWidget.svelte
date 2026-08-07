@@ -8,6 +8,7 @@
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Bell from '@lucide/svelte/icons/bell';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   let { summary, loading }: { summary: DashboardSummary | null; loading: boolean } = $props();
 
@@ -19,9 +20,9 @@
   }
 
   const KIND_STYLES: Record<EventKind, { dot: string; badge: string; icon: string }> = {
-    reminder: { dot: 'bg-violet-500', badge: 'bg-violet-500/10', icon: 'text-violet-500' },
-    fuel: { dot: 'bg-emerald-500', badge: 'bg-emerald-500/10', icon: 'text-emerald-500' },
-    maintenance: { dot: 'bg-amber-500', badge: 'bg-amber-500/10', icon: 'text-amber-500' }
+    reminder: { dot: ACCENT.plum.solid, badge: ACCENT.plum.soft, icon: ACCENT.plum.text },
+    fuel: { dot: ACCENT.moss.solid, badge: ACCENT.moss.soft, icon: ACCENT.moss.text },
+    maintenance: { dot: ACCENT.ochre.solid, badge: ACCENT.ochre.soft, icon: ACCENT.ochre.text }
   };
 
   const KIND_ICONS: Record<EventKind, typeof Bell> = {

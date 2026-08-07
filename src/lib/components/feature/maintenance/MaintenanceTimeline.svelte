@@ -5,6 +5,7 @@
   import StatusPill from '$dashboard/StatusPill.svelte';
   import CalendarClock from '@lucide/svelte/icons/calendar-clock';
   import * as m from '$lib/paraglide/messages';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   let {
     logs,
@@ -43,12 +44,10 @@
 
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
   <div
-    class="flex flex-col rounded-xl border bg-linear-to-br from-blue-50/60 to-transparent p-5 lg:col-span-1 dark:from-blue-950/20"
+    class="flex flex-col rounded-xl border bg-linear-to-br from-[#5c7487]/10 to-transparent p-5 lg:col-span-1"
   >
     <div class="mb-4 flex items-center gap-2">
-      <span
-        class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500"
-      >
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg {ACCENT.denim.chip}">
         <CalendarClock class="size-4" />
       </span>
       <h4 class="font-semibold">{m.maintenance_stat_next_service()}</h4>
@@ -104,8 +103,8 @@
             <div class="mt-0.5 flex flex-col items-center gap-0">
               <span
                 class="size-4 shrink-0 rounded-full {entry.kind === 'upcoming'
-                  ? 'bg-blue-500'
-                  : 'bg-emerald-500'}"
+                  ? 'bg-info'
+                  : 'bg-success'}"
               ></span>
               {#if i < timelineEntries.length - 1}
                 <span class="bg-border w-0.5 flex-1"></span>
@@ -126,7 +125,7 @@
                   />
                 {:else}
                   <span
-                    class="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                    class="bg-success/10 text-success shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
                   >
                     {m.reminder_status_completed()}
                   </span>

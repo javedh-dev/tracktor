@@ -88,8 +88,8 @@
           icon={X}
           onclick={() => removeField(index)}
           ariaLabel={m.custom_fields_remove_aria()}
-          buttonStyles="hover:bg-red-100 dark:hover:bg-red-700"
-          iconStyles="text-red-500"
+          buttonStyles="hover:bg-destructive/10"
+          iconStyles="text-destructive"
         />
       </div>
     {/each}

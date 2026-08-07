@@ -33,6 +33,7 @@
   import { page } from '$app/state';
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import { deleteReminder as deleteReminderService } from '$lib/services/reminder.service';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
   import { formatDate } from '$lib/helper/format.helper';
   import {
     REMINDER_TYPES,
@@ -146,12 +147,12 @@
       .join(' · ');
 
   const TYPE_STYLES: Record<Reminder['type'], { icon: typeof Wrench; bg: string; text: string }> = {
-    maintenance: { icon: Wrench, bg: 'bg-blue-500/10', text: 'text-blue-500' },
-    insurance: { icon: ShieldCheck, bg: 'bg-amber-500/10', text: 'text-amber-500' },
-    pollution: { icon: BadgeCheck, bg: 'bg-red-500/10', text: 'text-red-500' },
-    registration: { icon: Car, bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-    inspection: { icon: FileText, bg: 'bg-violet-500/10', text: 'text-violet-500' },
-    custom: { icon: BellRing, bg: 'bg-slate-500/10', text: 'text-slate-500' }
+    maintenance: { icon: Wrench, bg: ACCENT.denim.soft, text: ACCENT.denim.text },
+    insurance: { icon: ShieldCheck, bg: ACCENT.ochre.soft, text: ACCENT.ochre.text },
+    pollution: { icon: BadgeCheck, bg: ACCENT.brick.soft, text: ACCENT.brick.text },
+    registration: { icon: Car, bg: ACCENT.moss.soft, text: ACCENT.moss.text },
+    inspection: { icon: FileText, bg: ACCENT.plum.soft, text: ACCENT.plum.text },
+    custom: { icon: BellRing, bg: ACCENT.fog.soft, text: ACCENT.fog.text }
   };
 
   const reminderKey = (r: Reminder) => r.id ?? `${r.vehicleId}-${r.dueDate.getTime()}`;
@@ -221,9 +222,7 @@
     <div
       class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed p-12 text-center"
     >
-      <span
-        class="flex size-16 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-500"
-      >
+      <span class="flex size-16 items-center justify-center rounded-2xl {ACCENT.plum.chip}">
         <BellRing class="size-8" />
       </span>
       <div class="space-y-1">
@@ -240,25 +239,25 @@
         icon={AlertTriangle}
         label={m.reminder_stat_overdue()}
         value={overdueCount}
-        color="bg-gradient-to-br from-red-400 to-red-600 shadow-red-500/30"
+        color={ACCENT.brick.gradient}
       />
       <StatCard
         icon={Clock}
         label={m.reminder_stat_due_soon()}
         value={dueSoonCount}
-        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
+        color={ACCENT.ochre.gradient}
       />
       <StatCard
         icon={CalendarClock}
         label={m.reminder_stat_upcoming()}
         value={upcomingCount}
-        color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
+        color={ACCENT.denim.gradient}
       />
       <StatCard
         icon={CheckCircle2}
         label={m.reminder_stat_completed()}
         value={completedCount}
-        color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
+        color={ACCENT.moss.gradient}
       />
     </div>
 
@@ -359,7 +358,7 @@
               class="hover:bg-muted/40 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center"
               onclick={() => goto('/maintenance')}
             >
-              <Wrench class="size-5 text-blue-500" />
+              <Wrench class="size-5 {ACCENT.denim.text}" />
               <span class="text-xs font-medium">{m.nav_maintenance()}</span>
             </button>
             <button
@@ -367,7 +366,7 @@
               class="hover:bg-muted/40 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center"
               onclick={() => goto('/compliance')}
             >
-              <ShieldCheck class="size-5 text-amber-500" />
+              <ShieldCheck class="size-5 {ACCENT.ochre.text}" />
               <span class="text-xs font-medium">{m.nav_compliance()}</span>
             </button>
           </div>

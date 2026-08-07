@@ -15,12 +15,12 @@
     <div
       id="delete-confirmation-dialog"
       in:scale={{ duration: 500 }}
-      class="delete-confirmation-dialog flex max-h-[90vh] max-w-xl min-w-sm flex-col items-center justify-center overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-gray-800"
+      class="delete-confirmation-dialog bg-card flex max-h-[90vh] max-w-xl min-w-sm flex-col items-center justify-center overflow-y-auto rounded-lg p-8 shadow-2xl"
     >
-      <span id="delete-confirmation-icon" class="rounded-lg bg-rose-50 p-3">
-        <Trash2 class="h-6 w-6 text-rose-600" />
+      <span id="delete-confirmation-icon" class="bg-destructive/10 rounded-lg p-3">
+        <Trash2 class="text-destructive h-6 w-6" />
       </span>
-      <h3 id="delete-confirmation-title" class="mt-4 text-2xl text-black dark:text-white">
+      <h3 id="delete-confirmation-title" class="text-foreground mt-4 text-2xl">
         {m.delete_dialog_title()}
       </h3>
       <h5 id="delete-confirmation-message" class="">

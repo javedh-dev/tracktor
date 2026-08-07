@@ -19,6 +19,7 @@
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { page } from '$app/state';
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
   import {
     COMPLIANCE_TYPES,
     getComplianceStatus,
@@ -112,7 +113,7 @@
     <div
       class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed p-12 text-center"
     >
-      <span class="flex size-16 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500">
+      <span class="flex size-16 items-center justify-center rounded-2xl {ACCENT.teal.chip}">
         <Shield class="size-8" />
       </span>
       <div class="space-y-1">
@@ -129,25 +130,25 @@
         icon={Car}
         label={m.compliance_stat_total()}
         value={stats.total}
-        color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
+        color={ACCENT.denim.gradient}
       />
       <StatCard
         icon={BadgeCheck}
         label={m.compliance_stat_valid()}
         value={stats.valid}
-        color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
+        color={ACCENT.moss.gradient}
       />
       <StatCard
         icon={Timer}
         label={m.compliance_stat_expiring_soon()}
         value={stats.expiringSoon}
-        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
+        color={ACCENT.ochre.gradient}
       />
       <StatCard
         icon={AlertTriangle}
         label={m.compliance_stat_expired()}
         value={stats.expired}
-        color="bg-gradient-to-br from-red-400 to-red-600 shadow-red-500/30"
+        color={ACCENT.brick.gradient}
       />
     </div>
 

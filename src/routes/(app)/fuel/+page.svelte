@@ -6,6 +6,7 @@
   import Gauge from '@lucide/svelte/icons/gauge';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { chartStore } from '$stores/chart.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
   import { formatMileage } from '$lib/helper/format.helper';
   import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
@@ -46,25 +47,25 @@
         icon={Fuel}
         label={fuel_stat_used()}
         value={totalFuelUsed > 0 ? `${totalFuelUsed.toFixed(1)} L` : '--'}
-        color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
+        color={ACCENT.moss.gradient}
       />
       <StatCard
         icon={DollarSign}
         label={fuel_stat_spent()}
         value={totalCost > 0 ? `$${totalCost.toFixed(2)}` : '--'}
-        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
+        color={ACCENT.ochre.gradient}
       />
       <StatCard
         icon={Gauge}
         label={fuel_stat_avg_mileage()}
         value={avgMileage > 0 ? avgMileage.toFixed(1) : '--'}
-        color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
+        color={ACCENT.denim.gradient}
       />
       <StatCard
         icon={Route}
         label={fuel_stat_entries()}
         value={totalEntries}
-        color="bg-gradient-to-br from-violet-400 to-violet-600 shadow-violet-500/30"
+        color={ACCENT.plum.gradient}
       />
     </div>
 

@@ -65,7 +65,7 @@
       {/each}
     {/if}
     <DropdownMenu.Separator />
-    <DropdownMenu.Item id="vehicle-scope-manage" class="gap-2" onclick={() => goto('/vehicles')}>
+    <DropdownMenu.Item id="vehicle-scope-manage" class="gap-2" onclick={() => goto('/garage')}>
       <Settings2 class="size-4 shrink-0" />
       <span>{m.vehicle_scope_manage()}</span>
     </DropdownMenu.Item>

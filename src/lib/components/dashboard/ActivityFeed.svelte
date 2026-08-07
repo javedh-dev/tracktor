@@ -4,6 +4,7 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { formatCurrency, formatDate } from '$lib/helper/format.helper';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   let {
     entries,
@@ -36,13 +37,13 @@
       >
         {#if entry.type === 'fuel'}
           <span
-            class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500"
+            class="flex size-8 shrink-0 items-center justify-center rounded-lg {ACCENT.moss.chip}"
           >
             <Fuel class="size-4" />
           </span>
         {:else}
           <span
-            class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500"
+            class="flex size-8 shrink-0 items-center justify-center rounded-lg {ACCENT.ochre.chip}"
           >
             <Wrench class="size-4" />
           </span>

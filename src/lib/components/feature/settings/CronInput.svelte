@@ -122,7 +122,7 @@
 
   <div class="flex items-center gap-2 text-xs">
     {#if validation.valid}
-      <Check class="h-3 w-3 text-green-600 dark:text-green-400" />
+      <Check class="text-success h-3 w-3" />
       <span class="text-muted-foreground">{hint}</span>
     {:else}
       <X class="text-destructive h-3 w-3" />

@@ -43,14 +43,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.577 0.245 27.325)',
+      primary: 'oklch(0.577 0.085 27.325)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.577 0.245 27.325)'
+      ring: 'oklch(0.577 0.085 27.325)'
     },
     darkColors: {
-      primary: 'oklch(0.677 0.245 27.325)',
+      primary: 'oklch(0.677 0.085 27.325)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.677 0.245 27.325)'
+      ring: 'oklch(0.677 0.085 27.325)'
     }
   },
   rose: {
@@ -60,14 +60,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.643 0.181 19.301)',
+      primary: 'oklch(0.643 0.065 19.301)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.643 0.181 19.301)'
+      ring: 'oklch(0.643 0.065 19.301)'
     },
     darkColors: {
-      primary: 'oklch(0.743 0.181 19.301)',
+      primary: 'oklch(0.743 0.065 19.301)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.743 0.181 19.301)'
+      ring: 'oklch(0.743 0.065 19.301)'
     }
   },
   blue: {
@@ -77,14 +77,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.488 0.243 264.376)',
+      primary: 'oklch(0.488 0.073 264.376)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.488 0.243 264.376)'
+      ring: 'oklch(0.488 0.073 264.376)'
     },
     darkColors: {
-      primary: 'oklch(0.588 0.243 264.376)',
+      primary: 'oklch(0.588 0.073 264.376)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.588 0.243 264.376)'
+      ring: 'oklch(0.588 0.073 264.376)'
     }
   },
   green: {
@@ -94,14 +94,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.54 0.194 142.495)',
+      primary: 'oklch(0.54 0.068 142.495)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.54 0.194 142.495)'
+      ring: 'oklch(0.54 0.068 142.495)'
     },
     darkColors: {
-      primary: 'oklch(0.64 0.194 142.495)',
+      primary: 'oklch(0.64 0.068 142.495)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.64 0.194 142.495)'
+      ring: 'oklch(0.64 0.068 142.495)'
     }
   },
   purple: {
@@ -111,14 +111,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.589 0.25 292.514)',
+      primary: 'oklch(0.589 0.08 292.514)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.589 0.25 292.514)'
+      ring: 'oklch(0.589 0.08 292.514)'
     },
     darkColors: {
-      primary: 'oklch(0.689 0.25 292.514)',
+      primary: 'oklch(0.689 0.08 292.514)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.689 0.25 292.514)'
+      ring: 'oklch(0.689 0.08 292.514)'
     }
   },
   orange: {
@@ -128,14 +128,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.662 0.218 46.415)',
+      primary: 'oklch(0.662 0.076 46.415)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.662 0.218 46.415)'
+      ring: 'oklch(0.662 0.076 46.415)'
     },
     darkColors: {
-      primary: 'oklch(0.762 0.218 46.415)',
+      primary: 'oklch(0.762 0.076 46.415)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.762 0.218 46.415)'
+      ring: 'oklch(0.762 0.076 46.415)'
     }
   },
   yellow: {
@@ -145,14 +145,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.776 0.173 91.935)',
+      primary: 'oklch(0.776 0.069 91.935)',
       primaryForeground: 'oklch(0.205 0 0)',
-      ring: 'oklch(0.776 0.173 91.935)'
+      ring: 'oklch(0.776 0.069 91.935)'
     },
     darkColors: {
-      primary: 'oklch(0.876 0.173 91.935)',
+      primary: 'oklch(0.876 0.069 91.935)',
       primaryForeground: 'oklch(0.145 0 0)',
-      ring: 'oklch(0.876 0.173 91.935)'
+      ring: 'oklch(0.876 0.069 91.935)'
     }
   },
   teal: {
@@ -162,14 +162,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.559 0.151 180.735)',
+      primary: 'oklch(0.559 0.06 180.735)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.559 0.151 180.735)'
+      ring: 'oklch(0.559 0.06 180.735)'
     },
     darkColors: {
-      primary: 'oklch(0.659 0.151 180.735)',
+      primary: 'oklch(0.659 0.06 180.735)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.659 0.151 180.735)'
+      ring: 'oklch(0.659 0.06 180.735)'
     }
   },
   indigo: {
@@ -179,14 +179,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.482 0.198 272.314)',
+      primary: 'oklch(0.482 0.063 272.314)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.482 0.198 272.314)'
+      ring: 'oklch(0.482 0.063 272.314)'
     },
     darkColors: {
-      primary: 'oklch(0.582 0.198 272.314)',
+      primary: 'oklch(0.582 0.063 272.314)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.582 0.198 272.314)'
+      ring: 'oklch(0.582 0.063 272.314)'
     }
   },
   pink: {
@@ -196,14 +196,14 @@ export const themes: Record<string, ThemeConfig> = {
     },
     active: false,
     colors: {
-      primary: 'oklch(0.671 0.221 349.761)',
+      primary: 'oklch(0.671 0.071 349.761)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.671 0.221 349.761)'
+      ring: 'oklch(0.671 0.071 349.761)'
     },
     darkColors: {
-      primary: 'oklch(0.771 0.221 349.761)',
+      primary: 'oklch(0.771 0.071 349.761)',
       primaryForeground: 'oklch(0.985 0 0)',
-      ring: 'oklch(0.771 0.221 349.761)'
+      ring: 'oklch(0.771 0.071 349.761)'
     }
   }
 };

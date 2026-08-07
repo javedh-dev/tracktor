@@ -11,6 +11,7 @@
   import type { VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
   import VehicleImage from './VehicleImage.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Props {
     vehicle: VehicleHubSummary;
@@ -29,13 +30,13 @@
       vehicle.insuranceValidityStatus === 'expired' ||
       vehicle.otherComplianceValidityStatus === 'expired'
     ) {
-      return { label: 'Needs Attention', dot: 'bg-amber-500' };
+      return { label: 'Needs Attention', dot: ACCENT.ochre.solid };
     }
     if (
       vehicle.insuranceValidityStatus === 'valid' &&
       vehicle.otherComplianceValidityStatus === 'valid'
     ) {
-      return { label: 'Active', dot: 'bg-emerald-500' };
+      return { label: 'Active', dot: ACCENT.moss.solid };
     }
     return null;
   });
@@ -43,13 +44,13 @@
   const stats = $derived([
     {
       icon: Gauge,
-      color: 'bg-gradient-to-br from-violet-400 to-violet-600',
+      color: ACCENT.plum.gradient,
       value: vehicle.currentOdometer ? formatDistance(vehicle.currentOdometer) : '--',
       label: m.vehicle_hub_stat_odometer()
     },
     {
       icon: Rabbit,
-      color: 'bg-gradient-to-br from-emerald-400 to-emerald-600',
+      color: ACCENT.moss.gradient,
       value: vehicle.overallMileage
         ? formatMileage(vehicle.overallMileage, vehicle.fuelType)
         : '--',
@@ -57,13 +58,13 @@
     },
     {
       icon: Fuel,
-      color: 'bg-gradient-to-br from-amber-400 to-amber-600',
+      color: ACCENT.ochre.gradient,
       value: vehicle.totalFuelLogs ?? 0,
       label: m.vehicle_hub_stat_fuel_logs()
     },
     {
       icon: Wrench,
-      color: 'bg-gradient-to-br from-blue-400 to-blue-600',
+      color: ACCENT.denim.gradient,
       value: vehicle.totalMaintenanceLogs ?? 0,
       label: m.vehicle_hub_stat_maintenance_logs()
     }

@@ -18,6 +18,7 @@
   import * as DropdownMenu from '../ui/dropdown-menu';
   import Button from '../ui/button/button.svelte';
   import * as m from '$lib/paraglide/messages/_index.js';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   type NotificationType = Notification['type'];
 
@@ -26,33 +27,33 @@
     { ring: string; badge: string; icon: any }
   > = {
     reminder: {
-      ring: 'border-blue-500/40 bg-blue-500/10 text-blue-500 dark:border-blue-500/50 dark:bg-blue-500/10',
-      badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
+      ring: ACCENT.denim.ring,
+      badge: ACCENT.denim.pill,
       icon: CalendarDays
     },
     maintenance: {
-      ring: 'border-violet-500/40 bg-violet-500/10 text-violet-500 dark:border-violet-500/50 dark:bg-violet-500/10',
-      badge: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300',
+      ring: ACCENT.plum.ring,
+      badge: ACCENT.plum.pill,
       icon: Wrench
     },
     compliance: {
-      ring: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/50 dark:bg-emerald-500/10',
-      badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+      ring: ACCENT.moss.ring,
+      badge: ACCENT.moss.pill,
       icon: Shield
     },
     registration: {
-      ring: 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:border-amber-500/50 dark:bg-amber-500/10',
-      badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
+      ring: ACCENT.ochre.ring,
+      badge: ACCENT.ochre.pill,
       icon: FileText
     },
     alert: {
-      ring: 'border-red-500/40 bg-red-500/10 text-red-500 dark:border-red-500/50 dark:bg-red-500/10',
-      badge: 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300',
+      ring: ACCENT.brick.ring,
+      badge: ACCENT.brick.pill,
       icon: AlertTriangle
     },
     information: {
-      ring: 'border-sky-500/40 bg-sky-500/10 text-sky-600 dark:border-sky-500/50 dark:bg-sky-500/10',
-      badge: 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300',
+      ring: ACCENT.teal.ring,
+      badge: ACCENT.teal.pill,
       icon: Info
     }
   };
