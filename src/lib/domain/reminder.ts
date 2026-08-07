@@ -1,5 +1,5 @@
-import { parseDate } from '$lib/helper/format.helper';
 import { z } from 'zod';
+import { apiDateString, optionalApiDateString } from './shared';
 
 export const REMINDER_TYPES = {
   maintenance: 'maintenance',
@@ -93,6 +93,9 @@ export interface Reminder {
   recurrenceEndDate: Date | null;
   note: string | null;
   isCompleted: boolean;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehiclePlate?: string | null;
 }
 
 const reminderTypeOptions = Object.keys(REMINDER_TYPES) as (keyof typeof REMINDER_TYPES)[];
@@ -111,14 +114,7 @@ export const reminderSchema = z.object({
       reminderTypeOptions as [keyof typeof REMINDER_TYPES, ...Array<keyof typeof REMINDER_TYPES>]
     )
     .default('custom'),
-  dueDate: z.string().refine((val) => {
-    try {
-      parseDate(val);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }, 'Invalid date format'),
+  dueDate: apiDateString,
   remindSchedule: z
     .enum(
       reminderScheduleOptions as [
@@ -136,18 +132,7 @@ export const reminderSchema = z.object({
     )
     .default('none'),
   recurrenceInterval: z.number().int().positive().default(1),
-  recurrenceEndDate: z
-    .string()
-    .refine((val) => {
-      if (!val) return true;
-      try {
-        parseDate(val);
-        return true;
-      } catch (err) {
-        return false;
-      }
-    }, 'Invalid date format')
-    .nullable(),
+  recurrenceEndDate: optionalApiDateString,
   note: z.string().max(500, 'Notes cannot be longer than 500 characters.').nullable(),
   isCompleted: z.boolean().default(false)
 });

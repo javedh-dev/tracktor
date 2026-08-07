@@ -1,70 +1,52 @@
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq } from 'drizzle-orm';
-import type { ApiResponse } from '$lib/response';
-import { validateVehicleExists, performDelete } from '../utils/serviceUtils';
-import { createSuccessResponse, requireRecord } from './service-response.helper';
+import { eq, getTableColumns } from 'drizzle-orm';
+import { createOwnedEntityService } from '../utils/entity-service-factory';
+import type { z } from 'zod';
+import { maintenanceSchema } from '$lib/domain/maintenance';
 
-type MaintenanceLogPayload = {
-  date: string;
-  odometer: number;
-  serviceCenter: string;
-  cost: number;
-  notes: string | null;
-  attachment: string | null;
-};
+type MaintenanceLogPayload = Omit<z.infer<typeof maintenanceSchema>, 'id' | 'vehicleId'>;
+type MaintenanceLogUpdatePayload = Partial<MaintenanceLogPayload>;
 
-export const addMaintenanceLog = async (
-  vehicleId: string,
-  maintenanceLogData: MaintenanceLogPayload
-): Promise<ApiResponse> => {
-  await validateVehicleExists(vehicleId);
+const { add, getById, update, remove } = createOwnedEntityService<
+  MaintenanceLogPayload,
+  MaintenanceLogUpdatePayload
+>({
+  table: schema.maintenanceLogTable,
+  entityName: 'Maintenance log'
+});
 
-  const maintenanceLog = await db
-    .insert(schema.maintenanceLogTable)
-    .values({
-      ...maintenanceLogData,
-      vehicleId: vehicleId,
-      id: undefined
+export const addMaintenanceLog = add;
+export const getMaintenanceLogById = getById;
+export const updateMaintenanceLog = update;
+export const deleteMaintenanceLog = remove;
+
+export const getMaintenanceLogs = async (vehicleId?: string) => {
+  if (vehicleId) {
+    const rows = await db.query.maintenanceLogTable.findMany({
+      where: (logs, { eq }) => eq(logs.vehicleId, vehicleId),
+      orderBy: (logs, { asc }) => [asc(logs.date), asc(logs.odometer)]
+    });
+    return rows.map((r) => ({ ...r, date: new Date(r.date) }));
+  }
+
+  // Fleet mode: no cross-row derived metrics here (unlike fuel mileage), but
+  // logs are still ordered per-vehicle so any future odometer-based
+  // computation can rely on grouped, chronologically ordered rows.
+  const rows = await db
+    .select({
+      ...getTableColumns(schema.maintenanceLogTable),
+      vehicleMake: schema.vehicleTable.make,
+      vehicleModel: schema.vehicleTable.model,
+      vehiclePlate: schema.vehicleTable.licensePlate
     })
-    .returning();
-  return createSuccessResponse(maintenanceLog[0], 'Maintenance log added successfully.');
-};
+    .from(schema.maintenanceLogTable)
+    .leftJoin(schema.vehicleTable, eq(schema.maintenanceLogTable.vehicleId, schema.vehicleTable.id))
+    .orderBy(
+      schema.maintenanceLogTable.vehicleId,
+      schema.maintenanceLogTable.date,
+      schema.maintenanceLogTable.odometer
+    );
 
-export const getMaintenanceLogs = async (vehicleId: string): Promise<ApiResponse> => {
-  const maintenanceLogs = await db.query.maintenanceLogTable.findMany({
-    where: (logs, { eq }) => eq(logs.vehicleId, vehicleId),
-    orderBy: (logs, { asc }) => [asc(logs.date), asc(logs.odometer)]
-  });
-  return createSuccessResponse(maintenanceLogs);
-};
-
-export const getMaintenanceLogById = async (id: string): Promise<ApiResponse> => {
-  const maintenanceLog = requireRecord(
-    await db.query.maintenanceLogTable.findFirst({
-      where: (logs, { eq }) => eq(logs.id, id)
-    }),
-    `No Maintenence log found for id : ${id}`
-  );
-
-  return createSuccessResponse(maintenanceLog);
-};
-
-export const updateMaintenanceLog = async (
-  id: string,
-  maintenanceLogData: MaintenanceLogPayload
-): Promise<ApiResponse> => {
-  await getMaintenanceLogById(id);
-  const updatedLog = await db
-    .update(schema.maintenanceLogTable)
-    .set({
-      ...maintenanceLogData
-    })
-    .where(eq(schema.maintenanceLogTable.id, id))
-    .returning();
-  return createSuccessResponse(updatedLog[0], 'Maintenance log updated successfully.');
-};
-
-export const deleteMaintenanceLog = async (id: string): Promise<ApiResponse> => {
-  return await performDelete(schema.maintenanceLogTable, id, 'Maintenance log');
+  return rows.map((r) => ({ ...r, date: new Date(r.date) }));
 };

@@ -1,23 +1,20 @@
-import { authTable, usersTable, sessionsTable } from './auth';
+import { usersTable, sessionsTable } from './auth';
 import { configTable } from './config';
 import { fuelLogTable } from './fuel-log';
-import { insuranceTable } from './insurance';
 import { maintenanceLogTable } from './maintenance-logs';
 import { vehicleTable } from './vehicle';
-import { pollutionCertificateTable } from './pucc';
+import { complianceDocumentTable } from './compliance';
 import { reminderTable } from './reminder';
 import { notificationTable } from './notification';
 import { notificationProviderTable } from './notification-provider';
 
 export {
-  authTable,
   usersTable,
   sessionsTable,
   configTable,
   fuelLogTable,
-  insuranceTable,
   maintenanceLogTable,
-  pollutionCertificateTable,
+  complianceDocumentTable,
   vehicleTable,
   reminderTable,
   notificationTable,

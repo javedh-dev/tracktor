@@ -1,6 +1,7 @@
-import type { ThemeName, ThemeConfig } from '$lib/types/theme';
+import type { ThemeName, ThemeConfig, DarkVariant } from '$lib/types/theme';
 
 const THEME_STORAGE_KEY = 'tracktor-theme';
+const DARK_VARIANT_STORAGE_KEY = 'tracktor-dark-variant';
 
 /**
  * Get the theme from localStorage
@@ -22,7 +23,7 @@ export function saveTheme(theme: ThemeName): void {
 /**
  * Check if dark mode is currently active
  */
-export function isDarkMode(): boolean {
+function isDarkMode(): boolean {
   if (typeof document === 'undefined') return false;
   return document.documentElement.classList.contains('dark');
 }
@@ -59,19 +60,6 @@ export function applyThemeColors(
 }
 
 /**
- * Reset theme to default (remove all custom theme variables)
- */
-export function resetThemeColors(): void {
-  if (typeof document === 'undefined') return;
-  const root = document.documentElement;
-  const customProps = ['primary', 'primary-foreground', 'ring'];
-
-  customProps.forEach((prop) => {
-    root.style.removeProperty(`--${prop}`);
-  });
-}
-
-/**
  * Add or remove theme class from HTML element
  */
 export function setThemeClass(theme: ThemeName): void {
@@ -81,9 +69,25 @@ export function setThemeClass(theme: ThemeName): void {
 }
 
 /**
- * Get the current system theme preference
+ * Get the dark mode variant from localStorage
  */
-export function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+export function getStoredDarkVariant(): DarkVariant | null {
+  if (typeof window === 'undefined') return null;
+  return (localStorage.getItem(DARK_VARIANT_STORAGE_KEY) as DarkVariant) || null;
+}
+
+/**
+ * Save the dark mode variant to localStorage
+ */
+export function saveDarkVariant(variant: DarkVariant): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(DARK_VARIANT_STORAGE_KEY, variant);
+}
+
+/**
+ * Apply the dark mode variant attribute, read by the `.dark[data-dark-variant=...]` CSS overrides
+ */
+export function setDarkVariantAttr(variant: DarkVariant): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute('data-dark-variant', variant);
 }

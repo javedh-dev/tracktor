@@ -109,7 +109,7 @@ export interface User {
   username: string;
 }
 
-export interface SessionValidationResult {
+interface SessionValidationResult {
   session: Session | null;
   user: User | null;
 }

@@ -6,16 +6,14 @@
 
   import type {
     CreateNotificationProvider,
-    EmailProviderConfig,
-    GotifyProviderConfig,
-    NotificationProviderType,
     NotificationProviderWithParsedConfig,
-    UpdateNotificationProvider,
-    WebhookProviderConfig
+    UpdateNotificationProvider
   } from '$lib/domain/notification-provider';
   import * as providerService from '$lib/services/notification-provider.service';
+  import * as m from '$lib/paraglide/messages';
   import Button from '$ui/button/button.svelte';
   import SettingFormSection from './SettingFormSection.svelte';
+  import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
 
   import NotificationDeliveryPanel from './NotificationDeliveryPanel.svelte';
   import NotificationProviderDialog from './NotificationProviderDialog.svelte';
@@ -42,44 +40,17 @@
     disabled = false
   }: Props = $props();
 
-  const channelOptions: Array<{
-    value: ProviderChannel;
-    label: string;
-    description: string;
-  }> = [
-    {
-      value: 'reminder',
-      label: 'Reminder',
-      description: 'Due dates and reminder-style notifications'
-    },
-    {
-      value: 'alert',
-      label: 'Alert',
-      description: 'Urgent or expiring items that need attention'
-    },
-    {
-      value: 'information',
-      label: 'Information',
-      description: 'General informational updates'
-    }
-  ];
-
   let providers = $state<ProviderWithChannels[]>([]);
   let loading = $state(true);
   let dialogOpen = $state(false);
   let editingProvider = $state<ProviderWithChannels | null>(null);
-  let savingProvider = $state(false);
+  let saving = $state(false);
   let sendingNotifications = $state(false);
   let togglingProviderId = $state<string | null>(null);
   let testDialogOpen = $state(false);
   let testingProvider = $state<ProviderWithChannels | null>(null);
-
-  let formName = $state('');
-  let formType = $state<NotificationProviderType>();
-  let formChannels = $state<ProviderChannel[]>(['reminder', 'alert', 'information']);
-  let emailConfig = $state<Partial<EmailProviderConfig>>({});
-  let webhookConfig = $state<Partial<WebhookProviderConfig>>({});
-  let gotifyConfig = $state<Partial<GotifyProviderConfig>>({});
+  let deleteDialogOpen = $state(false);
+  let deletingProvider = $state<ProviderWithChannels | null>(null);
 
   onMount(async () => {
     await loadProviders();
@@ -90,132 +61,62 @@
       loading = true;
       providers = (await providerService.getProviders()) as ProviderWithChannels[];
     } catch {
-      toast.error('Failed to load notification providers');
+      toast.error(m.notif_load_failed());
     } finally {
       loading = false;
     }
   }
 
-  function resetForm() {
-    formName = '';
-    formType = undefined;
-    formChannels = ['reminder', 'alert', 'information'];
-    emailConfig = {};
-    webhookConfig = {};
-    gotifyConfig = {};
-  }
-
   function openCreateDialog() {
     editingProvider = null;
-    resetForm();
     dialogOpen = true;
   }
 
   function openEditDialog(provider: ProviderWithChannels) {
     editingProvider = provider;
-    formName = provider.name;
-    formType = provider.type;
-    formChannels = [...provider.channels];
-
-    if (provider.type === 'email') {
-      emailConfig = provider.config as EmailProviderConfig;
-    } else if (provider.type === 'webhook') {
-      webhookConfig = provider.config as WebhookProviderConfig;
-    } else if (provider.type === 'gotify') {
-      gotifyConfig = provider.config as GotifyProviderConfig;
-    }
-
     dialogOpen = true;
   }
 
-  function toggleChannel(channel: ProviderChannel, checked: boolean) {
-    if (checked) {
-      formChannels = Array.from(new Set([...formChannels, channel])) as ProviderChannel[];
-      return;
-    }
-
-    formChannels = formChannels.filter((value) => value !== channel);
-  }
-
-  function resolveProviderConfig() {
-    const providerType = formType ?? editingProvider?.type;
-
-    if (providerType === 'email') {
-      return { type: 'email' as const, ...(emailConfig as EmailProviderConfig) };
-    }
-
-    if (providerType === 'webhook') {
-      return { type: 'webhook' as const, ...(webhookConfig as WebhookProviderConfig) };
-    }
-
-    if (providerType === 'gotify') {
-      return { type: 'gotify' as const, ...(gotifyConfig as GotifyProviderConfig) };
-    }
-
-    return null;
-  }
-
-  async function handleSave() {
-    const config = resolveProviderConfig();
-    const providerType = formType ?? editingProvider?.type;
-
-    if (!providerType || !config) {
-      toast.error('Please select a provider type');
-      return;
-    }
-
-    if (formChannels.length === 0) {
-      toast.error('Select at least one notification channel');
-      return;
-    }
-
+  async function handleSaveFromDialog(
+    payload: CreateNotificationProvider | UpdateNotificationProvider
+  ) {
     try {
-      savingProvider = true;
-
+      saving = true;
       if (editingProvider) {
-        const updatePayload: UpdateNotificationProvider = {
-          name: formName,
-          config: config,
-          channels: formChannels,
-          isEnabled: editingProvider?.isEnabled ?? true
-        };
-
-        await providerService.updateProvider(editingProvider.id, updatePayload);
-        toast.success('Provider updated successfully');
+        await providerService.updateProvider(
+          editingProvider.id,
+          payload as UpdateNotificationProvider
+        );
+        toast.success(m.notif_provider_updated());
       } else {
-        const createPayload: CreateNotificationProvider = {
-          name: formName,
-          type: providerType,
-          config: config,
-          channels: formChannels,
-          isEnabled: true
-        };
-
-        await providerService.createProvider(createPayload);
-        toast.success('Provider created successfully');
+        await providerService.createProvider(payload as CreateNotificationProvider);
+        toast.success(m.notif_provider_created());
       }
-
       dialogOpen = false;
       await loadProviders();
     } catch (error) {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to save provider');
+      toast.error((error as Error).message || m.notif_save_provider_failed());
     } finally {
-      savingProvider = false;
+      saving = false;
     }
   }
 
-  async function handleDelete(provider: ProviderWithChannels) {
-    if (!confirm(`Are you sure you want to delete "${provider.name}"?`)) {
-      return;
-    }
+  function handleDelete(provider: ProviderWithChannels) {
+    deletingProvider = provider;
+    deleteDialogOpen = true;
+  }
 
+  async function confirmDelete() {
+    if (!deletingProvider) return;
     try {
-      await providerService.deleteProvider(provider.id);
-      toast.success('Provider deleted successfully');
+      await providerService.deleteProvider(deletingProvider.id);
+      toast.success(m.notif_provider_deleted());
       await loadProviders();
     } catch {
-      toast.error('Failed to delete provider');
+      toast.error(m.notif_provider_delete_failed());
+    } finally {
+      deleteDialogOpen = false;
+      deletingProvider = null;
     }
   }
 
@@ -235,7 +136,7 @@
       );
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to update provider');
+      toast.error(err.message || m.notif_update_provider_failed());
     } finally {
       togglingProviderId = null;
     }
@@ -248,11 +149,15 @@
       const successCount = result.results.filter((entry) => entry.success).length;
 
       toast.success(
-        `Sent ${result.notificationCount} notifications to ${successCount}/${result.providerCount} enabled provider${result.providerCount === 1 ? '' : 's'}`
+        m.notif_send_all_success({
+          notifCount: String(result.notificationCount),
+          successCount: String(successCount),
+          providerCount: String(result.providerCount)
+        })
       );
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to send notifications');
+      toast.error(err.message || m.notif_send_all_failed());
     } finally {
       sendingNotifications = false;
     }
@@ -261,8 +166,8 @@
 
 <div class="space-y-4">
   <SettingFormSection
-    title="Scheduled delivery"
-    subtitle="In-app notifications stay real-time. This schedule only controls provider delivery."
+    title={m.notif_scheduled_delivery()}
+    subtitle={m.notif_scheduled_delivery_desc()}
   >
     <NotificationDeliveryPanel
       bind:processingEnabled={notificationProcessingEnabled}
@@ -274,19 +179,16 @@
     />
   </SettingFormSection>
 
-  <SettingFormSection
-    title="Providers"
-    subtitle="Create, edit, test, and enable notification providers."
-  >
+  <SettingFormSection title={m.notif_providers()} subtitle={m.notif_providers_desc()}>
     <div class="flex items-center justify-between gap-4">
       <div>
         <p class="text-muted-foreground text-sm">
-          Each provider can subscribe to Reminder, Alert, and Information channels.
+          {m.notif_providers_channels_info()}
         </p>
       </div>
       <Button onclick={openCreateDialog} size="sm" {disabled}>
         <Plus class="mr-2 h-4 w-4" />
-        Add Provider
+        {m.notif_add_provider()}
       </Button>
     </div>
 
@@ -318,22 +220,11 @@
   open={dialogOpen}
   onOpenChange={(open) => (dialogOpen = open)}
   {editingProvider}
-  {formName}
-  onFormNameChange={(value) => (formName = value)}
-  bind:formType
-  {emailConfig}
-  onEmailConfigChange={(config) => (emailConfig = config)}
-  {webhookConfig}
-  onWebhookConfigChange={(config) => (webhookConfig = config)}
-  {gotifyConfig}
-  onGotifyConfigChange={(config) => (gotifyConfig = config)}
-  {formChannels}
-  onToggleChannel={toggleChannel}
-  {channelOptions}
-  {savingProvider}
-  onCancel={() => (dialogOpen = false)}
-  onSave={handleSave}
+  {saving}
+  onSave={handleSaveFromDialog}
 />
+
+<DeleteConfirmation onConfirm={confirmDelete} bind:open={deleteDialogOpen} />
 
 <TestProviderDialog
   provider={testingProvider}

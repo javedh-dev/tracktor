@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  out: './migrations',
+  out: './src/server/db/migrations',
   migrations: {
     prefix: 'timestamp',
     table: '_migrations'

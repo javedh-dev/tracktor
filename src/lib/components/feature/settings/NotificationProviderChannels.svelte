@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Checkbox } from '$ui/checkbox';
+  import * as m from '$lib/paraglide/messages';
 
   type ProviderChannel = 'reminder' | 'alert' | 'information';
 
@@ -20,9 +21,9 @@
 
 <div class="space-y-2 rounded-lg border p-2.5">
   <div>
-    <h4 class="font-medium">Channel subscriptions</h4>
+    <h4 class="font-medium">{m.notif_channel_subscriptions()}</h4>
     <p class="text-muted-foreground text-xs">
-      Pick which notification channels this provider should receive.
+      {m.notif_channel_subscriptions_desc()}
     </p>
   </div>
 

@@ -1,5 +1,5 @@
 import { HttpClient } from '$lib/helper/http.helper';
-import type { Response } from '$lib/domain';
+import type { Response } from '$lib/domain/shared';
 import type { ApiResponse } from '$lib/response';
 import { withBase } from '$lib/utils';
 

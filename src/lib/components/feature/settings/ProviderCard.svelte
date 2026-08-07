@@ -11,6 +11,7 @@
     NotificationProviderWithParsedConfig
   } from '$lib/domain/notification-provider';
   import Switch from '$lib/components/ui/switch/switch.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   type ProviderChannel = 'reminder' | 'alert' | 'information';
   type ProviderWithChannels = NotificationProviderWithParsedConfig & {
@@ -37,11 +38,11 @@
     testing = false
   }: Props = $props();
 
-  const channelLabelMap = {
-    reminder: 'Reminder',
-    alert: 'Alert',
-    information: 'Information'
-  } as const satisfies Record<ProviderChannel, string>;
+  const channelLabelMap = $derived({
+    reminder: m.notif_channel_reminder(),
+    alert: m.notif_channel_alert(),
+    information: m.notif_channel_information()
+  } satisfies Record<ProviderChannel, string>);
 
   function getProviderUrl(config: NotificationProviderConfig): string {
     switch (config.type) {
@@ -82,7 +83,7 @@
 
       <div class="flex flex-col justify-between gap-3 sm:items-end">
         <div class="flex items-center gap-2 self-start sm:self-end">
-          <span class="text-muted-foreground text-xs">Enabled</span>
+          <span class="text-muted-foreground text-xs">{m.notif_provider_enabled()}</span>
           <Switch
             checked={provider.isEnabled}
             disabled={toggling}
@@ -97,7 +98,7 @@
               size="icon"
               onclick={() => onTest(provider)}
               disabled={testing || !provider.isEnabled}
-              title="Test provider"
+              title={m.notif_provider_test()}
             >
               {#if testing}
                 <Loader2 class="h-4 w-4 animate-spin" />
@@ -112,7 +113,7 @@
               variant="ghost"
               size="icon"
               onclick={() => onEdit(provider)}
-              title="Edit provider"
+              title={m.notif_provider_edit()}
             >
               <Edit class="h-4 w-4" />
             </Button>
@@ -123,7 +124,7 @@
               variant="ghost"
               size="icon"
               onclick={() => onDelete(provider)}
-              title="Delete provider"
+              title={m.notif_provider_delete()}
             >
               <Trash2 class="h-4 w-4" />
             </Button>

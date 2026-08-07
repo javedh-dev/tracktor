@@ -1,6 +1,7 @@
 <script lang="ts">
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import Import from '@lucide/svelte/icons/import';
+  import FileDown from '@lucide/svelte/icons/file-down';
   import Button from '$ui/button/button.svelte';
   import LabelWithIcon from './LabelWithIcon.svelte';
   import * as m from '$lib/paraglide/messages';
@@ -11,6 +12,8 @@
     addActionDisabled = false,
     importAction = null,
     importActionDisabled = false,
+    exportAction = null,
+    exportActionDisabled = false,
     children
   } = $props();
 </script>
@@ -26,6 +29,18 @@
       {title}
     </h2>
     <div class="flex flex-row items-center">
+      {#if exportAction}
+        <Button
+          id="tab-container-export-btn"
+          variant="outline"
+          size="icon-sm"
+          class="mr-2 cursor-pointer"
+          onclick={exportAction}
+          disabled={exportActionDisabled}
+        >
+          <FileDown class="h-4 w-4" />
+        </Button>
+      {/if}
       {#if importAction}
         <Button
           id="tab-container-import-btn"

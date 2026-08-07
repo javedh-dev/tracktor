@@ -1,34 +1,29 @@
-import type { Reminder } from '$lib/domain';
-import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '$lib/response';
-import { vehicleStore } from './vehicle.svelte';
+import type { Reminder } from '$lib/domain/reminder';
+import { createEntityStore } from './entity-store.svelte';
 
-class ReminderStore {
-  reminders = $state<Reminder[]>();
-  processing = $state(false);
-  error = $state<string>();
-
-  refreshReminders = async () => {
-    if (!vehicleStore.selectedId) return;
-    this.processing = true;
-    try {
-      const { data } = await apiClient.get<ApiResponse>(
-        `/vehicles/${vehicleStore.selectedId}/reminders`
-      );
-      const reminders =
-        (data.data as Reminder[] | undefined)?.map((reminder) => ({
-          ...reminder,
-          dueDate: new Date(reminder.dueDate)
-        })) || [];
-      reminders.sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
-      this.reminders = reminders;
-      this.error = undefined;
-    } catch (err) {
-      this.error = 'Failed to fetch reminders';
-    } finally {
-      this.processing = false;
-    }
-  };
+function parseReminder(raw: unknown): Reminder {
+  const r = raw as Reminder & { dueDate: string };
+  return { ...r, dueDate: new Date(r.dueDate) };
 }
 
-export const reminderStore = new ReminderStore();
+const entityStore = createEntityStore<Reminder>({
+  buildPath: (vehicleId) => (vehicleId ? `/reminders?vehicleId=${vehicleId}` : '/reminders'),
+  map: parseReminder,
+  sort: (a, b) => a.dueDate.getTime() - b.dueDate.getTime(),
+  errorMessage: 'Failed to fetch reminders'
+});
+
+export const reminderStore = {
+  get reminders() {
+    return entityStore.items;
+  },
+  get processing() {
+    return entityStore.processing;
+  },
+  get error() {
+    return entityStore.error;
+  },
+  refreshReminders: entityStore.refresh,
+  reloadReminders: entityStore.reload,
+  clear: entityStore.clear
+};

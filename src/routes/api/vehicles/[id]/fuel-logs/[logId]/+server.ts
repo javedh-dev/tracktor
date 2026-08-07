@@ -1,64 +1,30 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
 import * as fuelLogService from '$server/services/fuelLogService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { fuelSchema } from '$lib/domain/fuel';
+import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Fuel log GET error:', async () => {
     const { logId } = event.params;
-
-    if (!logId) {
-      throw error(400, 'Fuel log ID is required');
-    }
-
     const result = await fuelLogService.getFuelLogById(logId);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
 export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Fuel log PUT error:', async () => {
     const { id, logId } = event.params;
-
-    if (!id || !logId) {
-      throw error(400, 'Vehicle ID and fuel log ID are required');
-    }
-
-    // Use body from locals if available (from middleware), otherwise parse it
-    const body = event.locals.requestBody || (await event.request.json());
-
-    // Validation for optional fuel amount updates
-    if (body.fuelAmount !== undefined && body.fuelAmount !== null) {
-      if (typeof body.fuelAmount !== 'number' || body.fuelAmount <= 0) {
-        throw error(400, 'Fuel amount must be a positive number');
-      }
-    }
-
-    // Validation for optional odometer updates
-    if (body.odometer !== undefined && body.odometer !== null) {
-      if (typeof body.odometer !== 'number' || body.odometer <= 0) {
-        throw error(400, 'Odometer must be a positive number');
-      }
-    }
-
-    if (body.cost && (typeof body.cost !== 'number' || body.cost <= 0)) {
-      throw error(400, 'Cost must be a positive number');
-    }
-
+    const parsed = await parseBody(event, fuelSchema.partial(), { vehicleId: id });
+    const { id: _, vehicleId: __, ...body } = parsed;
     const result = await fuelLogService.updateFuelLog(id, logId, body);
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Fuel log DELETE error:', async () => {
-    const { logId } = event.params;
-
-    if (!logId) {
-      throw error(400, 'Fuel log ID is required');
-    }
-
-    const result = await fuelLogService.deleteFuelLog(logId);
-    return json(result);
+    const { id, logId } = event.params;
+    const result = await fuelLogService.deleteFuelLog(id, logId);
+    return jsonResponse(result);
   });
 };

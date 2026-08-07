@@ -1,12 +1,12 @@
 // Stub helpers for CSV import flows. Implement the real parsing and persistence logic here.
-export type CsvParseOptions = {
+type CsvParseOptions = {
   delimiter: string;
   hasHeaders: boolean;
 };
 
 export type ParsedCsvRow = Record<string, string>;
 
-export type ParsedCsv = {
+type ParsedCsv = {
   headers: string[];
   rows: ParsedCsvRow[];
 };
@@ -64,8 +64,6 @@ export const importFuelLogsFromCsv = async (
   vehicleId: string,
   dateFormat: string
 ): Promise<{ imported: number; failed: number; errors: string[] }> => {
-  // Simulate delay for demo purposes
-  await new Promise((resolve) => setTimeout(resolve, 200000));
   const { parseWithFormat } = await import('$lib/helper/format.helper');
   const { saveFuelLog } = await import('$lib/services/fuel.service');
   const { parseDate } = await import('$lib/helper/format.helper');
@@ -131,6 +129,7 @@ export const importFuelLogsFromCsv = async (
         date: parsedDate,
         odometer,
         fuelAmount,
+        rate: null,
         cost,
         filled,
         missedLast,

@@ -1,13 +1,11 @@
 import { db } from '../db/index';
 import { sql } from 'drizzle-orm';
 import * as schema from '../db/schema/index';
-import type { ApiResponse } from '$lib/response';
-import { createSuccessResponse } from './service-response.helper';
 
 /**
  * Get unique values for service centers from maintenance logs
  */
-export const getUniqueServiceCenters = async (): Promise<ApiResponse> => {
+export const getUniqueServiceCenters = async () => {
   const result = await db
     .selectDistinct({ serviceCenter: schema.maintenanceLogTable.serviceCenter })
     .from(schema.maintenanceLogTable)
@@ -18,49 +16,33 @@ export const getUniqueServiceCenters = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.serviceCenter).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
- * Get unique values for insurance providers
+ * Get unique values for compliance document issuers (insurance providers, testing centers,
+ * inspection centers, registration authorities, ...), optionally narrowed to one type.
  */
-export const getUniqueInsuranceProviders = async (): Promise<ApiResponse> => {
+export const getUniqueComplianceIssuers = async (type?: string) => {
   const result = await db
-    .selectDistinct({ provider: schema.insuranceTable.provider })
-    .from(schema.insuranceTable)
+    .selectDistinct({ issuer: schema.complianceDocumentTable.issuer })
+    .from(schema.complianceDocumentTable)
     .where(
-      sql`${schema.insuranceTable.provider} IS NOT NULL AND ${schema.insuranceTable.provider} != ''`
+      type
+        ? sql`${schema.complianceDocumentTable.issuer} != '' AND ${schema.complianceDocumentTable.type} = ${type}`
+        : sql`${schema.complianceDocumentTable.issuer} != ''`
     )
-    .orderBy(schema.insuranceTable.provider);
+    .orderBy(schema.complianceDocumentTable.issuer);
 
-  const values = result.map((r) => r.provider).filter(Boolean);
+  const values = result.map((r) => r.issuer).filter(Boolean);
 
-  return createSuccessResponse(values);
-};
-
-/**
- * Get unique values for pollution certificate testing centers
- */
-export const getUniqueTestingCenters = async (): Promise<ApiResponse> => {
-  const result = await db
-    .selectDistinct({
-      testingCenter: schema.pollutionCertificateTable.testingCenter
-    })
-    .from(schema.pollutionCertificateTable)
-    .where(
-      sql`${schema.pollutionCertificateTable.testingCenter} IS NOT NULL AND ${schema.pollutionCertificateTable.testingCenter} != ''`
-    )
-    .orderBy(schema.pollutionCertificateTable.testingCenter);
-
-  const values = result.map((r) => r.testingCenter).filter(Boolean);
-
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique vehicle makes
  */
-export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
+export const getUniqueVehicleMakes = async () => {
   const result = await db
     .selectDistinct({ make: schema.vehicleTable.make })
     .from(schema.vehicleTable)
@@ -69,13 +51,13 @@ export const getUniqueVehicleMakes = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.make).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };
 
 /**
  * Get unique vehicle models (optionally filtered by make)
  */
-export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
+export const getUniqueVehicleModels = async () => {
   const result = await db
     .selectDistinct({ model: schema.vehicleTable.model })
     .from(schema.vehicleTable)
@@ -84,5 +66,5 @@ export const getUniqueVehicleModels = async (): Promise<ApiResponse> => {
 
   const values = result.map((r) => r.model).filter(Boolean);
 
-  return createSuccessResponse(values);
+  return values;
 };

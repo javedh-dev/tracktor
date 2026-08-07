@@ -2,7 +2,6 @@
   import type { Component } from 'svelte';
   import TabContainer from '$appui/TabContainer.svelte';
   import { sheetStore } from '$lib/stores/sheet.svelte';
-  import { vehicleStore } from '$lib/stores/vehicle.svelte';
 
   type SheetDataResolver = () => unknown;
   type AnyComponent = Component<any>;
@@ -16,6 +15,8 @@
     importSheetTitle?: string;
     importSheetComponent?: AnyComponent;
     importSheetData?: unknown | SheetDataResolver;
+    exportAction?: (() => void) | null;
+    exportActionDisabled?: boolean;
   }
 
   let {
@@ -26,7 +27,9 @@
     addSheetData,
     importSheetTitle,
     importSheetComponent,
-    importSheetData
+    importSheetData,
+    exportAction = null,
+    exportActionDisabled = false
   }: Props = $props();
 
   const resolveData = (data: unknown | SheetDataResolver) => {
@@ -52,7 +55,8 @@
           resolveData(importSheetData)
         )
     : null}
-  addActionDisabled={!vehicleStore.selectedId}
+  {exportAction}
+  {exportActionDisabled}
 >
   <ListComponent />
 </TabContainer>

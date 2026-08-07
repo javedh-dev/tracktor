@@ -36,7 +36,7 @@ const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur', 'yi'];
  * @param locale - Language/locale code (e.g., 'ar', 'en')
  * @returns true if the language is RTL
  */
-export function isRtlLanguage(locale: string): boolean {
+function isRtlLanguage(locale: string): boolean {
   return RTL_LANGUAGES.includes(locale.toLowerCase().split('-')[0]);
 }
 

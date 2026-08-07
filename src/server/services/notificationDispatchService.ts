@@ -13,12 +13,9 @@ import {
   groupNotifications
 } from './emailTemplateService';
 import { sendEmail } from './emailNotificationService';
-import { buildWebhookHeaders } from './notification-provider-http.helper';
+import { sendGotify, sendWebhook } from './notification-provider-http.helper';
 import { getEnabledProvidersForChannels } from './notificationProviderService';
-import {
-  getActiveNotificationsForChannels,
-  getPendingNotificationsForChannels
-} from './notificationService';
+import { getPendingNotificationsForChannels, syncAllNotifications } from './notificationService';
 
 type DispatchResult = {
   providerId: string;
@@ -29,104 +26,36 @@ type DispatchResult = {
   notificationCount: number;
 };
 
-async function sendWebhookNotification(
+async function send(
   provider: NotificationProviderWithParsedConfig,
   notifications: Notification[]
-): Promise<DispatchResult> {
-  const config = provider.config as WebhookProviderConfig;
+): Promise<{ success: boolean; error?: string }> {
+  const groups = groupNotifications(notifications);
+  const digest = generatePlainTextDigest(groups, notifications.length);
 
-  try {
-    const response = await fetch(config.url, {
-      method: config.method,
-      headers: buildWebhookHeaders(config),
-      body: JSON.stringify({
+  switch (provider.type) {
+    case 'email':
+      return sendEmail({
+        providerId: provider.id,
+        subject: `Tracktor: ${notifications.length} pending notification${notifications.length === 1 ? '' : 's'}`,
+        text: digest,
+        html: generateHtmlDigest(groups, notifications.length)
+      });
+    case 'webhook':
+      return sendWebhook(provider.config as WebhookProviderConfig, {
         title: 'Tracktor notifications',
         notificationCount: notifications.length,
         channels: provider.channels,
-        notifications,
-        timestamp: new Date().toISOString()
-      })
-    });
-
-    if (!response.ok) {
-      return {
-        providerId: provider.id,
-        providerName: provider.name,
-        providerType: provider.type,
-        success: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        notificationCount: notifications.length
-      };
-    }
-
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: true,
-      notificationCount: notifications.length
-    };
-  } catch (error) {
-    const err = error as Error;
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: false,
-      error: err.message,
-      notificationCount: notifications.length
-    };
-  }
-}
-
-async function sendGotifyNotification(
-  provider: NotificationProviderWithParsedConfig,
-  notifications: Notification[]
-): Promise<DispatchResult> {
-  const config = provider.config as GotifyProviderConfig;
-  const groups = groupNotifications(notifications);
-
-  try {
-    const response = await fetch(`${config.serverUrl}/message?token=${config.appToken}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        title: `Tracktor Notification Summary`,
-        message: generatePlainTextDigest(groups, notifications.length),
-        priority: config.priority
-      })
-    });
-
-    if (!response.ok) {
-      return {
-        providerId: provider.id,
-        providerName: provider.name,
-        providerType: provider.type,
-        success: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        notificationCount: notifications.length
-      };
-    }
-
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: true,
-      notificationCount: notifications.length
-    };
-  } catch (error) {
-    const err = error as Error;
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: false,
-      error: err.message,
-      notificationCount: notifications.length
-    };
+        notifications
+      });
+    case 'gotify':
+      return sendGotify(
+        provider.config as GotifyProviderConfig,
+        'Tracktor Notification Summary',
+        digest
+      );
+    default:
+      return { success: false, error: `Unsupported provider type: ${provider.type}` };
   }
 }
 
@@ -134,59 +63,26 @@ async function sendNotificationsToProvider(
   provider: NotificationProviderWithParsedConfig,
   notifications: Notification[]
 ): Promise<DispatchResult> {
-  if (notifications.length === 0) {
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: true,
-      notificationCount: 0
-    };
-  }
-
-  if (provider.type === 'email') {
-    const groups = groupNotifications(notifications);
-    const result = await sendEmail({
-      providerId: provider.id,
-      subject: `Tracktor: ${notifications.length} pending notification${notifications.length === 1 ? '' : 's'}`,
-      text: generatePlainTextDigest(groups, notifications.length),
-      html: generateHtmlDigest(groups, notifications.length)
-    });
-
-    return {
-      providerId: provider.id,
-      providerName: provider.name,
-      providerType: provider.type,
-      success: result.success,
-      error: result.error,
-      notificationCount: notifications.length
-    };
-  }
-
-  if (provider.type === 'webhook') {
-    return sendWebhookNotification(provider, notifications);
-  }
-
-  if (provider.type === 'gotify') {
-    return sendGotifyNotification(provider, notifications);
-  }
+  const result =
+    notifications.length === 0 ? { success: true } : await send(provider, notifications);
 
   return {
     providerId: provider.id,
     providerName: provider.name,
     providerType: provider.type,
-    success: false,
-    error: `Unsupported provider type: ${provider.type}`,
-    notificationCount: notifications.length
+    notificationCount: notifications.length,
+    ...result
   };
 }
 
-async function dispatchNotifications(useAllNotifications: boolean): Promise<{
+export async function dispatchScheduledNotifications(): Promise<{
   success: boolean;
   notificationCount: number;
   providerCount: number;
   results: DispatchResult[];
 }> {
+  await syncAllNotifications();
+
   const providers = await getEnabledProvidersForChannels([
     'reminder',
     'alert',
@@ -203,10 +99,7 @@ async function dispatchNotifications(useAllNotifications: boolean): Promise<{
   }
 
   const channels = Array.from(new Set(providers.flatMap((provider) => provider.channels)));
-  const notificationResult = useAllNotifications
-    ? await getActiveNotificationsForChannels(channels)
-    : await getPendingNotificationsForChannels(channels);
-  const allNotifications = (notificationResult.data ?? []) as Notification[];
+  const allNotifications = (await getPendingNotificationsForChannels(channels)) as Notification[];
 
   const results = await Promise.all(
     providers.map((provider) => {
@@ -232,22 +125,4 @@ async function dispatchNotifications(useAllNotifications: boolean): Promise<{
     providerCount: providers.length,
     results
   };
-}
-
-export async function dispatchScheduledNotifications(): Promise<{
-  success: boolean;
-  notificationCount: number;
-  providerCount: number;
-  results: DispatchResult[];
-}> {
-  return dispatchNotifications(false);
-}
-
-export async function dispatchAllNotificationsToEnabledProviders(): Promise<{
-  success: boolean;
-  notificationCount: number;
-  providerCount: number;
-  results: DispatchResult[];
-}> {
-  return dispatchNotifications(true);
 }

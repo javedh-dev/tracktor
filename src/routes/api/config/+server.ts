@@ -1,19 +1,19 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { getAppConfigs, updateAppConfig } from '$server/services/configService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config GET error:', async () => {
     const result = await getAppConfigs();
-    return json(result);
+    return jsonResponse(result);
   });
 };
 
 export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config PUT error:', async () => {
     // Use body from locals if available (from middleware), otherwise parse it
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Validate that body is an array of config objects
     if (!Array.isArray(body)) {
@@ -31,6 +31,6 @@ export const PUT: RequestHandler = async (event) => {
     }
 
     const result = await updateAppConfig(body);
-    return json(result);
+    return jsonResponse(result);
   });
 };

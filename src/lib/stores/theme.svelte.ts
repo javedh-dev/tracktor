@@ -1,13 +1,22 @@
-import { getContext, setContext } from 'svelte';
-import { type ThemeName, type ThemeConfig } from '$lib/types/theme';
+import { type ThemeName, type ThemeConfig, type DarkVariant } from '$lib/types/theme';
 import { themes } from '$lib/config/themes';
-import { getStoredTheme, saveTheme, applyThemeColors, setThemeClass } from '$lib/utils/theme';
+import {
+  getStoredTheme,
+  saveTheme,
+  applyThemeColors,
+  setThemeClass,
+  getStoredDarkVariant,
+  saveDarkVariant,
+  setDarkVariantAttr
+} from '$lib/utils/theme';
 
-const THEME_KEY = Symbol('theme');
+const DARK_VARIANTS: DarkVariant[] = ['default', 'dim', 'oled'];
 
 interface ThemeStore {
   theme: ThemeName;
+  darkVariant: DarkVariant;
   setTheme: (name: ThemeName) => void;
+  setDarkVariant: (variant: DarkVariant) => void;
   getThemes: () => ThemeConfig[];
   getActiveTheme: () => ThemeConfig | undefined;
   initializeTheme: () => void;
@@ -15,6 +24,7 @@ interface ThemeStore {
 
 function createThemeStore(): ThemeStore {
   let theme = $state<ThemeName>('slate');
+  let darkVariant = $state<DarkVariant>('default');
   let initialized = false;
 
   function applyTheme(name: ThemeName) {
@@ -29,13 +39,14 @@ function createThemeStore(): ThemeStore {
     if (initialized || typeof window === 'undefined') return;
 
     const storedTheme = getStoredTheme();
-    if (storedTheme && storedTheme in themes) {
-      theme = storedTheme;
-    } else {
-      theme = 'slate';
-    }
-
+    theme = storedTheme && storedTheme in themes ? storedTheme : 'slate';
     applyTheme(theme);
+
+    const storedVariant = getStoredDarkVariant();
+    darkVariant =
+      storedVariant && DARK_VARIANTS.includes(storedVariant) ? storedVariant : 'default';
+    setDarkVariantAttr(darkVariant);
+
     initialized = true;
   }
 
@@ -44,6 +55,14 @@ function createThemeStore(): ThemeStore {
       theme = name;
       applyTheme(name);
       saveTheme(name);
+    }
+  }
+
+  function setDarkVariant(variant: DarkVariant) {
+    if (DARK_VARIANTS.includes(variant)) {
+      darkVariant = variant;
+      setDarkVariantAttr(variant);
+      saveDarkVariant(variant);
     }
   }
 
@@ -62,7 +81,14 @@ function createThemeStore(): ThemeStore {
     set theme(value: ThemeName) {
       setTheme(value);
     },
+    get darkVariant() {
+      return darkVariant;
+    },
+    set darkVariant(value: DarkVariant) {
+      setDarkVariant(value);
+    },
     setTheme,
+    setDarkVariant,
     getThemes,
     getActiveTheme,
     initializeTheme
@@ -70,12 +96,3 @@ function createThemeStore(): ThemeStore {
 }
 
 export const themeStore = createThemeStore();
-
-// Context helpers for components
-export function setThemeContext(store: ThemeStore) {
-  return setContext(THEME_KEY, store);
-}
-
-export function getThemeContext(): ThemeStore {
-  return getContext<ThemeStore>(THEME_KEY);
-}

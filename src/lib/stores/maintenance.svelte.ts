@@ -1,32 +1,28 @@
-import type { FuelLog, MaintenanceLog } from '$lib/domain';
-import { apiClient } from '$lib/helper/api.helper';
-import type { ApiResponse } from '$lib/response';
+import type { MaintenanceLog } from '$lib/domain/maintenance';
 import { compareDesc } from 'date-fns';
-import { vehicleStore } from './vehicle.svelte';
+import { createEntityStore } from './entity-store.svelte';
 
-class MaintenanceStore {
-  maintenanceLogs = $state<MaintenanceLog[]>();
-  processing = $state(false);
-  error = $state<string>();
+const entityStore = createEntityStore<MaintenanceLog>({
+  buildPath: (vehicleId) =>
+    vehicleId ? `/maintenance-logs?vehicleId=${vehicleId}` : '/maintenance-logs',
+  sort: (a, b) => {
+    const dateDiff = compareDesc(a.date, b.date);
+    if (dateDiff !== 0) return dateDiff;
+    return b.odometer - a.odometer;
+  },
+  errorMessage: 'Failed to fetch Maintenance Logs'
+});
 
-  refreshMaintenanceLogs = () => {
-    if (!vehicleStore.selectedId) return;
-    this.processing = true;
-    apiClient
-      .get<ApiResponse>(`/vehicles/${vehicleStore.selectedId}/maintenance-logs`)
-      .then(({ data: res }) => {
-        const logs: MaintenanceLog[] = res.data;
-        this.maintenanceLogs = logs;
-        logs.sort((a, b) => {
-          const dateDiff = compareDesc(a.date, b.date);
-          if (dateDiff !== 0) return dateDiff;
-          return b.odometer - a.odometer;
-        });
-        this.error = undefined;
-      })
-      .catch((err) => (this.error = 'Failed to fetch Maintenance Logs'))
-      .finally(() => (this.processing = false));
-  };
-}
-
-export const maintenanceStore = new MaintenanceStore();
+export const maintenanceStore = {
+  get maintenanceLogs() {
+    return entityStore.items;
+  },
+  get processing() {
+    return entityStore.processing;
+  },
+  get error() {
+    return entityStore.error;
+  },
+  refreshMaintenanceLogs: entityStore.refresh,
+  reloadMaintenanceLogs: entityStore.reload
+};

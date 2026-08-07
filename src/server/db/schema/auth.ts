@@ -20,10 +20,3 @@ export const sessionsTable = table('sessions', {
   expiresAt: t.integer().notNull(),
   ...timestamps
 });
-
-// Keep the old auth table for migration purposes (can be removed later)
-export const authTable = table('auth', {
-  id: t.integer().primaryKey(),
-  hash: t.text().notNull(),
-  ...timestamps
-});

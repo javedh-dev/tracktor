@@ -1,12 +1,12 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 // POST /api/auth/register - Register a new user
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('Register POST error:', async () => {
-    const body = event.locals.requestBody || (await event.request.json());
+    const body = await event.request.json();
 
     // Validate request body
     if (!body.username || !body.password) {
@@ -23,6 +23,6 @@ export const POST: RequestHandler = async (event) => {
     }
 
     const result = await authService.createUser(body.username, body.password);
-    return json(result);
+    return jsonResponse(result, undefined, { status: 201 });
   });
 };

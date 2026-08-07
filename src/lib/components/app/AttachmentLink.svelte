@@ -5,6 +5,8 @@
   import FilePreviewModal from '$lib/components/app/FilePreviewModal.svelte';
   import type { Snippet } from 'svelte';
 
+  import * as m from '$lib/paraglide/messages';
+
   let { fileName, children }: { fileName: string; children?: Snippet } = $props();
 
   let open = $state(false);
@@ -15,7 +17,7 @@
 <button
   id="attachment-link-{fileName.replace(/[^a-zA-Z0-9]/g, '-')}"
   class="attachment-link text-primary hover:text-primary/80 inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 overflow-hidden border-0 bg-transparent p-0 text-left transition-colors"
-  title="View attachment"
+  title={m.attachment_link_view_title()}
   onclick={(e) => {
     e.stopPropagation();
     open = true;

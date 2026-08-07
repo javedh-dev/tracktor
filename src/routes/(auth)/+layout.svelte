@@ -1,24 +1,36 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import * as Card from '$lib/components/ui/card/index.js';
+  import { env } from '$lib/config/env';
+  import { m } from '$lib/paraglide/messages';
   import Tractor from '@lucide/svelte/icons/tractor';
+  import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 
   let { children } = $props();
 
   // Use URL pathname for reliable tracking
-  let currentPath = $derived($page.url.pathname);
+  let currentPath = $derived(page.url.pathname);
 </script>
 
 <div
   id="auth-container"
-  class="bg-background flex w-full grow items-center justify-center gap-6 overflow-hidden p-4 md:p-10"
+  class="bg-background flex min-h-svh w-full grow items-center justify-center gap-6 overflow-hidden p-4 md:p-10"
 >
   <div id="auth-card-wrapper" class="w-full max-w-2xl">
+    {#if env.DEMO_MODE}
+      <div
+        id="demo-mode-banner"
+        class="bg-warning/10 text-warning mb-6 flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium"
+      >
+        <TriangleAlert class="size-auto shrink-0" />
+        <span>{m.demo_banner()} <strong class="font-semibold">{m.default_login()}</strong></span>
+      </div>
+    {/if}
     <Card.Root id="auth-card-root" class="overflow-hidden p-0">
       <Card.Content id="auth-card-content" class="grid p-0 md:grid-cols-2">
         <div
           id="auth-hero-section"
-          class="bg-muted relative hidden items-center justify-center transition-all duration-300 md:flex"
+          class="bg-muted relative hidden flex-col items-center justify-center gap-3 p-8 text-center transition-all duration-300 md:flex"
         >
           <img
             id="auth-hero-bg"

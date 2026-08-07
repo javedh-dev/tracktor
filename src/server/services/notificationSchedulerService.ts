@@ -10,8 +10,8 @@ let scheduledTask: ScheduledTask | null = null;
 async function getNotificationProcessingSchedule(): Promise<string> {
   try {
     const result = await getAppConfigByKey('notificationProcessingSchedule');
-    if (result.success && result.data?.value) {
-      return result.data.value;
+    if (result?.value) {
+      return result.value;
     }
   } catch {
     // Fallback to default below.
@@ -23,8 +23,8 @@ async function getNotificationProcessingSchedule(): Promise<string> {
 async function isNotificationProcessingEnabled(): Promise<boolean> {
   try {
     const result = await getAppConfigByKey('notificationProcessingEnabled');
-    if (result.success && result.data?.value !== undefined) {
-      return result.data.value === 'true';
+    if (result?.value !== undefined) {
+      return result.value === 'true';
     }
   } catch {
     // Fallback to enabled below.
@@ -33,7 +33,7 @@ async function isNotificationProcessingEnabled(): Promise<boolean> {
   return true;
 }
 
-export async function processScheduledNotifications(): Promise<void> {
+async function processScheduledNotifications(): Promise<void> {
   const result = await dispatchScheduledNotifications();
 
   if (result.success) {
@@ -81,14 +81,4 @@ export async function initializeNotificationScheduler(): Promise<void> {
 
 export async function reloadNotificationScheduler(): Promise<void> {
   await initializeNotificationScheduler();
-}
-
-export function stopNotificationScheduler(): void {
-  if (!scheduledTask) {
-    return;
-  }
-
-  scheduledTask.stop();
-  scheduledTask = null;
-  logger.info('Notification scheduler stopped');
 }

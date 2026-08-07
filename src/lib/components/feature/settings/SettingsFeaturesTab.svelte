@@ -33,10 +33,10 @@
       />
       <SettingsFeatureToggle
         {form}
-        name="featurePucc"
-        label={m.feature_label_pollution()}
-        description={m.feature_desc_pollution()}
-        bind:checked={$formData.featurePucc}
+        name="featureCompliance"
+        label={m.feature_label_compliance()}
+        description={m.feature_desc_compliance()}
+        bind:checked={$formData.featureCompliance}
         disabled={processing}
       />
       <SettingsFeatureToggle
@@ -45,14 +45,6 @@
         label={m.feature_label_reminders()}
         description={m.feature_desc_reminders()}
         bind:checked={$formData.featureReminders}
-        disabled={processing}
-      />
-      <SettingsFeatureToggle
-        {form}
-        name="featureInsurance"
-        label={m.feature_label_insurance()}
-        description={m.feature_desc_insurance()}
-        bind:checked={$formData.featureInsurance}
         disabled={processing}
       />
       <SettingsFeatureToggle

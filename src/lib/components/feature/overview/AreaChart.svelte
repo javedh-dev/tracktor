@@ -2,9 +2,12 @@
   import * as Chart from '$ui/chart/index.js';
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
-  import { Area, AreaChart, LinearGradient, type AreaChartPropsObjProp } from 'layerchart';
-  import type { DataPoint } from '$lib/domain';
+  import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
+  import type { Snippet } from 'svelte';
+  import type { DataPoint } from '$lib/domain/shared';
+  import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { overview_chart_no_data } from '$lib/paraglide/messages/_index.js';
@@ -18,7 +21,9 @@
     title,
     xFormatter,
     valueFormatter,
-    loading = false
+    loading = false,
+    bare = false,
+    filter
   }: {
     chartData: DataPoint[];
     color?: string;
@@ -27,6 +32,10 @@
     xFormatter: (_: Date) => string;
     valueFormatter?: (_: number) => string;
     loading?: boolean;
+    /** Render content only — surrounding card chrome is provided by the parent. */
+    bare?: boolean;
+    /** Rendered on the right of the header, alongside the average badge. */
+    filter?: Snippet;
   } = $props();
 
   const chartProps = {
@@ -37,17 +46,16 @@
       motion: 'tween'
     },
     xAxis: {
-      format: (v) => v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      tickLabelProps: {
-        rotate: 325,
-        textAnchor: 'end'
-      }
+      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short' })
+    },
+    yAxis: {
+      format: (v: number) => valueFormatter?.(v) ?? v.toString()
     },
     grid: {
       style: 'stroke-dasharray: 2',
       class: 'stroke-1'
     }
-  } satisfies AreaChartPropsObjProp;
+  } satisfies AreaChartProps<unknown>['props'];
 
   const chartConfig = $derived({
     data: {
@@ -79,18 +87,25 @@
 
 <div
   id="chart-area-{title}"
-  class="area-chart lg:bg-background/50 bg-secondary relative rounded-lg px-4 pt-2 pb-6 lg:p-6"
+  class={bare
+    ? 'area-chart relative flex h-full flex-col'
+    : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  <div class="mb-4 flex flex-row items-center justify-start gap-2 font-bold">
-    <span>{title}</span>
-    <span
-      class="bg-background/90 text-muted-foreground rounded-full border px-2 py-0.5 text-[11px] font-medium shadow-sm"
-    >
-      Avg: {formattedAverage}
-    </span>
+  <div class="mb-4 flex flex-wrap items-center gap-2 font-bold">
+    {#if !bare}
+      <span>{title}</span>
+    {/if}
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <LegendInfoGroup items={[{ color, label, detail: `Avg ${formattedAverage}` }]} />
+      {@render filter?.()}
+    </div>
   </div>
   {#if loading}
-    <div class="flex h-50 flex-col justify-end space-y-2">
+    <div
+      class={bare
+        ? 'flex min-h-0 flex-1 flex-col justify-end space-y-2'
+        : 'flex h-50 flex-col justify-end space-y-2'}
+    >
       <div class="flex h-full items-end justify-between gap-2">
         {#each [40, 65, 45, 80, 55, 70, 50, 85, 60, 75] as height, i (i)}
           <Skeleton class="w-full rounded-t" style="height: {height}%" />
@@ -99,14 +114,15 @@
       <Skeleton class="h-4 w-full" />
     </div>
   {:else if chartData.length != 0}
-    <Chart.Container config={chartConfig}>
+    <Chart.Container
+      config={chartConfig}
+      class={bare ? 'aspect-auto min-h-0 w-full flex-1' : 'aspect-[2.5/1]'}
+    >
       <AreaChart
         data={chartDataWithAverage}
         x="x"
         xScale={scaleUtc()}
-        points={{
-          r: 0
-        }}
+        padding={{ left: 48, bottom: 24 }}
         series={[
           {
             key: 'y',
@@ -119,7 +135,7 @@
             color: 'var(--muted-foreground)'
           }
         ]}
-        axis={'x'}
+        axis
         props={chartProps}
       >
         {#snippet tooltip()}
@@ -132,20 +148,32 @@
             {/snippet}
           </Chart.Tooltip>
         {/snippet}
-        {#snippet marks({ series, getAreaProps }: any)}
-          {#each series as s, i (s.key)}
+        {#snippet marks({ context }: { context: any })}
+          {#each context.series.visibleSeries as s (s.key)}
             {#if s.key === 'y'}
               <LinearGradient
-                stops={[s.color ?? '', 'color-mix(in lch, ' + s.color + ' 10%, transparent)']}
+                stops={[
+                  'color-mix(in lch, ' + s.color + ' 55%, transparent)',
+                  'color-mix(in lch, ' + s.color + ' 4%, transparent)'
+                ]}
                 vertical
               >
                 {#snippet children({ gradient })}
-                  <Area {...getAreaProps(s, i)} fill={gradient} />
+                  <Area
+                    seriesKey={s.key}
+                    curve={curveCatmullRom}
+                    fillOpacity={0.8}
+                    line={{ class: 'stroke-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]' }}
+                    motion="tween"
+                    fill={gradient}
+                  />
                 {/snippet}
               </LinearGradient>
+              <ChartPoints seriesKey={s.key} color={s.color} />
             {:else}
               <Area
-                {...getAreaProps(s, i)}
+                seriesKey={s.key}
+                curve={curveCatmullRom}
                 fill="none"
                 line={{
                   stroke: s.color ?? 'var(--muted-foreground)',

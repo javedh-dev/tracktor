@@ -29,3 +29,7 @@ uploads/
 # Paraglide
 src/lib/paraglide
 project.inlang/cache/
+.opencode
+opencode.json
+.app/
+docs/planning

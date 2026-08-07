@@ -1,14 +1,16 @@
 # Stage 1: Build the application
 FROM node:22-alpine AS builder
 
+ARG APP_VERSION
+
 # Set working directory
 WORKDIR /app
 
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy package files and pnpm workspace config
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -25,6 +27,8 @@ RUN pnpm prune --prod
 # Stage 2: Create the production image
 FROM node:22-alpine
 
+ARG APP_VERSION
+
 # Set working directory
 WORKDIR /app
 
@@ -32,7 +36,7 @@ WORKDIR /app
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/src/server/db/migrations ./migrations
 
 # Expose the port the app runs on
 EXPOSE 3000
@@ -43,6 +47,7 @@ RUN mkdir -p /data/logs
 RUN mkdir -p /data/uploads
 
 # Set environment variables
+ENV APP_VERSION=${APP_VERSION}
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000

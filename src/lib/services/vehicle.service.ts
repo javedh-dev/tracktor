@@ -1,50 +1,7 @@
-import type { DataPoint, Response, Vehicle } from '$lib/domain';
+import type { Response } from '$lib/domain/shared';
+import type { Vehicle } from '$lib/domain/vehicle';
 import { apiClient } from '$lib/helper/api.helper';
 import { uploadFile } from './file.service';
-
-export const fetchMileageData = async (vehicleId: string): Promise<DataPoint[]> => {
-  try {
-    const response = await apiClient.get(`/vehicles/${vehicleId}/fuel-logs`);
-    const data: {
-      date: string;
-      mileage: number | null;
-    }[] = response.data;
-    return data
-      .filter((log) => log.mileage != null)
-      .map((log) => {
-        return {
-          x: new Date(log.date),
-          y: log.mileage
-        };
-      })
-      .sort((a, b) => a.x.getTime() - b.x.getTime());
-  } catch (e) {
-    console.error('Failed to fetch mileage data:', e);
-    return [];
-  }
-};
-
-export const fetchCostData = async (vehicleId: string): Promise<DataPoint[]> => {
-  try {
-    const response = await apiClient.get(`/vehicles/${vehicleId}/fuel-logs`);
-    const data: {
-      date: string;
-      cost: number | null;
-    }[] = response.data;
-    return data
-      .filter((log) => log.cost != null)
-      .map((log) => {
-        return {
-          x: new Date(log.date),
-          y: log.cost
-        };
-      })
-      .sort((a, b) => a.x.getTime() - b.x.getTime());
-  } catch (e) {
-    console.error('Failed to fetch cost data:', e);
-    return [];
-  }
-};
 
 export const saveVehicleWithImage = async (
   vehicle: Vehicle,

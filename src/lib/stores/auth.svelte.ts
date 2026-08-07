@@ -28,9 +28,7 @@ class AuthStore {
     }
 
     try {
-      const { data: res } = await apiClient.get<ApiResponse>('/auth', {
-        skipInterceptors: true
-      });
+      const { data: res } = await apiClient.get<ApiResponse>('/auth');
       this.isAuthDisabled = !!res.data?.isAuthDisabled;
       this.hasUsers = res.data?.hasUsers ?? false;
 
@@ -57,11 +55,7 @@ class AuthStore {
 
   login = async (username: string, password: string) => {
     try {
-      const { data: res } = await apiClient.post<ApiResponse>(
-        '/auth',
-        { username, password },
-        { skipInterceptors: true }
-      );
+      const { data: res } = await apiClient.post<ApiResponse>('/auth', { username, password });
 
       if (res.success && res.data) {
         this.user = res.data.user;
@@ -81,11 +75,10 @@ class AuthStore {
 
   register = async (username: string, password: string) => {
     try {
-      const { data: res } = await apiClient.post<ApiResponse>(
-        '/auth/register',
-        { username, password },
-        { skipInterceptors: true }
-      );
+      const { data: res } = await apiClient.post<ApiResponse>('/auth/register', {
+        username,
+        password
+      });
 
       if (res.success) {
         toast.success('User created successfully. Please login.');

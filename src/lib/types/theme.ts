@@ -12,6 +12,9 @@ export type ThemeName =
   | 'indigo'
   | 'pink';
 
+/** Dark-mode contrast style, independent of the accent color chosen via ThemeName. */
+export type DarkVariant = 'default' | 'dim' | 'oled';
+
 export interface ThemeColors {
   background?: string;
   foreground?: string;
@@ -40,10 +43,4 @@ export interface ThemeConfig {
   active: boolean;
   colors?: ThemeColors;
   darkColors?: ThemeColors;
-}
-
-export interface ThemeContextValue {
-  theme: ThemeName;
-  themes: ThemeConfig[];
-  setTheme: (theme: ThemeName) => void;
 }

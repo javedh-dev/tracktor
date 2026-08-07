@@ -1,15 +1,13 @@
 import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { clientEnv as publicClientEnv } from './env';
 
 /**
- * Client-side environment configuration
- * Only includes public environment variables that are safe to expose to the browser
+ * Client-side environment configuration, plus the server-only way of disabling auth
+ * (the private env var also works, so it can be set in container deployments).
  */
 export const clientEnv = {
-  DEMO_MODE: publicEnv.TRACKTOR_DEMO_MODE === 'true',
-  // Allow disabling auth via either the public or private env var so it works in container deployments
-  DISABLE_AUTH:
-    publicEnv.TRACKTOR_DISABLE_AUTH === 'true' || privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
+  ...publicClientEnv,
+  DISABLE_AUTH: publicClientEnv.DISABLE_AUTH || privateEnv.TRACKTOR_DISABLE_AUTH === 'true'
 } as const;
 
 function getCorsOrigins(origins?: string): string[] {
@@ -25,7 +23,7 @@ function getCorsOrigins(origins?: string): string[] {
 
 function getDBPath(): string | undefined {
   switch (privateEnv.NODE_ENV) {
-    case 'dev':
+    case 'development':
       return './tracktor.dev.db';
     case 'test':
       return './tracktor.test.db';
@@ -40,7 +38,7 @@ function getDBPath(): string | undefined {
  * Includes all environment variables
  */
 export const serverEnv = {
-  NODE_ENV: privateEnv.NODE_ENV || 'dev',
+  NODE_ENV: privateEnv.NODE_ENV || 'development',
   DB_PATH: privateEnv.DB_PATH || getDBPath(),
   UPLOADS_DIR: privateEnv.UPLOADS_DIR || './uploads',
   CORS_ORIGINS: getCorsOrigins(privateEnv.CORS_ORIGINS),
@@ -64,6 +62,6 @@ export const env = {
 } as const;
 
 // Environment helpers
-export const isDevelopment = env.NODE_ENV === 'dev';
+export const isDevelopment = env.NODE_ENV === 'development';
 export const isProduction = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';

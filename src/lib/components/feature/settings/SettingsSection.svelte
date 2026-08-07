@@ -1,29 +1,36 @@
 <script lang="ts">
-  import * as Accordion from '$lib/components/ui/accordion';
-  import * as Separator from '$ui/separator';
-  import type { Snippet } from 'svelte';
-
-  const expandedValues = ['General', 'Units', 'Feature Flags', 'Scheduled delivery', 'Providers'];
+  import type { Component, Snippet } from 'svelte';
 
   interface Props {
+    id: string;
+    icon: Component<{ class?: string }>;
+    iconClass?: string;
     title: string;
     description?: string;
     children: Snippet;
   }
 
-  let { title, description, children }: Props = $props();
+  let {
+    id,
+    icon: Icon,
+    iconClass = 'bg-primary/10 text-primary',
+    title,
+    description,
+    children
+  }: Props = $props();
 </script>
 
-<div class="space-y-2">
-  <div>
-    <h2 class="text-primary text-2xl font-semibold">{title}</h2>
-    {#if description}
-      <p class="text-muted-foreground text-sm">{description}</p>
-    {/if}
+<section {id} data-settings-section={id} class="bg-card scroll-mt-24 rounded-xl border p-4 sm:p-6">
+  <div class="mb-4 flex items-start gap-3">
+    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg {iconClass}">
+      <Icon class="size-5" />
+    </span>
+    <div class="space-y-0.5">
+      <h2 class="text-lg font-semibold">{title}</h2>
+      {#if description}
+        <p class="text-muted-foreground text-sm">{description}</p>
+      {/if}
+    </div>
   </div>
-  <Separator.Root class="mb-4" />
-
-  <Accordion.Root type="multiple" value={expandedValues} class="w-full sm:ps-4">
-    {@render children()}
-  </Accordion.Root>
-</div>
+  {@render children()}
+</section>

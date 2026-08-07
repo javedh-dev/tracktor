@@ -12,6 +12,7 @@
   import Input from '$appui/input.svelte';
   import type { NotificationProviderWithParsedConfig } from '$lib/domain/notification-provider';
   import { testProvider } from '$lib/services/notification-provider.service';
+  import * as m from '$lib/paraglide/messages';
 
   type ProviderWithChannels = NotificationProviderWithParsedConfig & {
     channels: Array<'reminder' | 'alert' | 'information'>;
@@ -64,15 +65,15 @@
       });
 
       if (result.success) {
-        toast.success('Test notification sent successfully');
+        toast.success(m.notif_test_success());
         onOpenChange(false);
         return;
       }
 
-      toast.error(`Failed to send test: ${result.error}`);
+      toast.error(result.error || m.notif_test_failed());
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message || 'Failed to send test notification');
+      toast.error(err.message || m.notif_test_failed());
     } finally {
       testing = false;
     }
@@ -84,10 +85,10 @@
 <Dialog.Root {open} {onOpenChange}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Test Provider</Dialog.Title>
+      <Dialog.Title>{m.notif_test_title()}</Dialog.Title>
       <Dialog.Description>
         {#if provider}
-          Send a test notification using <strong>{provider.name}</strong>
+          {m.notif_test_send_desc({ name: provider.name })}
         {/if}
       </Dialog.Description>
     </Dialog.Header>
@@ -101,26 +102,30 @@
           <div>
             <p class="font-medium">{provider.name}</p>
             <p class="text-muted-foreground text-xs">
-              {provider.type.charAt(0).toUpperCase() + provider.type.slice(1)} provider
+              {provider.type.charAt(0).toUpperCase() + provider.type.slice(1)}
             </p>
           </div>
         </div>
 
         {#if provider.type === 'email'}
           <div class="space-y-2">
-            <Label>Test Email</Label>
-            <Input bind:value={testEmail} type="email" placeholder="recipient@example.com" />
+            <Label>{m.notif_test_email_label()}</Label>
+            <Input
+              bind:value={testEmail}
+              type="email"
+              placeholder={m.notif_test_email_placeholder()}
+            />
             <p class="text-muted-foreground text-xs">
-              Optional override recipient for this test message.
+              {m.notif_test_email_desc()}
             </p>
           </div>
         {/if}
 
         <div class="space-y-2">
-          <Label>Test Message</Label>
+          <Label>{m.notif_test_message_label()}</Label>
           <Textarea
             bind:value={testMessage}
-            placeholder="This is a test notification from Tracktor"
+            placeholder={m.notif_test_message_placeholder()}
             disabled={testing}
             rows={3}
           />
@@ -130,13 +135,13 @@
 
     <Dialog.Footer>
       <Button variant="outline" onclick={() => onOpenChange(false)} disabled={testing}>
-        Cancel
+        {m.common_cancel()}
       </Button>
       <Button onclick={handleTest} disabled={testing || !provider}>
         {#if testing}
           <Loader2 class="mr-2 h-4 w-4 animate-spin" />
         {/if}
-        Send Test
+        {m.notif_test_send()}
       </Button>
     </Dialog.Footer>
   </Dialog.Content>

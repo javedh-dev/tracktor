@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
 import { resolveUploadFilePath, sanitizeUploadFilename } from '$server/utils/file-route';
-import { withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 import { writeFile } from 'fs/promises';
 
 export const POST: RequestHandler = async (event) => {
@@ -31,17 +31,14 @@ export const POST: RequestHandler = async (event) => {
       throw new AppError('Failed to save file', Status.INTERNAL_SERVER_ERROR);
     }
 
-    const result = {
-      success: true,
-      message: 'File uploaded successfully',
-      data: {
+    return jsonResponse(
+      {
         filename: filename,
         originalName: file.name,
         size: file.size,
         mimetype: file.type
-      }
-    };
-
-    return json(result);
+      },
+      'File uploaded successfully'
+    );
   });
 };
