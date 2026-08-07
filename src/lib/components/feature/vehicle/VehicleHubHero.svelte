@@ -6,11 +6,12 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Badge from '$ui/badge/badge.svelte';
   import { toast } from 'svelte-sonner';
-  import { getFuelTypeLabel, getVehicleTypeIcon, getVehicleTypeLabel } from '$lib/domain/vehicle';
+  import { getFuelTypeLabel, getVehicleTypeLabel } from '$lib/domain/vehicle';
   import { formatDistance, formatMileage } from '$lib/helper/format.helper';
   import type { VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
   import VehicleImage from './VehicleImage.svelte';
+  import VehicleTypeBadge from './VehicleTypeBadge.svelte';
   import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Props {
@@ -21,7 +22,6 @@
 
   const fuelLabel = $derived(getFuelTypeLabel(vehicle.fuelType ?? 'petrol', m));
   const vehicleTypeLabel = $derived(getVehicleTypeLabel(vehicle.vehicleType ?? 'car', m));
-  const VehicleTypeIcon = $derived(getVehicleTypeIcon(vehicle.vehicleType ?? 'car'));
 
   // Overall status pill: attention if either compliance record has lapsed, active once both are
   // valid, hidden entirely when there's not enough data yet to say either way.
@@ -89,9 +89,11 @@
     <div class="flex flex-col gap-8 p-4 sm:p-6 md:col-span-7">
       <div class="flex flex-col">
         <div class="flex flex-row items-center gap-4">
-          <div class="bg-accent rounded-xl p-2">
-            <VehicleTypeIcon style={`color: ${vehicle.color}`} />
-          </div>
+          <VehicleTypeBadge
+            vehicleType={vehicle.vehicleType}
+            color={vehicle.color}
+            class="size-11"
+          />
           <h1 class="text-2xl font-bold sm:text-3xl">
             {vehicle.make}
             {vehicle.model}

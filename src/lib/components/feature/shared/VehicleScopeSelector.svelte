@@ -10,6 +10,7 @@
   import { cn } from '$lib/utils';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { readVehicleScope, setVehicleScope } from '$lib/scope/vehicle-scope.svelte';
+  import VehicleTypeBadge from '$feature/vehicle/VehicleTypeBadge.svelte';
   import * as m from '$lib/paraglide/messages';
 
   const vehicles = $derived(vehicleStore.vehicles ?? []);
@@ -30,7 +31,15 @@
   <DropdownMenu.Trigger>
     {#snippet child({ props })}
       <Button id="vehicle-scope-trigger" variant="outline" {...props} class="gap-2">
-        <Car class="size-4" />
+        {#if !scope.isFleet && scope.vehicle}
+          <VehicleTypeBadge
+            vehicleType={scope.vehicle.vehicleType}
+            color={scope.vehicle.color}
+            class="size-5"
+          />
+        {:else}
+          <Car class="size-4" />
+        {/if}
         <span class="max-w-40 truncate">{triggerLabel}</span>
         <ChevronsUpDown class="size-4 opacity-50" />
       </Button>
@@ -54,6 +63,11 @@
               'size-4 shrink-0',
               (scope.isFleet || scope.vehicleId !== vehicle.id) && 'text-transparent'
             )}
+          />
+          <VehicleTypeBadge
+            vehicleType={vehicle.vehicleType}
+            color={vehicle.color}
+            class="size-7"
           />
           <div class="flex min-w-0 flex-col">
             <span class="truncate">{vehicleLabel(vehicle)}</span>

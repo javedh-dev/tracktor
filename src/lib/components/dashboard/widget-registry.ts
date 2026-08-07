@@ -41,7 +41,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'vehicle-count' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Car,
     iconColor: ACCENT.denim.gradient
   },
@@ -52,7 +52,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'total-distance' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Route,
     iconColor: ACCENT.plum.gradient
   },
@@ -63,7 +63,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'fuel-used' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Fuel,
     iconColor: ACCENT.moss.gradient
   },
@@ -74,7 +74,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'total-expenses' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: DollarSign,
     iconColor: ACCENT.ochre.gradient
   },
@@ -85,7 +85,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'cost-per-distance' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: CircleGauge,
     iconColor: ACCENT.clay.gradient
   },

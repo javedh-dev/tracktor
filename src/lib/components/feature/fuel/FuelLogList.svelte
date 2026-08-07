@@ -184,6 +184,7 @@
               }),
             cell: ({ row }: { row: { original: FuelLog } }) =>
               renderComponent(VehicleCell, {
+                vehicleId: row.original.vehicleId,
                 make: row.original.vehicleMake,
                 model: row.original.vehicleModel,
                 plate: row.original.vehiclePlate

@@ -178,6 +178,7 @@
               }),
             cell: ({ row }: { row: { original: Compliance } }) =>
               renderComponent(VehicleCell, {
+                vehicleId: row.original.vehicleId,
                 make: row.original.vehicleMake,
                 model: row.original.vehicleModel,
                 plate: row.original.vehiclePlate

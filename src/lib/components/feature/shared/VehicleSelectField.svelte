@@ -22,7 +22,9 @@
         value: vehicle.id as string,
         label: vehicle.licensePlate
           ? `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate})`
-          : `${vehicle.make} ${vehicle.model}`
+          : `${vehicle.make} ${vehicle.model}`,
+        vehicleType: vehicle.vehicleType,
+        color: vehicle.color
       }))
   );
 </script>

@@ -5,6 +5,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import Check from '@lucide/svelte/icons/check';
   import type { Vehicle } from '$lib/domain/vehicle';
+  import VehicleTypeBadge from '$feature/vehicle/VehicleTypeBadge.svelte';
   import { cn } from '$lib/utils';
 
   let {
@@ -17,12 +18,14 @@
 
   const vehicleLabel = (vehicle: Vehicle) => `${vehicle.make} ${vehicle.model}`;
 
+  const singleSelected = $derived(
+    selectedIds.length === 1 ? vehicles.find((v) => v.id === selectedIds[0]) : undefined
+  );
+
   const triggerLabel = $derived.by(() => {
     if (selectedIds.length === 0) return 'All Vehicles';
-    if (selectedIds.length === 1) {
-      const vehicle = vehicles.find((v) => v.id === selectedIds[0]);
-      return vehicle ? vehicleLabel(vehicle) : 'All Vehicles';
-    }
+    if (selectedIds.length === 1)
+      return singleSelected ? vehicleLabel(singleSelected) : 'All Vehicles';
     return `${selectedIds.length} vehicles`;
   });
 
@@ -37,7 +40,15 @@
   <DropdownMenu.Trigger>
     {#snippet child({ props })}
       <Button variant="outline" size="sm" {...props} class="h-7 gap-1.5 px-2.5 text-xs">
-        <Car class="size-3.5" />
+        {#if singleSelected}
+          <VehicleTypeBadge
+            vehicleType={singleSelected.vehicleType}
+            color={singleSelected.color}
+            class="size-4"
+          />
+        {:else}
+          <Car class="size-3.5" />
+        {/if}
         <span class="max-w-28 truncate">{triggerLabel}</span>
         <ChevronDown class="size-3.5 opacity-50" />
       </Button>
@@ -56,7 +67,14 @@
             checked={selectedIds.includes(vehicle.id)}
             onCheckedChange={() => toggle(vehicle.id!)}
           >
-            {vehicleLabel(vehicle)}
+            <div class="flex items-center gap-2">
+              <VehicleTypeBadge
+                vehicleType={vehicle.vehicleType}
+                color={vehicle.color}
+                class="size-6"
+              />
+              {vehicleLabel(vehicle)}
+            </div>
           </DropdownMenu.CheckboxItem>
         {/if}
       {/each}

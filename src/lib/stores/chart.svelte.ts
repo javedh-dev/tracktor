@@ -1,6 +1,7 @@
 import type { FuelLog } from '$lib/domain/fuel';
 import type { DataPoint } from '$lib/domain/shared';
 import type { Vehicle } from '$lib/domain/vehicle';
+import { vehicleTrendColor } from '$lib/domain/vehicle';
 import { fuelLogStore } from './fuel-log.svelte';
 import { vehicleStore } from './vehicle.svelte';
 
@@ -73,7 +74,7 @@ const groupByVehicle = (
       vehicleId,
       label,
       fuelType: vehicle?.fuelType ?? 'petrol',
-      color: vehicle?.color ?? null,
+      color: vehicleTrendColor(vehicle?.color),
       data: calculate(vehicleLogs)
     };
   });

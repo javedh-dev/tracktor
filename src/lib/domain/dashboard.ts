@@ -179,71 +179,136 @@ export function widgetMinSize(type: WidgetType): WidgetMinSize {
   return WIDGET_MIN_SIZES[type] ?? DEFAULT_MIN_SIZE;
 }
 
+/**
+ * Ships every registered widget. colSpan/rowSpan/colStart/rowStart here are the
+ * *default-layout* sizes/positions, independent of each widget's defaultColSpan in
+ * widget-registry.ts (which only applies when a widget is added later via "Add Widget").
+ * `compactLayout` (run on every load) resolves any remaining overlap, so these don't need
+ * to be perfectly non-overlapping on their own.
+ */
 export const DEFAULT_WIDGET_LAYOUT: WidgetLayoutItem[] = [
-  { id: 'default-1', type: 'stat-vehicle-count', colStart: 1, rowStart: 1, colSpan: 3, rowSpan: 4 },
+  { id: 'default-1', type: 'stat-vehicle-count', colStart: 6, rowStart: 5, colSpan: 3, rowSpan: 2 },
   {
     id: 'default-2',
     type: 'stat-total-distance',
     colStart: 4,
     rowStart: 1,
-    colSpan: 3,
-    rowSpan: 4
+    colSpan: 4,
+    rowSpan: 2
   },
-  { id: 'default-3', type: 'stat-fuel-used', colStart: 7, rowStart: 1, colSpan: 3, rowSpan: 4 },
+  { id: 'default-3', type: 'stat-fuel-used', colStart: 6, rowStart: 3, colSpan: 3, rowSpan: 2 },
   {
     id: 'default-4',
     type: 'stat-total-expenses',
-    colStart: 10,
+    colStart: 8,
     rowStart: 1,
-    colSpan: 3,
-    rowSpan: 4
+    colSpan: 5,
+    rowSpan: 2
   },
   {
     id: 'default-5',
-    type: 'fleet-fuel-trend',
+    type: 'stat-cost-per-distance',
     colStart: 1,
-    rowStart: 5,
-    colSpan: 9,
-    rowSpan: 8
+    rowStart: 1,
+    colSpan: 3,
+    rowSpan: 2
   },
-  {
-    id: 'default-6',
-    type: 'expense-breakdown-donut',
-    colStart: 1,
-    rowStart: 13,
-    colSpan: 6,
-    rowSpan: 8
-  },
+  { id: 'default-6', type: 'activity-calendar', colStart: 9, rowStart: 3, colSpan: 4, rowSpan: 10 },
   {
     id: 'default-7',
-    type: 'vehicle-health-distribution',
-    colStart: 7,
-    rowStart: 13,
-    colSpan: 6,
-    rowSpan: 8
-  },
-  {
-    id: 'default-8',
-    type: 'vehicle-quick-list',
+    type: 'monthly-expense-trend',
     colStart: 1,
-    rowStart: 21,
-    colSpan: 9,
-    rowSpan: 8
+    rowStart: 7,
+    colSpan: 8,
+    rowSpan: 6
   },
+  { id: 'default-8', type: 'fleet-fuel-trend', colStart: 1, rowStart: 13, colSpan: 12, rowSpan: 8 },
   {
     id: 'default-9',
-    type: 'pucc-status-donut',
+    type: 'fuel-consumption-trend',
     colStart: 1,
-    rowStart: 29,
+    rowStart: 21,
     colSpan: 6,
-    rowSpan: 6
+    rowSpan: 8
   },
   {
     id: 'default-10',
-    type: 'upcoming-reminders-list',
-    colStart: 1,
-    rowStart: 33,
+    type: 'mileage-overview-trend',
+    colStart: 7,
+    rowStart: 29,
     colSpan: 6,
     rowSpan: 8
+  },
+  {
+    id: 'default-11',
+    type: 'expense-breakdown-donut',
+    colStart: 7,
+    rowStart: 21,
+    colSpan: 3,
+    rowSpan: 8
+  },
+  {
+    id: 'default-12',
+    type: 'cost-by-vehicle-leaderboard',
+    colStart: 7,
+    rowStart: 37,
+    colSpan: 6,
+    rowSpan: 8
+  },
+  {
+    id: 'default-13',
+    type: 'efficiency-leaderboard',
+    colStart: 1,
+    rowStart: 29,
+    colSpan: 6,
+    rowSpan: 8
+  },
+  {
+    id: 'default-14',
+    type: 'vehicle-health-distribution',
+    colStart: 10,
+    rowStart: 21,
+    colSpan: 3,
+    rowSpan: 8
+  },
+  {
+    id: 'default-15',
+    type: 'pucc-status-donut',
+    colStart: 1,
+    rowStart: 37,
+    colSpan: 3,
+    rowSpan: 6
+  },
+  {
+    id: 'default-16',
+    type: 'insurance-status-donut',
+    colStart: 4,
+    rowStart: 37,
+    colSpan: 3,
+    rowSpan: 6
+  },
+  {
+    id: 'default-17',
+    type: 'vehicle-quick-list',
+    colStart: 7,
+    rowStart: 45,
+    colSpan: 6,
+    rowSpan: 8
+  },
+  {
+    id: 'default-18',
+    type: 'recent-activity-feed',
+    colStart: 1,
+    rowStart: 43,
+    colSpan: 6,
+    rowSpan: 10
+  },
+  {
+    id: 'default-19',
+    type: 'upcoming-reminders-list',
+    colStart: 1,
+    rowStart: 3,
+    colSpan: 5,
+    rowSpan: 4
   }
 ];
