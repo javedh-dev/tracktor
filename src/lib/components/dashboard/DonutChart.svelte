@@ -13,8 +13,6 @@
     data,
     title = '',
     loading = false,
-    showLegend = true,
-    legendPosition = 'bottom',
     height = 300,
     innerRadius = 60,
     bare = false,
@@ -24,9 +22,6 @@
     data: DonutDataPoint[];
     title?: string;
     loading?: boolean;
-    showLegend?: boolean;
-    /** 'side' places the legend next to the pie instead of stacked below it. */
-    legendPosition?: 'bottom' | 'side';
     height?: number;
     innerRadius?: number;
     /** Render content only — surrounding card chrome is provided by the parent. */
@@ -37,13 +32,6 @@
   } = $props();
 
   const total = $derived(data.reduce((sum, d) => sum + d.value, 0));
-
-  const itemsWithPercent = $derived(
-    data.map((d) => ({
-      ...d,
-      percentage: total > 0 ? roundToDec((d.value / total) * 100, 1) : 0
-    }))
-  );
 
   function roundToDec(value: number, decimals: number): number {
     const factor = 10 ** decimals;
@@ -60,34 +48,47 @@
   const chartStyle = $derived(bare ? '' : `height: ${height}px`);
   const chartAreaClass = $derived(bare ? 'min-h-0 w-full flex-1' : '');
 
-  // Rings drawn by hand (single slice, loading) need a pixel size. Non-bare takes it from the
-  // `height` prop; bare measures the box the card actually gave us so it tracks the widget's rowSpan.
+  // Caps how large the donut itself can get — without it, a wide/tall widget would blow the
+  // ring up to fill the whole card. Capping keeps it a stable size as the widget is resized.
+  const MAX_DONUT_SIZE = 220;
+
+  // Non-bare takes its size from the `height` prop; bare measures the box the card actually
+  // gave us so it tracks the widget's rowSpan/colSpan (used by the hand-drawn rings and to size
+  // the real PieChart's container, since that one otherwise just stretches to fill the card).
   let areaWidth = $state(0);
   let areaHeight = $state(0);
   const ringSize = $derived(
-    bare ? Math.max(40, Math.min(areaWidth, areaHeight)) : Math.min(height * 0.6, 220)
+    bare
+      ? Math.max(40, Math.min(areaWidth, areaHeight, MAX_DONUT_SIZE))
+      : Math.min(height * 0.6, MAX_DONUT_SIZE)
   );
 
-  // Bare legends may need to give ground to the chart in a short card, and scroll rather than clip.
-  const legendClass = $derived(
-    legendPosition === 'side'
-      ? 'flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-y-auto'
-      : bare
-        ? 'mt-3 flex min-h-0 shrink flex-col gap-1 overflow-y-auto'
-        : 'mt-4 flex shrink-0 flex-col gap-1'
-  );
+  // Single-slice ring is hand-drawn (no PieChart involved), so its hover is tracked locally.
+  let singleHovered = $state(false);
 
-  // 'side' arranges the chart area + legend in a row; 'bottom' keeps them as a transparent
-  // flex-col pass-through so the chart area's flex-1 still reaches up to the bare root.
-  const contentWrapClass = $derived(
-    legendPosition === 'side'
-      ? 'flex min-h-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center'
-      : 'flex min-h-0 flex-1 flex-col'
+  // Bound from PieChart so hovering an arc can be read here and mirrored into the center label —
+  // layerchart keeps the currently-hovered datum on `context.tooltip.data`.
+  let pieContext = $state<any>();
+  const hoveredDatum = $derived(pieContext?.tooltip?.data as DonutDataPoint | undefined);
+  const hoveredPercentage = $derived(
+    hoveredDatum && total > 0 ? roundToDec((hoveredDatum.value / total) * 100, 1) : 0
   );
 </script>
 
-{#snippet centerContent()}
-  {#if centerLabel}
+{#snippet centerContent(hovered?: DonutDataPoint & { percentage: number })}
+  {#if hovered}
+    <div
+      class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5 px-4 text-center"
+    >
+      <span class="text-muted-foreground max-w-full truncate text-xs font-medium"
+        >{hovered.name}</span
+      >
+      <span class="text-foreground text-xl font-bold tracking-tight tabular-nums"
+        >{hovered.value.toLocaleString()}</span
+      >
+      <span class="text-muted-foreground text-[11px] font-medium">{hovered.percentage}%</span>
+    </div>
+  {:else if centerLabel}
     <div
       class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5 text-center"
     >
@@ -112,22 +113,12 @@
 
   {#if loading}
     <div
-      class="flex flex-col items-center gap-6 {chartAreaClass}"
+      class="flex items-center justify-center {chartAreaClass}"
       style={chartStyle}
       bind:clientWidth={areaWidth}
       bind:clientHeight={areaHeight}
     >
-      <div class="flex min-h-0 flex-1 items-center justify-center">
-        <Skeleton class="rounded-full" style="width: {ringSize}px; height: {ringSize}px" />
-      </div>
-      <div class="flex flex-wrap justify-center gap-4">
-        {#each [0, 1, 2] as i (i)}
-          <div class="flex items-center gap-2">
-            <Skeleton class="size-3 rounded-full" />
-            <Skeleton class="h-3 w-16" />
-          </div>
-        {/each}
-      </div>
+      <Skeleton class="rounded-full" style="width: {ringSize}px; height: {ringSize}px" />
     </div>
   {:else if data.length === 0}
     <div
@@ -157,40 +148,23 @@
           fill="none"
           stroke={data[0].color}
           stroke-width={strokeWidth}
+          class="cursor-default"
+          role="img"
+          aria-label="{data[0].name}: {data[0].value}"
+          onmouseenter={() => (singleHovered = true)}
+          onmouseleave={() => (singleHovered = false)}
         />
       </svg>
-      {@render centerContent()}
+      {@render centerContent(singleHovered ? { ...data[0], percentage: 100 } : undefined)}
     </div>
-
-    {#if showLegend}
-      <div class={legendClass}>
-        {#each itemsWithPercent as item (item.name)}
-          <div
-            class="hover:bg-muted/60 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors"
-          >
-            <span
-              class="inline-block size-2.5 shrink-0 rounded-full"
-              style="background-color: {item.color}"
-            ></span>
-            <span class="text-foreground truncate font-medium">{item.name}</span>
-            <span class="text-muted-foreground shrink-0 font-mono text-xs tabular-nums"
-              >{item.percentage}%</span
-            >
-            <span class="ml-auto shrink-0 font-mono text-xs font-semibold tabular-nums">
-              {item.value.toLocaleString()}
-            </span>
-          </div>
-        {/each}
-      </div>
-    {/if}
   {:else}
-    <div class={contentWrapClass}>
-      <div
-        class="relative {legendPosition === 'side'
-          ? 'mx-auto aspect-square h-40 shrink-0 sm:mx-0 sm:h-full sm:max-h-56'
-          : chartAreaClass}"
-        style={chartStyle}
-      >
+    <div
+      class="flex items-center justify-center {chartAreaClass}"
+      style={chartStyle}
+      bind:clientWidth={areaWidth}
+      bind:clientHeight={areaHeight}
+    >
+      <div class="relative" style="width: {ringSize}px; height: {ringSize}px;">
         <Chart.Container config={chartConfig} class="aspect-auto h-full w-full">
           <PieChart
             {data}
@@ -201,47 +175,15 @@
             {innerRadius}
             padAngle={0.02}
             cornerRadius={4}
+            bind:context={pieContext}
           >
-            {#snippet tooltip()}
-              <Chart.Tooltip indicator="dot">
-                {#snippet formatter({ value, name })}
-                  {@const pct =
-                    total > 0 && typeof value === 'number'
-                      ? roundToDec((value / total) * 100, 1)
-                      : 0}
-                  <span class="text-muted-foreground">{name}</span>
-                  <span class="font-mono font-medium tabular-nums">
-                    {typeof value === 'number' ? value.toLocaleString() : value} ({pct}%)
-                  </span>
-                {/snippet}
-              </Chart.Tooltip>
-            {/snippet}
+            {#snippet tooltip()}{/snippet}
           </PieChart>
         </Chart.Container>
-        {@render centerContent()}
+        {@render centerContent(
+          hoveredDatum ? { ...hoveredDatum, percentage: hoveredPercentage } : undefined
+        )}
       </div>
-
-      {#if showLegend && itemsWithPercent.length > 0}
-        <div class={legendClass}>
-          {#each itemsWithPercent as item (item.name)}
-            <div
-              class="hover:bg-muted/60 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors"
-            >
-              <span
-                class="inline-block size-2.5 shrink-0 rounded-full"
-                style="background-color: {item.color}"
-              ></span>
-              <span class="text-foreground truncate font-medium">{item.name}</span>
-              <span class="text-muted-foreground shrink-0 font-mono text-xs tabular-nums"
-                >{item.percentage}%</span
-              >
-              <span class="ml-auto shrink-0 font-mono text-xs font-semibold tabular-nums">
-                {item.value.toLocaleString()}
-              </span>
-            </div>
-          {/each}
-        </div>
-      {/if}
     </div>
   {/if}
 </div>

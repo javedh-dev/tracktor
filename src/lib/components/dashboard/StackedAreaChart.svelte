@@ -2,10 +2,11 @@
   import * as Chart from '$ui/chart/index.js';
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
-  import { Area, AreaChart, type AreaChartProps } from 'layerchart';
+  import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
   import type { MonthlyExpensePoint } from '$lib/domain/dashboard';
   import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 
@@ -33,12 +34,6 @@
   const hasData = $derived(data.some((point) => point.total > 0));
 
   const chartProps = {
-    area: {
-      curve: curveCatmullRom,
-      'fill-opacity': 0.65,
-      line: { class: 'stroke-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.12)]' },
-      motion: 'tween'
-    },
     xAxis: {
       format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
     },
@@ -64,18 +59,12 @@
     ? 'area-chart relative flex h-full flex-col'
     : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+  <div class="mb-4 flex flex-wrap items-center gap-2">
     {#if !bare}
       <span class="font-bold">{title}</span>
     {/if}
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-      {#each SERIES as s (s.key)}
-        <span class="text-muted-foreground inline-flex items-center gap-1.5 text-xs font-medium">
-          <span class="inline-block size-1.5 rounded-full" style="background-color: {s.color}"
-          ></span>
-          {s.label}
-        </span>
-      {/each}
+    <div class="ml-auto">
+      <LegendInfoGroup items={SERIES.map((s) => ({ color: s.color, label: s.label }))} />
     </div>
   </div>
   {#if loading}
@@ -100,7 +89,7 @@
         data={chartData}
         x="x"
         xScale={scaleUtc()}
-        padding={{ left: 48 }}
+        padding={{ left: 48, bottom: 24 }}
         series={SERIES.map((s) => ({ key: s.key, label: s.label, color: s.color }))}
         seriesLayout="stack"
         axis
@@ -122,7 +111,24 @@
         {/snippet}
         {#snippet marks({ context }: { context: any })}
           {#each context.series.visibleSeries as s (s.key)}
-            <Area seriesKey={s.key} {...chartProps.area} />
+            <LinearGradient
+              stops={[
+                'color-mix(in lch, ' + s.color + ' 55%, transparent)',
+                'color-mix(in lch, ' + s.color + ' 4%, transparent)'
+              ]}
+              vertical
+            >
+              {#snippet children({ gradient })}
+                <Area
+                  seriesKey={s.key}
+                  curve={curveCatmullRom}
+                  fillOpacity={0.8}
+                  line={{ class: 'stroke-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.12)]' }}
+                  motion="tween"
+                  fill={gradient}
+                />
+              {/snippet}
+            </LinearGradient>
             <ChartPoints seriesKey={s.key} color={s.color} />
           {/each}
         {/snippet}

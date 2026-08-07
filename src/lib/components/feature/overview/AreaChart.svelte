@@ -3,9 +3,11 @@
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
   import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
+  import type { Snippet } from 'svelte';
   import type { DataPoint } from '$lib/domain/shared';
   import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { overview_chart_no_data } from '$lib/paraglide/messages/_index.js';
@@ -20,7 +22,8 @@
     xFormatter,
     valueFormatter,
     loading = false,
-    bare = false
+    bare = false,
+    filter
   }: {
     chartData: DataPoint[];
     color?: string;
@@ -31,6 +34,8 @@
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
     bare?: boolean;
+    /** Rendered on the right of the header, alongside the average badge. */
+    filter?: Snippet;
   } = $props();
 
   const chartProps = {
@@ -86,16 +91,14 @@
     ? 'area-chart relative flex h-full flex-col'
     : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  <div class="mb-4 flex shrink-0 flex-row items-center justify-start gap-2 font-bold">
+  <div class="mb-4 flex flex-wrap items-center gap-2 font-bold">
     {#if !bare}
       <span>{title}</span>
     {/if}
-    <span
-      class="bg-background/90 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium shadow-sm"
-    >
-      <span class="inline-block size-1.5 rounded-full" style="background-color: {color}"></span>
-      Avg: {formattedAverage}
-    </span>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <LegendInfoGroup items={[{ color, label, detail: `Avg ${formattedAverage}` }]} />
+      {@render filter?.()}
+    </div>
   </div>
   {#if loading}
     <div
@@ -119,7 +122,7 @@
         data={chartDataWithAverage}
         x="x"
         xScale={scaleUtc()}
-        padding={{ left: 48 }}
+        padding={{ left: 48, bottom: 24 }}
         series={[
           {
             key: 'y',

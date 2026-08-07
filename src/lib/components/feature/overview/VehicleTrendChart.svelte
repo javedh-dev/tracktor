@@ -3,10 +3,12 @@
   import { scaleUtc } from 'd3-scale';
   import { curveCatmullRom } from 'd3-shape';
   import { cubicOut } from 'svelte/easing';
-  import { Area, AreaChart, type AreaChartProps } from 'layerchart';
+  import { Area, AreaChart, LinearGradient, type AreaChartProps } from 'layerchart';
+  import type { Snippet } from 'svelte';
   import type { VehicleTrendSeries } from '$stores/chart.svelte';
   import ChartPoints from '$appui/ChartPoints.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
+  import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$ui/skeleton/skeleton.svelte';
   import { overview_chart_no_data } from '$lib/paraglide/messages/_index.js';
@@ -17,7 +19,8 @@
     xFormatter,
     valueFormatter,
     loading = false,
-    bare = false
+    bare = false,
+    filter
   }: {
     series: VehicleTrendSeries[];
     title: string;
@@ -26,6 +29,8 @@
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
     bare?: boolean;
+    /** Rendered on the right of the header, alongside the legend/average badge. */
+    filter?: Snippet;
   } = $props();
 
   // Fallback for vehicles without a color set. ponytail: fixed 5-hue categorical
@@ -86,34 +91,22 @@
     ? 'area-chart relative flex h-full flex-col'
     : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
-  <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+  <div class="mb-4 flex flex-wrap items-center gap-2">
     {#if !bare}
       <span class="font-bold">{title}</span>
     {/if}
-    {#if coloredSeries.length > 1}
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-        {#each coloredSeries as s (s.vehicleId)}
-          <span class="text-muted-foreground inline-flex items-center gap-1.5 text-xs font-medium">
-            <span class="inline-block size-1.5 rounded-full" style="background-color: {s.color}"
-            ></span>
-            {s.label}
-            {#if s.formattedAverage !== undefined}
-              <span class="opacity-70">· Avg {s.formattedAverage}</span>
-            {/if}
-          </span>
-        {/each}
-      </div>
-    {:else if coloredSeries[0]?.formattedAverage !== undefined}
-      <span
-        class="bg-background/90 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium shadow-sm"
-      >
-        <span
-          class="inline-block size-1.5 rounded-full"
-          style="background-color: {coloredSeries[0].color}"
-        ></span>
-        Avg: {coloredSeries[0].formattedAverage}
-      </span>
-    {/if}
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      {#if coloredSeries.length > 0}
+        <LegendInfoGroup
+          items={coloredSeries.map((s) => ({
+            color: s.color,
+            label: s.label,
+            detail: s.formattedAverage !== undefined ? `Avg ${s.formattedAverage}` : undefined
+          }))}
+        />
+      {/if}
+      {@render filter?.()}
+    </div>
   </div>
   {#if loading}
     <div
@@ -137,7 +130,7 @@
         x="x"
         y="y"
         xScale={scaleUtc()}
-        padding={{ left: 48 }}
+        padding={{ left: 48, bottom: 24 }}
         series={coloredSeries.map((s) => ({
           key: s.vehicleId,
           label: s.label,
@@ -162,21 +155,31 @@
         {/snippet}
         {#snippet marks()}
           {#each coloredSeries as s (s.vehicleId)}
-            <Area
-              seriesKey={s.vehicleId}
-              data={s.data}
-              x="x"
-              y1="y"
-              curve={curveCatmullRom}
-              fill={s.color}
-              fillOpacity={0.12}
-              line={{
-                stroke: s.color,
-                class: 'stroke-2',
-                motion: 'none',
-                draw: { duration: 900, easing: cubicOut }
-              }}
-            />
+            <LinearGradient
+              stops={[
+                'color-mix(in lch, ' + s.color + ' 55%, transparent)',
+                'color-mix(in lch, ' + s.color + ' 4%, transparent)'
+              ]}
+              vertical
+            >
+              {#snippet children({ gradient })}
+                <Area
+                  seriesKey={s.vehicleId}
+                  data={s.data}
+                  x="x"
+                  y1="y"
+                  curve={curveCatmullRom}
+                  fillOpacity={0.8}
+                  line={{
+                    stroke: s.color,
+                    class: 'stroke-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]',
+                    motion: 'none',
+                    draw: { duration: 900, easing: cubicOut }
+                  }}
+                  fill={gradient}
+                />
+              {/snippet}
+            </LinearGradient>
             <ChartPoints seriesKey={s.vehicleId} data={s.data} color={s.color} />
           {/each}
         {/snippet}

@@ -19,11 +19,10 @@
   const data = $derived.by(() => {
     const bucket = metric === 'other' ? summary?.compliance.other : summary?.compliance.insurance;
     if (!bucket) return [];
+    const invalid = bucket.expiringSoon + bucket.expired + bucket.notAvailable;
     return [
-      { name: 'Valid', value: bucket.valid, color: 'var(--chart-1)' },
-      { name: 'Expiring Soon', value: bucket.expiringSoon, color: 'var(--chart-4)' },
-      { name: 'Expired', value: bucket.expired, color: 'var(--chart-5)' },
-      { name: 'N/A', value: bucket.notAvailable, color: 'var(--muted-foreground)' }
+      { name: 'Valid', value: bucket.valid, color: 'var(--success)' },
+      { name: 'Invalid', value: invalid, color: 'var(--destructive)' }
     ].filter((d) => d.value > 0);
   });
 </script>

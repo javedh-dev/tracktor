@@ -99,7 +99,7 @@
         icon={AlertTriangle}
         label={maintenance_stat_due_soon()}
         value={vehiclesDueSoon}
-        color="bg-gradient-to-br from-rose-400 to-rose-600 shadow-rose-500/30"
+        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
       />
     </div>
   {:else}

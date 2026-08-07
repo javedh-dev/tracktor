@@ -91,7 +91,6 @@
         <div class="bg-card col-span-5 h-72 rounded-2xl border p-4">
           <DonutChart
             bare
-            legendPosition="side"
             data={costDonutData(costs)}
             title={reports_chart_breakdown_title()}
             {loading}

@@ -28,7 +28,7 @@ const calculateMileageData = (logs: FuelLog[]) => {
     .sort((a, b) => a.x.getTime() - b.x.getTime());
 };
 
-const calculateFuelAmountData = (logs: FuelLog[]) => {
+export const calculateFuelAmountData = (logs: FuelLog[]) => {
   return logs
     .filter((log) => log.fuelAmount)
     .map((log) => {
