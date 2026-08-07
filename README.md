@@ -21,9 +21,7 @@ If you own more than one vehicle, you know the drill: fuel receipts in a drawer,
 
 Run it on a Raspberry Pi, a home server, or a $5 VPS. Your data stays yours.
 
-<p align="center">
-    <video alt="Dashboard" src="./docs/images/tracktor-demo.mov" width="90%" style="border-radius: 10px" ></video>
-</p>
+![Tracktor Demo](https://github.com/javedh-dev/tracktor/raw/refs/heads/dev/docs/images/tracktor-demo.mp4)
 
 ## What it does
 
