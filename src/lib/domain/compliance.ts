@@ -5,7 +5,13 @@ import Leaf from '@lucide/svelte/icons/leaf';
 import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 import FileText from '@lucide/svelte/icons/file-text';
 import Shapes from '@lucide/svelte/icons/shapes';
-import { apiDateString, optionalApiDateString } from './shared';
+import {
+  apiDateString,
+  dateStringForFormat,
+  optionalApiDateString,
+  optionalDateStringForFormat
+} from './shared';
+import { parseWithFormat } from '$lib/helper/date.helper';
 import { getNextDueDate } from '$lib/helper/recurrence.helper';
 
 /**
@@ -196,9 +202,30 @@ export const complianceSchema = z
       if (data.endDate === undefined) return true;
       if (!data.endDate) return false;
       if (!data.startDate) return true;
-      return new Date(data.endDate) > new Date(data.startDate);
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+      // Field-level form validation handles localized values; this comparison
+      // is for ISO API values only.
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return true;
+      return endDate > startDate;
     },
     { message: 'End date must be after start date when recurrence is fixed' }
   );
 
 export type ComplianceSchema = typeof complianceSchema;
+
+export const complianceFormSchema = (dateFormat: string) =>
+  complianceSchema
+    .safeExtend({
+      startDate: dateStringForFormat(dateFormat),
+      endDate: optionalDateStringForFormat(dateFormat)
+    })
+    .refine(
+      (data) => {
+        if (data.recurrenceType !== 'none' || !data.startDate || !data.endDate) return true;
+        const startDate = parseWithFormat(data.startDate, dateFormat);
+        const endDate = parseWithFormat(data.endDate, dateFormat);
+        return !!startDate && !!endDate && endDate > startDate;
+      },
+      { message: 'End date must be after start date when recurrence is fixed' }
+    );
