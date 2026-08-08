@@ -13,12 +13,13 @@ export async function initializeDatabase(): Promise<void> {
     logger.info('Initializing database...');
 
     // Run migrations
-    logger.info('Running database migrations...');
+    const migrationsFolder = resolve(
+      env.RUNTIME.toLowerCase() === 'docker' ? process.cwd() : 'src/server/db',
+      'migrations'
+    );
+    logger.info(`Running database migrations in \`${migrationsFolder}\`...`);
     await migrate(db, {
-      migrationsFolder: resolve(
-        env.NODE_ENV === 'production' ? process.cwd() : 'src/server/db',
-        'migrations'
-      ),
+      migrationsFolder: migrationsFolder,
       migrationsTable: '_migrations'
     });
     logger.info('Database migrations completed successfully');
