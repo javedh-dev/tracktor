@@ -1,6 +1,7 @@
 import type { FuelLog } from '$lib/domain/fuel';
 import type { DataPoint } from '$lib/domain/shared';
 import type { Vehicle } from '$lib/domain/vehicle';
+import { vehicleTrendColor } from '$lib/domain/vehicle';
 import { fuelLogStore } from './fuel-log.svelte';
 import { vehicleStore } from './vehicle.svelte';
 
@@ -28,7 +29,7 @@ const calculateMileageData = (logs: FuelLog[]) => {
     .sort((a, b) => a.x.getTime() - b.x.getTime());
 };
 
-const calculateFuelAmountData = (logs: FuelLog[]) => {
+export const calculateFuelAmountData = (logs: FuelLog[]) => {
   return logs
     .filter((log) => log.fuelAmount)
     .map((log) => {
@@ -73,7 +74,7 @@ const groupByVehicle = (
       vehicleId,
       label,
       fuelType: vehicle?.fuelType ?? 'petrol',
-      color: vehicle?.color ?? null,
+      color: vehicleTrendColor(vehicle?.color),
       data: calculate(vehicleLogs)
     };
   });

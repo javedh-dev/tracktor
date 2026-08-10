@@ -25,9 +25,9 @@
 
   const trendClass = $derived(
     trend?.direction === 'up'
-      ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+      ? 'bg-success/10 text-success'
       : trend?.direction === 'down'
-        ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+        ? 'bg-destructive/10 text-destructive'
         : 'bg-muted text-muted-foreground'
   );
 </script>

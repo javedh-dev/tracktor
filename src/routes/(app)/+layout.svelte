@@ -39,7 +39,7 @@
       {#if demoMode}
         <div
           id="demo-mode-banner"
-          class="flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300"
+          class="bg-warning/10 text-warning flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
         >
           <TriangleAlert class="size-3.5 shrink-0" />
           <span>{demo_banner()}</span>

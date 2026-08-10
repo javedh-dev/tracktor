@@ -10,7 +10,7 @@
   import { toast } from 'svelte-sonner';
   import { sheetStore } from '$stores/sheet.svelte';
   import VehicleForm from './VehicleForm.svelte';
-  import VehicleImage from './VehicleImage.svelte';
+  import VehicleTypeBadge from './VehicleTypeBadge.svelte';
   import * as m from '$lib/paraglide/messages';
   import type { Vehicle } from '$lib/domain/vehicle';
 
@@ -44,10 +44,7 @@
   class={`hover:border-primary flex items-center gap-3 rounded-xl border-2 p-3 transition-colors ${isSelected ? 'border-primary/50' : 'border-transparent'}`}
 >
   <button type="button" {onclick} class="flex min-w-0 flex-1 items-center gap-3 text-left">
-    <VehicleImage
-      image={vehicle.image}
-      class="bg-secondary size-11 shrink-0 rounded-lg object-cover"
-    />
+    <VehicleTypeBadge vehicleType={vehicle.vehicleType} color={vehicle.color} class="size-11" />
     <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-semibold">{vehicle.make} {vehicle.model}</p>
       <p class="text-muted-foreground truncate text-xs">

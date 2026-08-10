@@ -15,6 +15,7 @@
   import MaintenanceForm from '../maintenance/MaintenanceForm.svelte';
   import type { VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Props {
     vehicle: VehicleHubSummary;
@@ -31,7 +32,7 @@
       label: m.nav_fuel_logs(),
       subtitle: m.vehicle_hub_records_count({ count: vehicle.totalFuelLogs ?? 0 }),
       href: `/fuel?vehicle=${vehicleId}`,
-      dotClass: 'bg-green-500/10 text-green-600 dark:text-green-400',
+      dotClass: ACCENT.moss.chip,
       addAriaLabel: m.vehicle_action_add_fuel_log(),
       onAdd: () =>
         sheetStore.openSheet(FuelLogForm, m.vehicle_action_add_fuel_log(), '', { vehicleId })
@@ -43,7 +44,7 @@
       label: m.nav_maintenance(),
       subtitle: m.vehicle_hub_records_count({ count: vehicle.totalMaintenanceLogs ?? 0 }),
       href: `/maintenance?vehicle=${vehicleId}`,
-      dotClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      dotClass: ACCENT.ochre.chip,
       addAriaLabel: m.vehicle_action_add_maintenance_log(),
       onAdd: () =>
         sheetStore.openSheet(MaintenanceForm, m.vehicle_action_add_maintenance_log(), '', {
@@ -59,7 +60,7 @@
         ? m.vehicle_hub_valid_till({ date: formatDate(vehicle.insuranceValidTill) })
         : m.vehicle_details_not_available(),
       href: `/compliance?vehicle=${vehicleId}`,
-      dotClass: 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+      dotClass: ACCENT.teal.chip
     },
     {
       id: 'reminders',
@@ -68,7 +69,7 @@
       label: m.nav_reminders(),
       subtitle: m.vehicle_hub_upcoming_count({ count: vehicle.upcomingRemindersCount ?? 0 }),
       href: `/reminders?vehicle=${vehicleId}`,
-      dotClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+      dotClass: ACCENT.plum.chip
     }
   ]);
 </script>

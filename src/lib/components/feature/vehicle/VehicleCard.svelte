@@ -22,6 +22,7 @@
   import VehicleCardDetails from './VehicleCardDetails.svelte';
   import VehicleCardHeader from './VehicleCardHeader.svelte';
   import VehicleQuickActions from './VehicleQuickActions.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   const { vehicle, onclick, onkeydown } = $props();
   let deleteDialog = $state(false);
@@ -41,9 +42,8 @@
     {
       id: 'vehicle-card-fuel-btn',
       feature: Features.FUEL_LOG,
-      buttonStyles: 'hover:bg-green-100 dark:hover:bg-green-700',
-      iconStyles:
-        'text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-200',
+      buttonStyles: ACCENT.moss.hoverBg,
+      iconStyles: ACCENT.moss.hoverText,
       icon: Fuel,
       onclick: () => sheetStore.openSheet(FuelLogForm, m.vehicle_action_add_fuel_log(), ''),
       ariaLabel: m.vehicle_action_add_fuel_log()
@@ -51,9 +51,8 @@
     {
       id: 'vehicle-card-maintenance-btn',
       feature: Features.MAINTENANCE,
-      buttonStyles: 'hover:bg-amber-100 dark:hover:bg-amber-700',
-      iconStyles:
-        'text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-200',
+      buttonStyles: ACCENT.ochre.hoverBg,
+      iconStyles: ACCENT.ochre.hoverText,
       icon: Wrench,
       onclick: () =>
         sheetStore.openSheet(MaintenanceForm, m.vehicle_action_add_maintenance_log(), ''),
@@ -62,8 +61,8 @@
     {
       id: 'vehicle-card-compliance-btn',
       feature: Features.COMPLIANCE,
-      buttonStyles: 'hover:bg-sky-100 dark:hover:bg-sky-700',
-      iconStyles: 'text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-200',
+      buttonStyles: ACCENT.teal.hoverBg,
+      iconStyles: ACCENT.teal.hoverText,
       icon: Shield,
       onclick: () => sheetStore.openSheet(ComplianceForm, m.vehicle_action_add_compliance(), ''),
       ariaLabel: m.vehicle_action_add_compliance()
@@ -71,9 +70,8 @@
     {
       id: 'vehicle-card-reminder-btn',
       feature: Features.REMINDERS,
-      buttonStyles: 'hover:bg-indigo-100 dark:hover:bg-indigo-700',
-      iconStyles:
-        'text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-200',
+      buttonStyles: ACCENT.plum.hoverBg,
+      iconStyles: ACCENT.plum.hoverText,
       icon: BellRing,
       onclick: () => sheetStore.openSheet(ReminderForm, m.vehicle_action_add_reminder(), ''),
       ariaLabel: m.vehicle_action_add_reminder()
@@ -104,8 +102,8 @@
         <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
           <IconButton
             id="vehicle-card-edit-btn"
-            buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-            iconStyles="text-gray-600 dark:text-gray-100 hover:text-sky-500"
+            buttonStyles="hover:bg-muted"
+            iconStyles="text-muted-foreground hover:text-[#5f8783]"
             icon={Pencil}
             onclick={() => {
               sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle);
@@ -114,8 +112,8 @@
           />
           <IconButton
             id="vehicle-card-delete-btn"
-            buttonStyles="hover:bg-gray-200 dark:hover:bg-gray-700"
-            iconStyles="text-gray-600 dark:text-gray-100 hover:text-red-500"
+            buttonStyles="hover:bg-muted"
+            iconStyles="text-muted-foreground hover:text-destructive"
             icon={Trash2}
             onclick={() => (deleteDialog = true)}
             ariaLabel={m.vehicle_action_delete()}

@@ -9,7 +9,12 @@
   import BadgeCheck from '@lucide/svelte/icons/badge-check';
   import StatusPill from '$dashboard/StatusPill.svelte';
   import { formatDate } from '$lib/helper/format.helper';
-  import { getFuelTypeLabel, getVehicleTypeIcon, getVehicleTypeLabel } from '$lib/domain/vehicle';
+  import {
+    getFuelTypeLabel,
+    getVehicleTypeIcon,
+    getVehicleTypeLabel,
+    vintageVehicleColor
+  } from '$lib/domain/vehicle';
   import type { VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
 
@@ -49,7 +54,7 @@
       icon: Paintbrush,
       label: m.vehicle_details_color(),
       value: vehicle.color || notSpecified,
-      colorDot: vehicle.color ?? undefined
+      colorDot: vintageVehicleColor(vehicle.color) ?? undefined
     },
     {
       icon: Shield,

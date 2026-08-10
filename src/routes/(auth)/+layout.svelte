@@ -20,10 +20,10 @@
     {#if env.DEMO_MODE}
       <div
         id="demo-mode-banner"
-        class="mb-6 flex items-center gap-2 rounded-md bg-amber-400/10 px-3 py-2 text-xs font-medium text-amber-800 dark:text-amber-300"
+        class="bg-warning/10 text-warning mb-6 flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium"
       >
         <TriangleAlert class="size-auto shrink-0" />
-        <span>{m.demo_banner()} <strong class="text-amber-600">{m.default_login()}</strong></span>
+        <span>{m.demo_banner()} <strong class="font-semibold">{m.default_login()}</strong></span>
       </div>
     {/if}
     <Card.Root id="auth-card-root" class="overflow-hidden p-0">

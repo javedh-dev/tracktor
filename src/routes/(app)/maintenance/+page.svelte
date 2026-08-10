@@ -11,6 +11,7 @@
   import { readVehicleScope } from '$lib/scope/vehicle-scope.svelte';
   import { maintenanceStore } from '$stores/maintenance.svelte';
   import { reminderStore } from '$stores/reminder.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
   import MaintenenceLogTab from '$feature/maintenance/MaintenenceLogTab.svelte';
   import MaintenanceTimeline from '$feature/maintenance/MaintenanceTimeline.svelte';
   import { Features } from '$lib/helper/feature.helper';
@@ -87,19 +88,19 @@
         icon={Wrench}
         label={maintenance_stat_total_services()}
         value={totalServices > 0 ? totalServices : '--'}
-        color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
+        color={ACCENT.moss.gradient}
       />
       <StatCard
         icon={DollarSign}
         label={maintenance_stat_total_spent()}
         value={totalSpent > 0 ? formatCurrency(totalSpent) : '--'}
-        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
+        color={ACCENT.ochre.gradient}
       />
       <StatCard
         icon={AlertTriangle}
         label={maintenance_stat_due_soon()}
         value={vehiclesDueSoon}
-        color="bg-gradient-to-br from-rose-400 to-rose-600 shadow-rose-500/30"
+        color={ACCENT.ochre.gradient}
       />
     </div>
   {:else}
@@ -108,19 +109,19 @@
         icon={HeartPulse}
         label={maintenance_stat_last_service()}
         value={lastServiceDate ? formatDate(lastServiceDate) : '--'}
-        color="bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30"
+        color={ACCENT.moss.gradient}
       />
       <StatCard
         icon={CalendarDays}
         label={maintenance_stat_next_service()}
         value={nextServiceDate ? formatDate(nextServiceDate) : '--'}
-        color="bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30"
+        color={ACCENT.ochre.gradient}
       />
       <StatCard
         icon={Gauge}
         label={maintenance_stat_odometer()}
         value={currentOdometer > 0 ? `${currentOdometer.toLocaleString()} km` : '--'}
-        color="bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30"
+        color={ACCENT.denim.gradient}
       />
     </div>
   {/if}

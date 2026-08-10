@@ -46,14 +46,14 @@
 
   const colorClass = $derived(
     status === 'valid' || status === 'active' || status === 'good'
-      ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border-green-200 dark:border-green-800'
+      ? 'bg-success/10 text-success border-success/20'
       : status === 'expiring_soon' || status === 'attention'
-        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+        ? 'bg-warning/10 text-warning border-warning/20'
         : status === 'not_available'
-          ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300 border-gray-200 dark:border-gray-800'
+          ? 'bg-muted text-muted-foreground border-border'
           : status === 'upcoming'
-            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border-blue-200 dark:border-blue-800'
-            : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border-red-200 dark:border-red-800'
+            ? 'bg-info/10 text-info border-info/20'
+            : 'bg-destructive/10 text-destructive border-destructive/20'
   );
 </script>
 

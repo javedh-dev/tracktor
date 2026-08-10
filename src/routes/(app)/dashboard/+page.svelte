@@ -8,6 +8,7 @@
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import LayoutGrid from '@lucide/svelte/icons/layout-grid';
   import ChartBar from '@lucide/svelte/icons/chart-bar';
+  import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
   import { dashboardStore } from '$stores/dashboard.svelte';
   import { dashboardLayoutStore } from '$stores/dashboard-layout.svelte';
   import { authStore } from '$stores/auth.svelte';
@@ -16,8 +17,11 @@
   import AddWidgetPanel from '$feature/dashboard/AddWidgetPanel.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import Button from '$ui/button/button.svelte';
+  import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import { goto } from '$app/navigation';
   import * as m from '$lib/paraglide/messages';
+
+  let resetDialogOpen = $state(false);
 
   onMount(() => {
     dashboardStore.fetchSummary();
@@ -37,6 +41,9 @@
 
 <div class="min-h-full space-y-6">
   <PageHeader title="Dashboard" description={greeting}>
+    <Button variant="outline" onclick={() => (resetDialogOpen = true)}>
+      <LabelWithIcon icon={RotateCcw} label="Reset to Default" />
+    </Button>
     <Button variant="outline" onclick={() => sheetStore.openSheet(AddWidgetPanel, 'Add Widget')}>
       <LabelWithIcon icon={LayoutGrid} label="Add Widget" />
     </Button>
@@ -47,6 +54,18 @@
       <LabelWithIcon icon={CirclePlus} label={m.app_add_vehicle()} />
     </Button>
   </PageHeader>
+
+  <DeleteConfirmation
+    bind:open={resetDialogOpen}
+    icon={RotateCcw}
+    title="Reset dashboard?"
+    message="This restores the default set of widgets and layout, replacing your current customization."
+    confirmLabel="Reset"
+    onConfirm={() => {
+      dashboardLayoutStore.resetToDefault();
+      resetDialogOpen = false;
+    }}
+  />
 
   <DashboardGrid
     items={dashboardLayoutStore.items}

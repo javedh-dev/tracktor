@@ -15,9 +15,11 @@
     vehicleSchema,
     FUEL_TYPES,
     VEHICLE_TYPES,
+    STANDARD_VEHICLE_COLORS,
     getFuelTypeLabel,
     getVehicleTypeLabel,
-    getVehicleTypeIcon
+    getVehicleTypeIcon,
+    vintageVehicleColor
   } from '$lib/domain/vehicle';
   import Building2 from '@lucide/svelte/icons/building-2';
   import Calendar from '@lucide/svelte/icons/calendar';
@@ -25,7 +27,6 @@
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
   import Fingerprint from '@lucide/svelte/icons/fingerprint';
   import IdCard from '@lucide/svelte/icons/id-card';
-  import Paintbrush from '@lucide/svelte/icons/paintbrush';
   import Fuel from '@lucide/svelte/icons/fuel';
   import SubmitButton from '$appui/SubmitButton.svelte';
   import * as Select from '$ui/select/index.js';
@@ -73,6 +74,12 @@
     }
   });
   const { form: formData, enhance } = form;
+
+  const matchedStandardColor = $derived(
+    STANDARD_VEHICLE_COLORS.find(
+      (c) => c.hex.toLowerCase() === ($formData.color ?? '').toLowerCase()
+    )
+  );
 
   $effect(() => {
     if (data) {
@@ -182,7 +189,38 @@
             <FormLabel description={m.vehicle_form_color_desc()} required>
               {m.vehicle_form_color_label()}
             </FormLabel>
-            <Input {...props} bind:value={$formData.color} icon={Paintbrush} type="color" />
+            <Select.Root
+              type="single"
+              value={matchedStandardColor?.hex}
+              onValueChange={(v) => {
+                if (v) $formData.color = v;
+              }}
+            >
+              <Select.Trigger {...props} class="w-full">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="size-3 shrink-0 rounded-full border"
+                    style={`background-color: ${vintageVehicleColor($formData.color) ?? 'transparent'}`}
+                  ></span>
+                  <span class="truncate">
+                    {matchedStandardColor ? matchedStandardColor.name : m.color_picker_label()}
+                  </span>
+                </div>
+              </Select.Trigger>
+              <Select.Content>
+                {#each STANDARD_VEHICLE_COLORS as swatch (swatch.hex)}
+                  <Select.Item value={swatch.hex}>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="size-3 shrink-0 rounded-full border"
+                        style={`background-color: ${vintageVehicleColor(swatch.hex)}`}
+                      ></span>
+                      {swatch.name}
+                    </div>
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
           {/snippet}
         </Form.Control>
         <!-- <Form.Description>Model of the vehicle</Form.Description> -->

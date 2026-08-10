@@ -14,9 +14,9 @@
   type ReminderStatus = 'completed' | 'overdue' | 'upcoming';
 
   const STATUS_STYLES: Record<ReminderStatus, string> = {
-    completed: 'bg-emerald-500',
-    overdue: 'bg-red-500',
-    upcoming: 'bg-blue-500'
+    completed: 'bg-success',
+    overdue: 'bg-destructive',
+    upcoming: 'bg-info'
   };
 
   const daysUntil = (date: Date) => Math.ceil((date.getTime() - Date.now()) / 86_400_000);

@@ -28,6 +28,7 @@
   import Bell from '@lucide/svelte/icons/bell';
   import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
   import Lock from '@lucide/svelte/icons/lock';
+  import { ACCENT } from '$helper/accent-color.helper';
   import NotificationProvidersSettings from '$feature/settings/NotificationProvidersSettings.svelte';
   import SettingsFeaturesTab from '$feature/settings/SettingsFeaturesTab.svelte';
   import SettingsAppearanceFields from '$feature/settings/SettingsAppearanceFields.svelte';
@@ -126,42 +127,42 @@
       label: m.settings_tab_personalization(),
       description: m.settings_nav_desc_personalization(),
       icon: Palette,
-      iconClass: 'bg-violet-500/10 text-violet-500'
+      iconClass: ACCENT.plum.chip
     },
     {
       id: 'localization',
       label: m.settings_tab_localization(),
       description: m.settings_nav_desc_localization(),
       icon: Earth,
-      iconClass: 'bg-blue-500/10 text-blue-500'
+      iconClass: ACCENT.denim.chip
     },
     {
       id: 'advanced',
       label: m.settings_tab_advanced(),
       description: m.settings_nav_desc_advanced(),
       icon: Code,
-      iconClass: 'bg-slate-500/10 text-slate-500'
+      iconClass: ACCENT.fog.chip
     },
     {
       id: 'notifications',
       label: m.settings_tab_notifications(),
       description: m.settings_nav_desc_notifications(),
       icon: Bell,
-      iconClass: 'bg-amber-500/10 text-amber-500'
+      iconClass: ACCENT.ochre.chip
     },
     {
       id: 'units',
       label: m.settings_tab_units(),
       description: m.settings_nav_desc_units(),
       icon: Gauge,
-      iconClass: 'bg-emerald-500/10 text-emerald-500'
+      iconClass: ACCENT.moss.chip
     },
     {
       id: 'features',
       label: m.settings_tab_features(),
       description: m.settings_nav_desc_features(),
       icon: ToggleLeft,
-      iconClass: 'bg-cyan-500/10 text-cyan-500'
+      iconClass: ACCENT.teal.chip
     }
   ]);
 
@@ -281,7 +282,7 @@
           <SettingsSection
             id="personalization"
             icon={Palette}
-            iconClass="bg-violet-500/10 text-violet-500"
+            iconClass={ACCENT.plum.chip}
             title={m.settings_tab_personalization()}
             description={m.settings_personalization_desc()}
           >
@@ -298,7 +299,7 @@
           <SettingsSection
             id="localization"
             icon={Earth}
-            iconClass="bg-blue-500/10 text-blue-500"
+            iconClass={ACCENT.denim.chip}
             title={m.settings_tab_localization()}
             description={m.settings_localization_desc()}
           >
@@ -317,7 +318,7 @@
           <SettingsSection
             id="advanced"
             icon={Code}
-            iconClass="bg-slate-500/10 text-slate-500"
+            iconClass={ACCENT.fog.chip}
             title={m.settings_tab_advanced()}
             description={m.settings_advanced_desc()}
           >
@@ -327,7 +328,7 @@
           <SettingsSection
             id="notifications"
             icon={Bell}
-            iconClass="bg-amber-500/10 text-amber-500"
+            iconClass={ACCENT.ochre.chip}
             title={m.settings_tab_notifications()}
             description={m.settings_notifications_desc()}
           >
@@ -342,7 +343,7 @@
           <SettingsSection
             id="units"
             icon={Gauge}
-            iconClass="bg-emerald-500/10 text-emerald-500"
+            iconClass={ACCENT.moss.chip}
             title={m.settings_tab_units()}
             description={m.settings_units_desc()}
           >
@@ -361,7 +362,7 @@
           <SettingsSection
             id="features"
             icon={ToggleLeft}
-            iconClass="bg-cyan-500/10 text-cyan-500"
+            iconClass={ACCENT.teal.chip}
             title={m.settings_tab_features()}
             description={m.settings_features_intro()}
           >

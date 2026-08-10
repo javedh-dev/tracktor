@@ -1,5 +1,6 @@
 import type { Component } from 'svelte';
 import type { WidgetColSpan, WidgetRowSpan, WidgetType } from '$lib/domain/dashboard';
+import { ACCENT } from '$lib/helper/accent-color.helper';
 import FleetStatWidget from './widgets/FleetStatWidget.svelte';
 import ExpenseBreakdownWidget from './widgets/ExpenseBreakdownWidget.svelte';
 import MonthlyExpenseTrendWidget from './widgets/MonthlyExpenseTrendWidget.svelte';
@@ -40,9 +41,9 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'vehicle-count' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Car,
-    iconColor: 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30'
+    iconColor: ACCENT.denim.gradient
   },
   'stat-total-distance': {
     type: 'stat-total-distance',
@@ -51,9 +52,9 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'total-distance' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Route,
-    iconColor: 'bg-gradient-to-br from-violet-400 to-violet-600 shadow-violet-500/30'
+    iconColor: ACCENT.plum.gradient
   },
   'stat-fuel-used': {
     type: 'stat-fuel-used',
@@ -62,9 +63,9 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'fuel-used' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: Fuel,
-    iconColor: 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30'
+    iconColor: ACCENT.moss.gradient
   },
   'stat-total-expenses': {
     type: 'stat-total-expenses',
@@ -73,9 +74,9 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'total-expenses' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: DollarSign,
-    iconColor: 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30'
+    iconColor: ACCENT.ochre.gradient
   },
   'stat-cost-per-distance': {
     type: 'stat-cost-per-distance',
@@ -84,9 +85,9 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     component: FleetStatWidget,
     extraProps: { metric: 'cost-per-distance' },
     defaultColSpan: 3,
-    defaultRowSpan: 4,
+    defaultRowSpan: 2,
     icon: CircleGauge,
-    iconColor: 'bg-gradient-to-br from-rose-400 to-rose-600 shadow-rose-500/30'
+    iconColor: ACCENT.clay.gradient
   },
   'expense-breakdown-donut': {
     type: 'expense-breakdown-donut',

@@ -98,6 +98,11 @@ class DashboardLayoutStore {
     this.scheduleSave();
   }
 
+  resetToDefault() {
+    this.items = compactLayout(applyMinSizes(DEFAULT_WIDGET_LAYOUT));
+    this.scheduleSave();
+  }
+
   /**
    * Accepts a layout already resolved by the grid engine (see `grid-layout.ts`). Called once per
    * drag/resize gesture, on drop — the grid keeps its own draft while the pointer is down.

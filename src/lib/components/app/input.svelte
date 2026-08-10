@@ -2,7 +2,6 @@
   import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
   import { cn, type WithElementRef } from '$lib/utils.js';
   import type { Component } from 'svelte';
-  import ColorPicker from 'svelte-awesome-color-picker';
   import * as Popover from '$ui/popover';
   import { Calendar } from '$lib/components/ui/calendar/index.js';
   import { formatDateForCalendar } from '$lib/helper/format.helper';
@@ -52,29 +51,6 @@
       bind:value
       {...restProps}
     />
-  {:else if type === 'color'}
-    <div
-      id="color-input-wrapper"
-      class={cn(
-        'border-input bg-background selection:bg-primary dark:bg-input/30',
-        'selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm',
-        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-        'flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow]',
-        'items-center justify-start outline-none disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-        Icon ? 'pr-4 pl-8' : ''
-      )}
-    >
-      <ColorPicker
-        position="responsive"
-        bind:hex={value}
-        label={value?.toUpperCase() || m.color_picker_label()}
-        isAlpha={false}
-        --slider-width="18px"
-        --input-size="18px"
-      />
-    </div>
   {:else if type == 'calendar'}
     <Popover.Root bind:open>
       <Popover.Trigger

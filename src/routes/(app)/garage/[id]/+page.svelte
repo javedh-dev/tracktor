@@ -40,7 +40,7 @@
     <button
       type="button"
       class="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm"
-      onclick={() => goto('/vehicles')}
+      onclick={() => goto('/garage')}
     >
       <ArrowLeft class="size-4" />
       {m.vehicle_hub_back_to_vehicles()}

@@ -9,6 +9,7 @@
   import { formatCurrency } from '$lib/helper/format.helper';
   import type { VehicleActivityEntry, VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Props {
     vehicle: VehicleHubSummary;
@@ -22,17 +23,17 @@
   > = {
     fuel: {
       icon: Fuel,
-      dot: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      dot: ACCENT.moss.chip,
       route: '/fuel'
     },
     maintenance: {
       icon: Wrench,
-      dot: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      dot: ACCENT.ochre.chip,
       route: '/maintenance'
     },
     compliance: {
       icon: Shield,
-      dot: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+      dot: ACCENT.teal.chip,
       route: '/compliance'
     }
   };

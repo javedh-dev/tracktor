@@ -6,11 +6,13 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Badge from '$ui/badge/badge.svelte';
   import { toast } from 'svelte-sonner';
-  import { getFuelTypeLabel, getVehicleTypeIcon, getVehicleTypeLabel } from '$lib/domain/vehicle';
+  import { getFuelTypeLabel, getVehicleTypeLabel } from '$lib/domain/vehicle';
   import { formatDistance, formatMileage } from '$lib/helper/format.helper';
   import type { VehicleHubSummary } from '$lib/domain/vehicle';
   import * as m from '$lib/paraglide/messages';
   import VehicleImage from './VehicleImage.svelte';
+  import VehicleTypeBadge from './VehicleTypeBadge.svelte';
+  import { ACCENT } from '$lib/helper/accent-color.helper';
 
   interface Props {
     vehicle: VehicleHubSummary;
@@ -20,7 +22,6 @@
 
   const fuelLabel = $derived(getFuelTypeLabel(vehicle.fuelType ?? 'petrol', m));
   const vehicleTypeLabel = $derived(getVehicleTypeLabel(vehicle.vehicleType ?? 'car', m));
-  const VehicleTypeIcon = $derived(getVehicleTypeIcon(vehicle.vehicleType ?? 'car'));
 
   // Overall status pill: attention if either compliance record has lapsed, active once both are
   // valid, hidden entirely when there's not enough data yet to say either way.
@@ -29,13 +30,13 @@
       vehicle.insuranceValidityStatus === 'expired' ||
       vehicle.otherComplianceValidityStatus === 'expired'
     ) {
-      return { label: 'Needs Attention', dot: 'bg-amber-500' };
+      return { label: 'Needs Attention', dot: ACCENT.ochre.solid };
     }
     if (
       vehicle.insuranceValidityStatus === 'valid' &&
       vehicle.otherComplianceValidityStatus === 'valid'
     ) {
-      return { label: 'Active', dot: 'bg-emerald-500' };
+      return { label: 'Active', dot: ACCENT.moss.solid };
     }
     return null;
   });
@@ -43,13 +44,13 @@
   const stats = $derived([
     {
       icon: Gauge,
-      color: 'bg-gradient-to-br from-violet-400 to-violet-600',
+      color: ACCENT.plum.gradient,
       value: vehicle.currentOdometer ? formatDistance(vehicle.currentOdometer) : '--',
       label: m.vehicle_hub_stat_odometer()
     },
     {
       icon: Rabbit,
-      color: 'bg-gradient-to-br from-emerald-400 to-emerald-600',
+      color: ACCENT.moss.gradient,
       value: vehicle.overallMileage
         ? formatMileage(vehicle.overallMileage, vehicle.fuelType)
         : '--',
@@ -57,13 +58,13 @@
     },
     {
       icon: Fuel,
-      color: 'bg-gradient-to-br from-amber-400 to-amber-600',
+      color: ACCENT.ochre.gradient,
       value: vehicle.totalFuelLogs ?? 0,
       label: m.vehicle_hub_stat_fuel_logs()
     },
     {
       icon: Wrench,
-      color: 'bg-gradient-to-br from-blue-400 to-blue-600',
+      color: ACCENT.denim.gradient,
       value: vehicle.totalMaintenanceLogs ?? 0,
       label: m.vehicle_hub_stat_maintenance_logs()
     }
@@ -88,9 +89,11 @@
     <div class="flex flex-col gap-8 p-4 sm:p-6 md:col-span-7">
       <div class="flex flex-col">
         <div class="flex flex-row items-center gap-4">
-          <div class="bg-accent rounded-xl p-2">
-            <VehicleTypeIcon style={`color: ${vehicle.color}`} />
-          </div>
+          <VehicleTypeBadge
+            vehicleType={vehicle.vehicleType}
+            color={vehicle.color}
+            class="size-11"
+          />
           <h1 class="text-2xl font-bold sm:text-3xl">
             {vehicle.make}
             {vehicle.model}
