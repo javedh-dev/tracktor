@@ -64,4 +64,25 @@ describe('localized date validation', () => {
       complianceFormSchema('dd/MM/yyyy').safeParse({ ...base, endDate: '12/08/2026' }).success
     ).toBe(false);
   });
+
+  it('does not reverse valid ambiguous dates in day-first formats', () => {
+    const base = {
+      id: null,
+      vehicleId: '123e4567-e89b-42d3-a456-426614174000',
+      type: 'insurance' as const,
+      otherLabel: null,
+      documentNumber: 'ABC123',
+      issuer: 'Insurer',
+      startDate: '10/03/2026',
+      recurrenceType: 'none' as const,
+      recurrenceInterval: 1,
+      cost: null,
+      notes: null,
+      attachment: null
+    };
+
+    expect(
+      complianceFormSchema('dd/MM/yyyy').safeParse({ ...base, endDate: '03/10/2026' }).success
+    ).toBe(true);
+  });
 });

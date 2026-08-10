@@ -194,22 +194,6 @@ export const complianceSchema = z
       return !!data.otherLabel && data.otherLabel.trim().length > 0;
     },
     { message: 'Please name the compliance type', path: ['otherLabel'] }
-  )
-  .refine(
-    (data) => {
-      if (data.recurrenceType === undefined) return true;
-      if (data.recurrenceType !== 'none') return true;
-      if (data.endDate === undefined) return true;
-      if (!data.endDate) return false;
-      if (!data.startDate) return true;
-      const startDate = new Date(data.startDate);
-      const endDate = new Date(data.endDate);
-      // Field-level form validation handles localized values; this comparison
-      // is for ISO API values only.
-      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return true;
-      return endDate > startDate;
-    },
-    { message: 'End date must be after start date when recurrence is fixed' }
   );
 
 export type ComplianceSchema = typeof complianceSchema;
