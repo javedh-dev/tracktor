@@ -7,7 +7,7 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { chartStore } from '$stores/chart.svelte';
   import { ACCENT } from '$lib/helper/accent-color.helper';
-  import { formatMileage } from '$lib/helper/format.helper';
+  import { formatCurrency, formatMileage } from '$lib/helper/format.helper';
   import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
   import { Features } from '$lib/helper/feature.helper';
@@ -52,7 +52,7 @@
       <StatCard
         icon={DollarSign}
         label={fuel_stat_spent()}
-        value={totalCost > 0 ? `$${totalCost.toFixed(2)}` : '--'}
+        value={totalCost > 0 ? formatCurrency(totalCost) : '--'}
         color={ACCENT.ochre.gradient}
       />
       <StatCard

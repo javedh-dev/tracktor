@@ -35,7 +35,7 @@ Run it on a Raspberry Pi, a home server, or a $5 VPS. Your data stays yours.
 - **Expenses & reports** — See what your vehicles actually cost you.
 - **Dashboard** — A fleet-wide overview with widgets you can rearrange to your liking.
 - **Auth & feature toggles** — Username/password login with sessions, and the ability to turn off features you don't need.
-- **10 languages** — English, Hindi, Spanish, French, German, Italian, Arabic, Romanian, Hungarian, and Finnish.
+- **11 languages** — English, Hindi, Spanish, French, German, Italian, Arabic, Romanian, Hungarian, Finnish, and Russian.
 
 ## Tech stack
 
