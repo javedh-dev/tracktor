@@ -9,6 +9,12 @@
   import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import {
+    reports_no_expense_data,
+    reports_type_fuel,
+    reports_type_maintenance,
+    reports_type_compliance
+  } from '$lib/paraglide/messages/_index.js';
 
   let {
     data,
@@ -24,9 +30,9 @@
   } = $props();
 
   const SERIES = [
-    { key: 'fuel', label: 'Fuel', color: 'var(--chart-1)' },
-    { key: 'maintenance', label: 'Maintenance', color: 'var(--chart-2)' },
-    { key: 'compliance', label: 'Compliance', color: 'var(--chart-3)' }
+    { key: 'fuel', label: reports_type_fuel(), color: 'var(--chart-1)' },
+    { key: 'maintenance', label: reports_type_maintenance(), color: 'var(--chart-2)' },
+    { key: 'compliance', label: reports_type_compliance(), color: 'var(--chart-3)' }
   ] as const;
 
   const chartData = $derived(data.map((point) => ({ ...point, x: new Date(`${point.month}-01`) })));
@@ -136,7 +142,7 @@
     </Chart.Container>
   {:else}
     <div class="flex h-full flex-col items-center justify-center">
-      <LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label="No expense data yet" />
+      <LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={reports_no_expense_data()} />
     </div>
   {/if}
 </div>

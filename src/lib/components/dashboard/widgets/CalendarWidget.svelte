@@ -9,6 +9,7 @@
   import Wrench from '@lucide/svelte/icons/wrench';
   import Bell from '@lucide/svelte/icons/bell';
   import { ACCENT } from '$lib/helper/accent-color.helper';
+  import { widget_calendar_no_activity_or_reminders } from '$lib/paraglide/messages/_index.js';
 
   let { summary, loading }: { summary: DashboardSummary | null; loading: boolean } = $props();
 
@@ -153,7 +154,7 @@
         {formatDateForCalendar(selected)}
       </p>
       {#if selectedEvents.length === 0}
-        <p class="text-muted-foreground text-sm">No activity or reminders on this date.</p>
+        <p class="text-muted-foreground text-sm">{widget_calendar_no_activity_or_reminders()}</p>
       {:else}
         <ul class="space-y-1.5">
           {#each selectedEvents as event (event.id)}

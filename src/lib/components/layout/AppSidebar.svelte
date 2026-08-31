@@ -47,50 +47,50 @@
 
   const NAV_ITEMS: NavItem[] = [
     {
-      label: 'Dashboard',
+      label: m.nav_dashboard(),
       href: '/dashboard',
       icon: LayoutDashboard,
-      group: 'Overview'
+      group: m.nav_overview()
     },
     {
-      label: 'Garage',
+      label: m.nav_garage(),
       href: '/garage',
       icon: Warehouse,
-      group: 'Overview'
+      group: m.nav_overview()
     },
     {
       label: m.nav_fuel_logs(),
       href: '/fuel',
       icon: Fuel,
       featureKey: 'featureFuelLog',
-      group: 'Logs'
+      group: m.nav_logs()
     },
     {
       label: m.nav_maintenance(),
       href: '/maintenance',
       icon: Wrench,
       featureKey: 'featureMaintenance',
-      group: 'Logs'
+      group: m.nav_logs()
     },
     {
       label: m.nav_reminders(),
       href: '/reminders',
       icon: Bell,
       featureKey: 'featureReminders',
-      group: 'Logs'
+      group: m.nav_logs()
     },
     {
       label: m.nav_compliance(),
       href: '/compliance',
       icon: Shield,
       featureKey: 'featureCompliance',
-      group: 'Logs'
+      group: m.nav_logs()
     },
     {
-      label: 'Reports',
+      label: m.nav_reports(),
       href: '/reports',
       icon: BarChart3,
-      group: 'Insights'
+      group: m.nav_insights()
     }
   ];
 

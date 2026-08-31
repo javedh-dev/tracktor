@@ -2,6 +2,7 @@
   import VehicleListItem from '$feature/vehicle/VehicleListItem.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { goto } from '$app/navigation';
+  import { widget_no_vehicles_yet } from '$lib/paraglide/messages/_index.js';
 </script>
 
 {#if vehicleStore.vehicles && vehicleStore.vehicles.length > 0}
@@ -18,6 +19,6 @@
   </div>
 {:else}
   <div class="text-muted-foreground flex h-full items-center justify-center text-sm">
-    No vehicles yet
+    {widget_no_vehicles_yet()}
   </div>
 {/if}
