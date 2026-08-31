@@ -15,6 +15,7 @@
     reports_type_maintenance,
     reports_type_compliance
   } from '$lib/paraglide/messages/_index.js';
+  import { formatCurrency } from '$lib/helper/format.helper';
 
   let {
     data,
@@ -44,7 +45,7 @@
       format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
     },
     yAxis: {
-      format: (v: number) => `$${v.toFixed(0)}`
+      format: (v: number) => formatCurrency(v)
     },
     grid: {
       style: 'stroke-dasharray: 2',
@@ -110,7 +111,7 @@
             {#snippet formatter({ value, name })}
               <span class="text-muted-foreground">{name}</span>
               <span class="font-mono font-medium tabular-nums">
-                {typeof value === 'number' ? `$${value.toFixed(2)}` : value}
+                {typeof value === 'number' ? formatCurrency(value) : value}
               </span>
             {/snippet}
           </Chart.Tooltip>
