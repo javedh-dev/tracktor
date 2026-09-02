@@ -20,7 +20,9 @@
     fuel_stat_used,
     fuel_stat_spent,
     fuel_stat_avg_mileage,
-    fuel_stat_entries
+    fuel_stat_entries,
+    widget_fuel_consumption_trend,
+    widget_mileage_overview
   } from '$lib/paraglide/messages/_index.js';
 
   const fuelLogs = $derived(fuelLogStore.fuelLogs ?? []);
@@ -72,7 +74,7 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <VehicleTrendChart
         series={chartStore.fuelAmountByVehicle}
-        title="Fuel Consumption Trend"
+        title={widget_fuel_consumption_trend()}
         loading={fuelLogStore.processing}
         valueFormatter={(value) => `${value.toFixed(1)} L`}
         xFormatter={(v: Date) =>
@@ -80,7 +82,7 @@
       />
       <VehicleTrendChart
         series={chartStore.mileageByVehicle}
-        title="Mileage Overview"
+        title={widget_mileage_overview()}
         loading={fuelLogStore.processing}
         valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
         xFormatter={(v: Date) =>

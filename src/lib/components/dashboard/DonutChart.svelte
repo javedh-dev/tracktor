@@ -2,6 +2,7 @@
   import * as Chart from '$ui/chart/index.js';
   import { PieChart } from 'layerchart';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import { donut_chart_no_data } from '$lib/paraglide/messages/_index.js';
 
   interface DonutDataPoint {
     name: string;
@@ -125,7 +126,7 @@
       class="flex flex-col items-center justify-center gap-2 {chartAreaClass}"
       style={chartStyle}
     >
-      <span class="text-muted-foreground text-sm">No data available</span>
+      <span class="text-muted-foreground text-sm">{donut_chart_no_data()}</span>
     </div>
   {:else if data.length === 1}
     {@const size = ringSize}

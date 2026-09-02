@@ -7,6 +7,7 @@
   import type { Vehicle } from '$lib/domain/vehicle';
   import VehicleTypeBadge from '$feature/vehicle/VehicleTypeBadge.svelte';
   import { cn } from '$lib/utils';
+  import { vehicle_scope_all } from '$lib/paraglide/messages/_index.js';
 
   let {
     vehicles,
@@ -23,9 +24,9 @@
   );
 
   const triggerLabel = $derived.by(() => {
-    if (selectedIds.length === 0) return 'All Vehicles';
+    if (selectedIds.length === 0) return vehicle_scope_all();
     if (selectedIds.length === 1)
-      return singleSelected ? vehicleLabel(singleSelected) : 'All Vehicles';
+      return singleSelected ? vehicleLabel(singleSelected) : vehicle_scope_all();
     return `${selectedIds.length} vehicles`;
   });
 
@@ -57,7 +58,7 @@
   <DropdownMenu.Content align="end" class="min-w-56">
     <DropdownMenu.Item class="gap-2" onclick={() => (selectedIds = [])}>
       <Check class={cn('size-4 shrink-0', selectedIds.length > 0 && 'text-transparent')} />
-      <span>All Vehicles</span>
+      <span>{vehicle_scope_all()}</span>
     </DropdownMenu.Item>
     {#if vehicles.length > 0}
       <DropdownMenu.Separator />

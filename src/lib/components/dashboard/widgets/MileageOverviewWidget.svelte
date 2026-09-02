@@ -5,6 +5,7 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
   import { formatMileage } from '$lib/helper/format.helper';
+  import { widget_mileage_overview } from '$lib/paraglide/messages/_index.js';
 
   // The dashboard doesn't pre-populate fuelLogStore (unlike the fuel page's
   // FuelLogList) — fetch it fleet-wide here; in-flight requests are shared,
@@ -25,7 +26,7 @@
 <VehicleTrendChart
   bare
   {series}
-  title="Mileage Overview"
+  title={widget_mileage_overview()}
   loading={fuelLogStore.processing}
   valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
   xFormatter={(v: Date) =>

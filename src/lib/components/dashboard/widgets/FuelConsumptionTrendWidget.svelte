@@ -4,6 +4,7 @@
   import { chartStore } from '$stores/chart.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { widget_fuel_consumption_trend } from '$lib/paraglide/messages/_index.js';
 
   // The dashboard doesn't pre-populate fuelLogStore (unlike the fuel page's
   // FuelLogList) — fetch it fleet-wide here; in-flight requests are shared,
@@ -24,7 +25,7 @@
 <VehicleTrendChart
   bare
   {series}
-  title="Fuel Consumption Trend"
+  title={widget_fuel_consumption_trend()}
   loading={fuelLogStore.processing}
   valueFormatter={(value) => `${value.toFixed(1)} L`}
   xFormatter={(v: Date) =>
