@@ -7,6 +7,8 @@ export const usersTable = table('users', {
   id: t.text().primaryKey(),
   username: t.text().notNull().unique(),
   passwordHash: t.text().notNull(),
+  oidcId: t.text().unique(),
+  oidcProvider: t.text(),
   ...timestamps
 });
 

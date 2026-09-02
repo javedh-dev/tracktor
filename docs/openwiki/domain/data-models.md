@@ -128,7 +128,7 @@ Important keys:
 
 Tables:
 
-- `users` — `id`, `username`, `passwordHash`, timestamps.
+- `users` — `id`, `username`, `passwordHash`, timestamps, `oidc_id`, `oidc_provider`.
 - `sessions` — `id`, `userId`, `expiresAt`, timestamps.
 - `auth` — legacy table kept for migration compatibility.
 

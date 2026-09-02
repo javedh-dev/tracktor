@@ -62,10 +62,15 @@ This is intended for local development or single-user trusted deployments, not p
 - changing the username,
 - changing the password after verifying the current password.
 
+## OIDC authentication
+
+Set `OIDC_ENABLED=true` and all the `OIDC_` related variables to the corresponding values.
+
 ## Source references
 
 - Auth schema: `src/server/db/schema/auth.ts`
 - Auth service: `src/server/services/authService.ts`
+- Oidc service: `src/server/services/oidcService.ts`
 - Session utilities: `src/server/utils/session.ts`
 - Auth middleware: `src/server/middlewares/auth.ts`
 - Auth API route: `src/routes/api/auth/+server.ts`

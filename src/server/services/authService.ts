@@ -99,6 +99,45 @@ export const validateSession = async (sessionToken: string): Promise<{ user: Use
   return { user: result.user };
 };
 
+export const findUserByOidcId = async (oidcId: string) => {
+  return db.query.usersTable.findFirst({
+    where: (users, { eq }) => eq(users.oidcId, oidcId)
+  });
+};
+
+export const createUserFromOidc = async (
+  username: string,
+  oidcId: string,
+  oidcProvider: string
+) => {
+  const userId = crypto.randomUUID();
+  const randomPassword = crypto.randomUUID();
+
+  await db.insert(schema.usersTable).values({
+    id: userId,
+    username,
+    passwordHash: await hashPassword(randomPassword),
+    oidcId,
+    oidcProvider
+  });
+
+  return { id: userId, username };
+};
+
+export const getFirstAvailableUsername = async (...usernames: string[]) => {
+  for (let username of usernames) {
+    const user = await db.query.usersTable.findFirst({
+      where: (users, { eq }) => eq(users.username, username)
+    });
+
+    if (!user) {
+      return username;
+    }
+  }
+
+  return null;
+};
+
 export const getUsersCount = async () => {
   const [user] = await db.select({ id: schema.usersTable.id }).from(schema.usersTable).limit(1);
   return {
