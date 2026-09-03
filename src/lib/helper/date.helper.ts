@@ -1,7 +1,7 @@
 import type { DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
-import { es, fr, de, hi } from 'date-fns/locale';
+import { ar, cs, de, enUS, es, fi, fr, hi, hu, it, pt, ro, ru } from 'date-fns/locale';
 
 export interface FormatConfig {
   dateFormat: string;
@@ -17,15 +17,32 @@ export interface FormatConfig {
 
 const getDateFnsLocale = (locale: string) => {
   switch (locale) {
-    case 'es':
-      return es;
-    case 'fr':
-      return fr;
+    case 'ar':
+      return ar;
+    case 'cs':
+      return cs;
     case 'de':
       return de;
+    case 'es':
+      return es;
+    case 'fi':
+      return fi;
+    case 'fr':
+      return fr;
     case 'hi':
       return hi;
+    case 'hu':
+      return hu;
+    case 'it':
+      return it;
+    case 'pt-PT':
+      return pt;
+    case 'ro':
+      return ro;
+    case 'ru':
+      return ru;
     case 'en':
+      return enUS;
     default:
       return undefined;
   }
