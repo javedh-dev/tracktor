@@ -4,8 +4,10 @@
   import type { Component } from 'svelte';
   import * as Popover from '$ui/popover';
   import { Calendar } from '$lib/components/ui/calendar/index.js';
+  import { resolveWeekStartsOn } from '$lib/helper/date.helper';
   import { formatDateForCalendar } from '$lib/helper/format.helper';
   import * as m from '$lib/paraglide/messages';
+  import { configStore } from '$stores/config.svelte';
 
   type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
@@ -27,6 +29,9 @@
   }: Props = $props();
 
   let open = $state(false);
+  const weekStartsOn = $derived(
+    resolveWeekStartsOn(configStore.configs.weekStartDay, configStore.configs.locale)
+  );
 </script>
 
 <div id="input-wrapper" class="relative">
@@ -75,6 +80,7 @@
           id="date-calendar"
           type="single"
           captionLayout="dropdown"
+          {weekStartsOn}
           onValueChange={(v) => {
             if (v) {
               value = formatDateForCalendar(v);

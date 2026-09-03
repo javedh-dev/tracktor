@@ -13,6 +13,7 @@ const DEFAULT_CONFIGS: Configs = {
   unitOfLpg: 'liter',
   unitOfCng: 'kilogram',
   mileageUnitFormat: 'distance-per-fuel',
+  weekStartDay: 'locale',
   locale: 'en',
   timezone: 'UTC',
   featureFuelLog: true,

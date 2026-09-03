@@ -4,6 +4,8 @@
   import { today, getLocalTimeZone, type DateValue } from '@internationalized/date';
   import { getLocale } from '$lib/paraglide/runtime.js';
   import type { Reminder } from '$lib/domain/reminder';
+  import { resolveWeekStartsOn } from '$lib/helper/date.helper';
+  import { configStore } from '$stores/config.svelte';
   import * as m from '$lib/paraglide/messages';
 
   let {
@@ -45,6 +47,9 @@
   let placeholder = $state<DateValue>(today(getLocalTimeZone()));
 
   const reminderKey = (r: Reminder) => r.id ?? `${r.vehicleId}-${r.dueDate.getTime()}`;
+  const weekStartsOn = $derived(
+    resolveWeekStartsOn(configStore.configs.weekStartDay, configStore.configs.locale)
+  );
 </script>
 
 <CalendarPrimitive.Root
@@ -54,6 +59,7 @@
   weekdayFormat="short"
   monthFormat="long"
   yearFormat="numeric"
+  {weekStartsOn}
   disableDaysOutsideMonth={false}
   locale={getLocale()}
   class="w-full [--cell-size:--spacing(9)]"

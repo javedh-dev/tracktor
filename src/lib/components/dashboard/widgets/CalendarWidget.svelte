@@ -4,7 +4,9 @@
   import { today, getLocalTimeZone, type DateValue } from '@internationalized/date';
   import { getLocale } from '$lib/paraglide/runtime.js';
   import type { DashboardSummary } from '$lib/domain/dashboard';
+  import { resolveWeekStartsOn } from '$lib/helper/date.helper';
   import { formatDateForCalendar } from '$lib/helper/format.helper';
+  import { configStore } from '$stores/config.svelte';
   import Fuel from '@lucide/svelte/icons/fuel';
   import Wrench from '@lucide/svelte/icons/wrench';
   import Bell from '@lucide/svelte/icons/bell';
@@ -63,6 +65,9 @@
   let placeholder = $state<DateValue>(today(getLocalTimeZone()));
 
   const selectedEvents = $derived(eventsByDate.get(selected.toString()) ?? []);
+  const weekStartsOn = $derived(
+    resolveWeekStartsOn(configStore.configs.weekStartDay, configStore.configs.locale)
+  );
 </script>
 
 {#if loading && !summary}
@@ -81,6 +86,7 @@
       weekdayFormat="short"
       monthFormat="long"
       yearFormat="numeric"
+      {weekStartsOn}
       disableDaysOutsideMonth={false}
       locale={getLocale()}
       class="w-full shrink-0 [--cell-size:--spacing(8)]"

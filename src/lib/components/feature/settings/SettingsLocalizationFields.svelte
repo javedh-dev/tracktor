@@ -6,6 +6,7 @@
   import SettingsSelectField from './SettingsSelectField.svelte';
   import type { SettingsOption } from '$lib/types/settings';
   import Calendar from '@lucide/svelte/icons/calendar';
+  import CalendarDays from '@lucide/svelte/icons/calendar-days';
   import Currency from '@lucide/svelte/icons/currency';
   import Earth from '@lucide/svelte/icons/earth';
   import Languages from '@lucide/svelte/icons/languages';
@@ -16,6 +17,7 @@
     processing: boolean;
     localeOptions: Array<SettingsOption>;
     currencyOptions: Array<SettingsOption>;
+    weekStartDayOptions: Array<SettingsOption>;
     getTimezoneOptions: () => Array<SettingsOption>;
     isValidFormat: (value: string) => { valid: boolean; ex?: string };
     messages: typeof import('$lib/paraglide/messages');
@@ -27,6 +29,7 @@
     processing,
     localeOptions,
     currencyOptions,
+    weekStartDayOptions,
     getTimezoneOptions,
     isValidFormat,
     messages: m
@@ -98,4 +101,15 @@
     </Form.Control>
     <Form.FieldErrors />
   </Form.Field>
+  <SettingsSelectField
+    {form}
+    name="weekStartDay"
+    label={m.settings_label_week_start_day()}
+    description={m.settings_desc_week_start_day()}
+    icon={CalendarDays}
+    options={weekStartDayOptions}
+    placeholder={m.settings_select_week_start_day()}
+    bind:value={$formData.weekStartDay}
+    disabled={processing}
+  />
 </fieldset>
