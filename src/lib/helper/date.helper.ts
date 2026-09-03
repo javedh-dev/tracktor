@@ -1,4 +1,4 @@
-import type { DateValue } from '@internationalized/date';
+import { CalendarDate, type DateValue } from '@internationalized/date';
 import { format, parse } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { es, fr, de, hi } from 'date-fns/locale';
@@ -47,6 +47,22 @@ export const formatDate = (date: Date | string, config: FormatConfig): string =>
 export const formatDateForCalendar = (date: DateValue, config: FormatConfig): string => {
   const dateObj = date.toDate(config.timezone);
   return format(dateObj, config.dateFormat, { locale: getDateFnsLocale(config.locale) });
+};
+
+export const parseDateForCalendar = (
+  date: string | undefined,
+  config: FormatConfig
+): CalendarDate | undefined => {
+  if (!date) return undefined;
+
+  const parsedDate = parse(date, config.dateFormat, new Date());
+  if (Number.isNaN(parsedDate.getTime())) return undefined;
+
+  return new CalendarDate(
+    parsedDate.getFullYear(),
+    parsedDate.getMonth() + 1,
+    parsedDate.getDate()
+  );
 };
 
 export const parseDate = (date: string, config: FormatConfig) => {
