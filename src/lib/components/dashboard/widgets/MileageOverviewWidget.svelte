@@ -4,8 +4,9 @@
   import { chartStore } from '$stores/chart.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
-  import { formatMileage } from '$lib/helper/format.helper';
+  import { formatDate, formatMileage } from '$lib/helper/format.helper';
   import { widget_mileage_overview } from '$lib/paraglide/messages/_index.js';
+  import { getLocale } from '$lib/paraglide/runtime.js';
 
   // The dashboard doesn't pre-populate fuelLogStore (unlike the fuel page's
   // FuelLogList) — fetch it fleet-wide here; in-flight requests are shared,
@@ -29,8 +30,8 @@
   title={widget_mileage_overview()}
   loading={fuelLogStore.processing}
   valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
-  xFormatter={(v: Date) =>
-    v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+  xFormatter={(value: Date) => formatDate(value)}
+  xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
 >
   {#snippet filter()}
     <VehicleFilterDropdown

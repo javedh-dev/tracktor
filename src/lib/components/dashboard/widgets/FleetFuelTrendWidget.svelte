@@ -4,6 +4,8 @@
   import { calculateFuelAmountData } from '$stores/chart.svelte';
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { vehicleStore } from '$stores/vehicle.svelte';
+  import { getLocale } from '$lib/paraglide/runtime.js';
+  import { formatDate } from '$lib/helper/format.helper';
 
   let { loading }: { loading: boolean } = $props();
 
@@ -33,8 +35,8 @@
   color="var(--chart-1)"
   loading={loading || fuelLogStore.processing}
   valueFormatter={(value: number) => `${value.toFixed(1)} L`}
-  xFormatter={(v: Date) =>
-    v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+  xFormatter={(value: Date) => formatDate(value)}
+  xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
 >
   {#snippet filter()}
     <VehicleFilterDropdown

@@ -2,8 +2,30 @@ import { describe, expect, it } from 'vitest';
 import { apiDateString, dateStringForFormat } from '$lib/domain/shared';
 import { maintenanceFormSchema } from '$lib/domain/maintenance';
 import { complianceFormSchema } from '$lib/domain/compliance';
+import { formatDate, type FormatConfig } from '$lib/helper/date.helper';
+
+const formatConfig: FormatConfig = {
+  dateFormat: 'd. MMMM yyyy',
+  timezone: 'UTC',
+  locale: 'en',
+  currency: 'USD',
+  unitOfVolume: 'liters',
+  unitOfLpg: 'liters',
+  unitOfCng: 'kg',
+  unitOfDistance: 'km',
+  mileageUnitFormat: 'km/L'
+};
 
 describe('localized date validation', () => {
+  it.each([
+    ['cs', '3. září 2026'],
+    ['ru', '3. сентября 2026']
+  ])('formats dates with %s month names', (locale, expected) => {
+    expect(formatDate(new Date('2026-09-03T12:00:00Z'), { ...formatConfig, locale })).toBe(
+      expected
+    );
+  });
+
   it('accepts days greater than 12 in day-first formats', () => {
     expect(dateStringForFormat('dd/MM/yyyy').safeParse('13/08/2026').success).toBe(true);
     expect(dateStringForFormat('dd/MM/yyyy').safeParse('31/12/2026').success).toBe(true);

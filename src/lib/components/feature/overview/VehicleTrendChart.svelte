@@ -17,6 +17,7 @@
     series,
     title,
     xFormatter,
+    xAxisFormatter,
     valueFormatter,
     loading = false,
     bare = false,
@@ -25,6 +26,7 @@
     series: VehicleTrendSeries[];
     title: string;
     xFormatter: (_: Date) => string;
+    xAxisFormatter: (_: Date) => string;
     valueFormatter?: (_: number, _series: VehicleTrendSeries) => string;
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
@@ -67,7 +69,7 @@
 
   const chartProps = {
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short' })
+      format: (value: Date) => xAxisFormatter(value)
     },
     yAxis: {
       format: (v: number) =>
