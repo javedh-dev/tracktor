@@ -4,8 +4,9 @@
   import type { Component } from 'svelte';
   import * as Popover from '$ui/popover';
   import { Calendar } from '$lib/components/ui/calendar/index.js';
-  import { formatDateForCalendar } from '$lib/helper/format.helper';
+  import { formatDateForCalendar, parseDateForCalendar } from '$lib/helper/format.helper';
   import * as m from '$lib/paraglide/messages';
+  import type { DateValue } from '@internationalized/date';
 
   type InputType = Exclude<HTMLInputTypeAttribute, 'file'> | 'calendar';
 
@@ -27,6 +28,13 @@
   }: Props = $props();
 
   let open = $state(false);
+  let calendarValue = $state<DateValue>();
+
+  $effect(() => {
+    if (open) {
+      calendarValue = typeof value === 'string' ? parseDateForCalendar(value) : undefined;
+    }
+  });
 </script>
 
 <div id="input-wrapper" class="relative">
@@ -75,6 +83,7 @@
           id="date-calendar"
           type="single"
           captionLayout="dropdown"
+          bind:value={calendarValue}
           onValueChange={(v) => {
             if (v) {
               value = formatDateForCalendar(v);

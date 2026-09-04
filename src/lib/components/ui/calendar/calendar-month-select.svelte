@@ -23,6 +23,7 @@
       <select {...props} {value} {onchange}>
         {#each monthItems as monthItem (monthItem.value)}
           <option
+            class="bg-popover text-popover-foreground"
             value={monthItem.value}
             selected={value !== undefined
               ? monthItem.value === value
