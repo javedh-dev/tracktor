@@ -15,19 +15,22 @@
     reports_type_maintenance,
     reports_type_compliance
   } from '$lib/paraglide/messages/_index.js';
-  import { formatCurrency } from '$lib/helper/format.helper';
+  import { formatCurrency, formatDate } from '$lib/helper/format.helper';
+  import { getLocale } from '$lib/paraglide/runtime.js';
 
   let {
     data,
     title,
     loading = false,
-    bare = false
+    bare = false,
+    xAxisFormatter = (value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })
   }: {
     data: MonthlyExpensePoint[];
     title: string;
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
     bare?: boolean;
+    xAxisFormatter?: (_: Date) => string;
   } = $props();
 
   const SERIES = [
@@ -42,7 +45,7 @@
 
   const chartProps = {
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
+      format: (value: Date) => xAxisFormatter(value)
     },
     yAxis: {
       format: (v: number) => formatCurrency(v)
@@ -103,11 +106,7 @@
         props={chartProps}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip
-            labelFormatter={(v: Date) =>
-              v.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
-            indicator="dot"
-          >
+          <Chart.Tooltip labelFormatter={formatDate} indicator="dot">
             {#snippet formatter({ value, name })}
               <span class="text-muted-foreground">{name}</span>
               <span class="font-mono font-medium tabular-nums">

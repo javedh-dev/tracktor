@@ -7,8 +7,9 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { chartStore } from '$stores/chart.svelte';
   import { ACCENT } from '$lib/helper/accent-color.helper';
-  import { formatCurrency, formatMileage } from '$lib/helper/format.helper';
+  import { formatCurrency, formatDate, formatMileage } from '$lib/helper/format.helper';
   import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
+  import { getLocale } from '$lib/paraglide/runtime.js';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
   import { Features } from '$lib/helper/feature.helper';
   import FeaturePageShell from '$feature/shared/FeaturePageShell.svelte';
@@ -77,16 +78,21 @@
         title={widget_fuel_consumption_trend()}
         loading={fuelLogStore.processing}
         valueFormatter={(value) => `${value.toFixed(1)} L`}
-        xFormatter={(v: Date) =>
-          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+        xFormatter={(value: Date) => formatDate(value)}
+        xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
       />
       <VehicleTrendChart
         series={chartStore.mileageByVehicle}
         title={widget_mileage_overview()}
         loading={fuelLogStore.processing}
         valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
-        xFormatter={(v: Date) =>
-          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+        xFormatter={(value: Date) =>
+          value.toLocaleDateString(getLocale(), {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          })}
+        xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
       />
     </div>
 
