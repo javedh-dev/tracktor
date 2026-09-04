@@ -49,12 +49,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -105,9 +101,7 @@
       "indexes": {
         "users_username_unique": {
           "name": "users_username_unique",
-          "columns": [
-            "username"
-          ],
+          "columns": ["username"],
           "isUnique": true
         }
       },
@@ -230,16 +224,12 @@
       "indexes": {
         "idx_compliance_documents_vehicle_id": {
           "name": "idx_compliance_documents_vehicle_id",
-          "columns": [
-            "vehicle_id"
-          ],
+          "columns": ["vehicle_id"],
           "isUnique": false
         },
         "idx_compliance_documents_type": {
           "name": "idx_compliance_documents_type",
-          "columns": [
-            "type"
-          ],
+          "columns": ["type"],
           "isUnique": false
         }
       },
@@ -248,12 +238,8 @@
           "name": "compliance_documents_vehicle_id_vehicles_id_fk",
           "tableFrom": "compliance_documents",
           "tableTo": "vehicles",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vehicle_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -405,9 +391,7 @@
       "indexes": {
         "idx_fuel_logs_vehicle_id": {
           "name": "idx_fuel_logs_vehicle_id",
-          "columns": [
-            "vehicle_id"
-          ],
+          "columns": ["vehicle_id"],
           "isUnique": false
         }
       },
@@ -416,12 +400,8 @@
           "name": "fuel_logs_vehicle_id_vehicles_id_fk",
           "tableFrom": "fuel_logs",
           "tableTo": "vehicles",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vehicle_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -507,9 +487,7 @@
       "indexes": {
         "idx_maintenance_logs_vehicle_id": {
           "name": "idx_maintenance_logs_vehicle_id",
-          "columns": [
-            "vehicle_id"
-          ],
+          "columns": ["vehicle_id"],
           "isUnique": false
         }
       },
@@ -518,12 +496,8 @@
           "name": "maintenance_logs_vehicle_id_vehicles_id_fk",
           "tableFrom": "maintenance_logs",
           "tableTo": "vehicles",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vehicle_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -693,16 +667,12 @@
       "indexes": {
         "idx_notifications_vehicle_id": {
           "name": "idx_notifications_vehicle_id",
-          "columns": [
-            "vehicle_id"
-          ],
+          "columns": ["vehicle_id"],
           "isUnique": false
         },
         "idx_notifications_notification_key": {
           "name": "idx_notifications_notification_key",
-          "columns": [
-            "notification_key"
-          ],
+          "columns": ["notification_key"],
           "isUnique": true
         }
       },
@@ -711,12 +681,8 @@
           "name": "notifications_vehicle_id_vehicles_id_fk",
           "tableFrom": "notifications",
           "tableTo": "vehicles",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vehicle_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -819,9 +785,7 @@
       "indexes": {
         "idx_reminders_vehicle_id": {
           "name": "idx_reminders_vehicle_id",
-          "columns": [
-            "vehicle_id"
-          ],
+          "columns": ["vehicle_id"],
           "isUnique": false
         }
       },
@@ -830,12 +794,8 @@
           "name": "reminders_vehicle_id_vehicles_id_fk",
           "tableFrom": "reminders",
           "tableTo": "vehicles",
-          "columnsFrom": [
-            "vehicle_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vehicle_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
