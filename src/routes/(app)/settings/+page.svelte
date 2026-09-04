@@ -118,6 +118,7 @@
     uovOptions,
     gasUnitOptions,
     mileageUnitFormatOptions,
+    weekStartDayOptions,
     localeOptions
   } = createSettingsOptions(m, locales);
 
@@ -309,6 +310,7 @@
               {processing}
               {localeOptions}
               {currencyOptions}
+              {weekStartDayOptions}
               {getTimezoneOptions}
               {isValidFormat}
               messages={m}

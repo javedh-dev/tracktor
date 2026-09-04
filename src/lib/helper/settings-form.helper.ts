@@ -16,6 +16,7 @@ const settingsConfigSchema = z.object({
   mileageUnitFormat: z
     .enum(['distance-per-fuel', 'fuel-per-distance', 'uk-mpg'])
     .default('distance-per-fuel'),
+  weekStartDay: z.enum(['locale', '0', '1', '2', '3', '4', '5', '6']).default('locale'),
   theme: z.string().default('light'),
   darkVariant: z.string().default('default'),
   customCss: z.string().optional(),
@@ -126,6 +127,16 @@ export function createSettingsOptions(
         value: 'uk-mpg',
         label: m.settings_mileage_format_uk_mpg()
       }
+    ],
+    weekStartDayOptions: [
+      { value: 'locale', label: m.settings_week_start_language_default() },
+      { value: '0', label: m.common_sunday() },
+      { value: '1', label: m.common_monday() },
+      { value: '2', label: m.common_tuesday() },
+      { value: '3', label: m.common_wednesday() },
+      { value: '4', label: m.common_thursday() },
+      { value: '5', label: m.common_friday() },
+      { value: '6', label: m.common_saturday() }
     ],
     localeOptions: locales.map((code) => ({
       value: code,

@@ -15,6 +15,60 @@ export interface FormatConfig {
   mileageUnitFormat: string;
 }
 
+export type WeekStartsOn = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type WeekStartDaySetting = 'locale' | `${WeekStartsOn}`;
+
+const WEEK_START_VALUES: Record<string, WeekStartsOn> = {
+  '0': 0,
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6
+};
+
+const LOCALE_WEEK_START_FALLBACKS: Record<string, WeekStartsOn> = {
+  ar: 6,
+  cs: 1,
+  de: 1,
+  en: 0,
+  es: 1,
+  fi: 1,
+  fr: 1,
+  hi: 0,
+  hu: 1,
+  it: 1,
+  'pt-PT': 1,
+  ro: 1,
+  ru: 1
+};
+
+const getWeekStartFromIntl = (locale: string): WeekStartsOn | undefined => {
+  try {
+    type LocaleWithWeekInfo = Intl.Locale & { weekInfo?: { firstDay?: number } };
+    const firstDay = (new Intl.Locale(locale) as LocaleWithWeekInfo).weekInfo?.firstDay;
+    if (typeof firstDay !== 'number') return undefined;
+    const weekStartsOn = firstDay % 7;
+    return WEEK_START_VALUES[String(weekStartsOn)];
+  } catch (_) {
+    return undefined;
+  }
+};
+
+export const resolveWeekStartsOn = (setting: unknown, locale: string): WeekStartsOn => {
+  if (typeof setting === 'string' && setting in WEEK_START_VALUES) {
+    return WEEK_START_VALUES[setting];
+  }
+
+  const intlValue = getWeekStartFromIntl(locale);
+  if (intlValue !== undefined) return intlValue;
+
+  return (
+    LOCALE_WEEK_START_FALLBACKS[locale] ?? LOCALE_WEEK_START_FALLBACKS[locale.split('-')[0]] ?? 0
+  );
+};
+
 const getDateFnsLocale = (locale: string) => {
   switch (locale) {
     case 'ar':
