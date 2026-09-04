@@ -81,7 +81,8 @@ export function createSettingsOptions(
     ro: 'Română',
     ru: 'Русский',
     'pt-PT': 'Português (Portugal)',
-    cs: 'Čeština'
+    cs: 'Čeština',
+    pl: 'Polski'
   };
 
   return {
