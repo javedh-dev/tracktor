@@ -9,24 +9,34 @@
   import LegendInfoGroup from '$appui/LegendInfoGroup.svelte';
   import CircleSlash2 from '@lucide/svelte/icons/circle-slash-2';
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+  import {
+    reports_no_expense_data,
+    reports_type_fuel,
+    reports_type_maintenance,
+    reports_type_compliance
+  } from '$lib/paraglide/messages/_index.js';
+  import { formatCurrency, formatDate } from '$lib/helper/format.helper';
+  import { getLocale } from '$lib/paraglide/runtime.js';
 
   let {
     data,
     title,
     loading = false,
-    bare = false
+    bare = false,
+    xAxisFormatter = (value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })
   }: {
     data: MonthlyExpensePoint[];
     title: string;
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
     bare?: boolean;
+    xAxisFormatter?: (_: Date) => string;
   } = $props();
 
   const SERIES = [
-    { key: 'fuel', label: 'Fuel', color: 'var(--chart-1)' },
-    { key: 'maintenance', label: 'Maintenance', color: 'var(--chart-2)' },
-    { key: 'compliance', label: 'Compliance', color: 'var(--chart-3)' }
+    { key: 'fuel', label: reports_type_fuel(), color: 'var(--chart-1)' },
+    { key: 'maintenance', label: reports_type_maintenance(), color: 'var(--chart-2)' },
+    { key: 'compliance', label: reports_type_compliance(), color: 'var(--chart-3)' }
   ] as const;
 
   const chartData = $derived(data.map((point) => ({ ...point, x: new Date(`${point.month}-01`) })));
@@ -35,10 +45,10 @@
 
   const chartProps = {
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
+      format: (value: Date) => xAxisFormatter(value)
     },
     yAxis: {
-      format: (v: number) => `$${v.toFixed(0)}`
+      format: (v: number) => formatCurrency(v)
     },
     grid: {
       style: 'stroke-dasharray: 2',
@@ -96,15 +106,11 @@
         props={chartProps}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip
-            labelFormatter={(v: Date) =>
-              v.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
-            indicator="dot"
-          >
+          <Chart.Tooltip labelFormatter={formatDate} indicator="dot">
             {#snippet formatter({ value, name })}
               <span class="text-muted-foreground">{name}</span>
               <span class="font-mono font-medium tabular-nums">
-                {typeof value === 'number' ? `$${value.toFixed(2)}` : value}
+                {typeof value === 'number' ? formatCurrency(value) : value}
               </span>
             {/snippet}
           </Chart.Tooltip>
@@ -136,7 +142,7 @@
     </Chart.Container>
   {:else}
     <div class="flex h-full flex-col items-center justify-center">
-      <LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label="No expense data yet" />
+      <LabelWithIcon icon={CircleSlash2} iconClass="h-4 w-4" label={reports_no_expense_data()} />
     </div>
   {/if}
 </div>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { apiDateString } from './shared';
+import { apiDateString, dateStringForFormat } from './shared';
 
 export interface MaintenanceLog {
   id: string | null;
@@ -28,5 +28,8 @@ export const maintenanceSchema = z.object({
   notes: z.string().nullable(),
   attachment: z.string().nullable()
 });
+
+export const maintenanceFormSchema = (dateFormat: string) =>
+  maintenanceSchema.extend({ date: dateStringForFormat(dateFormat) });
 
 export type MaintenanceSchema = typeof maintenanceSchema;

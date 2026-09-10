@@ -11,7 +11,7 @@
   import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import * as m from '$lib/paraglide/messages';
   import {
-    complianceSchema,
+    complianceFormSchema,
     COMPLIANCE_TYPES,
     COMPLIANCE_RECURRENCE_TYPES,
     getComplianceRecurrenceTypeLabel,
@@ -20,6 +20,7 @@
     getComplianceDocumentNumberLabel,
     getComplianceIssuerLabel
   } from '$lib/domain/compliance';
+  import configs from '$stores/config.svelte';
   import { FileDropZone, AutocompleteInput } from '$lib/components/app';
   import { getComplianceIssuerSuggestions } from '$lib/services/autocomplete.service';
   import Banknote from '@lucide/svelte/icons/banknote';
@@ -45,7 +46,7 @@
   );
 
   const sf = createSheetForm({
-    schema: complianceSchema,
+    schema: complianceFormSchema(configs.dateFormat),
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
         sf.processing = true;

@@ -16,7 +16,8 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { FileDropZone } from '$lib/components/app';
-  import { fuelSchema } from '$lib/domain/fuel';
+  import { fuelFormSchema } from '$lib/domain/fuel';
+  import configs from '$stores/config.svelte';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Calendar1 from '@lucide/svelte/icons/calendar-1';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -66,7 +67,7 @@
   );
 
   const sf = createSheetForm({
-    schema: fuelSchema,
+    schema: fuelFormSchema(configs.dateFormat),
     validationMethod: 'onsubmit',
     onUpdated: async ({ form: f }) => {
       if (f.valid) {

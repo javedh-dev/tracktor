@@ -4,6 +4,7 @@
   import { sheetStore } from '$stores/sheet.svelte';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
   import type { WidgetType } from '$lib/domain/dashboard';
+  import { all_widgets_used } from '$lib/paraglide/messages/_index.js';
 
   const availableWidgets = $derived(
     dashboardLayoutStore.availableWidgetTypes.map((type) => WIDGET_REGISTRY[type])
@@ -19,7 +20,7 @@
 <div class="space-y-2 pt-4">
   {#if availableWidgets.length === 0}
     <p class="text-muted-foreground py-6 text-center text-sm">
-      All available widgets are already on your dashboard.
+      {all_widgets_used()}
     </p>
   {:else}
     {#each availableWidgets as widget (widget.type)}

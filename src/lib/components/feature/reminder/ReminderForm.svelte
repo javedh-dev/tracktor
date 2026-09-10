@@ -7,11 +7,12 @@
     REMINDER_TYPES,
     REMINDER_SCHEDULES,
     REMINDER_RECURRENCE_TYPES,
-    reminderSchema,
+    reminderFormSchema,
     getReminderScheduleLabel,
     getRecurrenceTypeLabel,
     getReminderTypeLabel
   } from '$lib/domain/reminder';
+  import configs from '$stores/config.svelte';
   import { createSheetForm } from '$lib/composables/sheet-form.svelte';
   import { sheetStore } from '$stores/sheet.svelte';
   import SubmitButton from '$appui/SubmitButton.svelte';
@@ -35,7 +36,7 @@
   let { data }: { data?: Partial<Reminder> } = $props();
 
   const sf = createSheetForm({
-    schema: reminderSchema,
+    schema: reminderFormSchema(configs.dateFormat),
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
         sf.processing = true;

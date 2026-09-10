@@ -3,6 +3,7 @@
   import Bell from '@lucide/svelte/icons/bell';
   import type { DashboardSummary } from '$lib/domain/dashboard';
   import { ACCENT } from '$lib/helper/accent-color.helper';
+  import { widget_no_upcoming_reminders } from '$lib/paraglide/messages/_index.js';
 
   let { summary, loading }: { summary: DashboardSummary | null; loading: boolean } = $props();
 </script>
@@ -44,6 +45,6 @@
   <div class="text-muted-foreground py-4 text-sm">Loading reminders...</div>
 {:else}
   <div class="text-muted-foreground flex h-full items-center justify-center text-sm">
-    No upcoming reminders
+    {widget_no_upcoming_reminders()}
   </div>
 {/if}

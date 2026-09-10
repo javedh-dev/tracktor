@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { apiDateString, optionalApiDateString } from './shared';
+import {
+  apiDateString,
+  dateStringForFormat,
+  optionalApiDateString,
+  optionalDateStringForFormat
+} from './shared';
 
 export const REMINDER_TYPES = {
   maintenance: 'maintenance',
@@ -136,5 +141,11 @@ export const reminderSchema = z.object({
   note: z.string().max(500, 'Notes cannot be longer than 500 characters.').nullable(),
   isCompleted: z.boolean().default(false)
 });
+
+export const reminderFormSchema = (dateFormat: string) =>
+  reminderSchema.extend({
+    dueDate: dateStringForFormat(dateFormat),
+    recurrenceEndDate: optionalDateStringForFormat(dateFormat)
+  });
 
 export type ReminderSchema = typeof reminderSchema;

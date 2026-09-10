@@ -77,7 +77,11 @@ export function createSettingsOptions(
     it: 'Italiano',
     hu: 'Magyar',
     fi: 'Suomi',
-    ro: 'Română'
+    ro: 'Română',
+    ru: 'Русский',
+    'pt-PT': 'Português (Portugal)',
+    cs: 'Čeština',
+    pl: 'Polski'
   };
 
   return {

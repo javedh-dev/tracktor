@@ -5,6 +5,7 @@
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { formatCurrency, formatDate } from '$lib/helper/format.helper';
   import { ACCENT } from '$lib/helper/accent-color.helper';
+  import { vehicle_hub_activity_empty } from '$lib/paraglide/messages/_index.js';
 
   let {
     entries,
@@ -27,7 +28,7 @@
   </div>
 {:else if entries.length === 0}
   <div class="text-muted-foreground flex h-full items-center justify-center text-sm">
-    No recent activity
+    {vehicle_hub_activity_empty()}
   </div>
 {:else}
   <div class="divide-y">

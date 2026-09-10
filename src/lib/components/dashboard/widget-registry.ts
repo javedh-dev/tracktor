@@ -19,6 +19,7 @@ import Route from '@lucide/svelte/icons/route';
 import Fuel from '@lucide/svelte/icons/fuel';
 import DollarSign from '@lucide/svelte/icons/dollar-sign';
 import CircleGauge from '@lucide/svelte/icons/circle-gauge';
+import * as w from '$lib/paraglide/messages/_index.js';
 
 interface WidgetDefinition {
   type: WidgetType;
@@ -36,8 +37,8 @@ interface WidgetDefinition {
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   'stat-vehicle-count': {
     type: 'stat-vehicle-count',
-    title: 'Total Vehicles',
-    description: 'Number of vehicles in your garage',
+    title: w.widget_total_vehicles(),
+    description: w.widget_total_vehicles_description(),
     component: FleetStatWidget,
     extraProps: { metric: 'vehicle-count' },
     defaultColSpan: 3,
@@ -47,8 +48,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'stat-total-distance': {
     type: 'stat-total-distance',
-    title: 'Total Distance',
-    description: 'Distance driven across the whole fleet',
+    title: w.widget_total_distance(),
+    description: w.widget_total_distance_description(),
     component: FleetStatWidget,
     extraProps: { metric: 'total-distance' },
     defaultColSpan: 3,
@@ -58,8 +59,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'stat-fuel-used': {
     type: 'stat-fuel-used',
-    title: 'Total Fuel Used',
-    description: 'Fuel consumed across the whole fleet',
+    title: w.widget_total_fuel_used(),
+    description: w.widget_total_fuel_used_description(),
     component: FleetStatWidget,
     extraProps: { metric: 'fuel-used' },
     defaultColSpan: 3,
@@ -69,8 +70,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'stat-total-expenses': {
     type: 'stat-total-expenses',
-    title: 'Total Expenses',
-    description: 'Fuel, maintenance and insurance spend combined',
+    title: w.widget_total_expenses(),
+    description: w.widget_total_expenses_description(),
     component: FleetStatWidget,
     extraProps: { metric: 'total-expenses' },
     defaultColSpan: 3,
@@ -80,8 +81,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'stat-cost-per-distance': {
     type: 'stat-cost-per-distance',
-    title: 'Cost / Distance',
-    description: 'Overall running cost per unit distance',
+    title: w.widget_cost_per_distance(),
+    description: w.widget_cost_per_distance_description(),
     component: FleetStatWidget,
     extraProps: { metric: 'cost-per-distance' },
     defaultColSpan: 3,
@@ -91,24 +92,24 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'expense-breakdown-donut': {
     type: 'expense-breakdown-donut',
-    title: 'Expenses by Category',
-    description: 'Fuel vs. maintenance vs. compliance spend',
+    title: w.widget_expense_breakdown(),
+    description: w.widget_expense_breakdown_description(),
     component: ExpenseBreakdownWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
   },
   'monthly-expense-trend': {
     type: 'monthly-expense-trend',
-    title: 'Monthly Expense Trend',
-    description: 'Last 12 months of spend by category',
+    title: w.widget_monthly_expense_trend(),
+    description: w.widget_monthly_expense_trend_description(),
     component: MonthlyExpenseTrendWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },
   'cost-by-vehicle-leaderboard': {
     type: 'cost-by-vehicle-leaderboard',
-    title: 'Cost by Vehicle',
-    description: 'Which vehicles cost the most to run',
+    title: w.widget_cost_by_vehicle(),
+    description: w.widget_cost_by_vehicle_description(),
     component: VehicleLeaderboardWidget,
     extraProps: { metric: 'cost' },
     defaultColSpan: 6,
@@ -116,32 +117,32 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'fleet-fuel-trend': {
     type: 'fleet-fuel-trend',
-    title: 'Fleet Fuel Trend',
-    description: 'Daily fuel usage across the fleet',
+    title: w.widget_fleet_fuel_trend(),
+    description: w.widget_fleet_fuel_trend_description(),
     component: FleetFuelTrendWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },
   'fuel-consumption-trend': {
     type: 'fuel-consumption-trend',
-    title: 'Fuel Consumption Trend',
-    description: 'Fuel usage over time, one line per vehicle',
+    title: w.widget_fuel_consumption_trend(),
+    description: w.widget_fuel_consumption_trend_description(),
     component: FuelConsumptionTrendWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },
   'mileage-overview-trend': {
     type: 'mileage-overview-trend',
-    title: 'Mileage Overview',
-    description: 'Mileage over time, one line per vehicle',
+    title: w.widget_mileage_overview(),
+    description: w.widget_mileage_overview_description(),
     component: MileageOverviewWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },
   'efficiency-leaderboard': {
     type: 'efficiency-leaderboard',
-    title: 'Efficiency Leaderboard',
-    description: 'Vehicles ranked by fuel efficiency',
+    title: w.widget_efficiency_leaderboard(),
+    description: w.widget_efficiency_leaderboard_description(),
     component: VehicleLeaderboardWidget,
     extraProps: { metric: 'efficiency' },
     defaultColSpan: 6,
@@ -149,8 +150,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'pucc-status-donut': {
     type: 'pucc-status-donut',
-    title: 'Other Compliance Status',
-    description: 'Emissions, roadworthiness & registration status across the fleet',
+    title: w.widget_compliance_status(),
+    description: w.widget_compliance_status_description(),
     component: StatusDonutWidget,
     extraProps: { metric: 'other' },
     defaultColSpan: 6,
@@ -158,8 +159,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'insurance-status-donut': {
     type: 'insurance-status-donut',
-    title: 'Insurance Status',
-    description: 'Insurance policy status across the fleet',
+    title: w.widget_insurance_status(),
+    description: w.widget_insurance_status_description(),
     component: StatusDonutWidget,
     extraProps: { metric: 'insurance' },
     defaultColSpan: 6,
@@ -167,40 +168,40 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   },
   'vehicle-health-distribution': {
     type: 'vehicle-health-distribution',
-    title: 'Vehicle Health',
-    description: 'Overall good/attention/needs-action breakdown',
+    title: w.widget_vehicle_health(),
+    description: w.widget_vehicle_health_description(),
     component: VehicleHealthWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
   },
   'upcoming-reminders-list': {
     type: 'upcoming-reminders-list',
-    title: 'Upcoming Reminders',
-    description: 'Reminders coming due soon',
+    title: w.widget_upcoming_reminders(),
+    description: w.widget_upcoming_reminders_description(),
     component: UpcomingRemindersWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
   },
   'vehicle-quick-list': {
     type: 'vehicle-quick-list',
-    title: 'My Vehicles',
-    description: 'Quick access to your vehicles',
+    title: w.widget_vehicles_quick_list(),
+    description: w.widget_vehicles_quick_list_description(),
     component: VehicleQuickListWidget,
     defaultColSpan: 9,
     defaultRowSpan: 8
   },
   'recent-activity-feed': {
     type: 'recent-activity-feed',
-    title: 'Recent Activity',
-    description: 'Latest fuel and maintenance logs across the fleet',
+    title: w.widget_recent_activity(),
+    description: w.widget_recent_activity_description(),
     component: RecentActivityWidget,
     defaultColSpan: 6,
     defaultRowSpan: 8
   },
   'activity-calendar': {
     type: 'activity-calendar',
-    title: 'Activity Calendar',
-    description: 'Upcoming reminders and past fuel/maintenance activity by date',
+    title: w.widget_activity_calendar(),
+    description: w.widget_activity_calendar_description(),
     component: CalendarWidget,
     defaultColSpan: 4,
     defaultRowSpan: 10

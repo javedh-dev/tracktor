@@ -7,8 +7,9 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { chartStore } from '$stores/chart.svelte';
   import { ACCENT } from '$lib/helper/accent-color.helper';
-  import { formatMileage } from '$lib/helper/format.helper';
+  import { formatCurrency, formatDate, formatMileage } from '$lib/helper/format.helper';
   import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
+  import { getLocale } from '$lib/paraglide/runtime.js';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
   import { Features } from '$lib/helper/feature.helper';
   import FeaturePageShell from '$feature/shared/FeaturePageShell.svelte';
@@ -20,7 +21,9 @@
     fuel_stat_used,
     fuel_stat_spent,
     fuel_stat_avg_mileage,
-    fuel_stat_entries
+    fuel_stat_entries,
+    widget_fuel_consumption_trend,
+    widget_mileage_overview
   } from '$lib/paraglide/messages/_index.js';
 
   const fuelLogs = $derived(fuelLogStore.fuelLogs ?? []);
@@ -52,7 +55,7 @@
       <StatCard
         icon={DollarSign}
         label={fuel_stat_spent()}
-        value={totalCost > 0 ? `$${totalCost.toFixed(2)}` : '--'}
+        value={totalCost > 0 ? formatCurrency(totalCost) : '--'}
         color={ACCENT.ochre.gradient}
       />
       <StatCard
@@ -72,19 +75,24 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <VehicleTrendChart
         series={chartStore.fuelAmountByVehicle}
-        title="Fuel Consumption Trend"
+        title={widget_fuel_consumption_trend()}
         loading={fuelLogStore.processing}
         valueFormatter={(value) => `${value.toFixed(1)} L`}
-        xFormatter={(v: Date) =>
-          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+        xFormatter={(value: Date) => formatDate(value)}
+        xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
       />
       <VehicleTrendChart
         series={chartStore.mileageByVehicle}
-        title="Mileage Overview"
+        title={widget_mileage_overview()}
         loading={fuelLogStore.processing}
         valueFormatter={(value, series) => formatMileage(value, series.fuelType)}
-        xFormatter={(v: Date) =>
-          v.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+        xFormatter={(value: Date) =>
+          value.toLocaleDateString(getLocale(), {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          })}
+        xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
       />
     </div>
 

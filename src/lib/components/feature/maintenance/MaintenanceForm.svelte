@@ -5,7 +5,8 @@
   import Input from '$appui/input.svelte';
   import { Textarea } from '$ui/textarea';
   import { formatDate, parseDate } from '$lib/helper/format.helper';
-  import { maintenanceSchema } from '$lib/domain/maintenance';
+  import { maintenanceFormSchema } from '$lib/domain/maintenance';
+  import configs from '$stores/config.svelte';
   import Banknote from '@lucide/svelte/icons/banknote';
   import Hammer from '@lucide/svelte/icons/hammer';
   import CircleGauge from '@lucide/svelte/icons/circle-gauge';
@@ -34,7 +35,7 @@
   );
 
   const sf = createSheetForm({
-    schema: maintenanceSchema,
+    schema: maintenanceFormSchema(configs.dateFormat),
     onUpdated: async ({ form: f }) => {
       if (f.valid) {
         sf.processing = true;

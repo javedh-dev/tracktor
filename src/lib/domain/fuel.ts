@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { apiDateString } from './shared';
+import { apiDateString, dateStringForFormat } from './shared';
 
 export interface FuelLog {
   id: string | null;
@@ -33,5 +33,8 @@ export const fuelSchema = z.object({
   notes: z.string().nullable(),
   attachment: z.string().nullable()
 });
+
+export const fuelFormSchema = (dateFormat: string) =>
+  fuelSchema.extend({ date: dateStringForFormat(dateFormat) });
 
 export type FuelSchema = typeof fuelSchema;

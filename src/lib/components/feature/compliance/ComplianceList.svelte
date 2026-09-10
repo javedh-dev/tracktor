@@ -67,6 +67,17 @@
     expired: 'text-destructive'
   };
 
+  const getStatusLabel = (status: ComplianceStatus): string => {
+    switch (status) {
+      case 'valid':
+        return m.compliance_filter_valid();
+      case 'expiring_soon':
+        return m.compliance_filter_expiring_soon();
+      case 'expired':
+        return m.compliance_filter_expired();
+    }
+  };
+
   interface Props {
     /** Optional predicate to narrow what's rendered (e.g. page-level type/status filters). */
     filter?: (doc: Compliance) => boolean;
@@ -382,7 +393,7 @@
     {@const status = getComplianceStatus(selectedDoc)}
     <TableDetailPanel onClose={() => (selectedId = null)}>
       <div class="mb-3 flex items-center gap-2">
-        <StatusPill {status} />
+        <StatusPill {status} label={getStatusLabel(status)} />
         <span class="text-sm font-medium">
           {selectedDoc.type === 'other' && selectedDoc.otherLabel
             ? selectedDoc.otherLabel
@@ -435,7 +446,7 @@
 
 {#snippet statusCell({ status }: { status: ComplianceStatus })}
   <div class="flex flex-row justify-center">
-    <StatusPill {status} />
+    <StatusPill {status} label={getStatusLabel(status)} />
   </div>
 {/snippet}
 

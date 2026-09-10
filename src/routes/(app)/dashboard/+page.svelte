@@ -20,6 +20,20 @@
   import DeleteConfirmation from '$appui/DeleteConfirmation.svelte';
   import { goto } from '$app/navigation';
   import * as m from '$lib/paraglide/messages';
+  import {
+    dashboard_add_widget,
+    dashboard_title,
+    dashboard_good_morning,
+    dashboard_good_afternoon,
+    dashboard_good_evening,
+    dashboard_reset_to_default,
+    dashboard_reset_confirm_title,
+    dashboard_reset_confirm_message,
+    dashboard_reset_confirm_reset,
+    dashboard_cta_heading,
+    dashboard_cta_description,
+    dashboard_cta_button_label
+  } from '$lib/paraglide/messages/_index.js';
 
   let resetDialogOpen = $state(false);
 
@@ -34,18 +48,26 @@
   const greeting = $derived.by(() => {
     if (!authStore.user?.username) return 'Welcome';
     const hour = new Date().getHours();
-    const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const timeGreeting =
+      hour < 12
+        ? dashboard_good_morning()
+        : hour < 18
+          ? dashboard_good_afternoon()
+          : dashboard_good_evening();
     return `${timeGreeting}, ${authStore.user.username}`;
   });
 </script>
 
 <div class="min-h-full space-y-6">
-  <PageHeader title="Dashboard" description={greeting}>
+  <PageHeader title={dashboard_title()} description={greeting}>
     <Button variant="outline" onclick={() => (resetDialogOpen = true)}>
-      <LabelWithIcon icon={RotateCcw} label="Reset to Default" />
+      <LabelWithIcon icon={RotateCcw} label={dashboard_reset_to_default()} />
     </Button>
-    <Button variant="outline" onclick={() => sheetStore.openSheet(AddWidgetPanel, 'Add Widget')}>
-      <LabelWithIcon icon={LayoutGrid} label="Add Widget" />
+    <Button
+      variant="outline"
+      onclick={() => sheetStore.openSheet(AddWidgetPanel, dashboard_add_widget())}
+    >
+      <LabelWithIcon icon={LayoutGrid} label={dashboard_add_widget()} />
     </Button>
     <Button
       variant="default"
@@ -58,9 +80,9 @@
   <DeleteConfirmation
     bind:open={resetDialogOpen}
     icon={RotateCcw}
-    title="Reset dashboard?"
-    message="This restores the default set of widgets and layout, replacing your current customization."
-    confirmLabel="Reset"
+    title={dashboard_reset_confirm_title()}
+    message={dashboard_reset_confirm_message()}
+    confirmLabel={dashboard_reset_confirm_reset()}
     onConfirm={() => {
       dashboardLayoutStore.resetToDefault();
       resetDialogOpen = false;
@@ -87,9 +109,9 @@
 
   <!-- Bottom CTA -->
   <CtaBanner
-    heading="Get detailed insights"
-    description="View comprehensive reports and analytics for your fleet"
-    buttonLabel="View Reports"
+    heading={dashboard_cta_heading()}
+    description={dashboard_cta_description()}
+    buttonLabel={dashboard_cta_button_label()}
     buttonIcon={ChartBar}
     onButtonClick={() => goto('/reports')}
   />

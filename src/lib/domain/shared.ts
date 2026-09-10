@@ -1,16 +1,32 @@
 import { z } from 'zod';
+import { parseWithFormat } from '$lib/helper/date.helper';
+import { format, isValid, parseISO } from 'date-fns';
 
 /**
- * Validates date strings accepted by the API: anything the Date
- * constructor can parse (ISO 8601 payloads from JSON-serialized Dates).
+ * Validates ISO 8601 date strings accepted by the API, including payloads
+ * produced by JSON-serialized Dates.
  * Display-format validation for forms lives in format.helper (client-only).
  */
 export const apiDateString = z
   .string()
-  .refine((val) => !Number.isNaN(new Date(val).getTime()), 'Invalid date format');
+  .refine((value) => isValid(parseISO(value)), 'Invalid date format');
 
 /** Nullable/optional variant for fields that can be empty or omitted. */
 export const optionalApiDateString = apiDateString.nullable().optional();
+
+/** Validates a date exactly as it is displayed in a localized form. */
+export const dateStringForFormat = (dateFormat: string) =>
+  z.string().refine(
+    (value) => {
+      const parsed = parseWithFormat(value, dateFormat);
+      return parsed !== null && format(parsed, dateFormat) === value;
+    },
+    { message: `Invalid date. Expected format: ${dateFormat}` }
+  );
+
+/** Nullable/optional localized date used by form-only schemas. */
+export const optionalDateStringForFormat = (dateFormat: string) =>
+  dateStringForFormat(dateFormat).nullable().optional();
 
 export type DataPoint = {
   x: Date | string;

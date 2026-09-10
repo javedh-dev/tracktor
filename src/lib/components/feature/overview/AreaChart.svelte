@@ -20,6 +20,7 @@
     label,
     title,
     xFormatter,
+    xAxisFormatter,
     valueFormatter,
     loading = false,
     bare = false,
@@ -30,6 +31,7 @@
     label: string;
     title: string;
     xFormatter: (_: Date) => string;
+    xAxisFormatter: (_: Date) => string;
     valueFormatter?: (_: number) => string;
     loading?: boolean;
     /** Render content only — surrounding card chrome is provided by the parent. */
@@ -46,7 +48,7 @@
       motion: 'tween'
     },
     xAxis: {
-      format: (v: Date) => v.toLocaleDateString('en-IN', { month: 'short' })
+      format: (value: Date) => xAxisFormatter(value)
     },
     yAxis: {
       format: (v: number) => valueFormatter?.(v) ?? v.toString()

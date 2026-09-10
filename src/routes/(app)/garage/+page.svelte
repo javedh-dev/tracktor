@@ -8,11 +8,16 @@
   import { sheetStore } from '$stores/sheet.svelte';
   import { goto } from '$app/navigation';
   import CirclePlus from '@lucide/svelte/icons/circle-plus';
-  import { app_add_vehicle, vehicle_list_empty } from '$lib/paraglide/messages/_index.js';
+  import {
+    app_add_vehicle,
+    vehicle_list_empty,
+    vehicles_title,
+    vehicles_description
+  } from '$lib/paraglide/messages/_index.js';
 </script>
 
 <div class="space-y-6">
-  <PageHeader title="Vehicles" description="Manage your fleet" />
+  <PageHeader title={vehicles_title()} description={vehicles_description()} />
 
   {#if vehicleStore.processing}
     <CardGridSkeleton

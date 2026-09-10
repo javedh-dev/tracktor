@@ -2,6 +2,7 @@
   import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
   import { cn } from '$lib/utils';
   import { ACCENT } from '$lib/helper/accent-color.helper';
+  import { no_data_yet } from '$lib/paraglide/messages/_index.js';
 
   interface Entry {
     id: string;
@@ -13,7 +14,7 @@
   let {
     entries,
     loading = false,
-    emptyLabel = 'No data yet'
+    emptyLabel = no_data_yet()
   }: {
     entries: Entry[];
     loading?: boolean;
