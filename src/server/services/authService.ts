@@ -19,25 +19,41 @@ async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 }
 
+// Tracktor is single-owner: `/register` (UI and API) is the one-time first-run setup step,
+// never a general "create another account" endpoint — there is no role model, and
+// `updateUserProfile` is the only supported way to change the existing user afterwards.
+// The page-load redirects in `(auth)/register/+page.server.ts` and the check in
+// `middlewares/auth.ts` only gate the UI/unauthenticated-request path; `/api/auth/register`
+// itself previously had no such check, so it stayed reachable to create additional accounts
+// after setup was complete. Enforcing "at most one user" here, inside the same transaction as
+// the insert, keeps that invariant regardless of caller and closes the plain read-then-write
+// race a separate pre-check would leave open between two concurrent first-run requests.
+//
+// Residual caveat: this relies on the libsql/SQLite driver serializing concurrent writers
+// within a transaction; it hasn't been load-tested against a real two-request race, so treat
+// it as closing the practical "register after setup" gap rather than a proven-atomic guarantee.
 export const createUser = async (username: string, password: string) => {
-  const existingUser = await db.query.usersTable.findFirst({
-    where: (users, { eq }) => eq(users.username, username)
-  });
-
-  if (existingUser) {
-    throw new AppError('Username already exists', Status.BAD_REQUEST);
-  }
-
   const passwordHash = await hashPassword(password);
   const userId = crypto.randomUUID();
 
-  await db.insert(schema.usersTable).values({
-    id: userId,
-    username,
-    passwordHash
-  });
+  return db.transaction(async (tx) => {
+    const [anyUser] = await tx
+      .select({ id: schema.usersTable.id })
+      .from(schema.usersTable)
+      .limit(1);
 
-  return { userId, username };
+    if (anyUser) {
+      throw new AppError('Registration is closed. An account already exists.', Status.CONFLICT);
+    }
+
+    await tx.insert(schema.usersTable).values({
+      id: userId,
+      username,
+      passwordHash
+    });
+
+    return { userId, username };
+  });
 };
 
 export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
