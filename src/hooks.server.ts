@@ -4,6 +4,7 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 import { handleCors } from '$server/middlewares/cors';
 import { handleAuth } from '$server/middlewares/auth';
+import { handleRateLimit } from '$server/middlewares/rate-limit';
 import { handleLogging } from '$server/middlewares/logging';
 import { initializeDatabase } from '$server/db/init';
 import { appAsciiArt, appVersion, logger } from '$server/config';
@@ -100,4 +101,11 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     });
   });
 
-export const handle = sequence(handleInit, handleCors, handleAuth, handleLogging, handleParaglide);
+export const handle = sequence(
+  handleInit,
+  handleCors,
+  handleRateLimit,
+  handleAuth,
+  handleLogging,
+  handleParaglide
+);

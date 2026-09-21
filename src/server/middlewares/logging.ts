@@ -2,7 +2,7 @@ import { logger } from '$server/config';
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { env } from '$lib/config/env.server';
 
-function getClientAddress(event: RequestEvent): string {
+export function getClientAddress(event: RequestEvent): string {
   const forwardedFor = event.request.headers.get('x-forwarded-for');
   const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : event.getClientAddress();
 
