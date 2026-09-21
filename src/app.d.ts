@@ -26,7 +26,6 @@ declare namespace NodeJS {
     SERVER_PORT: string;
     DB_PATH: string;
     UPLOADS_DIR: string;
-    AUTH_PIN: string;
     CORS_ORIGINS: string;
     FORCE_DATA_SEED: string;
     TRACKTOR_DEMO_MODE: string;

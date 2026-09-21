@@ -2,7 +2,13 @@ import { serverEnv } from '$lib/config/env.server';
 import type { Handle } from '@sveltejs/kit';
 import type { ApiResponse } from '$lib/response';
 
-export function getCorsOrigin(request: Request): string {
+/**
+ * Resolves the Origin to echo back, or `null` when the request's Origin is present but
+ * not on the configured allow-list — callers must then omit the CORS headers entirely
+ * rather than fall back to some other configured origin (that would let an origin the
+ * operator never allowed borrow another allowed origin's CORS grant).
+ */
+export function getCorsOrigin(request: Request): string | null {
   const requestOrigin = request.headers.get('origin');
 
   if (!requestOrigin || serverEnv?.CORS_ORIGINS.includes('*')) {
@@ -13,7 +19,15 @@ export function getCorsOrigin(request: Request): string {
     return requestOrigin;
   }
 
-  return serverEnv?.CORS_ORIGINS[0] || '*';
+  return null;
+}
+
+function applyCorsHeaders(headers: Headers, request: Request): void {
+  const origin = getCorsOrigin(request);
+  if (!origin) return;
+
+  headers.set('Access-Control-Allow-Origin', origin);
+  headers.set('Access-Control-Allow-Credentials', 'true');
 }
 
 export function errorResponse(
@@ -23,33 +37,25 @@ export function errorResponse(
   error?: Error
 ): Response {
   const body: ApiResponse = { success: false, message, errors: error ? [error] : [] };
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  applyCorsHeaders(headers, request);
 
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': getCorsOrigin(request),
-      'Access-Control-Allow-Credentials': 'true'
-    }
-  });
+  return new Response(JSON.stringify(body), { status, headers });
 }
 
 export const handleCors: Handle = async ({ event, resolve }) => {
   if (event.request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': getCorsOrigin(event.request),
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-PIN',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400'
-      }
+    const headers = new Headers({
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
     });
+    applyCorsHeaders(headers, event.request);
+
+    return new Response(null, { status: 200, headers });
   }
 
   const response = await resolve(event);
-  response.headers.set('Access-Control-Allow-Origin', getCorsOrigin(event.request));
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
+  applyCorsHeaders(response.headers, event.request);
   return response;
 };

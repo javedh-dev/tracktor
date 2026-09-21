@@ -6,12 +6,18 @@ import { validateSession, getUsersCount } from '$server/services/authService';
 
 const BYPASS_PATHS = ['/api/auth', '/api/health', '/api/config/branding'];
 
+// Exact-segment match: '/api/auth' bypasses '/api/auth' and '/api/auth/profile',
+// but never an unrelated route that merely shares the prefix (e.g. '/api/authXxx').
+function matchesBypassPath(pathname: string, bypassPath: string): boolean {
+  return pathname === bypassPath || pathname.startsWith(`${bypassPath}/`);
+}
+
 function requiresAuth(pathname: string): boolean {
   if (env.DISABLE_AUTH || !pathname.startsWith('/api')) {
     return false;
   }
 
-  return !BYPASS_PATHS.some((path) => pathname.startsWith(path));
+  return !BYPASS_PATHS.some((path) => matchesBypassPath(pathname, path));
 }
 
 export const handleAuth: Handle = async ({ event, resolve }) => {
