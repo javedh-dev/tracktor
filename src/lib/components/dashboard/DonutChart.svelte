@@ -103,7 +103,7 @@
 
 <div
   class={bare
-    ? 'donut-chart relative flex h-full flex-col'
+    ? 'donut-chart relative flex h-full min-h-56 flex-col lg:min-h-0'
     : 'donut-chart bg-secondary lg:bg-background/50 relative rounded-lg px-4 pt-2 pb-6 lg:p-6'}
 >
   {#if title}

@@ -66,7 +66,7 @@
 <div
   id="stacked-chart-{title}"
   class={bare
-    ? 'area-chart relative flex h-full flex-col'
+    ? 'area-chart relative flex h-full min-h-56 flex-col lg:min-h-0'
     : 'area-chart lg:bg-background/50 bg-secondary relative rounded-xl border px-4 pt-2 pb-6 lg:p-6'}
 >
   <div class="mb-4 flex flex-wrap items-center gap-2">
