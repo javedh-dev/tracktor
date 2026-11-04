@@ -22,6 +22,7 @@
       <select {...props} {value}>
         {#each yearItems as yearItem (yearItem.value)}
           <option
+            class="bg-popover text-popover-foreground"
             value={yearItem.value}
             selected={value !== undefined
               ? yearItem.value === value

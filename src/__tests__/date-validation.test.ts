@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { apiDateString, dateStringForFormat } from '$lib/domain/shared';
 import { maintenanceFormSchema } from '$lib/domain/maintenance';
 import { complianceFormSchema } from '$lib/domain/compliance';
-import { formatDate, type FormatConfig } from '$lib/helper/date.helper';
+import { formatDate, parseDateForCalendar, type FormatConfig } from '$lib/helper/date.helper';
 
 const formatConfig: FormatConfig = {
-  dateFormat: 'd. MMMM yyyy',
+  dateFormat: 'dd/MM/yyyy',
   timezone: 'UTC',
   locale: 'en',
   currency: 'USD',
@@ -17,13 +17,33 @@ const formatConfig: FormatConfig = {
 };
 
 describe('localized date validation', () => {
+  it('restores calendar dates using the configured display format', () => {
+    const dayFirst = parseDateForCalendar('13/08/2026', formatConfig);
+    const monthFirst = parseDateForCalendar('08/13/2026', {
+      ...formatConfig,
+      dateFormat: 'MM/dd/yyyy'
+    });
+
+    expect(dayFirst?.toString()).toBe('2026-08-13');
+    expect(monthFirst?.toString()).toBe('2026-08-13');
+  });
+
+  it('does not restore invalid calendar input values', () => {
+    expect(parseDateForCalendar('31/02/2026', formatConfig)).toBeUndefined();
+    expect(parseDateForCalendar(undefined, formatConfig)).toBeUndefined();
+  });
+
   it.each([
     ['cs', '3. září 2026'],
     ['ru', '3. сентября 2026']
   ])('formats dates with %s month names', (locale, expected) => {
-    expect(formatDate(new Date('2026-09-03T12:00:00Z'), { ...formatConfig, locale })).toBe(
-      expected
-    );
+    expect(
+      formatDate(new Date('2026-09-03T12:00:00Z'), {
+        ...formatConfig,
+        locale,
+        dateFormat: 'd. MMMM yyyy'
+      })
+    ).toBe(expected);
   });
 
   it('accepts days greater than 12 in day-first formats', () => {

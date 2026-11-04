@@ -3,6 +3,7 @@ import type { FormatConfig } from './date.helper';
 import {
   formatDate as formatDatePure,
   formatDateForCalendar as formatDateForCalendarPure,
+  parseDateForCalendar as parseDateForCalendarPure,
   parseDate as parseDatePure
 } from './date.helper';
 export type { FormatConfig };
@@ -22,6 +23,8 @@ import {
 export const formatDate = (date: Date | string) => formatDatePure(date, configs);
 export const formatDateForCalendar = (date: import('@internationalized/date').DateValue) =>
   formatDateForCalendarPure(date, configs);
+export const parseDateForCalendar = (date: string | undefined) =>
+  parseDateForCalendarPure(date, configs);
 export const parseDate = (date: string) => parseDatePure(date, configs);
 export const getCurrencySymbol = (currency?: string) =>
   getCurrencySymbolPure(currency || configs.currency);
