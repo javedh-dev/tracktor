@@ -54,6 +54,7 @@ export const GET: RequestHandler = async (event) => {
     return jsonResponse({
       ...result,
       isAuthDisabled,
+      oidcEnabled: env.OIDC_ENABLED,
       user,
       isAuthenticated: isAuthDisabled || !!user
     });

@@ -14,6 +14,7 @@ class AuthStore {
   isLoggedIn = $state<boolean>(false);
   hasUsers = $state<boolean>(false);
   isAuthDisabled = $state<boolean>(env.DISABLE_AUTH);
+  oidcEnabled = $state<boolean>(false);
 
   constructor() {
     this.isLoggedIn = env.DISABLE_AUTH;
@@ -30,6 +31,7 @@ class AuthStore {
     try {
       const { data: res } = await apiClient.get<ApiResponse>('/auth');
       this.isAuthDisabled = !!res.data?.isAuthDisabled;
+      this.oidcEnabled = !!res.data?.oidcEnabled;
       this.hasUsers = res.data?.hasUsers ?? false;
 
       if (this.isAuthDisabled) {
@@ -51,6 +53,10 @@ class AuthStore {
       this.user = null;
       this.isLoggedIn = this.isAuthDisabled;
     }
+  };
+
+  oidcLogin = () => {
+    window.location.href = '/api/auth/oidc/login';
   };
 
   login = async (username: string, password: string) => {

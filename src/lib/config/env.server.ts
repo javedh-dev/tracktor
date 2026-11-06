@@ -49,7 +49,14 @@ export const serverEnv = {
   HTTP_MODE: privateEnv.HTTP_MODE || 'http',
   APP_VERSION: privateEnv.APP_VERSION,
   BASE_URL: privateEnv.BASE_URL || '',
-  APP_SECRET: privateEnv.APP_SECRET || ''
+  APP_SECRET: privateEnv.APP_SECRET || '',
+
+  OIDC_ENABLED: privateEnv.OIDC_ENABLED === 'true',
+  OIDC_ISSUER: privateEnv.OIDC_ISSUER || '',
+  OIDC_CLIENT_ID: privateEnv.OIDC_CLIENT_ID || '',
+  OIDC_CLIENT_SECRET: privateEnv.OIDC_CLIENT_SECRET || '',
+  OIDC_REDIRECT_URI: privateEnv.OIDC_REDIRECT_URI || '',
+  OIDC_SCOPES: privateEnv.OIDC_SCOPES || 'openid profile email'
 } as const;
 
 /**

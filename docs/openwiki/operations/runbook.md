@@ -30,6 +30,12 @@ Defined and typed in `src/lib/config/env.server.ts`. Public variables must be pr
 | `HTTP_MODE`             | `http`                                                                         | Set to `https` for secure cookies.                       |
 | `APP_VERSION`           | branch name (dev) / package version (prod)                                     | Override displayed version.                              |
 | `TRACKTOR_API_BASE_URL` | —                                                                              | Optional external API base URL.                          |
+| `OIDC_ENABLED`          | `false`                                                                        | Enables OIDC login                                       |
+| `OIDC_ISSUER`           | `""`                                                                           | Sets OIDC issuer                                         |
+| `OIDC_CLIENT_ID`        | `""`                                                                           | OIDC client ID                                           |
+| `OIDC_CLIENT_SECRET`    | `""`                                                                           | OIDC client secret                                       |
+| `OIDC_REDIRECT_URI`     | `""`                                                                           | OIDC redirect uri                                        |
+| `OIDC_SCOPES`           | `openid profile email`                                                         | Scopes to request to OIDC                                |
 
 > Do not commit secrets. The repo includes `.env.example` with placeholder values.
 
