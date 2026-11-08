@@ -69,7 +69,7 @@ const defaultMapping = (): Record<FuelLogColumnKey, string> => ({
 const autoMapHints: Record<FuelLogColumnKey, string[]> = {
   date: ['date', 'refuel date', 'refill date'],
   odometer: ['odo', 'odometer', 'mileage'],
-  fuelAmount: ['fuel', 'volume', 'litre', 'liter', 'quantity', 'energy', 'kwh'],
+  fuelAmount: ['fuel', 'volume', 'litre', 'liter', 'gallon', 'quantity', 'energy', 'kwh'],
   cost: ['cost', 'price', 'amount', 'total'],
   filled: ['full', 'filled', 'tank'],
   missedLast: ['missed', 'skip', 'skipped'],

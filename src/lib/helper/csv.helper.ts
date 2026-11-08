@@ -66,7 +66,6 @@ export const importFuelLogsFromCsv = async (
 ): Promise<{ imported: number; failed: number; errors: string[] }> => {
   const { parseWithFormat } = await import('$lib/helper/format.helper');
   const { saveFuelLog } = await import('$lib/services/fuel.service');
-  const { parseDate } = await import('$lib/helper/format.helper');
 
   const result = { imported: 0, failed: 0, errors: [] as string[] };
 
@@ -87,19 +86,19 @@ export const importFuelLogsFromCsv = async (
 
       const odometerStr = row.odometer?.trim();
       const odometer = odometerStr ? Number(odometerStr) : null;
-      if (odometer === null || isNaN(odometer)) {
+      if (odometer !== null && (!Number.isFinite(odometer) || odometer <= 0)) {
         throw new Error(`Row ${i + 1}: Odometer must be a valid number`);
       }
 
       const fuelAmountStr = row.fuelAmount?.trim();
       const fuelAmount = fuelAmountStr ? Number(fuelAmountStr) : null;
-      if (fuelAmount === null || isNaN(fuelAmount)) {
+      if (fuelAmount !== null && (!Number.isFinite(fuelAmount) || fuelAmount <= 0)) {
         throw new Error(`Row ${i + 1}: Fuel Amount must be a valid number`);
       }
 
       const costStr = row.cost?.trim();
       const cost = costStr ? Number(costStr) : null;
-      if (cost === null || isNaN(cost)) {
+      if (cost === null || !Number.isFinite(cost) || cost <= 0) {
         throw new Error(`Row ${i + 1}: Cost must be a valid number`);
       }
 
