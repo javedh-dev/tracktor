@@ -12,6 +12,26 @@ Tracktor uses username/password authentication with session management for secur
 
 ## Creating User Accounts
 
+Registration is available only until the first account exists. The API enforces
+this restriction with an atomic database insert; hiding the registration page is
+not the security boundary. Concurrent setup requests cannot create a second user.
+Existing accounts are not deleted or altered by this restriction.
+
+### Local account recovery
+
+Do not reopen public registration on an initialized instance. To recover the owner
+account, stop Tracktor, make a backup of the SQLite database, and update that user's
+`password_hash` locally with a bcrypt hash generated using the application's
+installed `bcrypt` package. Remove that user's rows from `sessions`, then restart
+Tracktor and sign in. Keep the database and password hash private. This preserves
+the owner's user ID and vehicle data without exposing a public setup window.
+
+If reinitialization is required, create a separate instance with a new empty data
+directory, restrict it to localhost, create the owner account, and then restore
+the vehicle data through the supported import flow. Preserve the original data
+directory until recovery is verified. There is intentionally no remote switch
+that reopens registration while accounts exist.
+
 ### Web Interface
 
 1. Navigate to the login page
