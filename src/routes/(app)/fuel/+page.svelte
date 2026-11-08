@@ -7,7 +7,10 @@
   import { fuelLogStore } from '$stores/fuel-log.svelte';
   import { chartStore } from '$stores/chart.svelte';
   import { ACCENT } from '$lib/helper/accent-color.helper';
-  import { formatCurrency, formatDate, formatMileage } from '$lib/helper/format.helper';
+  import { formatCurrency, formatDate, formatMileage, formatFuel } from '$lib/helper/format.helper';
+  import { formatFuelTotals } from '$lib/helper/unit.helper';
+  import configs from '$stores/config.svelte';
+  import { vehicleStore } from '$stores/vehicle.svelte';
   import VehicleTrendChart from '$feature/overview/VehicleTrendChart.svelte';
   import { getLocale } from '$lib/paraglide/runtime.js';
   import FuelLogTab from '$feature/fuel/FuelLogTab.svelte';
@@ -27,7 +30,17 @@
   } from '$lib/paraglide/messages/_index.js';
 
   const fuelLogs = $derived(fuelLogStore.fuelLogs ?? []);
-  const totalFuelUsed = $derived(fuelLogs.reduce((sum, l) => sum + (l.fuelAmount || 0), 0));
+  const totalFuelUsed = $derived(
+    formatFuelTotals(
+      fuelLogs.map((log) => ({
+        fuelAmount: log.fuelAmount,
+        fuelType:
+          vehicleStore.vehicles?.find((vehicle) => vehicle.id === log.vehicleId)?.fuelType ??
+          'petrol'
+      })),
+      configs
+    )
+  );
   const totalCost = $derived(fuelLogs.reduce((sum, l) => sum + (l.cost || 0), 0));
   const avgMileage = $derived.by(() => {
     const withMileage = fuelLogs.filter((l) => l.mileage);
@@ -49,7 +62,7 @@
       <StatCard
         icon={Fuel}
         label={fuel_stat_used()}
-        value={totalFuelUsed > 0 ? `${totalFuelUsed.toFixed(1)} L` : '--'}
+        value={totalFuelUsed || '--'}
         color={ACCENT.moss.gradient}
       />
       <StatCard
@@ -77,7 +90,7 @@
         series={chartStore.fuelAmountByVehicle}
         title={widget_fuel_consumption_trend()}
         loading={fuelLogStore.processing}
-        valueFormatter={(value) => `${value.toFixed(1)} L`}
+        valueFormatter={(value, series) => formatFuel(value, series.fuelType)}
         xFormatter={(value: Date) => formatDate(value)}
         xAxisFormatter={(value: Date) => value.toLocaleDateString(getLocale(), { month: 'short' })}
       />

@@ -100,6 +100,24 @@ export const formatFuel = (amount: number, vehicleType: string, config: FormatCo
   );
 };
 
+/** Aggregate compatible quantities without combining liquid fuel, gas mass, and electricity. */
+export function formatFuelTotals(
+  entries: ReadonlyArray<{ fuelAmount: number | null; fuelType: string }>,
+  config: FormatConfig
+): string {
+  const totals = new Map<string, { amount: number; fuelType: string }>();
+  for (const entry of entries) {
+    if (entry.fuelAmount === null) continue;
+    const unit = getFuelUnit(entry.fuelType, config);
+    const total = totals.get(unit) ?? { amount: 0, fuelType: entry.fuelType };
+    total.amount += entry.fuelAmount;
+    totals.set(unit, total);
+  }
+  return [...totals.values()]
+    .map(({ amount, fuelType }) => formatFuel(amount, fuelType, config))
+    .join(', ');
+}
+
 export const getMileageUnit = (vehicleType: string, config: FormatConfig): string => {
   if (vehicleType === 'electric') {
     return 'km/kWh';
