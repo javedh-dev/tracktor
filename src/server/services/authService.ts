@@ -3,7 +3,7 @@ import { AppError } from '../exceptions/AppError';
 import { Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   generateSessionToken,
   createSession,
@@ -20,6 +20,9 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 export const createUser = async (username: string, password: string) => {
+  if ((await getUsersCount()).hasUsers) {
+    throw new AppError('Registration is closed after initial setup', Status.FORBIDDEN);
+  }
   const existingUser = await db.query.usersTable.findFirst({
     where: (users, { eq }) => eq(users.username, username)
   });
@@ -31,11 +34,15 @@ export const createUser = async (username: string, password: string) => {
   const passwordHash = await hashPassword(password);
   const userId = crypto.randomUUID();
 
-  await db.insert(schema.usersTable).values({
-    id: userId,
-    username,
-    passwordHash
-  });
+  // A single statement also closes the race between concurrent first-user requests.
+  const result = await db.run(sql`
+    INSERT INTO ${schema.usersTable} (id, username, password_hash)
+    SELECT ${userId}, ${username}, ${passwordHash}
+    WHERE NOT EXISTS (SELECT 1 FROM ${schema.usersTable})
+  `);
+  if (result.rowsAffected !== 1) {
+    throw new AppError('Registration is closed after initial setup', Status.FORBIDDEN);
+  }
 
   return { userId, username };
 };
