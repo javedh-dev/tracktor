@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { parseWithFormat } from '$lib/helper/date.helper';
+import { normalizeDateFormat, parseWithFormat } from '$lib/helper/date.helper';
 import { format, isValid, parseISO } from 'date-fns';
 
 /**
@@ -19,7 +19,7 @@ export const dateStringForFormat = (dateFormat: string) =>
   z.string().refine(
     (value) => {
       const parsed = parseWithFormat(value, dateFormat);
-      return parsed !== null && format(parsed, dateFormat) === value;
+      return parsed !== null && format(parsed, normalizeDateFormat(dateFormat)) === value;
     },
     { message: `Invalid date. Expected format: ${dateFormat}` }
   );

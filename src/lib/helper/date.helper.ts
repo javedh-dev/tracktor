@@ -15,6 +15,12 @@ export interface FormatConfig {
   mileageUnitFormat: string;
 }
 
+/** Treat legacy unquoted Y year tokens as calendar years; preserve quoted literals. */
+export const normalizeDateFormat = (dateFormat: string): string =>
+  dateFormat.replace(/'(?:[^']|'')*'|Y+/g, (token) =>
+    token.startsWith("'") ? token : token === 'YYY' ? 'yyyy' : token.toLowerCase()
+  );
+
 const getDateFnsLocale = (locale: string) => {
   switch (locale) {
     case 'ar':
@@ -53,7 +59,7 @@ export const formatDate = (date: Date | string, config: FormatConfig): string =>
   try {
     const zonedDate = formatInTimeZone(dateObj, config.timezone, 'yyyy-MM-dd HH:mm:ss');
     const parsedDate = parse(zonedDate, 'yyyy-MM-dd HH:mm:ss', new Date());
-    return format(parsedDate, config.dateFormat, {
+    return format(parsedDate, normalizeDateFormat(config.dateFormat), {
       locale: getDateFnsLocale(config.locale)
     });
   } catch (e) {
@@ -63,18 +69,20 @@ export const formatDate = (date: Date | string, config: FormatConfig): string =>
 
 export const formatDateForCalendar = (date: DateValue, config: FormatConfig): string => {
   const dateObj = date.toDate(config.timezone);
-  return format(dateObj, config.dateFormat, { locale: getDateFnsLocale(config.locale) });
+  return format(dateObj, normalizeDateFormat(config.dateFormat), {
+    locale: getDateFnsLocale(config.locale)
+  });
 };
 
 export const parseDate = (date: string, config: FormatConfig) => {
-  const parsedDate = parse(date, config.dateFormat, new Date());
+  const parsedDate = parse(date, normalizeDateFormat(config.dateFormat), new Date());
   return fromZonedTime(parsedDate, config.timezone);
 };
 
 export const isValidFormat = (fmt: string): { ex?: string; valid: boolean } => {
   try {
     return {
-      ex: format(new Date(), fmt),
+      ex: format(new Date(), normalizeDateFormat(fmt)),
       valid: true
     };
   } catch (_) {
@@ -84,7 +92,7 @@ export const isValidFormat = (fmt: string): { ex?: string; valid: boolean } => {
 
 export const parseWithFormat = (dateStr: string, fmt: string): Date | null => {
   try {
-    const parsed = parse(dateStr, fmt, new Date());
+    const parsed = parse(dateStr, normalizeDateFormat(fmt), new Date());
     return isNaN(parsed.getTime()) ? null : parsed;
   } catch (_) {
     return null;
