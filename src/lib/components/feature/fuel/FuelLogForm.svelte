@@ -78,7 +78,7 @@
           sf.removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
-            toast.success(data ? fuel_toast_updated() : fuel_toast_saved());
+            toast.success(data?.id ? fuel_toast_updated() : fuel_toast_saved());
             sf.attachment = undefined;
             sheetStore.closeSheet(() => fuelLogStore.reloadFuelLogs());
           } else {
@@ -164,7 +164,7 @@
 
   $effect(() => {
     sf.resetAttachment();
-    if (data) {
+    if (data?.id) {
       formData.set({
         ...data,
         date: formatDate(data.date),
