@@ -1,8 +1,9 @@
 import type { RequestHandler } from './$types';
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { env } from '$lib/config/env.server';
 import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
+import { loginAttempts } from '$server/services/login-attempts';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
@@ -10,11 +11,26 @@ export const POST: RequestHandler = async (event) => {
     const body = await event.request.json();
 
     // Validate request body
-    if (!body.username || !body.password) {
+    if (
+      typeof body.username !== 'string' ||
+      !body.username ||
+      body.username.length > 256 ||
+      typeof body.password !== 'string' ||
+      !body.password
+    ) {
       throw error(400, 'Username and password are required');
     }
 
+    const retryAfter = loginAttempts.reserve(event.getClientAddress(), body.username);
+    if (retryAfter) {
+      return json(
+        { success: false, message: 'Too many login attempts. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
+
     const result = await authService.loginUser(body.username, body.password);
+    loginAttempts.succeed(body.username);
 
     // Set session cookie
     if (result.sessionToken) {

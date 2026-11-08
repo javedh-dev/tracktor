@@ -55,6 +55,26 @@ GET /api/auth
 
 ## Security
 
+### Login attempt limits
+
+The login endpoint reserves attempts before checking passwords, including concurrent
+requests. After five attempts for one username or 30 attempts from one address,
+further requests receive a generic HTTP 429 response with `Retry-After`. Backoff
+grows from one second to a maximum of 60 seconds; counters expire after 15 minutes.
+A successful login clears the username counter but retains the IP counter to resist
+password spraying. Unknown and existing usernames share the same limit policy.
+
+Counters are process-local and reset on restart. They are bounded to 10,000 entries;
+new keys are temporarily rejected when full instead of evicting active lockouts.
+For multiple instances, add a shared rate limiter at the reverse proxy. A persistent
+distributed backend is not included in this change.
+
+The address comes from adapter-node's `getClientAddress()`. Behind a trusted proxy,
+configure `ADDRESS_HEADER` and `XFF_DEPTH` for the actual proxy chain, overwrite the
+forwarded address header, and block direct backend access. Do not trust arbitrary
+client-supplied forwarding headers. See the
+[adapter-node documentation](https://svelte.dev/docs/kit/adapter-node#Environment-variables).
+
 - **Password Hashing**: Bcrypt with salt rounds
 - **Session Tokens**: Cryptographically secure tokens
 - **Automatic Cleanup**: Expired sessions removed automatically
