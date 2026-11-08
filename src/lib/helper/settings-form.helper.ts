@@ -83,6 +83,7 @@ export function createSettingsOptions(
     cs: 'Čeština',
     pl: 'Polski',
     da: 'Dansk'
+    az: 'Azərbaycanca'
   };
 
   return {
