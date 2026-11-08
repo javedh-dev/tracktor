@@ -61,7 +61,7 @@
           sf.removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
-            toast.success(m[data ? 'compliance_toast_updated' : 'compliance_toast_saved']());
+            toast.success(m[data?.id ? 'compliance_toast_updated' : 'compliance_toast_saved']());
             sf.attachment = undefined;
             sheetStore.closeSheet(() => complianceStore.reloadDocuments());
           } else {
@@ -87,7 +87,7 @@
 
   $effect(() => {
     sf.resetAttachment();
-    if (data) {
+    if (data?.id) {
       formData.set({
         ...data,
         startDate: formatDate(data.startDate),

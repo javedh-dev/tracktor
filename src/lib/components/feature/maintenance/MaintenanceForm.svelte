@@ -45,7 +45,7 @@
           sf.removeExistingAttachment
         ).then((res) => {
           if (res.status == 'OK') {
-            toast.success(data ? m.maintenance_toast_updated() : m.maintenance_toast_saved());
+            toast.success(data?.id ? m.maintenance_toast_updated() : m.maintenance_toast_saved());
             sf.attachment = undefined;
             sheetStore.closeSheet(maintenanceStore.reloadMaintenanceLogs);
           } else {
@@ -67,7 +67,7 @@
 
   $effect(() => {
     sf.resetAttachment();
-    if (data) {
+    if (data?.id) {
       formData.set({ ...data, date: formatDate(data.date), attachment: null });
     }
     if (suppliedVehicleId) sf.setVehicleId(suppliedVehicleId);
