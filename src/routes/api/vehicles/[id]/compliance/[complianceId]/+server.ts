@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import * as complianceService from '$server/services/complianceService';
 import { complianceSchema } from '$lib/domain/compliance';
-import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/route-handler';
+import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Compliance GET error:', async () => {
@@ -14,12 +14,13 @@ export const GET: RequestHandler = async (event) => {
 export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Compliance PUT error:', async () => {
     const { id, complianceId } = event.params;
-    const parsed = await parseBody(event, complianceSchema.partial(), { vehicleId: id });
-    const body = {
-      ...parsed,
-      recurrenceType: parsed.recurrenceType ?? 'none',
-      recurrenceInterval: parsed.recurrenceInterval ?? 1
-    };
+    const existing = await complianceService.getComplianceDocumentById(complianceId);
+    const body = complianceSchema.parse({
+      ...existing,
+      ...(await event.request.json()),
+      id: complianceId,
+      vehicleId: id
+    });
     const { id: _, vehicleId: __, ...payload } = body;
     const result = await complianceService.updateComplianceDocument(id, complianceId, payload);
     return jsonResponse(result);
