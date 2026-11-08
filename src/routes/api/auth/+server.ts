@@ -3,6 +3,7 @@ import { error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
 import { env } from '$lib/config/env.server';
 import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
+import { sessionCookieOptions } from '$server/utils/session-cookie';
 
 // POST /api/auth - Login with username/password
 export const POST: RequestHandler = async (event) => {
@@ -18,13 +19,12 @@ export const POST: RequestHandler = async (event) => {
 
     // Set session cookie
     if (result.sessionToken) {
-      event.cookies.set('session', result.sessionToken, {
-        path: '/',
-        httpOnly: true,
-        secure: env.HTTP_MODE === 'https',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30 // 30 days
-      });
+      // 30 days; HTTPS is inferred from the trusted adapter URL or explicitly configured.
+      event.cookies.set(
+        'session',
+        result.sessionToken,
+        sessionCookieOptions(event.url, env.HTTP_MODE)
+      );
     }
 
     return jsonResponse(result);
@@ -76,13 +76,8 @@ export const DELETE: RequestHandler = async (event) => {
     }
 
     // Clear session cookie with proper options
-    event.cookies.set('session', '', {
-      path: '/',
-      httpOnly: true,
-      secure: env.HTTP_MODE === 'https',
-      sameSite: 'lax',
-      maxAge: 0 // Expire immediately
-    });
+    // Expire immediately using the same cookie scope and security attributes as login.
+    event.cookies.set('session', '', sessionCookieOptions(event.url, env.HTTP_MODE, true));
 
     return jsonResponse(undefined, 'Logout successful');
   });
