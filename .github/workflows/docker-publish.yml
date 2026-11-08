@@ -104,7 +104,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '26.13.0'
 
       - name: Update package version
         run: npm pkg set version="${{ steps.release-version.outputs.value }}"
