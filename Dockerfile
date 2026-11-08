@@ -1,5 +1,7 @@
+ARG NODE_VERSION=26.13.0
+
 # Stage 1: Build the application
-FROM node:22-alpine AS builder
+FROM node:${NODE_VERSION}-alpine AS builder
 
 ARG APP_VERSION
 
@@ -25,7 +27,7 @@ RUN pnpm run build
 RUN pnpm prune --prod
 
 # Stage 2: Create the production image
-FROM node:22-alpine
+FROM node:${NODE_VERSION}-alpine
 
 ARG APP_VERSION
 
