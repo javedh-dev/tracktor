@@ -48,6 +48,21 @@ GET /api/auth
 
 ## Session Management
 
+Session cookies always use `HttpOnly`, `SameSite=Lax`, and path `/`. They use
+`Secure` when the adapter request URL is HTTPS or `HTTP_MODE=https` is configured.
+Local HTTP development uses a non-Secure cookie unless HTTPS mode is forced.
+Login creates a new random token; logout invalidates its database session and
+expires the cookie with matching scope and security attributes. The browser cookie
+lasts 30 days. Database sessions renew for 30 days when fewer than 15 days remain;
+an expired browser cookie still requires a new login.
+
+Behind HTTPS termination, set `ORIGIN=https://tracktor.example` and
+`HTTP_MODE=https`. Alternatively, configure adapter-node's `PROTOCOL_HEADER` and
+`HOST_HEADER` only when a trusted proxy overwrites those headers and direct access
+to the backend is blocked. Tracktor does not trust raw forwarded headers itself.
+See the [adapter-node documentation](https://svelte.dev/docs/kit/adapter-node#Environment-variables).
+An HTTPS session cookie cannot be used through a plain HTTP access path.
+
 - Sessions stored in database and linked to user accounts
 - HTTP-only secure cookies (in production)
 - Automatic session refresh when approaching expiration
