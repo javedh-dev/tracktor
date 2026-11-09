@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import * as fuelLogService from '$server/services/fuelLogService';
 import { fuelSchema } from '$lib/domain/fuel';
@@ -8,7 +9,7 @@ export const POST: RequestHandler = async (event) => {
     const { id } = event.params;
     const parsed = await parseBody(event, fuelSchema, { vehicleId: id });
     const { id: _, vehicleId: __, ...body } = parsed;
-    const result = await fuelLogService.addFuelLog(id, body);
+    const result = await fuelLogService.addFuelLog(requestAccess(event), id, body);
     return jsonResponse(result, undefined, { status: 201 });
   });
 };

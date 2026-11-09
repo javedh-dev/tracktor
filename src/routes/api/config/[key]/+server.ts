@@ -1,3 +1,4 @@
+import { requestAccess, requireAdmin } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { getAppConfigByKey } from '$server/services/configService';
@@ -5,6 +6,7 @@ import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handle
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config key GET error:', async () => {
+    requireAdmin(requestAccess(event));
     const { key } = event.params;
 
     if (!key) {

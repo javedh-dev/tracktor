@@ -1,32 +1,18 @@
+import { requestAccess } from '$server/services/access';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { getAppConfigs } from '$server/services/configService';
+import { getClientConfigs } from '$server/services/configService';
 import { getAllVehicles } from '$server/services/vehicleService';
-import { validateSession } from '$server/services/authService';
 import { env } from '$lib/config/env.server';
 
-export const load: LayoutServerLoad = async ({ cookies }) => {
-  const isAuthDisabled = env.DISABLE_AUTH;
-  let user = null;
-
-  if (!isAuthDisabled) {
-    const sessionToken = cookies.get('session');
-    if (sessionToken) {
-      try {
-        const sessionResult = await validateSession(sessionToken);
-        user = sessionResult.user;
-      } catch {
-        // Ignore invalid session
-      }
-    }
-
-    if (!user) {
-      throw redirect(307, '/login');
-    }
-  }
-
+export const load: LayoutServerLoad = async (event) => {
+  const user = event.locals.user;
+  if (!env.DISABLE_AUTH && !user) throw redirect(307, `${env.BASE_URL}/login`);
   // Fetch configs and vehicles
-  const [configs, vehicles] = await Promise.all([getAppConfigs(), getAllVehicles()]);
+  const [configs, vehicles] = await Promise.all([
+    getClientConfigs(requestAccess(event)),
+    getAllVehicles(requestAccess(event))
+  ]);
 
   const rawConfigs = (configs || []).map((c) => ({
     ...c,

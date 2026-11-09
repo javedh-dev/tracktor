@@ -1,17 +1,19 @@
+import { requestAccess, requireAdmin } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { getAppConfigs, updateAppConfig } from '$server/services/configService';
+import { getClientConfigs, updateAppConfig } from '$server/services/configService';
 import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
 
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config GET error:', async () => {
-    const result = await getAppConfigs();
+    const result = await getClientConfigs(requestAccess(event));
     return jsonResponse(result);
   });
 };
 
 export const PUT: RequestHandler = async (event) => {
   return withRouteErrorHandling('Config PUT error:', async () => {
+    requireAdmin(requestAccess(event));
     // Use body from locals if available (from middleware), otherwise parse it
     const body = await event.request.json();
 
@@ -30,7 +32,7 @@ export const PUT: RequestHandler = async (event) => {
       }
     }
 
-    const result = await updateAppConfig(body);
+    const result = await updateAppConfig(requestAccess(event), body);
     return jsonResponse(result);
   });
 };

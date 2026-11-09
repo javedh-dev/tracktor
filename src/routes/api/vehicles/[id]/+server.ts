@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import * as vehicleService from '$server/services/vehicleService';
 import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handler';
@@ -5,7 +6,7 @@ import { jsonResponse, withRouteErrorHandling } from '$server/utils/route-handle
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Vehicle GET error:', async () => {
     const { id } = event.params;
-    const result = await vehicleService.getVehicleById(id);
+    const result = await vehicleService.getVehicleById(requestAccess(event), id);
     return jsonResponse(result);
   });
 };
@@ -13,7 +14,7 @@ export const GET: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Vehicle DELETE error:', async () => {
     const { id } = event.params;
-    const result = await vehicleService.deleteVehicle(id);
+    const result = await vehicleService.deleteVehicle(requestAccess(event), id);
     return jsonResponse(result);
   });
 };

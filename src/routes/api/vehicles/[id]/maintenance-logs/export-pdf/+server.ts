@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import * as maintenanceLogService from '$server/services/maintenanceLogService';
@@ -13,9 +14,12 @@ export const GET: RequestHandler = async (event) => {
       throw error(400, 'Vehicle ID is required');
     }
 
-    const vehicle = await vehicleService.getVehicleById(vehicleId);
+    const vehicle = await vehicleService.getVehicleById(requestAccess(event), vehicleId);
 
-    const maintenanceLogs = await maintenanceLogService.getMaintenanceLogs(vehicleId);
+    const maintenanceLogs = await maintenanceLogService.getMaintenanceLogs(
+      requestAccess(event),
+      vehicleId
+    );
 
     const vehicleLabel =
       [vehicle.make, vehicle.model].filter(Boolean).join(' ') || 'Unknown Vehicle';

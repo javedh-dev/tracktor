@@ -40,7 +40,9 @@ export async function validateSessionToken(token: string): Promise<SessionValida
       },
       user: {
         id: usersTable.id,
-        username: usersTable.username
+        username: usersTable.username,
+        role: usersTable.role,
+        isActive: usersTable.isActive
       }
     })
     .from(sessionsTable)
@@ -48,7 +50,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     .where(eq(sessionsTable.id, sessionId))
     .limit(1);
 
-  if (result.length < 1) {
+  if (result.length < 1 || !result[0].user.isActive) {
     return { session: null, user: null };
   }
 
@@ -76,7 +78,9 @@ export async function validateSessionToken(token: string): Promise<SessionValida
       },
       user: {
         id: user.id,
-        username: user.username
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive
       }
     };
   }
@@ -89,7 +93,9 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     },
     user: {
       id: user.id,
-      username: user.username
+      username: user.username,
+      role: user.role,
+      isActive: user.isActive
     }
   };
 }
@@ -107,6 +113,8 @@ export interface Session {
 export interface User {
   id: string;
   username: string;
+  role: 'admin' | 'driver';
+  isActive: boolean;
 }
 
 interface SessionValidationResult {

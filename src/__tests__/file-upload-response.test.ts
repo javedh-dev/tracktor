@@ -2,6 +2,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('fs/promises', () => ({ writeFile: vi.fn().mockResolvedValue(undefined) }));
 
+vi.mock('$server/services/access', () => ({
+  requestAccess: () => ({ id: 'system', role: 'admin', isActive: true })
+}));
+vi.mock('$server/db', () => ({
+  db: { insert: () => ({ values: vi.fn().mockResolvedValue(undefined) }) }
+}));
+
 import { POST } from '../routes/api/files/+server';
 
 describe('POST /api/files', () => {

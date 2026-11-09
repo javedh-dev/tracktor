@@ -1,3 +1,4 @@
+import { type AccessContext, vehicleScope, requireVehicle } from './access';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { z } from 'zod';
@@ -71,12 +72,13 @@ function withMileageMetrics<T extends FuelLogRow & FuelLogVehicleFields>(
   });
 }
 
-export const getFuelLogs = async (vehicleId?: string) => {
+export const getFuelLogs = async (access: AccessContext, vehicleId?: string) => {
   const configs = await getConfigsByKeys(['mileageUnitFormat', 'unitOfDistance', 'unitOfVolume']);
   const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
   const mileageFormat = configMap.mileageUnitFormat || 'distance-per-fuel';
 
   if (vehicleId) {
+    await requireVehicle(access, vehicleId);
     const fuelLogs = await db.query.fuelLogTable.findMany({
       where: (log, { eq }) => eq(log.vehicleId, vehicleId),
       orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
@@ -98,6 +100,7 @@ export const getFuelLogs = async (vehicleId?: string) => {
     })
     .from(schema.fuelLogTable)
     .leftJoin(schema.vehicleTable, eq(schema.fuelLogTable.vehicleId, schema.vehicleTable.id))
+    .where(vehicleScope(schema.fuelLogTable.vehicleId, access))
     .orderBy(schema.fuelLogTable.vehicleId, schema.fuelLogTable.date, schema.fuelLogTable.odometer);
 
   const groupedByVehicle = new Map<string, (typeof rows)[number][]>();

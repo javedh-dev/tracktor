@@ -1,3 +1,4 @@
+import { type AccessContext, requireAdmin } from './access';
 import { getAppConfigByKey, updateAppConfig } from './configService';
 import {
   DEFAULT_WIDGET_LAYOUT,
@@ -18,7 +19,11 @@ export async function getWidgetLayout(): Promise<WidgetLayoutItem[]> {
   }
 }
 
-export async function saveWidgetLayout(layout: WidgetLayoutItem[]): Promise<WidgetLayoutItem[]> {
-  await updateAppConfig([{ key: LAYOUT_CONFIG_KEY, value: JSON.stringify(layout) }]);
+export async function saveWidgetLayout(
+  access: AccessContext,
+  layout: WidgetLayoutItem[]
+): Promise<WidgetLayoutItem[]> {
+  requireAdmin(access);
+  await updateAppConfig(access, [{ key: LAYOUT_CONFIG_KEY, value: JSON.stringify(layout) }]);
   return layout;
 }

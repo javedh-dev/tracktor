@@ -7,6 +7,8 @@ import { toast } from 'svelte-sonner';
 interface User {
   id: string;
   username: string;
+  role: 'admin' | 'driver';
+  isActive: boolean;
 }
 
 class AuthStore {
@@ -14,6 +16,10 @@ class AuthStore {
   isLoggedIn = $state<boolean>(false);
   hasUsers = $state<boolean>(false);
   isAuthDisabled = $state<boolean>(env.DISABLE_AUTH);
+
+  get isAdmin() {
+    return this.isAuthDisabled || this.user?.role === 'admin';
+  }
 
   constructor() {
     this.isLoggedIn = env.DISABLE_AUTH;
@@ -115,6 +121,7 @@ class AuthStore {
 
       if (res.success && res.data) {
         this.user = { ...this.user!, username: res.data.username };
+        if (data.newPassword) await this.logout();
         toast.success('Profile updated successfully');
         return true;
       }

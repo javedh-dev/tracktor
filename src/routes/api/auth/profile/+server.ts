@@ -39,6 +39,7 @@ export const PUT: RequestHandler = async (event) => {
       newPassword: body.newPassword
     });
 
+    if (body.newPassword) event.cookies.delete('session', { path: '/' });
     return jsonResponse(result);
   });
 };

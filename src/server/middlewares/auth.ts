@@ -2,65 +2,44 @@ import { env } from '$lib/config/env.server';
 import type { Handle } from '@sveltejs/kit';
 import { errorResponse } from './cors';
 import { AppError, Status } from '$server/exceptions/AppError';
-import { validateSession, getUsersCount } from '$server/services/authService';
+import { validateSession } from '$server/services/authService';
+import { SYSTEM_ACCESS } from '$server/services/access';
 
-const BYPASS_PATHS = ['/api/auth', '/api/health', '/api/config/branding'];
-
-function requiresAuth(pathname: string): boolean {
-  if (env.DISABLE_AUTH || !pathname.startsWith('/api')) {
-    return false;
-  }
-
-  return !BYPASS_PATHS.some((path) => pathname.startsWith(path));
-}
+const PUBLIC_ENDPOINTS = new Set([
+  'GET /api/auth',
+  'POST /api/auth',
+  'DELETE /api/auth',
+  'POST /api/auth/register',
+  'GET /api/health',
+  'GET /api/config/branding'
+]);
 
 export const handleAuth: Handle = async ({ event, resolve }) => {
-  if (!requiresAuth(event.url.pathname)) {
+  if (env.DISABLE_AUTH) {
+    event.locals.user = SYSTEM_ACCESS;
     return resolve(event);
   }
-
-  const usersStatus = await getUsersCount();
-  if (!usersStatus.hasUsers) {
-    return errorResponse(
-      'No users found. Please create a user account first.',
-      Status.BAD_REQUEST,
-      event.request
-    );
-  }
-
-  const authHeader = event.request.headers.get('Authorization');
-  const sessionToken = authHeader?.replace('Bearer ', '') || event.cookies.get('session');
-
-  if (!sessionToken) {
-    return errorResponse(
-      'Session token is required. Please login first.',
-      Status.UNAUTHORIZED,
-      event.request
-    );
-  }
-
-  try {
-    const { user } = await validateSession(sessionToken);
-
-    if (!user) {
-      return errorResponse(
-        'Invalid or expired session. Please login again.',
-        Status.UNAUTHORIZED,
-        event.request
-      );
+  const path = event.url.pathname.slice(env.BASE_URL.length) || '/';
+  const isPublic = PUBLIC_ENDPOINTS.has(`${event.request.method} ${path}`);
+  const token =
+    event.request.headers.get('Authorization')?.replace(/^Bearer /, '') ||
+    event.cookies.get('session');
+  if (token) {
+    try {
+      const { user } = await validateSession(token);
+      if (user) event.locals.user = user;
+    } catch (err) {
+      if (!isPublic && path.startsWith('/api/')) {
+        return errorResponse(
+          err instanceof AppError ? err.message : 'Authentication failed',
+          err instanceof AppError ? err.status : Status.INTERNAL_SERVER_ERROR,
+          event.request
+        );
+      }
     }
-
-    event.locals.user = user;
-  } catch (error) {
-    const isAppError = error instanceof AppError;
-
-    return errorResponse(
-      isAppError ? error.message : 'Authentication failed',
-      isAppError ? error.status : Status.INTERNAL_SERVER_ERROR,
-      event.request,
-      error as Error
-    );
   }
-
+  if (path.startsWith('/api/') && !isPublic && !event.locals.user) {
+    return errorResponse('Not authenticated', Status.UNAUTHORIZED, event.request);
+  }
   return resolve(event);
 };

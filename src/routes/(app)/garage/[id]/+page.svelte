@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { authStore } from '$stores/auth.svelte';
   import { goto } from '$app/navigation';
   import ArrowLeft from '@lucide/svelte/icons/arrow-left';
   import Pencil from '@lucide/svelte/icons/pencil';
@@ -46,25 +47,27 @@
       {m.vehicle_hub_back_to_vehicles()}
     </button>
 
-    <div class="flex items-center gap-2">
-      <Button
-        id="vehicle-hub-edit-btn"
-        variant="outline"
-        onclick={() =>
-          sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle)}
-      >
-        <Pencil class="size-4" />
-        {m.vehicle_action_edit()}
-      </Button>
-      <Button
-        id="vehicle-hub-delete-btn"
-        variant="destructive"
-        onclick={() => (deleteDialog = true)}
-      >
-        <Trash2 class="size-4" />
-        {m.vehicle_action_delete()}
-      </Button>
-    </div>
+    {#if authStore.isAdmin}
+      <div class="flex items-center gap-2">
+        <Button
+          id="vehicle-hub-edit-btn"
+          variant="outline"
+          onclick={() =>
+            sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle)}
+        >
+          <Pencil class="size-4" />
+          {m.vehicle_action_edit()}
+        </Button>
+        <Button
+          id="vehicle-hub-delete-btn"
+          variant="destructive"
+          onclick={() => (deleteDialog = true)}
+        >
+          <Trash2 class="size-4" />
+          {m.vehicle_action_delete()}
+        </Button>
+      </div>
+    {/if}
   </div>
 
   <VehicleHubHero {vehicle} />

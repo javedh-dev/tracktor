@@ -40,7 +40,7 @@ export const handleCors: Handle = async ({ event, resolve }) => {
       status: 200,
       headers: {
         'Access-Control-Allow-Origin': getCorsOrigin(event.request),
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-PIN',
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Max-Age': '86400'

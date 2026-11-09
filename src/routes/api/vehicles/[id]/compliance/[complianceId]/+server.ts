@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import * as complianceService from '$server/services/complianceService';
 import { complianceSchema } from '$lib/domain/compliance';
@@ -6,7 +7,11 @@ import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/r
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Compliance GET error:', async () => {
     const { complianceId } = event.params;
-    const result = await complianceService.getComplianceDocumentById(complianceId);
+    const result = await complianceService.getComplianceDocumentById(
+      requestAccess(event),
+      event.params.id,
+      complianceId
+    );
     return jsonResponse(result);
   });
 };
@@ -21,7 +26,12 @@ export const PUT: RequestHandler = async (event) => {
       recurrenceInterval: parsed.recurrenceInterval ?? 1
     };
     const { id: _, vehicleId: __, ...payload } = body;
-    const result = await complianceService.updateComplianceDocument(id, complianceId, payload);
+    const result = await complianceService.updateComplianceDocument(
+      requestAccess(event),
+      id,
+      complianceId,
+      payload
+    );
     return jsonResponse(result);
   });
 };
@@ -29,7 +39,11 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Compliance DELETE error:', async () => {
     const { id, complianceId } = event.params;
-    const result = await complianceService.deleteComplianceDocument(id, complianceId);
+    const result = await complianceService.deleteComplianceDocument(
+      requestAccess(event),
+      id,
+      complianceId
+    );
     return jsonResponse(result);
   });
 };
