@@ -7,6 +7,8 @@ import { toast } from 'svelte-sonner';
 interface User {
   id: string;
   username: string;
+  role: 'admin' | 'driver';
+  isActive: boolean;
 }
 
 class AuthStore {

@@ -155,6 +155,20 @@
       "when": 1785825449204,
       "tag": "20260804090200_drop_insurance_pucc_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "6",
+      "when": 1794246914845,
+      "tag": "20261109175514_fleet_permissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1794246915375,
+      "tag": "20261109175515_preserve_existing_admins",
+      "breakpoints": true
     }
   ]
 }

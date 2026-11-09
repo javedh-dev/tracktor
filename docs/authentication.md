@@ -85,3 +85,18 @@ GET /api/auth
 - Ensure you're including session cookies in your API requests
 - Check that your session hasn't expired
 - Verify the API endpoint URLs are correct
+
+## Fleet accounts
+
+Existing accounts retain administrator access when fleet permissions are installed.
+New managed accounts default to the `driver` role. Only the first local account can
+be registered publicly; later accounts are created by an administrator.
+Administrators can deactivate accounts, reset local passwords, and assign vehicles.
+A disabled account cannot log in, and its existing sessions are invalidated.
+The final active administrator cannot be disabled or demoted.
+
+Schema changes use additive migrations. Historical Drizzle snapshots predate some
+applied migrations; `scripts/generate-schema-migration.mjs <baseline-ref> <name>`
+generates a narrow schema diff against the baseline source without rewriting history.
+Back up the SQLite database and uploads before upgrading. Database rollback requires
+restoring that backup together with the matching application version.

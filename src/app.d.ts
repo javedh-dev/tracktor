@@ -7,10 +7,7 @@ declare global {
       message: string;
     }
     interface Locals {
-      user?: {
-        id: string;
-        username: string;
-      };
+      user?: import('./server/utils/session').User;
     }
     // interface PageData {}
     // interface PageState {}
