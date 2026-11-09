@@ -1,7 +1,9 @@
+import { requireAdmin, type AccessContext } from './access';
+import { DRIVER_CONFIG_KEYS } from './fileService';
 import { AppError } from '../exceptions/AppError';
 import { Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
-import { db } from '../db/index';
+import { db, writeTransaction } from '../db/index';
 import { eq, inArray } from 'drizzle-orm';
 import { requireRecord } from './service-response.helper';
 
@@ -26,8 +28,12 @@ export const getConfigsByKeys = async (keys: string[]) => {
   return db.select().from(schema.configTable).where(inArray(schema.configTable.key, keys));
 };
 
-export const updateAppConfig = async (configs: { key: string; value: string }[]) => {
-  return db.transaction(async (tx) => {
+export const updateAppConfig = async (
+  access: AccessContext,
+  configs: { key: string; value: string }[]
+) => {
+  requireAdmin(access);
+  return writeTransaction(async (tx) => {
     const results = await Promise.all(
       configs.map(async (config) => {
         const { key, value } = config;
@@ -63,3 +69,7 @@ export const updateAppConfig = async (configs: { key: string; value: string }[])
     return results;
   });
 };
+
+export async function getClientConfigs(access: AccessContext) {
+  return access.role === 'admin' ? getAppConfigs() : getConfigsByKeys(DRIVER_CONFIG_KEYS);
+}

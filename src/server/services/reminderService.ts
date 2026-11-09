@@ -1,9 +1,9 @@
+import { type AccessContext, vehicleScope, requireVehicle } from './access';
 import { AppError, Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import type { Reminder } from '$lib/domain/reminder';
-import { performDelete, validateVehicleExists } from '../utils/serviceUtils';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { and, eq, getTableColumns } from 'drizzle-orm';
 import { syncVehicleNotifications } from './notificationService';
 import { requireRecord } from './service-response.helper';
 
@@ -85,8 +85,12 @@ const normalizeReminderPayload = (
   };
 };
 
-export const addReminder = async (vehicleId: string, reminderData: ReminderPayload) => {
-  await validateVehicleExists(vehicleId);
+export const addReminder = async (
+  access: AccessContext,
+  vehicleId: string,
+  reminderData: ReminderPayload
+) => {
+  await requireVehicle(access, vehicleId);
   const payload = normalizeReminderPayload(reminderData);
   const [inserted] = await db
     .insert(schema.reminderTable)
@@ -97,13 +101,14 @@ export const addReminder = async (vehicleId: string, reminderData: ReminderPaylo
     })
     .returning();
 
-  await syncVehicleNotifications(vehicleId);
+  await syncVehicleNotifications(access, vehicleId);
 
   return inserted;
 };
 
-export const getReminders = async (vehicleId?: string) => {
+export const getReminders = async (access: AccessContext, vehicleId?: string) => {
   if (vehicleId) {
+    await requireVehicle(access, vehicleId);
     const reminders = await db.query.reminderTable.findMany({
       where: (reminder, { eq }) => eq(reminder.vehicleId, vehicleId),
       orderBy: (reminder, { asc }) => [asc(reminder.dueDate)]
@@ -121,15 +126,21 @@ export const getReminders = async (vehicleId?: string) => {
     })
     .from(schema.reminderTable)
     .leftJoin(schema.vehicleTable, eq(schema.reminderTable.vehicleId, schema.vehicleTable.id))
+    .where(vehicleScope(schema.reminderTable.vehicleId, access))
     .orderBy(schema.reminderTable.dueDate);
 
   return rows;
 };
 
-export const getReminderById = async (id: string) => {
+export const getReminderById = async (access: AccessContext, vehicleId: string, id: string) => {
   const reminder = requireRecord(
     await db.query.reminderTable.findFirst({
-      where: (reminder, { eq }) => eq(reminder.id, id)
+      where: (reminder, { eq }) =>
+        and(
+          eq(reminder.id, id),
+          eq(reminder.vehicleId, vehicleId),
+          vehicleScope(reminder.vehicleId, access)
+        )
     }),
     `No reminder found for id : ${id}`
   );
@@ -138,13 +149,19 @@ export const getReminderById = async (id: string) => {
 };
 
 export const updateReminder = async (
+  access: AccessContext,
   vehicleId: string,
   id: string,
   reminderData: ReminderUpdatePayload
 ) => {
   const reminder = requireRecord(
     await db.query.reminderTable.findFirst({
-      where: (reminder, { eq, and }) => and(eq(reminder.vehicleId, vehicleId), eq(reminder.id, id))
+      where: (reminder, { eq, and }) =>
+        and(
+          eq(reminder.vehicleId, vehicleId),
+          eq(reminder.id, id),
+          vehicleScope(reminder.vehicleId, access)
+        )
     }),
     `No reminder found for id : ${id}`
   );
@@ -153,23 +170,45 @@ export const updateReminder = async (
   const [updated] = await db
     .update(schema.reminderTable)
     .set({ ...payload })
-    .where(eq(schema.reminderTable.id, id))
+    .where(
+      and(
+        eq(schema.reminderTable.id, id),
+        eq(schema.reminderTable.vehicleId, vehicleId),
+        vehicleScope(schema.reminderTable.vehicleId, access)
+      )
+    )
     .returning();
 
-  await syncVehicleNotifications(vehicleId);
+  await syncVehicleNotifications(access, vehicleId);
 
   return updated;
 };
 
-export const deleteReminder = async (id: string) => {
+export const deleteReminder = async (access: AccessContext, vehicleId: string, id: string) => {
   const existingReminder = await db.query.reminderTable.findFirst({
-    where: (reminder, { eq }) => eq(reminder.id, id)
+    where: (reminder, { eq }) =>
+      and(
+        eq(reminder.id, id),
+        eq(reminder.vehicleId, vehicleId),
+        vehicleScope(reminder.vehicleId, access)
+      )
   });
 
-  const result = await performDelete(schema.reminderTable, id, 'Reminder');
+  if (!existingReminder) throw new AppError('Reminder not found', Status.NOT_FOUND);
+  const [result] = await db
+    .delete(schema.reminderTable)
+    .where(
+      and(
+        eq(schema.reminderTable.id, id),
+        eq(schema.reminderTable.vehicleId, vehicleId),
+        vehicleScope(schema.reminderTable.vehicleId, access)
+      )
+    )
+    .returning({ id: schema.reminderTable.id });
+  if (!result) throw new AppError('Reminder not found', Status.NOT_FOUND);
 
   if (existingReminder?.vehicleId) {
-    await syncVehicleNotifications(existingReminder.vehicleId);
+    await syncVehicleNotifications(access, existingReminder.vehicleId);
   }
 
   return result;

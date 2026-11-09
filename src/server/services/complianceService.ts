@@ -1,6 +1,7 @@
+import { type AccessContext, vehicleScope, requireVehicle } from './access';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { and, eq, getTableColumns } from 'drizzle-orm';
 import { createOwnedEntityService } from '../utils/entity-service-factory';
 import { clearFixedEndDate } from './domain-payload.helper';
 import type { z } from 'zod';
@@ -23,8 +24,13 @@ export const getComplianceDocumentById = getById;
 export const updateComplianceDocument = update;
 export const deleteComplianceDocument = remove;
 
-export const getComplianceDocuments = async (vehicleId?: string, type?: string) => {
+export const getComplianceDocuments = async (
+  access: AccessContext,
+  vehicleId?: string,
+  type?: string
+) => {
   if (vehicleId) {
+    await requireVehicle(access, vehicleId);
     const documents = await db.query.complianceDocumentTable.findMany({
       where: (docs, { and, eq }) =>
         type
@@ -46,7 +52,12 @@ export const getComplianceDocuments = async (vehicleId?: string, type?: string) 
       schema.vehicleTable,
       eq(schema.complianceDocumentTable.vehicleId, schema.vehicleTable.id)
     )
-    .where(type ? eq(schema.complianceDocumentTable.type, type) : undefined);
+    .where(
+      and(
+        vehicleScope(schema.complianceDocumentTable.vehicleId, access),
+        type ? eq(schema.complianceDocumentTable.type, type) : undefined
+      )
+    );
 
   return rows.map((d) => (d.recurrenceType !== 'none' ? { ...d, endDate: null } : d));
 };

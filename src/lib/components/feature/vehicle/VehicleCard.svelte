@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { authStore } from '$stores/auth.svelte';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import Fuel from '@lucide/svelte/icons/fuel';
@@ -99,26 +100,28 @@
     <Card.Footer id="vehicle-card-actions" class="px-3" onclick={(e) => e.stopPropagation()}>
       <div id="vehicle-card-action-row" class="flex w-full justify-between">
         <VehicleQuickActions actions={quickActions} />
-        <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
-          <IconButton
-            id="vehicle-card-edit-btn"
-            buttonStyles="hover:bg-muted"
-            iconStyles="text-muted-foreground hover:text-[#5f8783]"
-            icon={Pencil}
-            onclick={() => {
-              sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle);
-            }}
-            ariaLabel={m.vehicle_action_edit()}
-          />
-          <IconButton
-            id="vehicle-card-delete-btn"
-            buttonStyles="hover:bg-muted"
-            iconStyles="text-muted-foreground hover:text-destructive"
-            icon={Trash2}
-            onclick={() => (deleteDialog = true)}
-            ariaLabel={m.vehicle_action_delete()}
-          />
-        </div>
+        {#if authStore.isAdmin}
+          <div id="vehicle-card-secondary-actions" class="flex justify-end gap-2">
+            <IconButton
+              id="vehicle-card-edit-btn"
+              buttonStyles="hover:bg-muted"
+              iconStyles="text-muted-foreground hover:text-[#5f8783]"
+              icon={Pencil}
+              onclick={() => {
+                sheetStore.openSheet(VehicleForm, m.vehicle_action_update_vehicle(), '', vehicle);
+              }}
+              ariaLabel={m.vehicle_action_edit()}
+            />
+            <IconButton
+              id="vehicle-card-delete-btn"
+              buttonStyles="hover:bg-muted"
+              iconStyles="text-muted-foreground hover:text-destructive"
+              icon={Trash2}
+              onclick={() => (deleteDialog = true)}
+              ariaLabel={m.vehicle_action_delete()}
+            />
+          </div>
+        {/if}
       </div>
     </Card.Footer>
   </Card.Root>

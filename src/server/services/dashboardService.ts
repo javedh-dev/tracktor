@@ -1,3 +1,5 @@
+import { type AccessContext, vehicleScope } from './access';
+import * as schema from '$server/db/schema';
 import { db } from '../db/index';
 import {
   computeAverageMileage,
@@ -19,9 +21,10 @@ const ACTIVITY_MAX_ENTRIES = 15;
 const UPCOMING_REMINDERS_MAX = 10;
 const MONTHLY_TREND_MONTHS = 12;
 
-async function fetchRawData() {
+async function fetchRawData(access: AccessContext) {
   const [vehicles, fuelLogs, maintenanceLogs, complianceDocuments, reminders] = await Promise.all([
     db.query.vehicleTable.findMany({
+      where: vehicleScope(schema.vehicleTable.id, access),
       columns: {
         id: true,
         make: true,
@@ -33,6 +36,7 @@ async function fetchRawData() {
       }
     }),
     db.query.fuelLogTable.findMany({
+      where: vehicleScope(schema.fuelLogTable.vehicleId, access),
       columns: {
         vehicleId: true,
         fuelAmount: true,
@@ -45,12 +49,15 @@ async function fetchRawData() {
       orderBy: (log, { asc }) => [asc(log.date), asc(log.odometer)]
     }),
     db.query.maintenanceLogTable.findMany({
+      where: vehicleScope(schema.maintenanceLogTable.vehicleId, access),
       columns: { vehicleId: true, cost: true, odometer: true, date: true, serviceCenter: true }
     }),
     db.query.complianceDocumentTable.findMany({
+      where: vehicleScope(schema.complianceDocumentTable.vehicleId, access),
       columns: { vehicleId: true, type: true, startDate: true, endDate: true, cost: true }
     }),
     db.query.reminderTable.findMany({
+      where: vehicleScope(schema.reminderTable.vehicleId, access),
       columns: {
         id: true,
         vehicleId: true,
@@ -358,8 +365,8 @@ function buildActivitySection(raw: RawData): ActivityEntry[] {
     .slice(0, ACTIVITY_MAX_ENTRIES);
 }
 
-export async function getDashboardSummary(): Promise<DashboardSummary> {
-  const raw = await fetchRawData();
+export async function getDashboardSummary(access: AccessContext): Promise<DashboardSummary> {
+  const raw = await fetchRawData(access);
   const vehicles = buildVehicleSummaries(raw);
   const totalFuelUsed = raw.fuelLogs.reduce((sum, l) => sum + (l.fuelAmount || 0), 0);
 

@@ -1,3 +1,4 @@
+import { isLocalAuthEnabled } from '$server/services/oidcClient';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getUsersCount, validateSession } from '$server/services/authService';
@@ -7,8 +8,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const isAuthDisabled = env.DISABLE_AUTH;
 
   if (isAuthDisabled) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
+
+  if (!isLocalAuthEnabled()) throw redirect(307, `${env.BASE_URL}/login`);
 
   // Validate current session
   const sessionToken = cookies.get('session');
@@ -23,13 +26,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
 
   if (user) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
 
   // If users already exist, redirect to login
   const usersStatus = await getUsersCount();
   if (usersStatus.hasUsers) {
-    throw redirect(307, '/login');
+    throw redirect(307, `${env.BASE_URL}/login`);
   }
 
   return {};

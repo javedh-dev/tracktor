@@ -1,8 +1,10 @@
+import { requireLocalAuth } from './oidcClient';
+import { credentialsSchema, usernameSchema, passwordSchema } from '$lib/domain/auth';
 import bcrypt from 'bcrypt';
 import { AppError } from '../exceptions/AppError';
 import { Status } from '../exceptions/AppError';
 import * as schema from '../db/schema/index';
-import { db } from '../db/index';
+import { db, writeTransaction } from '../db/index';
 import { eq } from 'drizzle-orm';
 import {
   generateSessionToken,
@@ -20,24 +22,19 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 export const createUser = async (username: string, password: string) => {
-  const existingUser = await db.query.usersTable.findFirst({
-    where: (users, { eq }) => eq(users.username, username)
+  requireLocalAuth();
+  const data = credentialsSchema.parse({ username, password });
+  const passwordHash = await hashPassword(data.password);
+  return writeTransaction(async (tx) => {
+    const existing = await tx.select({ id: schema.usersTable.id }).from(schema.usersTable).limit(1);
+    if (existing.length)
+      throw new AppError('Registration is closed. Contact an administrator.', Status.FORBIDDEN);
+    const userId = crypto.randomUUID();
+    await tx
+      .insert(schema.usersTable)
+      .values({ id: userId, username: data.username, passwordHash, role: 'admin' });
+    return { userId, username: data.username };
   });
-
-  if (existingUser) {
-    throw new AppError('Username already exists', Status.BAD_REQUEST);
-  }
-
-  const passwordHash = await hashPassword(password);
-  const userId = crypto.randomUUID();
-
-  await db.insert(schema.usersTable).values({
-    id: userId,
-    username,
-    passwordHash
-  });
-
-  return { userId, username };
 };
 
 export const createOrUpdateUser = async (username: string, password: string): Promise<void> => {
@@ -53,7 +50,8 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
     await db.insert(schema.usersTable).values({
       id: userId,
       username: username,
-      passwordHash
+      passwordHash,
+      role: 'admin'
     });
   } else {
     await db
@@ -64,6 +62,7 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
 };
 
 export const loginUser = async (username: string, password: string) => {
+  requireLocalAuth();
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.username, username)
@@ -72,7 +71,7 @@ export const loginUser = async (username: string, password: string) => {
     Status.UNAUTHORIZED
   );
 
-  const match = await bcrypt.compare(password, user.passwordHash);
+  const match = user.isActive && (await bcrypt.compare(password, user.passwordHash));
   if (!match) {
     throw new AppError('Invalid username or password', Status.UNAUTHORIZED);
   }
@@ -84,7 +83,10 @@ export const loginUser = async (username: string, password: string) => {
     sessionToken,
     user: {
       id: user.id,
-      username: user.username
+      username: user.username,
+      role: user.role,
+      isActive: user.isActive,
+      hasLocalPassword: !!user.passwordHash
     }
   };
 };
@@ -130,11 +132,17 @@ export const updateUserProfile = async (
       throw new AppError('Username already exists', Status.BAD_REQUEST);
     }
 
-    updates.username = data.username;
+    updates.username = usernameSchema.parse(data.username);
   }
 
   // Handle password update
   if (data.newPassword) {
+    requireLocalAuth();
+    if (!user.passwordHash)
+      throw new AppError(
+        'This account has no local password. Use SSO or contact an administrator.',
+        Status.FORBIDDEN
+      );
     if (!data.currentPassword) {
       throw new AppError('Current password is required to change password', Status.BAD_REQUEST);
     }
@@ -144,7 +152,7 @@ export const updateUserProfile = async (
       throw new AppError('Current password is incorrect', Status.UNAUTHORIZED);
     }
 
-    updates.passwordHash = await hashPassword(data.newPassword);
+    updates.passwordHash = await hashPassword(passwordSchema.parse(data.newPassword));
   }
 
   if (Object.keys(updates).length === 0) {
@@ -153,5 +161,7 @@ export const updateUserProfile = async (
 
   await db.update(schema.usersTable).set(updates).where(eq(schema.usersTable.id, userId));
 
+  if (updates.passwordHash)
+    await db.delete(schema.sessionsTable).where(eq(schema.sessionsTable.userId, userId));
   return { id: user.id, username: updates.username || user.username };
 };

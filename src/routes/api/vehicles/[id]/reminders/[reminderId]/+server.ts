@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import * as reminderService from '$server/services/reminderService';
 import { reminderSchema } from '$lib/domain/reminder';
@@ -6,7 +7,11 @@ import { jsonResponse, parseBody, withRouteErrorHandling } from '$server/utils/r
 export const GET: RequestHandler = async (event) => {
   return withRouteErrorHandling('Reminder GET error:', async () => {
     const { reminderId } = event.params;
-    const result = await reminderService.getReminderById(reminderId);
+    const result = await reminderService.getReminderById(
+      requestAccess(event),
+      event.params.id,
+      reminderId
+    );
     return jsonResponse(result);
   });
 };
@@ -16,7 +21,7 @@ export const PUT: RequestHandler = async (event) => {
     const { id, reminderId } = event.params;
     const parsed = await parseBody(event, reminderSchema.partial(), { vehicleId: id });
     const { id: _, vehicleId: __, ...body } = parsed;
-    const result = await reminderService.updateReminder(id, reminderId, body);
+    const result = await reminderService.updateReminder(requestAccess(event), id, reminderId, body);
     return jsonResponse(result);
   });
 };
@@ -24,7 +29,11 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
   return withRouteErrorHandling('Reminder DELETE error:', async () => {
     const { reminderId } = event.params;
-    const result = await reminderService.deleteReminder(reminderId);
+    const result = await reminderService.deleteReminder(
+      requestAccess(event),
+      event.params.id,
+      reminderId
+    );
     return jsonResponse(result);
   });
 };

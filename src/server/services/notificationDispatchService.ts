@@ -1,3 +1,4 @@
+import { SYSTEM_ACCESS } from './access';
 import type {
   GotifyProviderConfig,
   NotificationChannel,
@@ -81,9 +82,9 @@ export async function dispatchScheduledNotifications(): Promise<{
   providerCount: number;
   results: DispatchResult[];
 }> {
-  await syncAllNotifications();
+  await syncAllNotifications(SYSTEM_ACCESS);
 
-  const providers = await getEnabledProvidersForChannels([
+  const providers = await getEnabledProvidersForChannels(SYSTEM_ACCESS, [
     'reminder',
     'alert',
     'information'
@@ -99,7 +100,10 @@ export async function dispatchScheduledNotifications(): Promise<{
   }
 
   const channels = Array.from(new Set(providers.flatMap((provider) => provider.channels)));
-  const allNotifications = (await getPendingNotificationsForChannels(channels)) as Notification[];
+  const allNotifications = (await getPendingNotificationsForChannels(
+    SYSTEM_ACCESS,
+    channels
+  )) as Notification[];
 
   const results = await Promise.all(
     providers.map((provider) => {

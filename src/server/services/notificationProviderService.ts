@@ -1,3 +1,4 @@
+import { type AccessContext, requireAdmin } from './access';
 import type {
   CreateNotificationProvider,
   NotificationChannel,
@@ -61,7 +62,8 @@ async function getProviderRecord(providerId: string): Promise<ProviderRecord> {
   return requireRecord(provider, 'Provider not found');
 }
 
-export const getAllProviders = async () => {
+export const getAllProviders = async (access: AccessContext) => {
+  requireAdmin(access);
   const providers = await db.query.notificationProviderTable.findMany({
     orderBy: (providers, { desc }) => [desc(providers.created_at)]
   });
@@ -69,13 +71,18 @@ export const getAllProviders = async () => {
   return providers.map(parseProvider);
 };
 
-export const getProviderById = async (providerId: string) => {
+export const getProviderById = async (access: AccessContext, providerId: string) => {
+  requireAdmin(access);
   const provider = await getProviderRecord(providerId);
 
   return parseProvider(provider);
 };
 
-export const addProvider = async (providerData: CreateNotificationProvider) => {
+export const addProvider = async (
+  access: AccessContext,
+  providerData: CreateNotificationProvider
+) => {
+  requireAdmin(access);
   const validated = createNotificationProviderSchema.parse(providerData);
   const validatedConfig = notificationProviderConfigSchema.parse(validated.config);
 
@@ -98,9 +105,11 @@ export const addProvider = async (providerData: CreateNotificationProvider) => {
 };
 
 export const updateProvider = async (
+  access: AccessContext,
   providerId: string,
   providerData: UpdateNotificationProvider
 ) => {
+  requireAdmin(access);
   const validated = updateNotificationProviderSchema.parse(providerData);
   const existingProvider = await getProviderRecord(providerId);
 
@@ -131,7 +140,8 @@ export const updateProvider = async (
   return parseProvider(updatedProvider);
 };
 
-export const deleteProvider = async (providerId: string) => {
+export const deleteProvider = async (access: AccessContext, providerId: string) => {
+  requireAdmin(access);
   await getProviderRecord(providerId);
 
   await db
@@ -141,7 +151,11 @@ export const deleteProvider = async (providerId: string) => {
   return { id: providerId };
 };
 
-export const getEnabledProvidersForChannels = async (channels: NotificationChannel[]) => {
+export const getEnabledProvidersForChannels = async (
+  access: AccessContext,
+  channels: NotificationChannel[]
+) => {
+  requireAdmin(access);
   const providers = await db.query.notificationProviderTable.findMany({
     where: (provider, { eq }) => eq(provider.isEnabled, true)
   });
@@ -151,7 +165,8 @@ export const getEnabledProvidersForChannels = async (channels: NotificationChann
     .filter((provider) => provider.channels.some((channel) => channels.includes(channel)));
 };
 
-export const getEnabledProvidersByType = async (type: string) => {
+export const getEnabledProvidersByType = async (access: AccessContext, type: string) => {
+  requireAdmin(access);
   const providers = await db.query.notificationProviderTable.findMany({
     where: (provider, { and, eq }) => and(eq(provider.type, type), eq(provider.isEnabled, true)),
     orderBy: (providers, { desc }) => [desc(providers.created_at)]

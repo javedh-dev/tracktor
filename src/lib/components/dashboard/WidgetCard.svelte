@@ -13,6 +13,7 @@
     icon: Icon,
     iconColor = ACCENT.fog.gradient,
     draggable = true,
+    removable = true,
     onRemove,
     children
   }: {
@@ -21,6 +22,7 @@
     icon?: Component<{ class?: string }>;
     iconColor?: string;
     draggable?: boolean;
+    removable?: boolean;
     onRemove: () => void;
     children: Snippet;
   } = $props();
@@ -202,31 +204,35 @@
 
   <!-- Sits outside the drag surface: a real button nested inside a `role="button"` is ambiguous to
        assistive tech, and keeping it out also gives the title back the width it was reserving. -->
-  <button
-    type="button"
-    onclick={onRemove}
-    aria-label="Remove {title}"
-    class="text-muted-foreground hover:bg-secondary hover:text-destructive absolute top-2 right-2 flex size-6 cursor-pointer items-center justify-center rounded-full opacity-0 transition-opacity group-hover/widget:opacity-100 focus-visible:opacity-100"
-  >
-    <X class="size-3.5" />
-  </button>
+  {#if removable}
+    <button
+      type="button"
+      onclick={onRemove}
+      aria-label="Remove {title}"
+      class="text-muted-foreground hover:bg-secondary hover:text-destructive absolute top-2 right-2 flex size-6 cursor-pointer items-center justify-center rounded-full opacity-0 transition-opacity group-hover/widget:opacity-100 focus-visible:opacity-100"
+    >
+      <X class="size-3.5" />
+    </button>
+  {/if}
 
-  <button
-    type="button"
-    onpointerdown={startResize}
-    onkeydown={handleResizeKeys}
-    aria-label="Resize {title}"
-    class="text-muted-foreground/60 hover:text-muted-foreground absolute right-0 bottom-0 flex size-5 cursor-nwse-resize items-end justify-end p-1 opacity-0 transition-opacity group-hover/widget:opacity-100 focus-visible:opacity-100"
-  >
-    <svg viewBox="0 0 12 12" class="size-3" fill="none" aria-hidden="true">
-      <path
-        d="M11 1 1 11M11 6 6 11"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-    </svg>
-  </button>
+  {#if draggable}
+    <button
+      type="button"
+      onpointerdown={startResize}
+      onkeydown={handleResizeKeys}
+      aria-label="Resize {title}"
+      class="text-muted-foreground/60 hover:text-muted-foreground absolute right-0 bottom-0 flex size-5 cursor-nwse-resize items-end justify-end p-1 opacity-0 transition-opacity group-hover/widget:opacity-100 focus-visible:opacity-100"
+    >
+      <svg viewBox="0 0 12 12" class="size-3" fill="none" aria-hidden="true">
+        <path
+          d="M11 1 1 11M11 6 6 11"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+  {/if}
 </div>
 
 <style>

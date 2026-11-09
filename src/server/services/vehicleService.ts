@@ -1,6 +1,8 @@
+import { requireAttachableFile } from './fileService';
+import { type AccessContext, vehicleScope, requireVehicle, requireAdmin } from './access';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { Vehicle, VehicleActivityEntry } from '$lib/domain/vehicle';
 import { performDelete } from '../utils/serviceUtils';
 import { requireRecord } from './service-response.helper';
@@ -27,17 +29,20 @@ function parseVehicleRecord<T extends { customFields: string | null }>(vehicle: 
   };
 }
 
-export const addVehicle = async (vehicleData: VehicleMutationPayload) => {
+export const addVehicle = async (access: AccessContext, vehicleData: VehicleMutationPayload) => {
+  requireAdmin(access);
+  await requireAttachableFile(access, vehicleData.image);
   const processedData = serializeVehiclePayload(vehicleData);
   const [vehicle] = await db.insert(schema.vehicleTable).values(processedData).returning();
 
   return parseVehicleRecord(vehicle);
 };
 
-export const getAllVehicles = async () => {
+export const getAllVehicles = async (access: AccessContext) => {
   const [vehicles, maxFuelOdometerRows, maxMaintenanceOdometerRows, allFuelLogs] =
     await Promise.all([
       db.query.vehicleTable.findMany({
+        where: vehicleScope(schema.vehicleTable.id, access),
         columns: {
           id: true,
           make: true,
@@ -59,7 +64,12 @@ export const getAllVehicles = async () => {
           maxOdometer: sql<number>`MAX(${schema.fuelLogTable.odometer})`.as('max_odometer')
         })
         .from(schema.fuelLogTable)
-        .where(sql`${schema.fuelLogTable.odometer} IS NOT NULL`)
+        .where(
+          and(
+            vehicleScope(schema.fuelLogTable.vehicleId, access),
+            sql`${schema.fuelLogTable.odometer} IS NOT NULL`
+          )
+        )
         .groupBy(schema.fuelLogTable.vehicleId),
       db
         .select({
@@ -67,9 +77,15 @@ export const getAllVehicles = async () => {
           maxOdometer: sql<number>`MAX(${schema.maintenanceLogTable.odometer})`.as('max_odometer')
         })
         .from(schema.maintenanceLogTable)
-        .where(sql`${schema.maintenanceLogTable.odometer} IS NOT NULL`)
+        .where(
+          and(
+            vehicleScope(schema.maintenanceLogTable.vehicleId, access),
+            sql`${schema.maintenanceLogTable.odometer} IS NOT NULL`
+          )
+        )
         .groupBy(schema.maintenanceLogTable.vehicleId),
       db.query.fuelLogTable.findMany({
+        where: vehicleScope(schema.fuelLogTable.vehicleId, access),
         columns: {
           vehicleId: true,
           filled: true,
@@ -117,10 +133,10 @@ export const getAllVehicles = async () => {
   return enrichedVehicles;
 };
 
-export const getVehicleById = async (id: string) => {
+export const getVehicleById = async (access: AccessContext, id: string) => {
   const vehicle = requireRecord(
     await db.query.vehicleTable.findFirst({
-      where: (vehicles, { eq }) => eq(vehicles.id, id)
+      where: (vehicles, { eq }) => and(eq(vehicles.id, id), vehicleScope(vehicles.id, access))
     }),
     `No vehicle found for id : ${id}`
   );
@@ -157,15 +173,21 @@ export const getVehicleById = async (id: string) => {
   };
 };
 
-export const updateVehicle = async (id: string, vehicleData: VehicleMutationPayload) => {
+export const updateVehicle = async (
+  access: AccessContext,
+  id: string,
+  vehicleData: VehicleMutationPayload
+) => {
+  requireAdmin(access);
   requireRecord(
     await db.query.vehicleTable.findFirst({
-      where: (vehicles, { eq }) => eq(vehicles.id, id),
+      where: (vehicles, { eq }) => and(eq(vehicles.id, id), vehicleScope(vehicles.id, access)),
       columns: { id: true }
     }),
     `No vehicle found for id : ${id}`
   );
 
+  await requireAttachableFile(access, vehicleData.image);
   const processedData = serializeVehiclePayload(vehicleData);
 
   const [updatedVehicle] = await db
@@ -177,7 +199,8 @@ export const updateVehicle = async (id: string, vehicleData: VehicleMutationPayl
   return parseVehicleRecord(updatedVehicle);
 };
 
-export const deleteVehicle = async (id: string) => {
+export const deleteVehicle = async (access: AccessContext, id: string) => {
+  requireAdmin(access);
   return await performDelete(schema.vehicleTable, id, 'Vehicle');
 };
 
@@ -195,9 +218,10 @@ function latestValidity(
 }
 
 // Get vehicles with minimal data for dropdown/selection purposes
-export const getVehicleSummary = async (id: string) => {
+export const getVehicleSummary = async (access: AccessContext, id: string) => {
+  await requireVehicle(access, id);
   const [vehicle, fuelLogs, maintenanceLogs, complianceDocuments, reminders] = await Promise.all([
-    getVehicleById(id),
+    getVehicleById(access, id),
     db.query.fuelLogTable.findMany({
       where: (log, { eq }) => eq(log.vehicleId, id),
       orderBy: (log, { desc }) => [desc(log.date)]

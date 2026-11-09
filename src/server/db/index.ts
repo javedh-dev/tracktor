@@ -11,3 +11,17 @@ const db = drizzle({
 });
 
 export { db };
+
+// Serialize local writes so a synchronous SQLite lock wait cannot block the
+// JavaScript continuation that needs to commit the preceding transaction.
+let writeQueue: Promise<unknown> = Promise.resolve();
+export function writeTransaction<T>(
+  work: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>
+): Promise<T> {
+  const pending = writeQueue.then(() => db.transaction(work));
+  writeQueue = pending.then(
+    () => undefined,
+    () => undefined
+  );
+  return pending;
+}

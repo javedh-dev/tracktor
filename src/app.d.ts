@@ -7,10 +7,7 @@ declare global {
       message: string;
     }
     interface Locals {
-      user?: {
-        id: string;
-        username: string;
-      };
+      user?: import('./server/utils/session').User;
     }
     // interface PageData {}
     // interface PageState {}
@@ -36,6 +33,13 @@ declare namespace NodeJS {
     APP_VERSION?: string;
     TRACKTOR_DISABLE_AUTH: string;
     TRACKTOR_API_BASE_URL?: string;
+    OIDC_ENABLED?: string;
+    OIDC_ISSUER?: string;
+    OIDC_CLIENT_ID?: string;
+    OIDC_CLIENT_SECRET?: string;
+    OIDC_REDIRECT_URI?: string;
+    OIDC_SCOPES?: string;
+    OIDC_DISABLE_LOCAL_AUTH?: string;
   }
 }
 

@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import * as maintenanceLogService from '$server/services/maintenanceLogService';
 import { maintenanceSchema } from '$lib/domain/maintenance';
@@ -8,7 +9,7 @@ export const POST: RequestHandler = async (event) => {
     const { id } = event.params;
     const parsed = await parseBody(event, maintenanceSchema, { vehicleId: id });
     const { id: _, vehicleId: __, ...body } = parsed;
-    const result = await maintenanceLogService.addMaintenanceLog(id, body);
+    const result = await maintenanceLogService.addMaintenanceLog(requestAccess(event), id, body);
     return jsonResponse(result, undefined, { status: 201 });
   });
 };

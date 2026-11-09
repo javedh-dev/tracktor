@@ -2,6 +2,7 @@
   import { FieldGroup, Field, FieldLabel } from '$ui/field/index.js';
   import Input from '$appui/input.svelte';
   import { authStore } from '$stores/auth.svelte';
+  import { withBase } from '$lib/utils';
   import { goto } from '$app/navigation';
   import UserIcon from '@lucide/svelte/icons/circle-user-round';
   import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
@@ -33,7 +34,7 @@
     try {
       const success = await authStore.register(username, password);
       if (success) {
-        goto('/dashboard');
+        goto(withBase('/dashboard'));
       }
     } finally {
       processing = false;

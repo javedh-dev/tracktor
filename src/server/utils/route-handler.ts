@@ -59,6 +59,7 @@ export async function withRouteErrorHandling<T>(
   try {
     return await handler();
   } catch (err) {
+    if (isRedirect(err)) throw err;
     logger.error(label, err);
     rethrowRouteError(err, fallbackMessage);
   }
