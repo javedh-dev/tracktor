@@ -1,4 +1,7 @@
 <script lang="ts">
+  import UsersSettings from '$feature/settings/UsersSettings.svelte';
+  import { authStore } from '$stores/auth.svelte';
+  import Users from '@lucide/svelte/icons/users';
   import SettingsSection from '$feature/settings/SettingsSection.svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
   import { configStore } from '$stores/config.svelte';
@@ -123,6 +126,13 @@
 
   const sidebarItems = $derived([
     {
+      id: 'users',
+      label: m.users_title(),
+      description: m.users_description(),
+      icon: Users,
+      iconClass: ACCENT.denim.chip
+    },
+    {
       id: 'personalization',
       label: m.settings_tab_personalization(),
       description: m.settings_nav_desc_personalization(),
@@ -241,187 +251,198 @@
   });
 </script>
 
-<div id="settings-page" class="space-y-6">
-  <PageHeader title={m.settings_title()} description={m.settings_page_description()} />
+{#if authStore.user?.role === 'admin'}
+  <div id="settings-page" class="space-y-6">
+    <PageHeader title={m.settings_title()} description={m.settings_page_description()} />
 
-  <!-- Settings Layout with Sidebar -->
-  <div class="flex flex-col gap-6 sm:flex-row">
-    <!-- Sidebar Navigation -->
-    <aside class="w-full shrink-0 sm:w-64">
-      <nav
-        class="bg-card sticky top-20 flex flex-row gap-2 overflow-x-auto rounded-xl border p-2 sm:top-6 sm:flex-col sm:gap-1 sm:overflow-visible"
-      >
-        {#each sidebarItems as item (item.id)}
-          {@const Icon = item.icon}
-          <button
-            type="button"
-            onclick={() => scrollToSection(item.id)}
-            class="flex shrink-0 items-center gap-3 rounded-lg p-2.5 text-left transition-colors {activeSection ===
-            item.id
-              ? 'bg-muted ring-border ring-1'
-              : 'hover:bg-muted/60'}"
-          >
-            <span
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg {item.iconClass}"
-            >
-              <Icon class="size-4" />
-            </span>
-            <span class="hidden min-w-0 flex-col sm:flex">
-              <span class="truncate text-sm font-medium">{item.label}</span>
-              <span class="text-muted-foreground truncate text-xs">{item.description}</span>
-            </span>
-          </button>
-        {/each}
-      </nav>
-    </aside>
-
-    <!-- Main Content Area -->
-    <div id="settings-content" class="min-w-0 flex-1">
-      <form id="settings-form" use:enhance onsubmit={(e) => e.preventDefault()}>
-        <div bind:this={contentEl} class="space-y-6">
-          <SettingsSection
-            id="personalization"
-            icon={Palette}
-            iconClass={ACCENT.plum.chip}
-            title={m.settings_tab_personalization()}
-            description={m.settings_personalization_desc()}
-          >
-            <SettingsAppearanceFields
-              {form}
-              {formData}
-              {processing}
-              {themeOptions}
-              {darkVariantOptions}
-              messages={m}
-            />
-          </SettingsSection>
-
-          <SettingsSection
-            id="localization"
-            icon={Earth}
-            iconClass={ACCENT.denim.chip}
-            title={m.settings_tab_localization()}
-            description={m.settings_localization_desc()}
-          >
-            <SettingsLocalizationFields
-              {form}
-              {formData}
-              {processing}
-              {localeOptions}
-              {currencyOptions}
-              {getTimezoneOptions}
-              {isValidFormat}
-              messages={m}
-            />
-          </SettingsSection>
-
-          <SettingsSection
-            id="advanced"
-            icon={Code}
-            iconClass={ACCENT.fog.chip}
-            title={m.settings_tab_advanced()}
-            description={m.settings_advanced_desc()}
-          >
-            <SettingsAdvancedFields {form} {formData} {processing} messages={m} />
-          </SettingsSection>
-
-          <SettingsSection
-            id="notifications"
-            icon={Bell}
-            iconClass={ACCENT.ochre.chip}
-            title={m.settings_tab_notifications()}
-            description={m.settings_notifications_desc()}
-          >
-            <NotificationProvidersSettings
-              bind:notificationProcessingEnabled
-              processingSchedule={notificationProcessingSchedule}
-              onProcessingScheduleChange={updateNotificationProcessingSchedule}
-              disabled={processing}
-            />
-          </SettingsSection>
-
-          <SettingsSection
-            id="units"
-            icon={Gauge}
-            iconClass={ACCENT.moss.chip}
-            title={m.settings_tab_units()}
-            description={m.settings_units_desc()}
-          >
-            <SettingsUnitsTab
-              {form}
-              {formData}
-              {processing}
-              {uodOptions}
-              {uovOptions}
-              {gasUnitOptions}
-              {mileageUnitFormatOptions}
-              messages={m}
-            />
-          </SettingsSection>
-
-          <SettingsSection
-            id="features"
-            icon={ToggleLeft}
-            iconClass={ACCENT.teal.chip}
-            title={m.settings_tab_features()}
-            description={m.settings_features_intro()}
-          >
-            <SettingsFeaturesTab {form} {formData} {processing} messages={m} />
-          </SettingsSection>
-
-          <!-- Error Summary -->
-          {#if hasErrors}
-            <div class="bg-destructive/10 border-destructive/50 rounded-lg border p-4">
-              <h3 class="text-destructive mb-2 text-sm font-semibold">
-                {m.settings_error_fix_errors()}
-              </h3>
-              <ul class="text-destructive list-inside list-disc space-y-1 text-sm">
-                {#each errorEntries as [field, errorArray]}
-                  <li>
-                    <span class="font-medium capitalize"
-                      >{field.replace(/([A-Z])/g, ' $1').trim()}:</span
-                    >
-                    {errorArray.join(', ')}
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          {/if}
-        </div>
-
-        <!-- Sticky Save Bar -->
-        <div class="bg-card sticky bottom-0 z-10 mt-6 rounded-xl border p-4 shadow-lg">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button
+    <!-- Settings Layout with Sidebar -->
+    <div class="flex flex-col gap-6 sm:flex-row">
+      <!-- Sidebar Navigation -->
+      <aside class="w-full shrink-0 sm:w-64">
+        <nav
+          class="bg-card sticky top-20 flex flex-row gap-2 overflow-x-auto rounded-xl border p-2 sm:top-6 sm:flex-col sm:gap-1 sm:overflow-visible"
+        >
+          {#each sidebarItems as item (item.id)}
+            {@const Icon = item.icon}
+            <button
               type="button"
-              variant="ghost"
-              onclick={resetToDefaults}
-              disabled={processing}
-              class="justify-start"
+              onclick={() => scrollToSection(item.id)}
+              class="flex shrink-0 items-center gap-3 rounded-lg p-2.5 text-left transition-colors {activeSection ===
+              item.id
+                ? 'bg-muted ring-border ring-1'
+                : 'hover:bg-muted/60'}"
             >
-              <LabelWithIcon icon={RotateCcw} label={m.settings_reset_defaults()} />
-            </Button>
-            <div class="flex items-center gap-2">
+              <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-lg {item.iconClass}"
+              >
+                <Icon class="size-4" />
+              </span>
+              <span class="hidden min-w-0 flex-col sm:flex">
+                <span class="truncate text-sm font-medium">{item.label}</span>
+                <span class="text-muted-foreground truncate text-xs">{item.description}</span>
+              </span>
+            </button>
+          {/each}
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div id="settings-content" class="min-w-0 flex-1" bind:this={contentEl}>
+        <SettingsSection
+          id="users"
+          icon={Users}
+          iconClass={ACCENT.denim.chip}
+          title={m.users_title()}
+          description={m.users_description()}
+        >
+          <UsersSettings />
+        </SettingsSection>
+        <form id="settings-form" class="mt-6" use:enhance onsubmit={(e) => e.preventDefault()}>
+          <div class="space-y-6">
+            <SettingsSection
+              id="personalization"
+              icon={Palette}
+              iconClass={ACCENT.plum.chip}
+              title={m.settings_tab_personalization()}
+              description={m.settings_personalization_desc()}
+            >
+              <SettingsAppearanceFields
+                {form}
+                {formData}
+                {processing}
+                {themeOptions}
+                {darkVariantOptions}
+                messages={m}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              id="localization"
+              icon={Earth}
+              iconClass={ACCENT.denim.chip}
+              title={m.settings_tab_localization()}
+              description={m.settings_localization_desc()}
+            >
+              <SettingsLocalizationFields
+                {form}
+                {formData}
+                {processing}
+                {localeOptions}
+                {currencyOptions}
+                {getTimezoneOptions}
+                {isValidFormat}
+                messages={m}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              id="advanced"
+              icon={Code}
+              iconClass={ACCENT.fog.chip}
+              title={m.settings_tab_advanced()}
+              description={m.settings_advanced_desc()}
+            >
+              <SettingsAdvancedFields {form} {formData} {processing} messages={m} />
+            </SettingsSection>
+
+            <SettingsSection
+              id="notifications"
+              icon={Bell}
+              iconClass={ACCENT.ochre.chip}
+              title={m.settings_tab_notifications()}
+              description={m.settings_notifications_desc()}
+            >
+              <NotificationProvidersSettings
+                bind:notificationProcessingEnabled
+                processingSchedule={notificationProcessingSchedule}
+                onProcessingScheduleChange={updateNotificationProcessingSchedule}
+                disabled={processing}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              id="units"
+              icon={Gauge}
+              iconClass={ACCENT.moss.chip}
+              title={m.settings_tab_units()}
+              description={m.settings_units_desc()}
+            >
+              <SettingsUnitsTab
+                {form}
+                {formData}
+                {processing}
+                {uodOptions}
+                {uovOptions}
+                {gasUnitOptions}
+                {mileageUnitFormatOptions}
+                messages={m}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              id="features"
+              icon={ToggleLeft}
+              iconClass={ACCENT.teal.chip}
+              title={m.settings_tab_features()}
+              description={m.settings_features_intro()}
+            >
+              <SettingsFeaturesTab {form} {formData} {processing} messages={m} />
+            </SettingsSection>
+
+            <!-- Error Summary -->
+            {#if hasErrors}
+              <div class="bg-destructive/10 border-destructive/50 rounded-lg border p-4">
+                <h3 class="text-destructive mb-2 text-sm font-semibold">
+                  {m.settings_error_fix_errors()}
+                </h3>
+                <ul class="text-destructive list-inside list-disc space-y-1 text-sm">
+                  {#each errorEntries as [field, errorArray]}
+                    <li>
+                      <span class="font-medium capitalize"
+                        >{field.replace(/([A-Z])/g, ' $1').trim()}:</span
+                      >
+                      {errorArray.join(', ')}
+                    </li>
+                  {/each}
+                </ul>
+              </div>
+            {/if}
+          </div>
+
+          <!-- Sticky Save Bar -->
+          <div class="bg-card sticky bottom-0 z-10 mt-6 rounded-xl border p-4 shadow-lg">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button
                 type="button"
-                variant="outline"
-                onclick={applyLoadedConfig}
+                variant="ghost"
+                onclick={resetToDefaults}
                 disabled={processing}
-                class="flex-1 sm:flex-none"
+                class="justify-start"
               >
-                {m.settings_cancel_button()}
+                <LabelWithIcon icon={RotateCcw} label={m.settings_reset_defaults()} />
               </Button>
-              <SubmitButton {processing} class="flex-1 sm:flex-none">
-                {m.settings_update_button()}
-              </SubmitButton>
+              <div class="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onclick={applyLoadedConfig}
+                  disabled={processing}
+                  class="flex-1 sm:flex-none"
+                >
+                  {m.settings_cancel_button()}
+                </Button>
+                <SubmitButton {processing} class="flex-1 sm:flex-none">
+                  {m.settings_update_button()}
+                </SubmitButton>
+              </div>
             </div>
+            <p class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
+              <Lock class="size-3" />
+              {m.settings_secure_note()}
+            </p>
           </div>
-          <p class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
-            <Lock class="size-3" />
-            {m.settings_secure_note()}
-          </p>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+{/if}

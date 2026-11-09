@@ -1,3 +1,5 @@
+import { requestAccess } from '$server/services/access';
+import { requireReadableFile } from '$server/services/fileService';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import {
@@ -14,6 +16,7 @@ export const GET: RequestHandler = async (event) => {
     const preview = event.url.searchParams.get('preview') === 'true';
 
     assertSafeUploadFilename(filename);
+    await requireReadableFile(requestAccess(event), filename);
 
     const filePath = resolveUploadFilePath(filename);
     const contentType = getContentTypeForFilename(filename);

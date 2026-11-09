@@ -1,3 +1,6 @@
+import { requestAccess } from '$server/services/access';
+import { db } from '$server/db';
+import { uploadsTable } from '$server/db/schema';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { AppError, Status } from '$server/exceptions/AppError';
@@ -7,6 +10,7 @@ import { writeFile } from 'fs/promises';
 
 export const POST: RequestHandler = async (event) => {
   return withRouteErrorHandling('File upload error:', async () => {
+    const access = requestAccess(event);
     const contentType = event.request.headers.get('content-type');
 
     if (!contentType || !contentType.includes('multipart/form-data')) {
@@ -25,7 +29,12 @@ export const POST: RequestHandler = async (event) => {
     const filePath = resolveUploadFilePath(filename);
 
     try {
-      await writeFile(filePath, Buffer.from(buffer));
+      await writeFile(filePath, Buffer.from(buffer), { flag: 'wx' });
+      await db.insert(uploadsTable).values({
+        filename,
+        userId: access.id === 'system' ? null : access.id,
+        createdAt: Date.now()
+      });
     } catch (writeErr) {
       console.error('Failed to save file:', writeErr);
       throw new AppError('Failed to save file', Status.INTERNAL_SERVER_ERROR);

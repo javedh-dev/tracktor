@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { authStore } from '$stores/auth.svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
   import LabelWithIcon from '$appui/LabelWithIcon.svelte';
   import VehicleForm from '$feature/vehicle/VehicleForm.svelte';
@@ -35,14 +36,16 @@
           onkeydown={() => {}}
         />
       {/each}
-      <button
-        class="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex min-h-[200px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-transparent transition-colors"
-        onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
-      >
-        <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
-      </button>
+      {#if authStore.isAdmin}
+        <button
+          class="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex min-h-[200px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-transparent transition-colors"
+          onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
+        >
+          <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
+        </button>
+      {/if}
     </div>
-  {:else}
+  {:else if authStore.isAdmin}
     <button
       class="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex h-40 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed bg-transparent transition-colors"
       onclick={() => sheetStore.openSheet(VehicleForm, app_add_vehicle())}
@@ -50,5 +53,7 @@
       <p class="text-lg font-medium">{vehicle_list_empty()}</p>
       <LabelWithIcon icon={CirclePlus} label={app_add_vehicle()} />
     </button>
+  {:else}
+    <p class="text-muted-foreground">{vehicle_list_empty()}</p>
   {/if}
 </div>

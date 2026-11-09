@@ -16,7 +16,7 @@ const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
 };
 
 export function sanitizeUploadFilename(filename: string): string {
-  return `${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+  return `${crypto.randomUUID()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
 }
 
 export function assertSafeUploadFilename(filename: string): void {

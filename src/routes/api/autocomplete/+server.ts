@@ -1,3 +1,4 @@
+import { requestAccess } from '$server/services/access';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import * as autocompleteService from '$server/services/autocompleteService';
@@ -15,21 +16,22 @@ export const GET: RequestHandler = async (event) => {
 
     switch (field) {
       case 'serviceCenter':
-        result = await autocompleteService.getUniqueServiceCenters();
+        result = await autocompleteService.getUniqueServiceCenters(requestAccess(event));
         break;
 
       case 'complianceIssuer':
         result = await autocompleteService.getUniqueComplianceIssuers(
+          requestAccess(event),
           event.url.searchParams.get('type') ?? undefined
         );
         break;
 
       case 'vehicleMake':
-        result = await autocompleteService.getUniqueVehicleMakes();
+        result = await autocompleteService.getUniqueVehicleMakes(requestAccess(event));
         break;
 
       case 'vehicleModel':
-        result = await autocompleteService.getUniqueVehicleModels();
+        result = await autocompleteService.getUniqueVehicleModels(requestAccess(event));
         break;
 
       default:

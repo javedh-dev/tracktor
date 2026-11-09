@@ -17,6 +17,10 @@ class AuthStore {
   hasUsers = $state<boolean>(false);
   isAuthDisabled = $state<boolean>(env.DISABLE_AUTH);
 
+  get isAdmin() {
+    return this.isAuthDisabled || this.user?.role === 'admin';
+  }
+
   constructor() {
     this.isLoggedIn = env.DISABLE_AUTH;
     this.hasUsers = env.DISABLE_AUTH;
@@ -117,6 +121,7 @@ class AuthStore {
 
       if (res.success && res.data) {
         this.user = { ...this.user!, username: res.data.username };
+        if (data.newPassword) await this.logout();
         toast.success('Profile updated successfully');
         return true;
       }

@@ -873,5 +873,20 @@
   "widget_recent_activity_description": "Latest fuel and maintenance logs across the fleet",
   "widget_activity_calendar": "Activity Calendar",
   "widget_activity_calendar_description": "Upcoming reminders and past fuel/maintenance activity by date",
-  "widget_calendar_no_activity_or_reminders": "No activity or reminders on this date."
+  "widget_calendar_no_activity_or_reminders": "No activity or reminders on this date.",
+  "users_title": "Users",
+  "users_description": "Manage fleet accounts, roles, and vehicle access.",
+  "users_username": "Username",
+  "users_password": "Password",
+  "users_role": "Role",
+  "users_admin": "Administrator",
+  "users_driver": "Driver",
+  "users_active": "Active",
+  "users_vehicles": "Assigned vehicles",
+  "users_create": "Create user",
+  "users_save": "Save",
+  "users_reset_password": "Reset password",
+  "users_saved": "User saved",
+  "users_error": "Unable to save user.",
+  "fleet_pending_access": "No vehicles assigned. Contact an administrator."
 }

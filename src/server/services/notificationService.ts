@@ -1,3 +1,4 @@
+import { type AccessContext, vehicleScope, requireVehicle, requireAdmin } from './access';
 import {
   NOTIFICATION_CHANNELS,
   NOTIFICATION_SOURCES,
@@ -114,7 +115,11 @@ async function removeStaleNotifications(vehicleId: string, activeKeys: Set<strin
   await db.delete(schema.notificationTable).where(inArray(schema.notificationTable.id, staleIds));
 }
 
-export async function syncVehicleNotifications(vehicleId: string): Promise<void> {
+export async function syncVehicleNotifications(
+  access: AccessContext,
+  vehicleId: string
+): Promise<void> {
+  await requireVehicle(access, vehicleId);
   const notifications = await buildAvailableNotifications(vehicleId);
   const activeKeys = new Set(notifications.map((n) => n.notificationKey));
 
@@ -148,15 +153,17 @@ export async function syncVehicleNotifications(vehicleId: string): Promise<void>
   await removeStaleNotifications(vehicleId, activeKeys);
 }
 
-export async function syncAllNotifications(): Promise<void> {
+export async function syncAllNotifications(access: AccessContext): Promise<void> {
+  requireAdmin(access);
   const vehicles = await db.query.vehicleTable.findMany();
 
   for (const vehicle of vehicles) {
-    await syncVehicleNotifications(vehicle.id);
+    await syncVehicleNotifications(access, vehicle.id);
   }
 }
 
-export const getNotifications = async (vehicleId: string) => {
+export const getNotifications = async (access: AccessContext, vehicleId: string) => {
+  await requireVehicle(access, vehicleId);
   const notifications = await db.query.notificationTable.findMany({
     where: (notification, { and, eq, isNull }) =>
       and(eq(notification.vehicleId, vehicleId), isNull(notification.clearedAt)),
@@ -171,7 +178,7 @@ export const getNotifications = async (vehicleId: string) => {
 };
 
 /** Fleet-wide notification list, with vehicle fields joined in for display. */
-export const getAllNotifications = async () => {
+export const getAllNotifications = async (access: AccessContext) => {
   const rows = await db
     .select({
       ...getTableColumns(schema.notificationTable),
@@ -181,7 +188,12 @@ export const getAllNotifications = async () => {
     })
     .from(schema.notificationTable)
     .leftJoin(schema.vehicleTable, eq(schema.notificationTable.vehicleId, schema.vehicleTable.id))
-    .where(isNull(schema.notificationTable.clearedAt))
+    .where(
+      and(
+        isNull(schema.notificationTable.clearedAt),
+        vehicleScope(schema.notificationTable.vehicleId, access)
+      )
+    )
     .orderBy(
       asc(schema.notificationTable.isRead),
       asc(schema.notificationTable.dueDate),
@@ -191,7 +203,11 @@ export const getAllNotifications = async () => {
   return rows;
 };
 
-export const getPendingNotificationsForChannels = async (channels: NotificationChannel[]) => {
+export const getPendingNotificationsForChannels = async (
+  access: AccessContext,
+  channels: NotificationChannel[]
+) => {
+  requireAdmin(access);
   const notifications = await db.query.notificationTable.findMany({
     where: (notification, { and, eq, inArray, isNull }) =>
       and(
@@ -205,7 +221,11 @@ export const getPendingNotificationsForChannels = async (channels: NotificationC
   return notifications;
 };
 
-export const getActiveNotificationsForChannels = async (channels: NotificationChannel[]) => {
+export const getActiveNotificationsForChannels = async (
+  access: AccessContext,
+  channels: NotificationChannel[]
+) => {
+  requireAdmin(access);
   const notifications = await db.query.notificationTable.findMany({
     where: (notification, { and, inArray, isNull }) =>
       and(inArray(notification.channel, channels), isNull(notification.clearedAt)),
@@ -215,9 +235,18 @@ export const getActiveNotificationsForChannels = async (channels: NotificationCh
   return notifications;
 };
 
-export const clearNotification = async (notificationId: string) => {
+export const clearNotification = async (
+  access: AccessContext,
+  vehicleId: string,
+  notificationId: string
+) => {
   const existingNotification = await db.query.notificationTable.findFirst({
-    where: (notification, { eq }) => eq(notification.id, notificationId)
+    where: (notification, { eq }) =>
+      and(
+        eq(notification.id, notificationId),
+        eq(notification.vehicleId, vehicleId),
+        vehicleScope(notification.vehicleId, access)
+      )
   });
 
   if (!existingNotification) {
@@ -231,17 +260,33 @@ export const clearNotification = async (notificationId: string) => {
   const clearedNotifications = await db
     .update(schema.notificationTable)
     .set({ clearedAt: new Date().toISOString() })
-    .where(eq(schema.notificationTable.id, notificationId))
+    .where(
+      and(
+        eq(schema.notificationTable.id, notificationId),
+        eq(schema.notificationTable.vehicleId, vehicleId),
+        vehicleScope(schema.notificationTable.vehicleId, access)
+      )
+    )
     .returning();
 
   return clearedNotifications[0];
 };
 
-export const markNotificationAsRead = async (notificationId: string) => {
+export const markNotificationAsRead = async (
+  access: AccessContext,
+  vehicleId: string,
+  notificationId: string
+) => {
   const updatedNotification = await db
     .update(schema.notificationTable)
     .set({ isRead: true })
-    .where(eq(schema.notificationTable.id, notificationId))
+    .where(
+      and(
+        eq(schema.notificationTable.id, notificationId),
+        eq(schema.notificationTable.vehicleId, vehicleId),
+        vehicleScope(schema.notificationTable.vehicleId, access)
+      )
+    )
     .returning();
 
   if (updatedNotification.length === 0) {
@@ -251,7 +296,8 @@ export const markNotificationAsRead = async (notificationId: string) => {
   return updatedNotification[0];
 };
 
-export const markAllNotificationsAsRead = async (vehicleId: string) => {
+export const markAllNotificationsAsRead = async (access: AccessContext, vehicleId: string) => {
+  await requireVehicle(access, vehicleId);
   const updatedNotifications = await db
     .update(schema.notificationTable)
     .set({ isRead: true })

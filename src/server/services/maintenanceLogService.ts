@@ -1,3 +1,4 @@
+import { type AccessContext, vehicleScope, requireVehicle } from './access';
 import * as schema from '../db/schema/index';
 import { db } from '../db/index';
 import { eq, getTableColumns } from 'drizzle-orm';
@@ -21,8 +22,9 @@ export const getMaintenanceLogById = getById;
 export const updateMaintenanceLog = update;
 export const deleteMaintenanceLog = remove;
 
-export const getMaintenanceLogs = async (vehicleId?: string) => {
+export const getMaintenanceLogs = async (access: AccessContext, vehicleId?: string) => {
   if (vehicleId) {
+    await requireVehicle(access, vehicleId);
     const rows = await db.query.maintenanceLogTable.findMany({
       where: (logs, { eq }) => eq(logs.vehicleId, vehicleId),
       orderBy: (logs, { asc }) => [asc(logs.date), asc(logs.odometer)]
@@ -42,6 +44,7 @@ export const getMaintenanceLogs = async (vehicleId?: string) => {
     })
     .from(schema.maintenanceLogTable)
     .leftJoin(schema.vehicleTable, eq(schema.maintenanceLogTable.vehicleId, schema.vehicleTable.id))
+    .where(vehicleScope(schema.maintenanceLogTable.vehicleId, access))
     .orderBy(
       schema.maintenanceLogTable.vehicleId,
       schema.maintenanceLogTable.date,

@@ -1,4 +1,5 @@
-import { db } from '$server/db';
+import { type AccessContext, requireAdmin } from './access';
+import { db, writeTransaction } from '$server/db';
 import * as schema from '$server/db/schema';
 import { decrypt, encrypt } from '$server/services/crypto.service';
 import { AppError, Status } from '$server/exceptions/AppError';
@@ -19,7 +20,12 @@ type ImportableDataSet = {
   configs?: (typeof schema.configTable.$inferInsert)[];
 };
 
-export async function buildExportData(shouldEncrypt: unknown, password?: string) {
+export async function buildExportData(
+  access: AccessContext,
+  shouldEncrypt: unknown,
+  password?: string
+) {
+  requireAdmin(access);
   const exportData = {
     version: '1.0',
     timestamp: new Date().toISOString(),
@@ -88,8 +94,13 @@ export async function resolveImportData(
   return dataToImport as ImportableDataSet;
 }
 
-export async function importDataSet(dataToImport: ImportableDataSet): Promise<void> {
-  await db.transaction(async (tx) => {
+export async function importDataSet(
+  access: AccessContext,
+  dataToImport: ImportableDataSet
+): Promise<void> {
+  requireAdmin(access);
+  await writeTransaction(async (tx) => {
+    const assignments = await tx.select().from(schema.vehicleAssignmentsTable);
     // Delete in FK-safe order (children first)
     await tx.delete(schema.notificationTable);
     await tx.delete(schema.reminderTable);
@@ -126,6 +137,14 @@ export async function importDataSet(dataToImport: ImportableDataSet): Promise<vo
     if (dataToImport.notificationProviders?.length) {
       await tx.insert(schema.notificationProviderTable).values(dataToImport.notificationProviders);
     }
+
+    const importedVehicleIds = new Set((dataToImport.vehicles ?? []).map((vehicle) => vehicle.id));
+    const retainedAssignments = assignments.filter((assignment) =>
+      importedVehicleIds.has(assignment.vehicleId)
+    );
+    await tx.delete(schema.vehicleAssignmentsTable);
+    if (retainedAssignments.length)
+      await tx.insert(schema.vehicleAssignmentsTable).values(retainedAssignments);
 
     // Configs are intentionally not imported to preserve system configuration
   });

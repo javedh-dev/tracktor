@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { and, eq, inArray } from 'drizzle-orm';
-import { db } from '$server/db';
+import { db, writeTransaction } from '$server/db';
 import {
   usersTable,
   sessionsTable,
@@ -37,7 +37,7 @@ export async function createManagedUser(access: AccessContext, input: unknown) {
   requireAdmin(access);
   const data = createManagedUserSchema.parse(input);
   const passwordHash = await bcrypt.hash(data.password, 10);
-  return db.transaction(async (tx) => {
+  return writeTransaction(async (tx) => {
     const existing = await tx
       .select({ id: usersTable.id })
       .from(usersTable)
@@ -54,7 +54,7 @@ export async function createManagedUser(access: AccessContext, input: unknown) {
 export async function updateManagedUser(access: AccessContext, id: string, input: unknown) {
   requireAdmin(access);
   const data = updateManagedUserSchema.parse(input);
-  return db.transaction(async (tx) => {
+  return writeTransaction(async (tx) => {
     const [user] = await tx
       .update(usersTable)
       .set(data)
@@ -76,7 +76,7 @@ export async function updateManagedUser(access: AccessContext, id: string, input
 export async function resetLocalPassword(access: AccessContext, id: string, input: unknown) {
   requireAdmin(access);
   const passwordHash = await bcrypt.hash(passwordSchema.parse(input), 10);
-  await db.transaction(async (tx) => {
+  await writeTransaction(async (tx) => {
     const rows = await tx
       .update(usersTable)
       .set({ passwordHash })
@@ -90,7 +90,7 @@ export async function resetLocalPassword(access: AccessContext, id: string, inpu
 export async function replaceAssignments(access: AccessContext, userId: string, input: unknown) {
   requireAdmin(access);
   const vehicleIds = [...new Set(assignmentSchema.parse(input).vehicleIds)];
-  await db.transaction(async (tx) => {
+  await writeTransaction(async (tx) => {
     const user = await tx
       .select({ id: usersTable.id })
       .from(usersTable)

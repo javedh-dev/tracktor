@@ -60,21 +60,23 @@
 
 <div class="min-h-full space-y-6">
   <PageHeader title={dashboard_title()} description={greeting}>
-    <Button variant="outline" onclick={() => (resetDialogOpen = true)}>
-      <LabelWithIcon icon={RotateCcw} label={dashboard_reset_to_default()} />
-    </Button>
-    <Button
-      variant="outline"
-      onclick={() => sheetStore.openSheet(AddWidgetPanel, dashboard_add_widget())}
-    >
-      <LabelWithIcon icon={LayoutGrid} label={dashboard_add_widget()} />
-    </Button>
-    <Button
-      variant="default"
-      onclick={() => sheetStore.openSheet(VehicleForm, m.app_add_vehicle())}
-    >
-      <LabelWithIcon icon={CirclePlus} label={m.app_add_vehicle()} />
-    </Button>
+    {#if authStore.isAdmin}
+      <Button variant="outline" onclick={() => (resetDialogOpen = true)}>
+        <LabelWithIcon icon={RotateCcw} label={dashboard_reset_to_default()} />
+      </Button>
+      <Button
+        variant="outline"
+        onclick={() => sheetStore.openSheet(AddWidgetPanel, dashboard_add_widget())}
+      >
+        <LabelWithIcon icon={LayoutGrid} label={dashboard_add_widget()} />
+      </Button>
+      <Button
+        variant="default"
+        onclick={() => sheetStore.openSheet(VehicleForm, m.app_add_vehicle())}
+      >
+        <LabelWithIcon icon={CirclePlus} label={m.app_add_vehicle()} />
+      </Button>
+    {/if}
   </PageHeader>
 
   <DeleteConfirmation
@@ -96,6 +98,8 @@
     {#snippet children(item)}
       {@const def = WIDGET_REGISTRY[item.type]}
       <WidgetCard
+        draggable={authStore.isAdmin}
+        removable={authStore.isAdmin}
         layout={item}
         title={def.title}
         icon={def.icon}

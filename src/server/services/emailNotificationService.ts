@@ -1,3 +1,4 @@
+import { SYSTEM_ACCESS } from './access';
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
@@ -27,7 +28,7 @@ const createTransporter = (config: EmailProviderConfig): Transporter => {
 };
 
 async function resolveEmailProvider(providerId?: string) {
-  const providers = await getEnabledProvidersByType('email');
+  const providers = await getEnabledProvidersByType(SYSTEM_ACCESS, 'email');
 
   if (providers.length === 0) {
     throw new AppError('No email provider configured', Status.BAD_REQUEST);

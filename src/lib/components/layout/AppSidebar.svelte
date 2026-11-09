@@ -181,16 +181,18 @@
 
   <Sidebar.Footer>
     <Sidebar.Menu>
-      <Sidebar.MenuItem>
-        <Sidebar.MenuButton
-          {...navActiveProps('/settings')}
-          onclick={() => handleNavClick('/settings')}
-          tooltipContent={m.settings_title()}
-        >
-          <Settings class="h-4 w-4" />
-          <span>{m.settings_title()}</span>
-        </Sidebar.MenuButton>
-      </Sidebar.MenuItem>
+      {#if authStore.isAdmin}
+        <Sidebar.MenuItem>
+          <Sidebar.MenuButton
+            {...navActiveProps('/settings')}
+            onclick={() => handleNavClick('/settings')}
+            tooltipContent={m.settings_title()}
+          >
+            <Settings class="h-4 w-4" />
+            <span>{m.settings_title()}</span>
+          </Sidebar.MenuButton>
+        </Sidebar.MenuItem>
+      {/if}
       <Sidebar.MenuItem>
         <Sidebar.MenuButton
           onclick={toggleMode}
@@ -250,26 +252,28 @@
             <UserCog class="h-4 w-4" />
             {m.profile_menu_item()}
           </DropdownMenu.Item>
-          <DropdownMenu.Sub>
-            <DropdownMenu.SubTrigger>
-              <ToolCase class="h-4 w-4" />
-              <span>{m.tools_menu()}</span>
-            </DropdownMenu.SubTrigger>
-            <DropdownMenu.SubContent sideOffset={-4} class="min-w-48">
-              <DropdownMenu.Item
-                onclick={() => {
-                  sheetStore.openSheet(
-                    DataExportImport,
-                    m.data_export_import_sheet_title(),
-                    m.data_export_import_sheet_desc()
-                  );
-                }}
-              >
-                <Database class="h-4 w-4" />
-                {m.data_export_import_menu_item()}
-              </DropdownMenu.Item>
-            </DropdownMenu.SubContent>
-          </DropdownMenu.Sub>
+          {#if authStore.isAdmin}
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger>
+                <ToolCase class="h-4 w-4" />
+                <span>{m.tools_menu()}</span>
+              </DropdownMenu.SubTrigger>
+              <DropdownMenu.SubContent sideOffset={-4} class="min-w-48">
+                <DropdownMenu.Item
+                  onclick={() => {
+                    sheetStore.openSheet(
+                      DataExportImport,
+                      m.data_export_import_sheet_title(),
+                      m.data_export_import_sheet_desc()
+                    );
+                  }}
+                >
+                  <Database class="h-4 w-4" />
+                  {m.data_export_import_menu_item()}
+                </DropdownMenu.Item>
+              </DropdownMenu.SubContent>
+            </DropdownMenu.Sub>
+          {/if}
           <DropdownMenu.Separator />
           <DropdownMenu.Item onclick={authStore.logout}>
             <LogOut class="h-4 w-4" />
