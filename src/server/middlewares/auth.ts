@@ -10,6 +10,8 @@ const PUBLIC_ENDPOINTS = new Set([
   'POST /api/auth',
   'DELETE /api/auth',
   'POST /api/auth/register',
+  'GET /api/auth/oidc/login',
+  'GET /api/auth/oidc/callback',
   'GET /api/health',
   'GET /api/config/branding'
 ]);

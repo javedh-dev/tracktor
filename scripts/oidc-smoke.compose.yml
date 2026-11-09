@@ -1,0 +1,49 @@
+# Disposable OIDC test fixture. Credentials are synthetic and public by design.
+x-authentik-environment: &authentik-environment
+  AUTHENTIK_POSTGRESQL__HOST: postgresql
+  AUTHENTIK_POSTGRESQL__NAME: authentik
+  AUTHENTIK_POSTGRESQL__USER: authentik
+  AUTHENTIK_POSTGRESQL__PASSWORD: tracktor-smoke-postgresql-password
+  AUTHENTIK_SECRET_KEY: tracktor-smoke-only-never-use-in-production-0123456789abcdef
+  AUTHENTIK_ERROR_REPORTING__ENABLED: 'false'
+  AUTHENTIK_DISABLE_UPDATE_CHECK: 'true'
+
+services:
+  postgresql:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: tracktor-smoke-postgresql-password
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d authentik -U authentik']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  server:
+    image: ghcr.io/goauthentik/server:2026.8.5
+    command: server
+    environment: *authentik-environment
+    ports:
+      - '127.0.0.1:19000:9000'
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+  worker:
+    image: ghcr.io/goauthentik/server:2026.8.5
+    command: worker
+    environment:
+      <<: *authentik-environment
+      AUTHENTIK_BOOTSTRAP_PASSWORD: tracktor-smoke-admin-password
+      AUTHENTIK_BOOTSTRAP_TOKEN: tracktor-smoke-bootstrap-token-0123456789abcdef
+      AUTHENTIK_BOOTSTRAP_EMAIL: akadmin@example.test
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+volumes:
+  database:

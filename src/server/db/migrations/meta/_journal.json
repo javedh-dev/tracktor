@@ -169,6 +169,13 @@
       "when": 1794246915375,
       "tag": "20261109175515_preserve_existing_admins",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1794247619961,
+      "tag": "20261109180659_oidc_authentication",
+      "breakpoints": true
     }
   ]
 }

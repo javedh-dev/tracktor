@@ -2,7 +2,7 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/enco
 import { sha256 } from '@oslojs/crypto/sha2';
 import { db } from '../db/index';
 import { sessionsTable, usersTable } from '../db/schema/index';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(20);
@@ -11,7 +11,11 @@ export function generateSessionToken(): string {
   return token;
 }
 
-export async function createSession(token: string, userId: string): Promise<Session> {
+export async function createSession(
+  token: string,
+  userId: string,
+  connection: Pick<typeof db, 'insert'> = db
+): Promise<Session> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const session: Session = {
     id: sessionId,
@@ -19,7 +23,7 @@ export async function createSession(token: string, userId: string): Promise<Sess
     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) // 30 days
   };
 
-  await db.insert(sessionsTable).values({
+  await connection.insert(sessionsTable).values({
     id: session.id,
     userId: session.userId,
     expiresAt: Math.floor(session.expiresAt.getTime() / 1000)
@@ -42,7 +46,8 @@ export async function validateSessionToken(token: string): Promise<SessionValida
         id: usersTable.id,
         username: usersTable.username,
         role: usersTable.role,
-        isActive: usersTable.isActive
+        isActive: usersTable.isActive,
+        hasLocalPassword: sql<boolean>`length(${usersTable.passwordHash}) > 0`.mapWith(Boolean)
       }
     })
     .from(sessionsTable)
@@ -80,7 +85,8 @@ export async function validateSessionToken(token: string): Promise<SessionValida
         id: user.id,
         username: user.username,
         role: user.role,
-        isActive: user.isActive
+        isActive: user.isActive,
+        hasLocalPassword: user.hasLocalPassword
       }
     };
   }
@@ -95,7 +101,8 @@ export async function validateSessionToken(token: string): Promise<SessionValida
       id: user.id,
       username: user.username,
       role: user.role,
-      isActive: user.isActive
+      isActive: user.isActive,
+      hasLocalPassword: user.hasLocalPassword
     }
   };
 }
@@ -115,6 +122,7 @@ export interface User {
   username: string;
   role: 'admin' | 'driver';
   isActive: boolean;
+  hasLocalPassword?: boolean;
 }
 
 interface SessionValidationResult {

@@ -1,3 +1,4 @@
+import { isOidcEnabled, isLocalAuthEnabled } from '$server/services/oidcClient';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getUsersCount, validateSession } from '$server/services/authService';
@@ -7,13 +8,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const isAuthDisabled = env.DISABLE_AUTH;
 
   if (isAuthDisabled) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
 
   // Check if any users exist in the system
   const usersStatus = await getUsersCount();
-  if (!usersStatus.hasUsers) {
-    throw redirect(307, '/register');
+  if (!usersStatus.hasUsers && !isOidcEnabled()) {
+    throw redirect(307, `${env.BASE_URL}/register`);
   }
 
   // Validate current session
@@ -29,8 +30,14 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
 
   if (user) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
 
-  return {};
+  return {
+    authCapabilities: {
+      oidcEnabled: isOidcEnabled(),
+      localAuthEnabled: isLocalAuthEnabled(),
+      hasUsers: usersStatus.hasUsers
+    }
+  };
 };

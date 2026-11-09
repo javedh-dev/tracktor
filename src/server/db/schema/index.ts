@@ -1,4 +1,11 @@
-import { usersTable, sessionsTable, vehicleAssignmentsTable, uploadsTable } from './auth';
+import {
+  usersTable,
+  sessionsTable,
+  oidcIdentitiesTable,
+  oidcTransactionsTable,
+  vehicleAssignmentsTable,
+  uploadsTable
+} from './auth';
 import { configTable } from './config';
 import { fuelLogTable } from './fuel-log';
 import { maintenanceLogTable } from './maintenance-logs';
@@ -10,6 +17,8 @@ import { notificationProviderTable } from './notification-provider';
 
 export {
   usersTable,
+  oidcIdentitiesTable,
+  oidcTransactionsTable,
   vehicleAssignmentsTable,
   uploadsTable,
   sessionsTable,

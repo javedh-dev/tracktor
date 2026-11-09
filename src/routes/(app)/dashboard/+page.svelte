@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+  import { toast } from 'svelte-sonner';
   import { onMount } from 'svelte';
   import PageHeader from '$dashboard/PageHeader.svelte';
   import DashboardGrid from '$dashboard/DashboardGrid.svelte';
@@ -38,6 +40,8 @@
   let resetDialogOpen = $state(false);
 
   onMount(() => {
+    if (page.url.searchParams.get('oidc') === 'linked') toast.success(m.auth_sso_linked());
+    if (page.url.searchParams.get('oidc') === 'error') toast.error(m.auth_sso_error());
     dashboardStore.fetchSummary();
     dashboardLayoutStore.fetchLayout();
   });

@@ -1,3 +1,4 @@
+import { validateOidcStartup } from '$server/services/oidcClient';
 import { sequence } from '@sveltejs/kit/hooks';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
@@ -55,6 +56,7 @@ const initPromise = (async () => {
 
   try {
     await initializeDatabase();
+    await validateOidcStartup();
     dbInitialized = true;
     logger.info('Database initialization completed');
   } catch (error) {

@@ -1,3 +1,4 @@
+import { isLocalAuthEnabled, isOidcEnabled } from '$server/services/oidcClient';
 import { requestAccess } from '$server/services/access';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
@@ -29,6 +30,11 @@ export const load: LayoutServerLoad = async (event) => {
 
   return {
     user,
+    authCapabilities: {
+      isAuthDisabled: env.DISABLE_AUTH,
+      oidcEnabled: isOidcEnabled(),
+      localAuthEnabled: isLocalAuthEnabled()
+    },
     rawConfigs,
     configs: configsMap,
     vehicles: vehicles || []

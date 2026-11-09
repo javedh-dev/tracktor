@@ -1,3 +1,4 @@
+import { withBase } from '$lib/utils';
 import { goto } from '$app/navigation';
 import { env } from '$lib/config/env';
 import { apiClient } from '../helper/api.helper';
@@ -9,12 +10,15 @@ interface User {
   username: string;
   role: 'admin' | 'driver';
   isActive: boolean;
+  hasLocalPassword?: boolean;
 }
 
 class AuthStore {
   user = $state<User | null>(null);
   isLoggedIn = $state<boolean>(false);
   hasUsers = $state<boolean>(false);
+  oidcEnabled = $state(false);
+  localAuthEnabled = $state(true);
   isAuthDisabled = $state<boolean>(env.DISABLE_AUTH);
 
   get isAdmin() {
@@ -37,6 +41,8 @@ class AuthStore {
       const { data: res } = await apiClient.get<ApiResponse>('/auth');
       this.isAuthDisabled = !!res.data?.isAuthDisabled;
       this.hasUsers = res.data?.hasUsers ?? false;
+      this.oidcEnabled = !!res.data?.oidcEnabled;
+      this.localAuthEnabled = res.data?.localAuthEnabled !== false;
 
       if (this.isAuthDisabled) {
         this.isLoggedIn = true;
@@ -107,7 +113,7 @@ class AuthStore {
     } finally {
       this.user = null;
       this.isLoggedIn = false;
-      goto('/login');
+      goto(withBase('/login'));
     }
   };
 

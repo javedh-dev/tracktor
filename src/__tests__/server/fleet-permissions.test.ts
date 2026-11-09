@@ -57,9 +57,9 @@ beforeAll(async () => {
   await cp('src/server/db/migrations', oldFolder, { recursive: true });
   const journalPath = join(oldFolder, 'meta/_journal.json');
   const journal = JSON.parse(await readFile(journalPath, 'utf8'));
-  journal.entries = journal.entries.filter(
-    (entry: { tag: string }) =>
-      !entry.tag.includes('fleet_permissions') && !entry.tag.includes('preserve_existing_admins')
+  journal.entries = journal.entries.slice(
+    0,
+    journal.entries.findIndex((entry: { tag: string }) => entry.tag.includes('fleet_permissions'))
   );
   await writeFile(journalPath, JSON.stringify(journal));
   await migrate(db, { migrationsFolder: oldFolder, migrationsTable: '_migrations' });
@@ -85,6 +85,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await db.delete(schema.oidcTransactionsTable);
+  await db.delete(schema.oidcIdentitiesTable);
   await db.delete(schema.notificationTable);
   await db.delete(schema.reminderTable);
   await db.delete(schema.complianceDocumentTable);

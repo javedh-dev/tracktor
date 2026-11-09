@@ -10,6 +10,8 @@
   import User from '@lucide/svelte/icons/user';
   import Lock from '@lucide/svelte/icons/lock';
   import { sheetStore } from '$stores/sheet.svelte';
+  import { withBase } from '$lib/utils';
+  import { Button } from '$ui/button';
   import * as m from '$lib/paraglide/messages';
 
   let processing = $state(false);
@@ -104,68 +106,76 @@
       <Form.FieldErrors />
     </Form.Field>
 
-    <div class="border-t pt-4">
-      <p class="text-muted-foreground mb-4 text-sm">
-        {m.profile_password_hint()}
-      </p>
+    {#if authStore.localAuthEnabled && authStore.user?.hasLocalPassword}
+      <div class="border-t pt-4">
+        <p class="text-muted-foreground mb-4 text-sm">
+          {m.profile_password_hint()}
+        </p>
 
-      <div class="flex flex-col gap-6">
-        <Form.Field {form} name="currentPassword" class="w-full">
-          <Form.Control>
-            {#snippet children({ props })}
-              <FormLabel description={m.profile_current_password_desc()}
-                >{m.profile_current_password()}</FormLabel
-              >
-              <Input
-                {...props}
-                bind:value={$formData.currentPassword}
-                icon={Lock}
-                type="password"
-                autocomplete="current-password"
-              />
-            {/snippet}
-          </Form.Control>
-          <Form.FieldErrors />
-        </Form.Field>
+        <div class="flex flex-col gap-6">
+          <Form.Field {form} name="currentPassword" class="w-full">
+            <Form.Control>
+              {#snippet children({ props })}
+                <FormLabel description={m.profile_current_password_desc()}
+                  >{m.profile_current_password()}</FormLabel
+                >
+                <Input
+                  {...props}
+                  bind:value={$formData.currentPassword}
+                  icon={Lock}
+                  type="password"
+                  autocomplete="current-password"
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-        <Form.Field {form} name="newPassword" class="w-full">
-          <Form.Control>
-            {#snippet children({ props })}
-              <FormLabel description={m.profile_new_password_desc()}
-                >{m.profile_new_password()}</FormLabel
-              >
-              <Input
-                {...props}
-                bind:value={$formData.newPassword}
-                icon={Lock}
-                type="password"
-                autocomplete="new-password"
-              />
-            {/snippet}
-          </Form.Control>
-          <Form.FieldErrors />
-        </Form.Field>
+          <Form.Field {form} name="newPassword" class="w-full">
+            <Form.Control>
+              {#snippet children({ props })}
+                <FormLabel description={m.profile_new_password_desc()}
+                  >{m.profile_new_password()}</FormLabel
+                >
+                <Input
+                  {...props}
+                  bind:value={$formData.newPassword}
+                  icon={Lock}
+                  type="password"
+                  autocomplete="new-password"
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-        <Form.Field {form} name="confirmPassword" class="w-full">
-          <Form.Control>
-            {#snippet children({ props })}
-              <FormLabel description={m.profile_confirm_password_desc()}
-                >{m.profile_confirm_password()}</FormLabel
-              >
-              <Input
-                {...props}
-                bind:value={$formData.confirmPassword}
-                icon={Lock}
-                type="password"
-                autocomplete="new-password"
-              />
-            {/snippet}
-          </Form.Control>
-          <Form.FieldErrors />
-        </Form.Field>
+          <Form.Field {form} name="confirmPassword" class="w-full">
+            <Form.Control>
+              {#snippet children({ props })}
+                <FormLabel description={m.profile_confirm_password_desc()}
+                  >{m.profile_confirm_password()}</FormLabel
+                >
+                <Input
+                  {...props}
+                  bind:value={$formData.confirmPassword}
+                  icon={Lock}
+                  type="password"
+                  autocomplete="new-password"
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
+        </div>
       </div>
-    </div>
+    {/if}
 
     <SubmitButton {processing} class="w-full">{m.profile_update_button()}</SubmitButton>
   </fieldset>
 </form>
+
+{#if authStore.oidcEnabled}
+  <form method="POST" action={withBase('/api/auth/oidc/link')} class="mt-4">
+    <Button type="submit" variant="outline">{m.auth_sso_link_button()}</Button>
+  </form>
+{/if}

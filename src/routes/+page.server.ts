@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const isAuthDisabled = env.DISABLE_AUTH;
 
   if (isAuthDisabled) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
 
   const sessionToken = cookies.get('session');
@@ -22,8 +22,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
 
   if (user) {
-    throw redirect(307, '/dashboard');
+    throw redirect(307, `${env.BASE_URL}/dashboard`);
   }
 
-  throw redirect(307, '/login');
+  throw redirect(307, `${env.BASE_URL}/login`);
 };

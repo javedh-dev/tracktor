@@ -48,3 +48,29 @@ export const uploadsTable = table('uploads', {
   userId: t.text().references(() => usersTable.id, { onDelete: 'set null' }),
   createdAt: t.integer().notNull()
 });
+
+export const oidcIdentitiesTable = table(
+  'oidc_identities',
+  {
+    issuer: t.text().notNull(),
+    subject: t.text().notNull(),
+    userId: t
+      .text()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: 'cascade' })
+  },
+  (table) => [
+    t.primaryKey({ columns: [table.issuer, table.subject] }),
+    t.uniqueIndex('oidc_user_issuer_unique').on(table.userId, table.issuer)
+  ]
+);
+
+export const oidcTransactionsTable = table('oidc_transactions', {
+  id: t.text().primaryKey(),
+  state: t.text().notNull(),
+  nonce: t.text().notNull(),
+  codeVerifier: t.text().notNull(),
+  expiresAt: t.integer().notNull(),
+  userId: t.text().references(() => usersTable.id, { onDelete: 'cascade' }),
+  sessionId: t.text().references(() => sessionsTable.id, { onDelete: 'cascade' })
+});

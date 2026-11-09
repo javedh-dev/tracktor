@@ -722,5 +722,10 @@
   "users_reset_password": "Passwort zurücksetzen",
   "users_saved": "Benutzer gespeichert",
   "users_error": "Benutzer konnte nicht gespeichert werden.",
-  "fleet_pending_access": "Keine Fahrzeuge zugewiesen. Wende dich an einen Administrator."
+  "fleet_pending_access": "Keine Fahrzeuge zugewiesen. Wende dich an einen Administrator.",
+  "auth_sso_login_button": "Mit SSO anmelden",
+  "auth_sso_link_button": "SSO-Konto verknüpfen",
+  "auth_sso_error": "SSO-Anmeldung oder Kontoverknüpfung fehlgeschlagen. Bitte erneut versuchen.",
+  "auth_sso_linked": "SSO-Konto erfolgreich verknüpft.",
+  "auth_create_admin": "Ersten Administrator erstellen"
 }

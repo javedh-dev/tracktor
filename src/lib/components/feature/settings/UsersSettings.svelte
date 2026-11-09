@@ -141,75 +141,79 @@
     </Alert.Root>
   {/if}
 
-  <form
-    onsubmit={(event) => {
-      event.preventDefault();
-      void createUser();
-    }}
-  >
-    <Card.Root>
-      <Card.Header>
-        <Card.Title>{m.users_create()}</Card.Title>
-        <Card.Description>{m.users_description()}</Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <Field.FieldSet disabled={loading || busy}>
-          <Field.FieldGroup>
-            <Field.Field>
-              <Field.FieldLabel for="managed-user-username">{m.users_username()}</Field.FieldLabel>
-              <Input
-                id="managed-user-username"
-                bind:value={username}
-                autocomplete="off"
-                minlength={3}
-                maxlength={128}
-                required
-              />
-            </Field.Field>
-            <Field.Field>
-              <Field.FieldLabel for="managed-user-password">{m.users_password()}</Field.FieldLabel>
-              <Input
-                id="managed-user-password"
-                type="password"
-                bind:value={password}
-                autocomplete="new-password"
-                minlength={6}
-                maxlength={72}
-                required
-              />
-            </Field.Field>
-            <Field.Field>
-              <Field.FieldLabel for="managed-user-role">{m.users_role()}</Field.FieldLabel>
-              <Select.Root
-                type="single"
-                value={role}
-                onValueChange={(value) => {
-                  if (value === 'admin' || value === 'driver') role = value;
-                }}
-                disabled={loading || busy}
-              >
-                <Select.Trigger id="managed-user-role" class="w-full">
-                  {role === 'admin' ? m.users_admin() : m.users_driver()}
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Group>
-                    {#each roles as option (option.value)}
-                      <Select.Item value={option.value} label={option.label}
-                        >{option.label}</Select.Item
-                      >
-                    {/each}
-                  </Select.Group>
-                </Select.Content>
-              </Select.Root>
-            </Field.Field>
-          </Field.FieldGroup>
-        </Field.FieldSet>
-      </Card.Content>
-      <Card.Footer>
-        <Button type="submit" disabled={loading || busy}>{m.users_create()}</Button>
-      </Card.Footer>
-    </Card.Root>
-  </form>
+  {#if authStore.localAuthEnabled}
+    <form
+      onsubmit={(event) => {
+        event.preventDefault();
+        void createUser();
+      }}
+    >
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>{m.users_create()}</Card.Title>
+          <Card.Description>{m.users_description()}</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <Field.FieldSet disabled={loading || busy}>
+            <Field.FieldGroup>
+              <Field.Field>
+                <Field.FieldLabel for="managed-user-username">{m.users_username()}</Field.FieldLabel
+                >
+                <Input
+                  id="managed-user-username"
+                  bind:value={username}
+                  autocomplete="off"
+                  minlength={3}
+                  maxlength={128}
+                  required
+                />
+              </Field.Field>
+              <Field.Field>
+                <Field.FieldLabel for="managed-user-password">{m.users_password()}</Field.FieldLabel
+                >
+                <Input
+                  id="managed-user-password"
+                  type="password"
+                  bind:value={password}
+                  autocomplete="new-password"
+                  minlength={6}
+                  maxlength={72}
+                  required
+                />
+              </Field.Field>
+              <Field.Field>
+                <Field.FieldLabel for="managed-user-role">{m.users_role()}</Field.FieldLabel>
+                <Select.Root
+                  type="single"
+                  value={role}
+                  onValueChange={(value) => {
+                    if (value === 'admin' || value === 'driver') role = value;
+                  }}
+                  disabled={loading || busy}
+                >
+                  <Select.Trigger id="managed-user-role" class="w-full">
+                    {role === 'admin' ? m.users_admin() : m.users_driver()}
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Group>
+                      {#each roles as option (option.value)}
+                        <Select.Item value={option.value} label={option.label}
+                          >{option.label}</Select.Item
+                        >
+                      {/each}
+                    </Select.Group>
+                  </Select.Content>
+                </Select.Root>
+              </Field.Field>
+            </Field.FieldGroup>
+          </Field.FieldSet>
+        </Card.Content>
+        <Card.Footer>
+          <Button type="submit" disabled={loading || busy}>{m.users_create()}</Button>
+        </Card.Footer>
+      </Card.Root>
+    </form>
+  {/if}
 
   {#if loading}
     <p role="status">{m.common_loading()}</p>
@@ -298,36 +302,38 @@
               </Field.FieldGroup>
             </Field.FieldSet>
           </form>
-          <form
-            onsubmit={(event) => {
-              event.preventDefault();
-              void resetPassword(user);
-            }}
-          >
-            <Field.FieldSet disabled={busy}>
-              <Field.FieldGroup>
-                <Field.Field>
-                  <Field.FieldLabel for={`managed-password-${user.id}`}
-                    >{m.users_password()}</Field.FieldLabel
-                  >
-                  <Input
-                    id={`managed-password-${user.id}`}
-                    type="password"
-                    bind:value={passwords[user.id]}
-                    autocomplete="new-password"
-                    minlength={6}
-                    maxlength={72}
-                    required
-                  />
-                </Field.Field>
-                <Field.Field>
-                  <Button type="submit" variant="outline" disabled={busy}
-                    >{m.users_reset_password()}</Button
-                  >
-                </Field.Field>
-              </Field.FieldGroup>
-            </Field.FieldSet>
-          </form>
+          {#if authStore.localAuthEnabled}
+            <form
+              onsubmit={(event) => {
+                event.preventDefault();
+                void resetPassword(user);
+              }}
+            >
+              <Field.FieldSet disabled={busy}>
+                <Field.FieldGroup>
+                  <Field.Field>
+                    <Field.FieldLabel for={`managed-password-${user.id}`}
+                      >{m.users_password()}</Field.FieldLabel
+                    >
+                    <Input
+                      id={`managed-password-${user.id}`}
+                      type="password"
+                      bind:value={passwords[user.id]}
+                      autocomplete="new-password"
+                      minlength={6}
+                      maxlength={72}
+                      required
+                    />
+                  </Field.Field>
+                  <Field.Field>
+                    <Button type="submit" variant="outline" disabled={busy}
+                      >{m.users_reset_password()}</Button
+                    >
+                  </Field.Field>
+                </Field.FieldGroup>
+              </Field.FieldSet>
+            </form>
+          {/if}
         </Card.Content>
       </Card.Root>
     {/each}

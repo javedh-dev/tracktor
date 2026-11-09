@@ -1,3 +1,4 @@
+import { requireLocalAuth } from './oidcClient';
 import { credentialsSchema, usernameSchema, passwordSchema } from '$lib/domain/auth';
 import bcrypt from 'bcrypt';
 import { AppError } from '../exceptions/AppError';
@@ -21,6 +22,7 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 export const createUser = async (username: string, password: string) => {
+  requireLocalAuth();
   const data = credentialsSchema.parse({ username, password });
   const passwordHash = await hashPassword(data.password);
   return writeTransaction(async (tx) => {
@@ -60,6 +62,7 @@ export const createOrUpdateUser = async (username: string, password: string): Pr
 };
 
 export const loginUser = async (username: string, password: string) => {
+  requireLocalAuth();
   const user = requireRecord(
     await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.username, username)
@@ -82,7 +85,8 @@ export const loginUser = async (username: string, password: string) => {
       id: user.id,
       username: user.username,
       role: user.role,
-      isActive: user.isActive
+      isActive: user.isActive,
+      hasLocalPassword: !!user.passwordHash
     }
   };
 };
@@ -133,6 +137,12 @@ export const updateUserProfile = async (
 
   // Handle password update
   if (data.newPassword) {
+    requireLocalAuth();
+    if (!user.passwordHash)
+      throw new AppError(
+        'This account has no local password. Use SSO or contact an administrator.',
+        Status.FORBIDDEN
+      );
     if (!data.currentPassword) {
       throw new AppError('Current password is required to change password', Status.BAD_REQUEST);
     }

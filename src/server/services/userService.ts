@@ -1,3 +1,4 @@
+import { requireLocalAuth, assertOidcAdminAvailable } from './oidcClient';
 import bcrypt from 'bcrypt';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db, writeTransaction } from '$server/db';
@@ -35,6 +36,7 @@ export async function listUsers(access: AccessContext) {
 
 export async function createManagedUser(access: AccessContext, input: unknown) {
   requireAdmin(access);
+  requireLocalAuth();
   const data = createManagedUserSchema.parse(input);
   const passwordHash = await bcrypt.hash(data.password, 10);
   return writeTransaction(async (tx) => {
@@ -68,6 +70,7 @@ export async function updateManagedUser(access: AccessContext, id: string, input
       .limit(1);
     if (!admins.length)
       throw new AppError('At least one active administrator is required', Status.CONFLICT);
+    await assertOidcAdminAvailable(tx);
     if (data.isActive === false) await tx.delete(sessionsTable).where(eq(sessionsTable.userId, id));
     return user;
   });
@@ -75,6 +78,7 @@ export async function updateManagedUser(access: AccessContext, id: string, input
 
 export async function resetLocalPassword(access: AccessContext, id: string, input: unknown) {
   requireAdmin(access);
+  requireLocalAuth();
   const passwordHash = await bcrypt.hash(passwordSchema.parse(input), 10);
   await writeTransaction(async (tx) => {
     const rows = await tx

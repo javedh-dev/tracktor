@@ -16,6 +16,9 @@
   let sidebarOpen = $state(true);
 
   $effect.pre(() => {
+    authStore.isAuthDisabled = data.authCapabilities.isAuthDisabled;
+    authStore.oidcEnabled = data.authCapabilities.oidcEnabled;
+    authStore.localAuthEnabled = data.authCapabilities.localAuthEnabled;
     if (data.rawConfigs) {
       configStore.setConfigs(data.rawConfigs);
     }

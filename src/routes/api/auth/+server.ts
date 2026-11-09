@@ -1,3 +1,4 @@
+import { isLocalAuthEnabled, isOidcEnabled } from '$server/services/oidcClient';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import * as authService from '$server/services/authService';
@@ -54,6 +55,8 @@ export const GET: RequestHandler = async (event) => {
     return jsonResponse({
       ...result,
       isAuthDisabled,
+      localAuthEnabled: isLocalAuthEnabled(),
+      oidcEnabled: isOidcEnabled(),
       user,
       isAuthenticated: isAuthDisabled || !!user
     });
