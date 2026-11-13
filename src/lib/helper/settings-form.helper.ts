@@ -82,7 +82,7 @@ export function createSettingsOptions(
     'pt-PT': 'Português (Portugal)',
     cs: 'Čeština',
     pl: 'Polski',
-    da: 'Dansk'
+    da: 'Dansk',
     az: 'Azərbaycanca'
   };
 
